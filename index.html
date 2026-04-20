@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PMO Dashboard — Azumo</title>
+<style>
+:root{
+  --bg:#060C1A; --surf:#0D1626; --card:#112035; --brd:#1C3154;
+  --blue:#0066FF; --blue-lt:#3385FF; --blue-dk:#0047B3;
+  --txt:#EEF4FF; --muted:#6B8FBF; --green:#10B981;
+  --yellow:#F59E0B; --red:#EF4444; --orange:#F97316;
+  --purple:#7C3AED; --teal:#06B6D4; --r:12px; --rl:18px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+/* NAV */
+nav{position:sticky;top:0;z-index:200;background:rgba(6,12,26,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--brd)}
+.nav-inner{max-width:1300px;margin:0 auto;padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo{background:var(--blue);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff}
+.nav-title{font-size:1rem;font-weight:700}.nav-sub{font-size:.72rem;color:var(--muted);margin-top:1px}
+.nav-links{display:flex;gap:4px}
+.nav-link{padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:500;color:var(--muted);background:none;border:none;cursor:pointer;transition:all .15s;white-space:nowrap}
+.nav-link:hover,.nav-link.active{background:var(--card);color:var(--txt)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-refresh{background:rgba(0,102,255,.12);border:1px solid rgba(0,102,255,.3);color:#60A5FA;border-radius:8px;padding:5px 12px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s}
+.nav-refresh:hover{background:rgba(0,102,255,.2)}
+.nav-date{font-size:.78rem;color:var(--muted)}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#60A5FA);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+/* TAB NAV */
+.tabs{background:var(--surf);border-bottom:1px solid var(--brd);padding:0 2rem}
+.tabs-inner{max-width:1300px;margin:0 auto;display:flex;gap:0}
+.tab-btn{padding:14px 20px;font-size:.875rem;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tab-btn:hover{color:var(--txt)}
+.tab-btn.active{color:var(--blue-lt);border-bottom-color:var(--blue)}
+/* HERO */
+.hero{background:linear-gradient(135deg,#091224,#0D1E3D 60%,var(--bg));border-bottom:1px solid var(--brd);padding:2.5rem 2rem 2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 70% 40%,rgba(0,102,255,.1) 0%,transparent 70%);pointer-events:none}
+.hero-inner{max-width:1300px;margin:0 auto;position:relative}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,102,255,.1);border:1px solid rgba(0,102,255,.28);border-radius:20px;padding:4px 12px;font-size:.72rem;font-weight:600;color:#60A5FA;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.8rem}
+.hero h1{font-size:2rem;font-weight:800;line-height:1.15;margin-bottom:.4rem}
+.hero h1 span{color:var(--blue-lt)}
+.hero-meta{color:var(--muted);font-size:.88rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hero-meta .dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;font-size:.875rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .2s;white-space:nowrap}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 4px 16px rgba(0,102,255,.35)}
+.btn-primary:hover{background:var(--blue-lt);transform:translateY(-1px)}
+.btn-harvest{background:linear-gradient(135deg,#E8501A,#FF7A55);color:#fff;box-shadow:0 4px 14px rgba(232,80,26,.3)}
+.btn-harvest:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(232,80,26,.45)}
+.btn-ghost{background:var(--card);color:var(--txt);border:1px solid var(--brd)}
+.btn-ghost:hover{background:var(--brd);transform:translateY(-1px)}
+.btn-sm{padding:6px 12px;font-size:.8rem}
+/* MAIN */
+main{max-width:1300px;margin:0 auto;padding:2rem}
+section{margin-bottom:2.5rem}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:1.2rem}
+.sec-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--blue-dk),var(--blue));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.sec-head h2{font-size:1.05rem;font-weight:700}
+.sec-tag{margin-left:auto;background:var(--card);border:1px solid var(--brd);border-radius:20px;padding:3px 10px;font-size:.73rem;color:var(--muted);white-space:nowrap}
+/* TABS PANEL */
+.tab-panel{display:none}.tab-panel.active{display:block}
+/* METRICS GRID */
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.mc{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);padding:1.2rem;position:relative;overflow:hidden;transition:all .2s}
+.mc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--mc,var(--blue));border-radius:2px 2px 0 0}
+.mc:hover{border-color:var(--mc,var(--blue));transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.mc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.6rem}
+.mc-name{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;line-height:1.3;flex:1;padding-right:6px}
+.mc-val{font-size:2rem;font-weight:800;line-height:1;margin-bottom:.3rem}
+.mc-unit{font-size:1rem;font-weight:400;color:var(--muted)}
+.mc-sub{font-size:.75rem;color:var(--muted);line-height:1.4}
+.mc-sub.up{color:var(--green)}.mc-sub.dn{color:var(--red)}
+/* SPARKLINE inside metric card */
+.mc-spark{margin-top:8px}
+/* TABLES */
+.tbl-wrap{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);overflow:hidden}
+.tbl-head{background:var(--surf);padding:.9rem 1.3rem;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tbl-head h3{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.badge{border-radius:20px;padding:2px 9px;font-size:.72rem;font-weight:700}
+.badge-red{background:rgba(239,68,68,.15);color:#F87171}
+.badge-yellow{background:rgba(245,158,11,.15);color:#FCD34D}
+.badge-blue{background:rgba(0,102,255,.15);color:#60A5FA}
+.badge-green{background:rgba(16,185,129,.15);color:#34D399}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{padding:8px 14px;text-align:left;color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:rgba(255,255,255,.02);white-space:nowrap}
+td{padding:10px 14px;border-top:1px solid var(--brd);vertical-align:middle}
+tr:hover td{background:rgba(0,102,255,.04)}
+.chip{display:inline-flex;align-items:center;border-radius:6px;padding:2px 8px;font-size:.73rem;font-weight:600;white-space:nowrap}
+.avail-hi{color:#F87171;font-weight:700}.avail-md{color:#FCD34D;font-weight:700}.avail-lo{color:#34D399;font-weight:700}
+.exp-urgent{color:#F87171;font-weight:700}.exp-soon{color:#FB923C;font-weight:700}.exp-ok{color:#FCD34D;font-weight:700}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.two-col{grid-template-columns:1fr}}
+.col-stack{display:flex;flex-direction:column;gap:16px}
+/* HISTORY */
+.history-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.hist-card{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);padding:1.2rem}
+.hist-label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem}
+.hist-vals{display:flex;align-items:flex-end;gap:8px;margin-bottom:.5rem}
+.hist-cur{font-size:1.6rem;font-weight:800}
+.hist-prev{font-size:.88rem;color:var(--muted);padding-bottom:2px}
+.hist-delta{font-size:.78rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-bottom:2px}
+.delta-up{color:var(--green);background:rgba(16,185,129,.12)}
+.delta-dn{color:var(--red);background:rgba(239,68,68,.12)}
+.delta-flat{color:var(--muted);background:rgba(107,143,191,.1)}
+/* FORECAST */
+.forecast-wrap{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);padding:1.5rem}
+.forecast-chart{display:flex;align-items:flex-end;gap:10px;height:160px;margin-bottom:1rem}
+.fc-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.fc-bar-outer{width:100%;background:rgba(0,102,255,.08);border-radius:6px 6px 0 0;position:relative;display:flex;align-items:flex-end;justify-content:center}
+.fc-bar{width:100%;border-radius:6px 6px 0 0;transition:height .4s ease}
+.fc-bar.urgent{background:linear-gradient(180deg,#EF4444,#DC2626)}
+.fc-bar.soon{background:linear-gradient(180deg,#F97316,#EA580C)}
+.fc-bar.ok{background:linear-gradient(180deg,#0066FF,#0047B3)}
+.fc-count{font-size:.8rem;font-weight:700;color:var(--txt)}
+.fc-month{font-size:.72rem;color:var(--muted);text-align:center;white-space:nowrap}
+.fc-table-wrap{overflow-x:auto}
+.headcount-line{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);padding:1.5rem;margin-top:16px}
+.hc-chart{width:100%;overflow:hidden}
+/* NOTES */
+.lock-panel{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);padding:2.5rem;text-align:center}
+.lock-icon{font-size:2.5rem;margin-bottom:1rem}
+.lock-panel h3{font-size:1.1rem;font-weight:700;margin-bottom:.4rem}
+.lock-panel p{color:var(--muted);font-size:.88rem;margin-bottom:1.5rem}
+.pw-row{display:flex;gap:8px;max-width:360px;margin:0 auto}
+.az-input{flex:1;background:var(--surf);border:1px solid var(--brd);border-radius:9px;padding:10px 14px;color:var(--txt);font-size:.9rem;outline:none;font-family:inherit;transition:border-color .2s}
+.az-input:focus{border-color:var(--blue)}
+.err{color:var(--red);font-size:.8rem;margin-top:8px}
+.notes-panel{display:none}.notes-panel.open{display:block}
+.notes-toolbar{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl) var(--rl) 0 0;padding:.9rem 1.3rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.notes-search{background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;color:var(--txt);font-size:.82rem;outline:none;width:200px}
+.notes-search:focus{border-color:var(--blue)}
+.ml-auto{margin-left:auto}
+.notes-list{background:var(--card);border:1px solid var(--brd);border-top:none;padding:1rem;display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto}
+.note-item{background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:1rem;transition:all .15s}
+.note-item:hover{border-color:var(--blue)}
+.note-item-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
+.note-title{font-weight:600;font-size:.88rem}
+.note-btns button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 6px;border-radius:4px;transition:all .15s}
+.note-btns button:hover{background:var(--brd);color:var(--txt)}
+.note-body{font-size:.82rem;color:var(--muted);line-height:1.6}
+.note-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.note-tag{background:rgba(0,102,255,.12);color:#60A5FA;border-radius:20px;padding:2px 9px;font-size:.72rem;font-weight:500}
+.note-date{font-size:.72rem;color:var(--muted);margin-top:5px}
+.note-empty{text-align:center;padding:2rem;color:var(--muted);font-size:.88rem}
+.note-form{background:var(--card);border:1px solid var(--brd);border-top:none;border-radius:0 0 var(--rl) var(--rl);padding:1rem}
+.note-form input,.note-form textarea{width:100%;background:var(--surf);border:1px solid var(--brd);border-radius:9px;padding:9px 13px;color:var(--txt);font-size:.85rem;outline:none;margin-bottom:8px;font-family:inherit;transition:border-color .2s}
+.note-form input:focus,.note-form textarea:focus{border-color:var(--blue)}
+.note-form textarea{resize:vertical;min-height:75px}
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form-actions{display:flex;justify-content:flex-end;gap:8px}
+/* APPS */
+.apps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:13px}
+.app-card{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);padding:1.1rem;display:flex;gap:13px;align-items:flex-start;text-decoration:none;color:inherit;transition:all .2s}
+.app-card:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.app-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.app-cat{font-size:.68rem;font-weight:700;color:var(--blue-lt);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.app-name{font-size:.9rem;font-weight:700;margin-bottom:3px}
+.app-desc{font-size:.77rem;color:var(--muted);line-height:1.5}
+/* FOOTER */
+footer{border-top:1px solid var(--brd);padding:1.5rem 2rem;text-align:center;color:var(--muted);font-size:.8rem;display:flex;align-items:center;justify-content:center;gap:8px}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--brd);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--blue)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="#">
+      <div class="nav-logo">PMO</div>
+      <div><div class="nav-title">Project Management Office</div><div class="nav-sub">Azumo · Federica Gonzalez</div></div>
+    </a>
+    <div class="nav-links">
+      <button class="nav-link" onclick="goTo('dashboard')">📊 Dashboard</button>
+      <button class="nav-link" onclick="goTo('bench')">🪑 Bench</button>
+      <button class="nav-link" onclick="goTo('history')">📈 History</button>
+      <button class="nav-link" onclick="goTo('forecast')">🔭 Forecast</button>
+      <button class="nav-link" onclick="goTo('notes')">🔒 Notas</button>
+      <button class="nav-link" onclick="goTo('apps')">🛠 Tools</button>
+    </div>
+    <div class="nav-right">
+      <button class="nav-refresh" onclick="showRefreshInfo()">⟳ Refresh info</button>
+      <span class="nav-date" id="navDate"></span>
+      <div class="avatar" title="Federica Gonzalez">FG</div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">⚡ PMO Dashboard</div>
+    <h1>Operations Center — <span>Azumo PMO</span></h1>
+    <div class="hero-meta">
+      <span><span class="dot"></span> Datos sincronizados desde Jira</span>
+      <span id="lastRefreshMeta">—</span>
+    </div>
+    <div class="btn-row">
+      <a href="https://id.getharvest.com/harvest/sign_in" target="_blank" class="btn btn-harvest">🌾 Harvest</a>
+      <a href="https://azumohq.atlassian.net/jira/software/projects/AA/boards" target="_blank" class="btn btn-primary">🗂 Jira AA</a>
+      <button class="btn btn-ghost" onclick="goTo('forecast')">🔭 Ver Forecast</button>
+      <button class="btn btn-ghost" onclick="goTo('history')">📈 Ver History</button>
+      <button class="btn btn-ghost" onclick="goTo('notes')">🔒 Mis Notas</button>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<!-- ── DASHBOARD ──────────────────────────────── -->
+<section id="dashboard">
+  <div class="sec-head">
+    <div class="sec-icon">📊</div>
+    <h2>Métricas — <span id="currentSnapshotLabel" style="color:var(--blue-lt)"></span></h2>
+    <div class="sec-tag" id="lastRefreshTag">Último refresh: —</div>
+  </div>
+  <div class="metrics-grid" id="metricsGrid"></div>
+</section>
+
+<!-- ── BENCH & ASSIGNMENTS ──────────────────── -->
+<section id="bench">
+  <div class="sec-head">
+    <div class="sec-icon">🪑</div>
+    <h2>Bench &amp; Assignments</h2>
+    <div class="sec-tag" id="benchTag">—</div>
+  </div>
+  <div class="two-col">
+    <div class="tbl-wrap">
+      <div class="tbl-head">
+        <h3>🪑 Bench <span class="badge badge-red" id="benchBadge">—</span></h3>
+      </div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Nombre</th><th>Posición</th><th>Assign%</th><th>Billing%</th><th>Disponib.</th><th>Due</th></tr></thead><tbody id="benchTbody"></tbody></table></div>
+    </div>
+    <div class="col-stack">
+      <div class="tbl-wrap">
+        <div class="tbl-head"><h3>⏳ Pending <span class="badge badge-yellow" id="pendingBadge">—</span></h3></div>
+        <table><thead><tr><th>Key</th><th>Assignee</th><th>Cliente</th><th>Rol</th><th>Start</th></tr></thead><tbody id="pendingTbody"></tbody></table>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-head">
+          <h3>📅 Contratos por vencer <span class="badge badge-yellow" id="expiringBadge">—</span></h3>
+          <span style="font-size:.75rem;color:var(--muted)">próximos 60 días</span>
+        </div>
+        <div style="max-height:260px;overflow-y:auto"><table><thead><tr><th>Assignee</th><th>Cliente</th><th>Posición</th><th>End Date</th></tr></thead><tbody id="expiringTbody"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HISTORY ─────────────────────────────── -->
+<section id="history">
+  <div class="sec-head">
+    <div class="sec-icon">📈</div>
+    <h2>Historical Trends</h2>
+    <div class="sec-tag" id="historySnapshotsTag">—</div>
+  </div>
+  <div class="history-grid" id="historyGrid"></div>
+</section>
+
+<!-- ── FORECAST ────────────────────────────── -->
+<section id="forecast">
+  <div class="sec-head">
+    <div class="sec-icon">🔭</div>
+    <h2>Forecast — Próximos 6 Meses</h2>
+    <div class="sec-tag">Basado en due dates de Jira</div>
+  </div>
+
+  <div class="forecast-wrap">
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:1.2rem">Contratos que vencen por mes. Cada barra representa assignees cuyo contrato termina ese mes.</p>
+    <div class="forecast-chart" id="forecastChart"></div>
+    <div class="fc-table-wrap">
+      <table><thead><tr><th>Mes</th><th>Contratos que vencen</th><th>Headcount proyectado</th><th>Riesgo de bench</th><th>Assignees</th></tr></thead>
+      <tbody id="forecastTbody"></tbody></table>
+    </div>
+  </div>
+
+  <div class="headcount-line">
+    <h4 style="font-size:.9rem;font-weight:700;margin-bottom:1rem">📉 Proyección de Headcount Billable</h4>
+    <svg id="hcSvg" width="100%" height="100" viewBox="0 0 800 100" preserveAspectRatio="none" style="display:block"></svg>
+    <div id="hcLegend" style="display:flex;gap:16px;margin-top:8px;font-size:.75rem;color:var(--muted);flex-wrap:wrap"></div>
+  </div>
+</section>
+
+<!-- ── NOTES ───────────────────────────────── -->
+<section id="notes">
+  <div class="sec-head"><div class="sec-icon">🔒</div><h2>Repositorio de Notas</h2><div class="sec-tag">Acceso con contraseña</div></div>
+  <div class="lock-panel" id="lockPanel">
+    <div class="lock-icon">🔐</div>
+    <h3>Repositorio Privado</h3>
+    <p>Ingresá la contraseña para acceder a tus notas</p>
+    <div class="pw-row"><input type="password" class="az-input" id="pwIn" placeholder="Contraseña..." onkeydown="if(event.key==='Enter')unlock()"/><button class="btn btn-primary" onclick="unlock()">Entrar</button></div>
+    <div class="err" id="pwErr" style="display:none">Contraseña incorrecta</div>
+  </div>
+  <div class="notes-panel" id="notesPanel">
+    <div class="notes-toolbar">
+      <strong style="font-size:.9rem">🗒️ Mis Notas</strong>
+      <span style="font-size:.78rem;color:var(--muted)" id="notesCount"></span>
+      <input class="notes-search" type="text" placeholder="🔍 Buscar..." oninput="filterNotes(this.value)"/>
+      <div class="ml-auto"><button class="btn btn-ghost btn-sm" onclick="lockNotes()">🔒 Cerrar</button></div>
+    </div>
+    <div class="notes-list" id="notesList"></div>
+    <div class="note-form">
+      <div class="form-2col"><input type="text" id="nTitle" placeholder="Título..."/><input type="text" id="nTags" placeholder="Etiquetas: reunión, cliente, riesgo"/></div>
+      <textarea id="nBody" placeholder="Escribe tu nota aquí..."></textarea>
+      <div class="form-actions">
+        <button class="btn btn-ghost btn-sm" onclick="clearForm()">Cancelar</button>
+        <button class="btn btn-primary btn-sm" onclick="addNote()">💾 Guardar nota</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── APPS ────────────────────────────────── -->
+<section id="apps">
+  <div class="sec-head"><div class="sec-icon">🛠</div><h2>Herramientas Recomendadas para PMO</h2></div>
+  <div class="apps-grid" id="appsGrid"></div>
+</section>
+
+</main>
+<footer>
+  <img src="https://cdn.prod.website-files.com/60bf1f474febc8bc145ee778/6873d18c089332e17fe80043_azumo_logo_90x30.avif" alt="Azumo" height="16" style="opacity:.45" onerror="this.style.display='none'"/>
+  PMO Dashboard · Azumo · Federica Gonzalez
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════
+// DATA — injected by pmo-refresh.py
+// ════════════════════════════════════════════════════
+const PMO = /*%%PMO_DATA%%*/{"cloudId":"226f839b-1eed-48eb-993a-618d9bd89189","project":"AA","last_refresh":"2026-04-20","snapshots":[{"date":"2026-02-01","label":"Feb 2026","metrics":{"utilization_assignment":89.5,"utilization_billing":83.2,"headcount_billable":93,"headcount_nonbillable":20,"bench":13,"active_clients":19,"pending_assignments":4,"unassigned_capacity":10.5}},{"date":"2026-03-01","label":"Mar 2026","metrics":{"utilization_assignment":92.15,"utilization_billing":86.8,"headcount_billable":95,"headcount_nonbillable":19,"bench":11,"active_clients":20,"pending_assignments":3,"unassigned_capacity":7.85}},{"date":"2026-04-20","label":"Abr 2026","metrics":{"utilization_assignment":94.69,"utilization_billing":89.02,"headcount_billable":97,"headcount_nonbillable":18,"bench":9,"active_clients":22,"pending_assignments":1,"unassigned_capacity":5.31},"expiring_60d":[{"assignee":"Matheus Serrão","client":"Syntrove","position":"Engineer","due":"2026-04-24"},{"assignee":"Roberta Ferreira","client":"TownPlanner","position":"Project Manager","due":"2026-04-24"},{"assignee":"Juan Nevado","client":"TownPlanner","position":"Fullstack Engineer","due":"2026-04-24"},{"assignee":"Jorge Sandoval","client":"Azumo","position":"Engineer","due":"2026-04-30"},{"assignee":"Lorena Conca","client":"NGL","position":"UX/UI","due":"2026-04-30"},{"assignee":"Ronald Castillo","client":"Azumo","position":"Engineer","due":"2026-04-30"},{"assignee":"Facundo Altamiranda","client":"Angle Health","position":"Engineer","due":"2026-04-30"},{"assignee":"Mariela Suarez","client":"Azumo","position":"Business Analyst","due":"2026-04-30"},{"assignee":"Kelvin Ferraz","client":"Azumo","position":"DevOps","due":"2026-04-30"},{"assignee":"Laura Pimper","client":"Azumo","position":"Project Manager","due":"2026-04-30"},{"assignee":"Micaela Goicoechea","client":"Profusa","position":"Project Manager","due":"2026-04-30"},{"assignee":"Miguel Godoy","client":"Profusa","position":"Engineer","due":"2026-04-30"},{"assignee":"Micaela Goicoechea","client":"Brierstone","position":"Project Manager","due":"2026-04-30"},{"assignee":"David Gonzalez","client":"Wrenchwise","position":"Engineer","due":"2026-05-15"},{"assignee":"Roberta Ferreira","client":"Wrenchwise","position":"Project Manager","due":"2026-05-15"},{"assignee":"Pedro Telleria","client":"Fairwater","position":"Engineer","due":"2026-05-29"},{"assignee":"Rommel Berrios","client":"Carwire","position":"Engineer","due":"2026-05-29"},{"assignee":"Alejandro Gonzalez","client":"Carwire","position":"Engineer","due":"2026-05-29"},{"assignee":"Pablo Corzo","client":"Spinwheel","position":"DevOps","due":"2026-05-31"},{"assignee":"Tomas Lingotti","client":"Brierstone","position":"Engineer","due":"2026-05-31"}],"active_clients":["Alkalight","Angle Health","Brierstone","Built to Sell","CSSI","Carwire","Centegix","CompuClaim","Fairwater","Jostens","Jostens Scholastic","NGL","Screenwave","Spinwheel","Standard Normal","Stovell","Syntrove","TownPlanner","Wrenchwise","Zynga","nVenue"],"forecast":{"2026-04":[{"assignee":"Matheus Serrão","client":"Syntrove"},{"assignee":"Roberta Ferreira","client":"TownPlanner"},{"assignee":"Juan Nevado","client":"TownPlanner"},{"assignee":"Jorge Sandoval","client":"Azumo"},{"assignee":"Lorena Conca","client":"NGL"},{"assignee":"Ronald Castillo","client":"Azumo"},{"assignee":"Facundo Altamiranda","client":"Angle Health"},{"assignee":"Mariela Suarez","client":"Azumo"},{"assignee":"Kelvin Ferraz","client":"Azumo"},{"assignee":"Laura Pimper","client":"Azumo"},{"assignee":"Micaela Goicoechea","client":"Profusa"}],"2026-05":[{"assignee":"David Gonzalez","client":"Wrenchwise"},{"assignee":"Roberta Ferreira","client":"Wrenchwise"},{"assignee":"Pedro Telleria","client":"Fairwater"},{"assignee":"Rommel Berrios","client":"Carwire"},{"assignee":"Alejandro Gonzalez","client":"Carwire"},{"assignee":"Pablo Corzo","client":"Spinwheel"},{"assignee":"Tomas Lingotti","client":"Brierstone"},{"assignee":"Miguel Godoy","client":"Profusa"}],"2026-06":[{"assignee":"Lautaro Bruno","client":"NGL"},{"assignee":"Victor Matzkin","client":"NGL"},{"assignee":"Guillermo Germade","client":"NGL"},{"assignee":"Jennifer Greyling","client":"NGL"},{"assignee":"Manuel Alfonso","client":"nVenue"},{"assignee":"Esteban Li Causi","client":"Syntrove"},{"assignee":"Angel Guzman","client":"Syntrove"},{"assignee":"Jhon Fernandez","client":"Syntrove"},{"assignee":"Luis Duque","client":"Syntrove"}],"2026-07":[{"assignee":"German Isaurralde","client":"Jostens"},{"assignee":"Graciela Kremer","client":"Jostens"}],"2026-08":[{"assignee":"Virginia Balducci","client":"Centegix"}]},"bench_list":[{"name":"Esteban Li Causi","position":"DevOps","assign":70,"billing":30,"avail":70,"due":"2027-03-06"},{"name":"Laura Pimper","position":"PM/BA","assign":60,"billing":0,"avail":60,"due":"2027-03-23"},{"name":"Jorge Sandoval","position":"Data Scientist","assign":50,"billing":0,"avail":50,"due":"2027-03-16"},{"name":"Lorena Conca","position":"UX/UI","assign":95,"billing":5,"avail":95,"due":"2027-02-02"},{"name":"Valeria Maira Esquivel","position":"UX/UI","assign":75,"billing":25,"avail":75,"due":"2027-02-02"},{"name":"Micaela Goicoechea","position":"Project Manager","assign":50,"billing":50,"avail":50,"due":"2027-03-09"},{"name":"Mariela Suárez","position":"Business Analyst","assign":65,"billing":25,"avail":65,"due":"2027-01-27"},{"name":"Roberta Ferreira","position":"Project Manager","assign":25,"billing":75,"avail":25,"due":"2027-03-16"},{"name":"Edson Sugimoto","position":"Data Engineering","assign":100,"billing":0,"avail":100,"due":"2027-03-16"}],"pending_list":[{"key":"AA-968","assignee":"Pablo Corzo","client":"Spinwheel","position":"DevOps","start":"2026-06-01"}]}]}/*%%PMO_DATA_END%%*/;
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+const today  = new Date();
+const latest = PMO.snapshots[PMO.snapshots.length - 1];
+const prev   = PMO.snapshots.length > 1 ? PMO.snapshots[PMO.snapshots.length - 2] : null;
+
+document.getElementById('navDate').textContent =
+  today.toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'});
+document.getElementById('lastRefreshMeta').textContent = `Último refresh: ${PMO.last_refresh}`;
+document.getElementById('lastRefreshTag').textContent  = `Sincronizado: ${PMO.last_refresh}`;
+document.getElementById('currentSnapshotLabel').textContent = latest.label;
+document.getElementById('historySnapshotsTag').textContent  = `${PMO.snapshots.length} snapshots`;
+
+function goTo(id){ document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'}); }
+
+function showRefreshInfo(){
+  alert(
+    '⟳ Cómo actualizar datos automáticamente:\n\n' +
+    '1. Pedile a Claude en Cowork: "Refresh del PMO dashboard"\n' +
+    '2. Claude va a consultar Jira (project AA), procesar los datos\n' +
+    '   y reescribir pmo-dashboard.html con los números actualizados.\n\n' +
+    '3. Para métricas de EazyBI (Utilization Rate, Billing %),\n' +
+    '   indicá los valores al pedirle el refresh. Ejemplo:\n' +
+    '   "Refresh PMO dashboard. Utilization Assignment: 93.5%,\n' +
+    '    Billing: 88%, Bench: 8"\n\n' +
+    'Los snapshots quedan guardados para el historial.'
+  );
+}
+
+// ════════════════════════════════════════════════════
+// METRICS CARDS
+// ════════════════════════════════════════════════════
+const METRIC_CFG = [
+  {key:'utilization_assignment', label:'Utilization Rate (Assignment)', unit:'%',  color:'#10B981', higherBetter:true,  src:'EazyBI'},
+  {key:'utilization_billing',    label:'Utilization Rate (Billing)',    unit:'%',  color:'#10B981', higherBetter:true,  src:'EazyBI'},
+  {key:'headcount_billable',     label:'Headcount Billable',            unit:'',   color:'#0066FF', higherBetter:true,  src:'Jira'},
+  {key:'headcount_nonbillable',  label:'Headcount Non-Billable',        unit:'',   color:'#F59E0B', higherBetter:false, src:'Jira'},
+  {key:'bench',                  label:'Bench',                         unit:'',   color:'#EF4444', higherBetter:false, src:'Jira'},
+  {key:'active_clients',         label:'Clientes Activos',              unit:'',   color:'#7C3AED', higherBetter:true,  src:'Jira'},
+  {key:'pending_assignments',    label:'Pending Assignments',           unit:'',   color:'#F59E0B', higherBetter:false, src:'Jira'},
+  {key:'unassigned_capacity',    label:'Unassigned Capacity',           unit:'%',  color:'#F97316', higherBetter:false, src:'EazyBI'},
+];
+
+function deltaStr(cur, prv, higherBetter){
+  if(prv === undefined || prv === null) return {text:'—', cls:'delta-flat'};
+  const d = (cur - prv);
+  if(Math.abs(d) < 0.01) return {text:'sin cambio', cls:'delta-flat'};
+  const sign = d > 0 ? '+' : '';
+  const pct  = typeof cur === 'number' && Math.abs(cur) < 200 ? `${sign}${d.toFixed(1)}` : `${sign}${Math.round(d)}`;
+  const good = higherBetter ? d > 0 : d < 0;
+  return {text: pct + (typeof cur === 'number' && cur < 200 ? '' : ''), cls: good ? 'delta-up' : 'delta-dn'};
+}
+
+function sparklineSVG(snapshots, key, color){
+  if(snapshots.length < 2) return '';
+  const vals  = snapshots.map(s => s.metrics[key] || 0);
+  const min   = Math.min(...vals);
+  const max   = Math.max(...vals);
+  const range = max - min || 1;
+  const W = 120, H = 30, PAD = 3;
+  const pts = vals.map((v,i) => {
+    const x = PAD + (i / (vals.length-1)) * (W - PAD*2);
+    const y = H - PAD - ((v - min) / range) * (H - PAD*2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" class="mc-spark">
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity=".8"/>
+    <circle cx="${pts.split(' ').at(-1).split(',')[0]}" cy="${pts.split(' ').at(-1).split(',')[1]}" r="3" fill="${color}"/>
+  </svg>`;
+}
+
+function renderMetrics(){
+  const grid = document.getElementById('metricsGrid');
+  grid.innerHTML = '';
+  METRIC_CFG.forEach(cfg => {
+    const cur = latest.metrics[cfg.key];
+    const prv = prev ? prev.metrics[cfg.key] : null;
+    const {text, cls} = deltaStr(cur, prv, cfg.higherBetter);
+    const card = document.createElement('div');
+    card.className = 'mc';
+    card.style.setProperty('--mc', cfg.color);
+    card.innerHTML = `
+      <div class="mc-top">
+        <div class="mc-name">${cfg.label}</div>
+        <span style="font-size:.68rem;color:var(--muted);background:var(--surf);border:1px solid var(--brd);border-radius:4px;padding:1px 5px;">${cfg.src}</span>
+      </div>
+      <div class="mc-val">${typeof cur === 'number' ? (cur % 1 !== 0 ? cur.toFixed(2) : cur) : '—'}<span class="mc-unit"> ${cfg.unit}</span></div>
+      ${prev ? `<span class="hist-delta ${cls}" style="font-size:.72rem;display:inline-block;margin-bottom:4px">${text} vs ${prev.label}</span>` : ''}
+      ${sparklineSVG(PMO.snapshots, cfg.key, cfg.color)}
+    `;
+    grid.appendChild(card);
+  });
+}
+renderMetrics();
+
+// ════════════════════════════════════════════════════
+// BENCH / EXPIRING / PENDING
+// ════════════════════════════════════════════════════
+const POS_COLOR = {
+  'DevOps':'#3B82F6','PM/BA':'#A855F7','Project Manager':'#A855F7',
+  'Data Scientist':'#10B981','Data Scientist, Applied AI':'#10B981',
+  'UX/UI':'#F97316','Business Analyst':'#F59E0B','Data Engineering':'#06B6D4',
+  'Engineer':'#0066FF','Fullstack Engineer':'#0066FF'
+};
+function posChip(p){ const c=POS_COLOR[p]||'#6B8FBF'; return `<span class="chip" style="background:${c}18;color:${c}">${p}</span>`; }
+function availCls(v){ return v>=70?'avail-hi':v>=40?'avail-md':'avail-lo'; }
+function expCls(dateStr){ const d=Math.ceil((new Date(dateStr)-today)/86400000); return d<=10?'exp-urgent':d<=30?'exp-soon':'exp-ok'; }
+function fmtDate(s){ return s?new Date(s).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—'; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderBench(){
+  const bench = latest.bench_list || [];
+  document.getElementById('benchBadge').textContent = bench.length;
+  document.getElementById('benchTag').textContent = latest.label;
+  document.getElementById('benchTbody').innerHTML = bench.map(p=>`<tr>
+    <td style="font-weight:600;white-space:nowrap">${esc(p.name)}</td>
+    <td>${posChip(p.position)}</td>
+    <td style="color:var(--muted)">${p.assign}%</td>
+    <td style="color:var(--muted)">${p.billing}%</td>
+    <td><span class="${availCls(p.avail)}">${p.avail}%</span></td>
+    <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${fmtDate(p.due)}</td>
+  </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">Sin datos de bench</td></tr>';
+}
+
+function renderPending(){
+  const pend = latest.pending_list || [];
+  document.getElementById('pendingBadge').textContent = pend.length;
+  document.getElementById('pendingTbody').innerHTML = pend.length
+    ? pend.map(p=>`<tr>
+        <td><span style="color:var(--blue-lt);font-weight:700">${esc(p.key)}</span></td>
+        <td style="font-weight:600">${esc(p.assignee)}</td>
+        <td style="color:var(--muted)">${esc(p.client)}</td>
+        <td>${posChip(p.position)}</td>
+        <td style="color:var(--muted);font-size:.78rem">${fmtDate(p.start)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="5" style="text-align:center;padding:1rem;color:var(--muted)">Sin pending assignments</td></tr>';
+}
+
+function renderExpiring(){
+  const exp = latest.expiring_60d || [];
+  document.getElementById('expiringBadge').textContent = exp.length;
+  document.getElementById('expiringTbody').innerHTML = exp.map(e=>`<tr>
+    <td style="font-weight:600;font-size:.8rem;white-space:nowrap">${esc(e.assignee)}</td>
+    <td style="color:var(--muted);font-size:.8rem">${esc(e.client)}</td>
+    <td style="color:var(--muted);font-size:.75rem">${esc(e.position)}</td>
+    <td><span class="${expCls(e.due)}">${fmtDate(e.due)}</span></td>
+  </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--muted)">Sin contratos próximos a vencer</td></tr>';
+}
+
+renderBench(); renderPending(); renderExpiring();
+
+// ════════════════════════════════════════════════════
+// HISTORY CARDS
+// ════════════════════════════════════════════════════
+function renderHistory(){
+  const grid = document.getElementById('historyGrid');
+  grid.innerHTML = '';
+  if(PMO.snapshots.length < 2){ grid.innerHTML='<p style="color:var(--muted)">Se necesitan al menos 2 snapshots para ver tendencias. El historial crece con cada refresh.</p>'; return; }
+  METRIC_CFG.forEach(cfg => {
+    const card = document.createElement('div');
+    card.className = 'hist-card';
+    const cur = latest.metrics[cfg.key];
+    const prv = prev  ? prev.metrics[cfg.key] : null;
+    const {text,cls} = deltaStr(cur, prv, cfg.higherBetter);
+    card.innerHTML = `
+      <div class="hist-label">${cfg.label}</div>
+      <div class="hist-vals">
+        <div class="hist-cur" style="color:${cfg.color}">${typeof cur==='number'?(cur%1!==0?cur.toFixed(2):cur):'—'}${cfg.unit}</div>
+        ${prv!=null?`<div class="hist-prev">prev: ${typeof prv==='number'?(prv%1!==0?prv.toFixed(2):prv):'—'}${cfg.unit}</div>`:''}
+        <div class="hist-delta ${cls}">${text}</div>
+      </div>
+      ${sparklineSVG(PMO.snapshots, cfg.key, cfg.color)}
+      <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+        ${PMO.snapshots.map(s=>`<span style="font-size:.68rem;background:var(--surf);border:1px solid var(--brd);border-radius:4px;padding:2px 6px;color:var(--muted)">${s.label}: <strong style="color:var(--txt)">${s.metrics[cfg.key]!=null?(typeof s.metrics[cfg.key]==='number'&&s.metrics[cfg.key]%1!==0?s.metrics[cfg.key].toFixed(1):s.metrics[cfg.key]):'—'}</strong></span>`).join('')}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+renderHistory();
+
+// ════════════════════════════════════════════════════
+// FORECAST
+// ════════════════════════════════════════════════════
+function renderForecast(){
+  const fc      = latest.forecast || {};
+  const months  = Object.keys(fc).sort();
+  if(!months.length){ document.getElementById('forecastChart').innerHTML='<p style="color:var(--muted)">Sin datos de forecast disponibles.</p>'; return; }
+
+  const counts  = months.map(m => fc[m].length);
+  const maxCnt  = Math.max(...counts, 1);
+  const MAX_H   = 130; // px
+
+  // Current headcount from latest snapshot
+  let projHC = latest.metrics.headcount_billable || 97;
+  const hcPoints = [];
+
+  // Chart bars
+  const chart = document.getElementById('forecastChart');
+  chart.innerHTML = '';
+  months.forEach((m,i) => {
+    const cnt   = fc[m].length;
+    const h     = Math.max(8, (cnt / maxCnt) * MAX_H);
+    const today2= new Date();
+    const mDate = new Date(m + '-01');
+    const diff  = (mDate.getFullYear()-today2.getFullYear())*12 + mDate.getMonth()-today2.getMonth();
+    const cls   = diff <= 0 ? 'urgent' : diff <= 1 ? 'soon' : 'ok';
+    const label = mDate.toLocaleDateString('es-MX',{month:'short',year:'2-digit'});
+    const wrap  = document.createElement('div');
+    wrap.className = 'fc-bar-wrap';
+    wrap.innerHTML = `
+      <div class="fc-count">${cnt}</div>
+      <div class="fc-bar-outer" style="height:${MAX_H}px">
+        <div class="fc-bar ${cls}" style="height:${h}px;width:100%"
+             title="${label}: ${cnt} contratos vencen\n${fc[m].map(a=>a.assignee+' ('+a.client+')').join('\n')}">
+        </div>
+      </div>
+      <div class="fc-month">${label}</div>
+    `;
+    chart.appendChild(wrap);
+    // Track for HC projection
+    projHC -= cnt;
+    hcPoints.push({label, projHC: Math.max(projHC, 0)});
+  });
+
+  // Forecast table
+  let runHC = latest.metrics.headcount_billable || 97;
+  document.getElementById('forecastTbody').innerHTML = months.map(m => {
+    const cnt    = fc[m].length;
+    const mDate  = new Date(m + '-01');
+    const label  = mDate.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+    runHC       -= cnt;
+    const risk   = cnt >= 10 ? '<span style="color:#F87171">🔴 Alto</span>' : cnt >= 5 ? '<span style="color:#FB923C">🟡 Medio</span>' : '<span style="color:#34D399">🟢 Bajo</span>';
+    const names  = fc[m].map(a=>`${a.assignee} (${a.client})`).join(', ');
+    return `<tr>
+      <td style="font-weight:600;text-transform:capitalize">${label}</td>
+      <td><span style="font-size:1.1rem;font-weight:800">${cnt}</span></td>
+      <td style="font-weight:700;color:${runHC<90?'#F87171':'#EEF4FF'}">${Math.max(runHC,0)}</td>
+      <td>${risk}</td>
+      <td style="color:var(--muted);font-size:.75rem;max-width:300px">${names}</td>
+    </tr>`;
+  }).join('');
+
+  // Headcount projection SVG line chart
+  renderHCChart([{label:'Hoy', projHC: latest.metrics.headcount_billable || 97}, ...hcPoints]);
+}
+
+function renderHCChart(points){
+  const svg    = document.getElementById('hcSvg');
+  const legend = document.getElementById('hcLegend');
+  if(points.length < 2){ svg.innerHTML=''; return; }
+
+  const W=800, H=100, PAD={t:10,b:25,l:40,r:20};
+  const vals  = points.map(p=>p.projHC);
+  const minV  = Math.max(0, Math.min(...vals) - 5);
+  const maxV  = Math.max(...vals) + 5;
+  const xStep = (W - PAD.l - PAD.r) / (points.length - 1);
+
+  const pts = points.map((p,i) => {
+    const x = PAD.l + i * xStep;
+    const y = H - PAD.b - ((p.projHC - minV) / (maxV - minV)) * (H - PAD.t - PAD.b);
+    return {x, y, ...p};
+  });
+
+  const polyline = pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const area     = `${pts[0].x},${H-PAD.b} ` + pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ') + ` ${pts.at(-1).x},${H-PAD.b}`;
+
+  svg.innerHTML = `
+    <defs><linearGradient id="hcGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0066FF" stop-opacity=".25"/><stop offset="100%" stop-color="#0066FF" stop-opacity="0"/></linearGradient></defs>
+    <polygon points="${area}" fill="url(#hcGrad)"/>
+    <polyline points="${polyline}" fill="none" stroke="#0066FF" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${pts.map((p,i)=>`
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${i===0?5:4}" fill="${i===0?'#10B981':'#0066FF'}" stroke="var(--bg)" stroke-width="2"/>
+      <text x="${p.x.toFixed(1)}" y="${(H-PAD.b+16).toFixed(1)}" text-anchor="middle" font-size="9" fill="#6B8FBF">${p.label}</text>
+      <text x="${p.x.toFixed(1)}" y="${(p.y-8).toFixed(1)}" text-anchor="middle" font-size="9" fill="${p.projHC<90?'#F87171':'#EEF4FF'}" font-weight="bold">${p.projHC}</text>
+    `).join('')}
+  `;
+
+  legend.innerHTML = `
+    <span>🟢 Hoy: <strong>${pts[0].projHC}</strong> billable</span>
+    <span>🔵 Proyectado al vencer contratos</span>
+    <span style="color:#F87171">⚠ Umbral crítico: &lt;90</span>
+  `;
+}
+
+renderForecast();
+
+// ════════════════════════════════════════════════════
+// NOTES
+// ════════════════════════════════════════════════════
+const PASS='pmo2026', NK='pmo_notes_v3';
+let notes=JSON.parse(localStorage.getItem(NK)||'[]');
+function saveNotes(){ localStorage.setItem(NK,JSON.stringify(notes)); }
+function unlock(){
+  if(document.getElementById('pwIn').value===PASS){
+    document.getElementById('lockPanel').style.display='none';
+    document.getElementById('notesPanel').classList.add('open');
+    renderNotes();
+  } else { document.getElementById('pwErr').style.display='block'; document.getElementById('pwIn').value=''; }
+}
+function lockNotes(){
+  document.getElementById('lockPanel').style.display='';
+  document.getElementById('notesPanel').classList.remove('open');
+  document.getElementById('pwIn').value='';
+  document.getElementById('pwErr').style.display='none';
+}
+function renderNotes(q=''){
+  const list=document.getElementById('notesList');
+  const filt=q?notes.filter(n=>n.title.toLowerCase().includes(q.toLowerCase())||n.body.toLowerCase().includes(q.toLowerCase())||n.tags.some(t=>t.toLowerCase().includes(q.toLowerCase()))):notes;
+  document.getElementById('notesCount').textContent=`${notes.length} nota${notes.length!==1?'s':''}`;
+  if(!filt.length){list.innerHTML=`<div class="note-empty">${q?'Sin resultados':'No hay notas aún.'}</div>`;return;}
+  list.innerHTML=[...filt].reverse().map((n,ri)=>{const i=notes.length-1-ri;return`<div class="note-item"><div class="note-item-top"><div class="note-title">${esc(n.title)}</div><div class="note-btns"><button onclick="delNote(${i})">🗑</button></div></div><div class="note-body">${esc(n.body)}</div>${n.tags.length?`<div class="note-tags">${n.tags.map(t=>`<span class="note-tag">${esc(t)}</span>`).join('')}</div>`:''}<div class="note-date">${n.date}</div></div>`;}).join('');
+}
+function filterNotes(v){renderNotes(v);}
+function addNote(){
+  const t=document.getElementById('nTitle').value.trim(),b=document.getElementById('nBody').value.trim(),tags=document.getElementById('nTags').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!t&&!b){alert('Necesita título o contenido');return;}
+  notes.push({title:t||'Sin título',body:b,tags,date:new Date().toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'})});
+  saveNotes();renderNotes();clearForm();
+}
+function delNote(i){if(!confirm('¿Eliminar nota?'))return;notes.splice(i,1);saveNotes();renderNotes();}
+function clearForm(){['nTitle','nBody','nTags'].forEach(id=>document.getElementById(id).value='');}
+
+// ════════════════════════════════════════════════════
+// APPS
+// ════════════════════════════════════════════════════
+const APPS=[
+  {i:'🌾',bg:'#E8501A',n:'Harvest',      c:'Time Tracking',       d:'Horas, facturación y reportes de tiempo.',url:'https://id.getharvest.com/harvest/sign_in'},
+  {i:'🗂',bg:'#0066FF',n:'Jira (AA)',     c:'Gestión de Proyectos',d:'Assignments, bench, pipeline de Azumo.',url:'https://azumohq.atlassian.net/jira/software/projects/AA/boards'},
+  {i:'📊',bg:'#0A6BF0',n:'EazyBI',        c:'Analytics & Reportes', d:'Utilization Rate, Billing Ratio, headcount.',url:'https://eazybi.com'},
+  {i:'📘',bg:'#172B4D',n:'Confluence',    c:'Documentación',       d:'Wiki para procesos, decisiones y guías.',url:'https://azumohq.atlassian.net/wiki'},
+  {i:'📋',bg:'#00C875',n:'Monday.com',    c:'Gestión de Proyectos',d:'Planificación visual, timelines, recursos.',url:'https://monday.com'},
+  {i:'🧠',bg:'#191919',n:'Notion',        c:'Documentación & Notas',d:'Notas, bases de datos, wikis, Kanban.',url:'https://notion.so'},
+  {i:'🟡',bg:'#217346',n:'Power BI',      c:'Analytics & Reportes', d:'Reportes integrados con Microsoft 365.',url:'https://powerbi.microsoft.com'},
+  {i:'🎨',bg:'#FF3366',n:'Miro',          c:'Colaboración Visual',  d:'Pizarras para planificación y roadmaps.',url:'https://miro.com'},
+  {i:'🔗',bg:'#0073B1',n:'Smartsheet',    c:'Gestión de Proyectos',d:'Gantt colaborativo con automatizaciones.',url:'https://smartsheet.com'},
+  {i:'🤖',bg:'#0066FF',n:'Claude (Cowork)',c:'IA para PMO',         d:'Refresh automático de datos, reportes, análisis.',url:'https://claude.ai'},
+];
+const ag=document.getElementById('appsGrid');
+APPS.forEach(a=>{
+  const el=document.createElement('a');
+  el.className='app-card';el.href=a.url;el.target='_blank';el.rel='noopener';
+  el.innerHTML=`<div class="app-icon" style="background:${a.bg}22">${a.i}</div><div><div class="app-cat">${a.c}</div><div class="app-name">${a.n}</div><div class="app-desc">${a.d}</div></div>`;
+  ag.appendChild(el);
+});
+</script>
+</body>
+</html>

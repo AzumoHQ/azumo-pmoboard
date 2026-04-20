@@ -1,0 +1,557 @@
+{
+  "cloudId": "226f839b-1eed-48eb-993a-618d9bd89189",
+  "project": "AA",
+  "last_refresh": "2026-04-20",
+  "snapshots": [
+    {
+      "date": "2026-02-01",
+      "label": "Feb 2026",
+      "metrics": {
+        "utilization_assignment": 89.5,
+        "utilization_billing": 83.2,
+        "headcount_billable": 93,
+        "headcount_nonbillable": 20,
+        "bench": 13,
+        "active_clients": 19,
+        "pending_assignments": 4,
+        "unassigned_capacity": 10.5
+      }
+    },
+    {
+      "date": "2026-03-01",
+      "label": "Mar 2026",
+      "metrics": {
+        "utilization_assignment": 92.15,
+        "utilization_billing": 86.8,
+        "headcount_billable": 95,
+        "headcount_nonbillable": 19,
+        "bench": 11,
+        "active_clients": 20,
+        "pending_assignments": 3,
+        "unassigned_capacity": 7.85
+      }
+    },
+    {
+      "date": "2026-04-20",
+      "label": "Apr 2026",
+      "metrics": {
+        "utilization_assignment": 94.69,
+        "utilization_billing": 89.02,
+        "headcount_billable": 97,
+        "headcount_nonbillable": 18,
+        "bench": 9,
+        "active_clients": 21,
+        "pending_assignments": 1,
+        "unassigned_capacity": 5.31
+      },
+      "expiring_60d": [
+        {
+          "assignee": "Matheus Serrão",
+          "client": "Syntrove",
+          "position": "Engineer",
+          "due": "2026-04-24"
+        },
+        {
+          "assignee": "Roberta Ferreira",
+          "client": "TownPlanner",
+          "position": "Project Manager",
+          "due": "2026-04-24"
+        },
+        {
+          "assignee": "Juan Nevado",
+          "client": "TownPlanner",
+          "position": "Fullstack Engineer",
+          "due": "2026-04-24"
+        },
+        {
+          "assignee": "Jorge Sandoval",
+          "client": "Azumo",
+          "position": "Engineer",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Lorena Conca",
+          "client": "NGL",
+          "position": "UX/UI",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Ronald Castillo",
+          "client": "Azumo",
+          "position": "Engineer",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Facundo Altamiranda",
+          "client": "Angle Health",
+          "position": "Engineer",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Mariela Suarez",
+          "client": "Azumo",
+          "position": "Business Analyst",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Kelvin Ferraz",
+          "client": "Azumo",
+          "position": "DevOps",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Laura Pimper",
+          "client": "Azumo",
+          "position": "Project Manager",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Micaela Goicoechea",
+          "client": "Profusa",
+          "position": "Project Manager",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Miguel Godoy",
+          "client": "Profusa",
+          "position": "Engineer",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Micaela Goicoechea",
+          "client": "Brierstone",
+          "position": "Project Manager",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Mariela Suarez",
+          "client": "Brierstone",
+          "position": "Business Analyst",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Esteban Li Causi",
+          "client": "NGL",
+          "position": "DevOps",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Lautaro Bruno",
+          "client": "NGL",
+          "position": "Fullstack Engineer",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Guillermo Germade",
+          "client": "NGL",
+          "position": "Technical Leader",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Victor Matzkin",
+          "client": "NGL",
+          "position": "Data Engineer",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Jennifer Greyling",
+          "client": "NGL",
+          "position": "Business Analyst",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Jesus Ibanez",
+          "client": "Azumo",
+          "position": "Engineer",
+          "due": "2026-04-30"
+        },
+        {
+          "assignee": "Santiago Pieretti",
+          "client": "Alkalight",
+          "position": "Data Engineer",
+          "due": "2026-05-01"
+        },
+        {
+          "assignee": "Roberta Ferreira",
+          "client": "Wrenchwise",
+          "position": "Project Manager",
+          "due": "2026-05-15"
+        },
+        {
+          "assignee": "David Gonzalez",
+          "client": "Wrenchwise",
+          "position": "Fullstack Engineer",
+          "due": "2026-05-15"
+        },
+        {
+          "assignee": "Rommel Berrios",
+          "client": "Carwire",
+          "position": "Fullstack Engineer",
+          "due": "2026-05-29"
+        },
+        {
+          "assignee": "Pedro Telleria",
+          "client": "Fairwater",
+          "position": "Fullstack Engineer",
+          "due": "2026-05-29"
+        },
+        {
+          "assignee": "Alejandro Gonzalez",
+          "client": "Carwire",
+          "position": "Fullstack Engineer",
+          "due": "2026-05-29"
+        },
+        {
+          "assignee": "Tomas Lingotti",
+          "client": "Brierstone",
+          "position": "Engineer",
+          "due": "2026-05-31"
+        },
+        {
+          "assignee": "Pablo Corzo",
+          "client": "Spinwheel",
+          "position": "DevOps",
+          "due": "2026-05-31"
+        }
+      ],
+      "active_clients": [
+        "Alkalight",
+        "Angle Health",
+        "Brierstone",
+        "Built to Sell",
+        "CSSI",
+        "Carwire",
+        "Centegix",
+        "CompuClaim",
+        "Fairwater",
+        "Jostens",
+        "Jostens Scholastic",
+        "NGL",
+        "Profusa",
+        "Screenwave",
+        "Spinwheel",
+        "Standard Normal",
+        "Stovell",
+        "Syntrove",
+        "TownPlanner",
+        "Wrenchwise",
+        "nVenue"
+      ],
+      "forecast": {
+        "2026-04": [
+          {
+            "assignee": "Matheus Serrão",
+            "client": "Syntrove",
+            "position": "Engineer"
+          },
+          {
+            "assignee": "Roberta Ferreira",
+            "client": "TownPlanner",
+            "position": "Project Manager"
+          },
+          {
+            "assignee": "Juan Nevado",
+            "client": "TownPlanner",
+            "position": "Fullstack Engineer"
+          },
+          {
+            "assignee": "Jorge Sandoval",
+            "client": "Azumo",
+            "position": "Engineer"
+          },
+          {
+            "assignee": "Lorena Conca",
+            "client": "NGL",
+            "position": "UX/UI"
+          },
+          {
+            "assignee": "Ronald Castillo",
+            "client": "Azumo",
+            "position": "Engineer"
+          },
+          {
+            "assignee": "Facundo Altamiranda",
+            "client": "Angle Health",
+            "position": "Engineer"
+          },
+          {
+            "assignee": "Mariela Suarez",
+            "client": "Azumo",
+            "position": "Business Analyst"
+          },
+          {
+            "assignee": "Kelvin Ferraz",
+            "client": "Azumo",
+            "position": "DevOps"
+          },
+          {
+            "assignee": "Kelvin Ferraz",
+            "client": "Azumo",
+            "position": "DevOps"
+          },
+          {
+            "assignee": "Kelvin Ferraz",
+            "client": "Azumo",
+            "position": "DevOps"
+          },
+          {
+            "assignee": "Laura Pimper",
+            "client": "Azumo",
+            "position": "Project Manager"
+          },
+          {
+            "assignee": "Micaela Goicoechea",
+            "client": "Profusa",
+            "position": "Project Manager"
+          },
+          {
+            "assignee": "Miguel Godoy",
+            "client": "Profusa",
+            "position": "Engineer"
+          },
+          {
+            "assignee": "Micaela Goicoechea",
+            "client": "Brierstone",
+            "position": "Project Manager"
+          },
+          {
+            "assignee": "Mariela Suarez",
+            "client": "Brierstone",
+            "position": "Business Analyst"
+          },
+          {
+            "assignee": "Esteban Li Causi",
+            "client": "NGL",
+            "position": "DevOps"
+          },
+          {
+            "assignee": "Lautaro Bruno",
+            "client": "NGL",
+            "position": "Fullstack Engineer"
+          },
+          {
+            "assignee": "Guillermo Germade",
+            "client": "NGL",
+            "position": "Technical Leader"
+          },
+          {
+            "assignee": "Victor Matzkin",
+            "client": "NGL",
+            "position": "Data Engineer"
+          },
+          {
+            "assignee": "Jennifer Greyling",
+            "client": "NGL",
+            "position": "Business Analyst"
+          },
+          {
+            "assignee": "Jesus Ibanez",
+            "client": "Azumo",
+            "position": "Engineer"
+          },
+          {
+            "assignee": "Laura Pimper",
+            "client": "Azumo",
+            "position": "Project Manager"
+          },
+          {
+            "assignee": "Laura Pimper",
+            "client": "Azumo",
+            "position": "Project Manager"
+          }
+        ],
+        "2026-05": [
+          {
+            "assignee": "Santiago Pieretti",
+            "client": "Alkalight",
+            "position": "Data Engineer"
+          },
+          {
+            "assignee": "Roberta Ferreira",
+            "client": "Wrenchwise",
+            "position": "Project Manager"
+          },
+          {
+            "assignee": "David Gonzalez",
+            "client": "Wrenchwise",
+            "position": "Fullstack Engineer"
+          },
+          {
+            "assignee": "Rommel Berrios",
+            "client": "Carwire",
+            "position": "Fullstack Engineer"
+          },
+          {
+            "assignee": "Pedro Telleria",
+            "client": "Fairwater",
+            "position": "Fullstack Engineer"
+          },
+          {
+            "assignee": "Alejandro Gonzalez",
+            "client": "Carwire",
+            "position": "Fullstack Engineer"
+          },
+          {
+            "assignee": "Tomas Lingotti",
+            "client": "Brierstone",
+            "position": "Engineer"
+          },
+          {
+            "assignee": "Pablo Corzo",
+            "client": "Spinwheel",
+            "position": "DevOps"
+          }
+        ],
+        "2026-06": [
+          {
+            "assignee": "Dante Potolicchio",
+            "client": "Syntrove",
+            "position": "Engineer"
+          },
+          {
+            "assignee": "Juan Manuel Vicente",
+            "client": "Syntrove",
+            "position": "Engineer"
+          },
+          {
+            "assignee": "Miguel Godoy",
+            "client": "Standard Normal",
+            "position": "Architect"
+          },
+          {
+            "assignee": "Roberta Ferreira",
+            "client": "Syntrove",
+            "position": "Project Manager"
+          },
+          {
+            "assignee": "Jhon Fernandez",
+            "client": "Syntrove",
+            "position": "Engineer"
+          },
+          {
+            "assignee": "Luis Duque",
+            "client": "Syntrove",
+            "position": "Engineer"
+          },
+          {
+            "assignee": "Esteban Li Causi",
+            "client": "Syntrove",
+            "position": "DevOps"
+          },
+          {
+            "assignee": "Angel Guzman",
+            "client": "Syntrove",
+            "position": "Engineer"
+          },
+          {
+            "assignee": "Manuel Alfonso",
+            "client": "nVenue",
+            "position": "Engineer"
+          }
+        ],
+        "2026-07": [
+          {
+            "assignee": "Graciela Kremer",
+            "client": "Jostens",
+            "position": "Project Manager"
+          },
+          {
+            "assignee": "German Isaurralde",
+            "client": "Jostens",
+            "position": "Project Manager"
+          }
+        ],
+        "2026-08": [
+          {
+            "assignee": "Virginia Balducci",
+            "client": "Centegix",
+            "position": "QA"
+          }
+        ]
+      },
+      "bench_list": [
+        {
+          "name": "Esteban Li Causi",
+          "position": "DevOps",
+          "assign": 70,
+          "billing": 30,
+          "avail": 70,
+          "due": "2027-03-06"
+        },
+        {
+          "name": "Laura Pimper",
+          "position": "PM/BA",
+          "assign": 60,
+          "billing": 0,
+          "avail": 60,
+          "due": "2027-03-23"
+        },
+        {
+          "name": "Jorge Sandoval",
+          "position": "Data Scientist",
+          "assign": 50,
+          "billing": 0,
+          "avail": 50,
+          "due": "2027-03-16"
+        },
+        {
+          "name": "Lorena Conca",
+          "position": "UX/UI",
+          "assign": 95,
+          "billing": 5,
+          "avail": 95,
+          "due": "2027-02-02"
+        },
+        {
+          "name": "Valeria Maira Esquivel",
+          "position": "UX/UI",
+          "assign": 75,
+          "billing": 25,
+          "avail": 75,
+          "due": "2027-02-02"
+        },
+        {
+          "name": "Micaela Goicoechea",
+          "position": "Project Manager",
+          "assign": 50,
+          "billing": 50,
+          "avail": 50,
+          "due": "2027-03-09"
+        },
+        {
+          "name": "Mariela Suárez",
+          "position": "Business Analyst",
+          "assign": 65,
+          "billing": 25,
+          "avail": 65,
+          "due": "2027-01-27"
+        },
+        {
+          "name": "Roberta Ferreira",
+          "position": "Project Manager",
+          "assign": 25,
+          "billing": 75,
+          "avail": 25,
+          "due": "2027-03-16"
+        },
+        {
+          "name": "Edson Sugimoto",
+          "position": "Data Engineering",
+          "assign": 100,
+          "billing": 0,
+          "avail": 100,
+          "due": "2027-03-16"
+        }
+      ],
+      "pending_list": [
+        {
+          "key": "AA-968",
+          "assignee": "Pablo Corzo",
+          "client": "Spinwheel",
+          "position": "DevOps",
+          "start": "2026-06-01"
+        }
+      ]
+    }
+  ]
+}
