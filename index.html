@@ -658,27 +658,3 @@ function delNote(i){if(!confirm('¿Eliminar nota?'))return;notes.splice(i,1);sav
 function clearForm(){['nTitle','nBody','nTags'].forEach(id=>document.getElementById(id).value='');}
 
 // ════════════════════════════════════════════════════
-// APPS
-// ════════════════════════════════════════════════════
-const APPS=[
-  {i:'🌾',bg:'#E8501A',n:'Harvest',      c:'Time Tracking',       d:'Horas, facturación y reportes de tiempo.',url:'https://id.getharvest.com/harvest/sign_in'},
-  {i:'🗂',bg:'#0066FF',n:'Jira (AA)',     c:'Gestión de Proyectos',d:'Assignments, bench, pipeline de Azumo.',url:'https://azumohq.atlassian.net/jira/software/projects/AA/boards'},
-  {i:'📊',bg:'#0A6BF0',n:'EazyBI',        c:'Analytics & Reportes', d:'Utilization Rate, Billing Ratio, headcount.',url:'https://eazybi.com'},
-  {i:'📘',bg:'#172B4D',n:'Confluence',    c:'Documentación',       d:'Wiki para procesos, decisiones y guías.',url:'https://azumohq.atlassian.net/wiki'},
-  {i:'📋',bg:'#00C875',n:'Monday.com',    c:'Gestión de Proyectos',d:'Planificación visual, timelines, recursos.',url:'https://monday.com'},
-  {i:'🧠',bg:'#191919',n:'Notion',        c:'Documentación & Notas',d:'Notas, bases de datos, wikis, Kanban.',url:'https://notion.so'},
-  {i:'🟡',bg:'#217346',n:'Power BI',      c:'Analytics & Reportes', d:'Reportes integrados con Microsoft 365.',url:'https://powerbi.microsoft.com'},
-  {i:'🎨',bg:'#FF3366',n:'Miro',          c:'Colaboración Visual',  d:'Pizarras para planificación y roadmaps.',url:'https://miro.com'},
-  {i:'🔗',bg:'#0073B1',n:'Smartsheet',    c:'Gestión de Proyectos',d:'Gantt colaborativo con automatizaciones.',url:'https://smartsheet.com'},
-  {i:'🤖',bg:'#0066FF',n:'Claude (Cowork)',c:'IA para PMO',         d:'Refresh automático de datos, reportes, análisis.',url:'https://claude.ai'},
-];
-const ag=document.getElementById('appsGrid');
-APPS.forEach(a=>{
-  const el=document.createElement('a');
-  el.className='app-card';el.href=a.url;el.target='_blank';el.rel='noopener';
-  el.innerHTML=`<div class="app-icon" style="background:${a.bg}22">${a.i}</div><div><div class="app-cat">${a.c}</div><div class="app-name">${a.n}</div><div class="app-desc">${a.d}</div></div>`;
-  ag.appendChild(el);
-});
-</script>
-</body>
-</html>
