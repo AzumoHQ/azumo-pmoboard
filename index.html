@@ -181,7 +181,6 @@ footer{border-top:1px solid var(--brd);padding:1.5rem 2rem;text-align:center;col
       <button class="nav-link" onclick="goTo('history')">📈 History</button>
       <button class="nav-link" onclick="goTo('forecast')">🔭 Forecast</button>
       <button class="nav-link" onclick="goTo('notes')">🔒 Notas</button>
-      <button class="nav-link" onclick="goTo('apps')">🛠 Tools</button>
     </div>
     <div class="nav-right">
       <button class="nav-refresh" onclick="showRefreshInfo()">⟳ Refresh info</button>
@@ -315,11 +314,6 @@ footer{border-top:1px solid var(--brd);padding:1.5rem 2rem;text-align:center;col
   </div>
 </section>
 
-<!-- ── APPS ────────────────────────────────── -->
-<section id="apps">
-  <div class="sec-head"><div class="sec-icon">🛠</div><h2>Herramientas Recomendadas para PMO</h2></div>
-  <div class="apps-grid" id="appsGrid"></div>
-</section>
 
 </main>
 <footer>
@@ -657,4 +651,6 @@ function addNote(){
 function delNote(i){if(!confirm('¿Eliminar nota?'))return;notes.splice(i,1);saveNotes();renderNotes();}
 function clearForm(){['nTitle','nBody','nTags'].forEach(id=>document.getElementById(id).value='');}
 
-// ════════════════════════════════════════════════════
+</script>
+</body>
+</html>
