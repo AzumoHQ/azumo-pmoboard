@@ -1,0 +1,13 @@
+{
+  "name": "pmoboard",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "check": "node --check api/dashboard.js && node --check api/health.js && node --check api/notes.js && node --check api/refresh.js && node --check api/snapshots.js && node --check lib/data-store.js && node --check lib/eazybi-client.js && node --check lib/jira-client.js && node --check lib/pmo-transform.js && node --check scripts/import-pmo-data.js && node --check scripts/local-server.js",
+    "dev": "node scripts/local-server.js",
+    "import:data": "node scripts/import-pmo-data.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0"
+  }
+}

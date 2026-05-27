@@ -19,7 +19,10 @@ from collections import defaultdict
 # ── Paths ──────────────────────────────────────────────────────────────
 SCRIPT_DIR   = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE    = os.path.join(SCRIPT_DIR, 'pmo-data.json')
-DASH_FILE    = os.path.join(SCRIPT_DIR, 'pmo-dashboard.html')
+DASH_FILES   = [
+    os.path.join(SCRIPT_DIR, 'index.html'),
+    os.path.join(SCRIPT_DIR, 'pmo-dashboard.html'),
+]
 
 # ── Custom fields (Azumo Jira) ─────────────────────────────────────────
 CF_START_DATE  = 'customfield_10800'   # Start Date
@@ -200,32 +203,33 @@ def update_data_file(snapshot: dict) -> dict:
 
 
 def inject_into_dashboard(data: dict):
-    """Replace the DATA_PLACEHOLDER in pmo-dashboard.html with fresh data."""
-    if not os.path.exists(DASH_FILE):
-        print(f"⚠ Dashboard not found at {DASH_FILE} — skipping HTML injection")
-        return
-
-    with open(DASH_FILE, 'r', encoding='utf-8') as f:
-        html = f.read()
-
+    """Replace the DATA_PLACEHOLDER in dashboard HTML files with fresh data."""
     json_str = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     placeholder = '/*%%PMO_DATA%%*/'
 
-    if placeholder not in html:
-        print("⚠ DATA placeholder not found in HTML — skipping injection")
-        return
+    for dash_file in DASH_FILES:
+        if not os.path.exists(dash_file):
+            print(f"⚠ Dashboard not found at {dash_file} — skipping HTML injection")
+            continue
 
-    # Replace the current data object
-    import re
-    html = re.sub(
-        r'/\*%%PMO_DATA%%\*/.*?/\*%%PMO_DATA_END%%\*/',
-        f'{placeholder}{json_str}/*%%PMO_DATA_END%%*/',
-        html,
-        flags=re.DOTALL
-    )
-    with open(DASH_FILE, 'w', encoding='utf-8') as f:
-        f.write(html)
-    print(f"✓ pmo-dashboard.html updated with latest data")
+        with open(dash_file, 'r', encoding='utf-8') as f:
+            html = f.read()
+
+        if placeholder not in html:
+            print(f"⚠ DATA placeholder not found in {os.path.basename(dash_file)} — skipping injection")
+            continue
+
+        # Replace the current data object
+        import re
+        html = re.sub(
+            r'/\*%%PMO_DATA%%\*/.*?/\*%%PMO_DATA_END%%\*/',
+            f'{placeholder}{json_str}/*%%PMO_DATA_END%%*/',
+            html,
+            flags=re.DOTALL
+        )
+        with open(dash_file, 'w', encoding='utf-8') as f:
+            f.write(html)
+        print(f"✓ {os.path.basename(dash_file)} updated with latest data")
 
 
 def main():
