@@ -1025,7 +1025,7 @@ def apply_next_due_date_enrichment(parsed: dict, rows: list) -> dict:
             assignment['due'] = first_non_empty(assignment.get('due'), row.get('due'))
             assignment['summary'] = first_non_empty(row.get('summary'), assignment.get('summary'))
             assignment['technology'] = first_non_empty(row.get('technology'), assignment.get('technology'))
-            assignment['project_manager'] = first_non_empty(row.get('project_manager'), assignment.get('project_manager'))
+            assignment['project_manager'] = first_non_empty(assignment.get('project_manager'), row.get('project_manager'))
             assignment['csm'] = first_non_empty(row.get('csm'), assignment.get('csm'))
             assignment['csm_assigned'] = first_non_empty(row.get('csm'), assignment.get('csm_assigned'))
             assignment['source'] = first_non_empty(row.get('source'), assignment.get('source'), 'Jira')
