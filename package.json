@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "check": "node --check api/auth/change-password.js && node --check api/auth/login.js && node --check api/auth/logout.js && node --check api/auth/me.js && node --check api/cron-snapshot.js && node --check lib/daily-qa.js && node --check api/dashboard.js && node --check api/eazybi-embed.js && node --check api/health.js && node --check api/harvest-hours.js && node --check api/notes.js && node --check api/refresh.js && node --check api/snapshots.js && node --check api/users.js && node --check lib/auth.js && node --check lib/data-store.js && node --check lib/eazybi-client.js && node --check lib/harvest-client.js && node --check lib/jira-client.js && node --check lib/pmo-transform.js && node --check scripts/create-pmo-user.js && node --check scripts/import-pmo-data.js && node --check scripts/local-server.js",
+    "check": "node --check api/auth.js && node --check api/cron-snapshot.js && node --check lib/daily-qa.js && node --check api/dashboard.js && node --check api/health.js && node --check api/harvest-hours.js && node --check api/notes.js && node --check api/refresh.js && node --check api/snapshots.js && node --check api/users.js && node --check lib/auth.js && node --check lib/data-store.js && node --check lib/eazybi-client.js && node --check lib/harvest-client.js && node --check lib/jira-client.js && node --check lib/pmo-transform.js && node --check scripts/create-pmo-user.js && node --check scripts/import-pmo-data.js && node --check scripts/local-server.js",
     "dev": "node scripts/local-server.js",
     "import:data": "node scripts/import-pmo-data.js"
   },

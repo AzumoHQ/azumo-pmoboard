@@ -1559,6 +1559,18 @@ let authMode = 'login';
 let authAfterLogin = null;
 const ROLE_PREVIEW_PARAM = 'previewRole';
 function normalizeRole(role){ return String(role || '').trim().toLowerCase(); }
+function displayRoleName(role){
+  const normalized = normalizeRole(role);
+  if(['admin','pmo'].includes(normalized)) return 'Administrator';
+  if(['executive','viewer'].includes(normalized)) return 'Executive';
+  if(normalized === 'csm') return 'CSM';
+  if(normalized === 'pm') return 'PM';
+  if(normalized === 'tl') return 'TL';
+  if(normalized === 'hr') return 'HR';
+  if(normalized === 'assignee') return 'Assignee';
+  if(normalized === 'c-level' || normalized === 'clevel') return 'C-Level';
+  return String(role || '');
+}
 function realUserRole(){ return normalizeRole(currentUser?.role || ''); }
 function requestedPreviewRole(){
   if(location.protocol === 'file:') return '';
@@ -1572,12 +1584,13 @@ function effectiveUserRole(){
 }
 function effectiveRoleLabel(){
   const role = effectiveUserRole();
+  if(role === 'admin' || role === 'pmo') return 'Administrator';
   if(role === 'c-level' || role === 'clevel') return 'C-Level preview';
   if(role === 'executive') return 'Executive preview';
   if(role === 'viewer') return 'Viewer preview';
   if(role === 'pm') return 'PM preview';
   if(role === 'csm') return 'CSM preview';
-  return currentUser?.role || '';
+  return displayRoleName(currentUser?.role || '');
 }
 function canRunRefresh(){ return ['admin','pmo'].includes(effectiveUserRole()); }
 function updateRoleSensitiveUi(){
@@ -1617,7 +1630,7 @@ function setAuthGateState(user){
   }
 }
 async function loginWithCredentials(email, password){
-  const response = await fetch('/api/auth/login', {
+  const response = await fetch('/api/auth?action=login', {
     method:'POST',
     credentials:'same-origin',
     headers:{'Content-Type':'application/json'},
@@ -1656,7 +1669,7 @@ function updateAuthUi(){
   if(currentUser){
     const preview = requestedPreviewRole() && canPreviewRole();
     status.textContent = preview ? `${currentUser.name || currentUser.email || 'Signed in'} · ${effectiveRoleLabel()}` : (currentUser.name || currentUser.email || 'Signed in');
-    status.title = `${currentUser.email || ''} · role: ${currentUser.role || ''}${preview ? ` · viewing as: ${effectiveRoleLabel()}` : ''}`;
+    status.title = `${currentUser.email || ''} · role: ${displayRoleName(currentUser.role || '')}${preview ? ` · viewing as: ${effectiveRoleLabel()}` : ''}`;
     pwd.style.display = '';
     logout.style.display = '';
     avatar.textContent = userInitials(currentUser);
@@ -1680,7 +1693,7 @@ async function loadCurrentUser(){
     return null;
   }
   try{
-    const response = await fetch('/api/auth/me', {cache:'no-store', credentials:'same-origin'});
+    const response = await fetch('/api/auth', {cache:'no-store', credentials:'same-origin'});
     if(response.ok){
       const result = await response.json();
       currentUser = result.user || null;
@@ -1723,7 +1736,7 @@ function showAuthModal(mode='login', afterLogin=null){
     copy.textContent = 'You are signed in to the PMO dashboard.';
     submit.textContent = 'Change password';
     document.getElementById('authAccountSummary').innerHTML = currentUser
-      ? `<strong>${esc(currentUser.name || currentUser.email)}</strong><br/>${esc(currentUser.email || '')}<br/><span style="color:var(--muted)">Role: ${esc(currentUser.role || 'viewer')}</span>`
+      ? `<strong>${esc(currentUser.name || currentUser.email)}</strong><br/>${esc(currentUser.email || '')}<br/><span style="color:var(--muted)">Role: ${esc(displayRoleName(currentUser.role || 'Executive'))}</span>`
       : 'Not signed in.';
   }else{
     title.textContent = 'Sign in';
@@ -1789,7 +1802,7 @@ async function changeUserPassword(){
   submit.disabled = true;
   submit.textContent = 'Saving...';
   try{
-    const response = await fetch('/api/auth/change-password', {
+    const response = await fetch('/api/auth?action=change-password', {
       method:'POST',
       credentials:'same-origin',
       headers:{'Content-Type':'application/json'},
@@ -1811,7 +1824,7 @@ async function changeUserPassword(){
   }
 }
 async function logoutUser(){
-  try{ await fetch('/api/auth/logout', {method:'POST', credentials:'same-origin'}); }
+  try{ await fetch('/api/auth?action=logout', {method:'POST', credentials:'same-origin'}); }
   catch(error){ console.info('Logout failed:', error.message); }
   currentUser = null;
   latest = null;

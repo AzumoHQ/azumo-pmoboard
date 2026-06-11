@@ -1,9 +1,27 @@
 const { getDashboardData } = require('../lib/data-store');
-const { clientReportConfig, fetchInternalProjectsReport, fetchNewSearchesTriageReport } = require('../lib/eazybi-client');
+const { clientReportConfig, fetchInternalProjectsReport, fetchNewSearchesTriageReport, reportConfig } = require('../lib/eazybi-client');
 const { getSessionUser } = require('../lib/auth');
 
 function sendError(res, status, message) {
   res.status(status).json({ message });
+}
+
+function requestParams(req) {
+  const url = new URL(req.url || '/', `https://${req.headers.host || 'localhost'}`);
+  return url.searchParams;
+}
+
+function normalizeBaseUrl(url) {
+  return String(url || '').replace(/\/+$/, '');
+}
+
+function embedUrlFor(reportKey) {
+  const config = reportConfig(reportKey);
+  const publicBase = normalizeBaseUrl(process.env.EAZYBI_PUBLIC_URL || process.env.EAZYBI_URL).replace(/\/eazy$/, '');
+  if (!publicBase || !config.account_id || !config.report_id || !config.embed_token) {
+    return '';
+  }
+  return `${publicBase}/accounts/${encodeURIComponent(config.account_id)}/embed/report/${encodeURIComponent(config.report_id)}?embed_token=${encodeURIComponent(config.embed_token)}`;
 }
 
 module.exports = async function dashboardHandler(req, res) {
@@ -17,6 +35,32 @@ module.exports = async function dashboardHandler(req, res) {
     const user = await getSessionUser(req);
     if (!user || user.active === false) {
       sendError(res, 401, 'Sign in required');
+      return;
+    }
+
+    const params = requestParams(req);
+    if (String(params.get('action') || '').trim().toLowerCase() === 'embed') {
+      const reportKey = String(params.get('report') || '').trim();
+      const url = embedUrlFor(reportKey);
+      if (!url) {
+        sendError(res, 404, 'Embedded report is not configured.');
+        return;
+      }
+
+      const response = await fetch(url, {
+        headers: {
+          Accept: 'text/html,application/xhtml+xml'
+        }
+      });
+      const html = await response.text();
+      if (!response.ok) {
+        sendError(res, 502, `EazyBI embed error ${response.status}`);
+        return;
+      }
+
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-store');
+      res.status(200).send(html);
       return;
     }
 

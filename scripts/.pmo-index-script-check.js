@@ -220,7 +220,7 @@ function setAuthGateState(user){
   }
 }
 async function loginWithCredentials(email, password){
-  const response = await fetch('/api/auth/login', {
+  const response = await fetch('/api/auth?action=login', {
     method:'POST',
     credentials:'same-origin',
     headers:{'Content-Type':'application/json'},
@@ -289,7 +289,7 @@ async function loadCurrentUser(){
     return null;
   }
   try{
-    const response = await fetch('/api/auth/me', {cache:'no-store', credentials:'same-origin'});
+    const response = await fetch('/api/auth', {cache:'no-store', credentials:'same-origin'});
     if(response.ok){
       const result = await response.json();
       currentUser = result.user || null;
@@ -398,7 +398,7 @@ async function changeUserPassword(){
   submit.disabled = true;
   submit.textContent = 'Saving...';
   try{
-    const response = await fetch('/api/auth/change-password', {
+    const response = await fetch('/api/auth?action=change-password', {
       method:'POST',
       credentials:'same-origin',
       headers:{'Content-Type':'application/json'},
@@ -420,7 +420,7 @@ async function changeUserPassword(){
   }
 }
 async function logoutUser(){
-  try{ await fetch('/api/auth/logout', {method:'POST', credentials:'same-origin'}); }
+  try{ await fetch('/api/auth?action=logout', {method:'POST', credentials:'same-origin'}); }
   catch(error){ console.info('Logout failed:', error.message); }
   currentUser = null;
   latest = null;
