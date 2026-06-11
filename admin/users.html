@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>User Management — PMO Dashboard</title>
+<link rel="stylesheet" href="https://use.typekit.net/yer2bzk.css">
+<style>
+:root{
+  --bg:#060C1A; --surf:#0D1626; --card:#112035; --brd:#1C3154;
+  --blue:#0066FF; --blue-lt:#3385FF; --txt:#EEF4FF; --muted:#6B8FBF;
+  --green:#10B981; --red:#EF4444; --orange:#F59E0B;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:"azo-sans-web",sans-serif;background:radial-gradient(circle at 20% 0%,rgba(0,102,255,.16),transparent 30%),var(--bg);color:var(--txt);min-height:100vh}
+a{color:inherit}
+.page{max-width:1280px;margin:0 auto;padding:28px 24px 56px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-badge{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--blue),#7C3AED);display:flex;align-items:center;justify-content:center;font-weight:900}
+.eyebrow{display:inline-flex;align-items:center;padding:6px 10px;border:1px solid rgba(51,133,255,.24);border-radius:999px;background:rgba(0,102,255,.10);color:#AFCBFF;font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
+h1{font-size:clamp(1.8rem,3.5vw,2.7rem);line-height:1.02;letter-spacing:-.04em;margin:0 0 6px}
+.sub{color:var(--muted);font-size:.96rem;max-width:760px;line-height:1.55}
+.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn,.field input,.field select{font:inherit}
+.btn{appearance:none;border:1px solid var(--brd);background:var(--card);color:var(--txt);border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.15s ease}
+.btn:hover{transform:translateY(-1px);border-color:rgba(51,133,255,.45)}
+.btn-primary{background:linear-gradient(135deg,var(--blue),#0057D9);border-color:transparent}
+.btn-ghost{background:rgba(255,255,255,.03)}
+.btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+.meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.85rem}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.03),transparent 35%),var(--card);border:1px solid rgba(107,143,191,.30);border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,.28)}
+.toolbar{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 18px 0}
+.search{flex:1 1 280px;position:relative}
+.search input{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--brd);color:var(--txt);border-radius:14px;padding:13px 14px 13px 42px;outline:none}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;fill:var(--muted)}
+.add-panel{display:none;padding:0 18px 18px}
+.add-panel.open{display:block}
+.add-box{margin-top:14px;background:rgba(255,255,255,.025);border:1px solid var(--brd);border-radius:18px;padding:16px}
+.add-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:.78rem;color:var(--muted);font-weight:800}
+.field input,.field select{background:rgba(255,255,255,.03);border:1px solid var(--brd);color:var(--txt);border-radius:12px;padding:12px 13px;outline:none}
+.field input::placeholder{color:#7F98BA}
+.field select{appearance:none}
+.add-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:14px}
+.table-wrap{padding:0 18px 18px}
+.table-shell{margin-top:14px;border:1px solid var(--brd);border-radius:18px;overflow:hidden;background:rgba(255,255,255,.02)}
+table{width:100%;border-collapse:collapse;min-width:920px}
+thead th{position:sticky;top:0;z-index:2;background:#152741;color:#AFCBFF;text-transform:uppercase;letter-spacing:.06em;font-size:.72rem;font-weight:900;padding:13px 14px;text-align:left;border-bottom:1px solid var(--brd)}
+tbody td{padding:14px;border-bottom:1px solid rgba(107,143,191,.14);vertical-align:middle}
+tbody tr:nth-child(odd) td{background:rgba(255,255,255,.015)}
+tbody tr:hover td{background:rgba(0,102,255,.05)}
+.user-cell{display:flex;flex-direction:column;gap:3px}
+.user-name{font-weight:850}
+.user-note{font-size:.74rem;color:var(--muted)}
+.email{color:#BCD2F7;font-size:.86rem}
+.role-select{min-width:180px;background:rgba(255,255,255,.03);border:1px solid var(--brd);color:var(--txt);border-radius:12px;padding:10px 12px;font-weight:700}
+.role-select[disabled]{opacity:.55;cursor:not-allowed}
+.status-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;font-size:.76rem;font-weight:900;border:1px solid transparent}
+.status-pill.active{background:rgba(16,185,129,.14);color:#86EFAC;border-color:rgba(16,185,129,.25)}
+.status-pill.inactive{background:rgba(239,68,68,.14);color:#FCA5A5;border-color:rgba(239,68,68,.26)}
+.toggle-wrap{display:flex;align-items:center;gap:10px}
+.toggle{position:relative;width:52px;height:30px;display:inline-block}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;border-radius:999px;background:rgba(239,68,68,.25);border:1px solid rgba(239,68,68,.26);transition:.15s ease}
+.slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:#fff;transition:.15s ease}
+.toggle input:checked + .slider{background:rgba(16,185,129,.28);border-color:rgba(16,185,129,.35)}
+.toggle input:checked + .slider:before{transform:translateX(22px)}
+.toggle input:disabled + .slider{opacity:.45;cursor:not-allowed}
+.empty{padding:28px 16px;text-align:center;color:var(--muted)}
+.toast-stack{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:1000}
+.toast{min-width:260px;max-width:360px;padding:14px 16px;border-radius:16px;border:1px solid var(--brd);background:#10233B;box-shadow:0 16px 40px rgba(0,0,0,.28);font-size:.9rem;font-weight:700;animation:toastIn .18s ease}
+.toast.success{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.13);color:#D1FAE5}
+.toast.error{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.13);color:#FECACA}
+.loading,.forbidden{display:flex;align-items:center;justify-content:center;min-height:55vh;color:var(--muted)}
+.tag{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(107,143,191,.18);font-size:.72rem;font-weight:800;color:#CFE0FF}
+.count{padding:7px 10px;border-radius:999px;background:rgba(0,102,255,.10);border:1px solid rgba(51,133,255,.24);color:#AFCBFF;font-size:.76rem;font-weight:900}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media (max-width: 980px){.add-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width: 640px){.page{padding:20px 14px 42px}.add-grid{grid-template-columns:1fr}.actions{width:100%}.actions .btn{flex:1}.toolbar{padding:14px 14px 0}.add-panel{padding:0 14px 14px}.table-wrap{padding:0 14px 14px}}
+</style>
+</head>
+<body>
+  <div class="page">
+    <div id="loadingState" class="loading">Checking administrator access…</div>
+
+    <div id="app" style="display:none">
+      <div class="topbar">
+        <div>
+          <div class="eyebrow">PMO Administration</div>
+          <div class="brand">
+            <div class="brand-badge">PMO</div>
+            <div>
+              <h1>User management</h1>
+              <div class="sub">Manage authorized dashboard users, roles, and activation state. The <strong>Administrator</strong> label is stored internally as <code>PMO</code>.</div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <a class="btn btn-ghost" href="/">← Back to dashboard</a>
+          <button class="btn btn-primary" type="button" id="toggleAddBtn">+ Add user</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar">
+          <div class="search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4a6 6 0 1 0 3.88 10.58l4.27 4.27 1.42-1.42-4.27-4.27A6 6 0 0 0 10 4Zm0 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"/></svg>
+            <input id="searchInput" type="search" placeholder="Search by name, email, or role" />
+          </div>
+          <div class="meta">
+            <span class="count" id="userCount">0 users</span>
+            <span class="tag" id="adminMeta">Administrator</span>
+          </div>
+        </div>
+
+        <div class="add-panel" id="addPanel">
+          <div class="add-box">
+            <div class="add-grid">
+              <div class="field">
+                <label for="newEmail">Email</label>
+                <input id="newEmail" type="email" placeholder="name@azumo.co" />
+              </div>
+              <div class="field">
+                <label for="newFirstName">First name</label>
+                <input id="newFirstName" type="text" placeholder="First name" />
+              </div>
+              <div class="field">
+                <label for="newLastName">Last name</label>
+                <input id="newLastName" type="text" placeholder="Last name" />
+              </div>
+              <div class="field">
+                <label for="newRole">Role</label>
+                <select id="newRole"></select>
+              </div>
+            </div>
+            <div class="add-actions">
+              <button class="btn btn-ghost" type="button" id="cancelAddBtn">Cancel</button>
+              <button class="btn btn-primary" type="button" id="saveAddBtn">Create user</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-shell">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:28%">User</th>
+                  <th style="width:26%">Email</th>
+                  <th style="width:20%">Role</th>
+                  <th style="width:12%">Status</th>
+                  <th style="width:14%">Active toggle</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <tr><td colspan="5" class="empty">Loading users…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="forbiddenState" class="forbidden" style="display:none"></div>
+  </div>
+
+  <div class="toast-stack" id="toastStack"></div>
+
+<script>
+const ROLE_OPTIONS = ['PMO','Executive','CSM','PM','TL','HR','Assignee'];
+let currentUser = null;
+let allUsers = [];
+let filteredUsers = [];
+let searchTerm = '';
+
+function displayRole(role=''){
+  return String(role || '') === 'PMO' ? 'Administrator' : String(role || '');
+}
+function esc(value=''){
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+function fullName(user){
+  const first = String(user?.first_name || '').trim();
+  const last = String(user?.last_name || '').trim();
+  return `${first} ${last}`.trim() || String(user?.name || user?.email || '—');
+}
+function isSelf(user){
+  return String(user?.email || '').trim().toLowerCase() === String(currentUser?.email || '').trim().toLowerCase();
+}
+function toast(message, type='success'){
+  const stack = document.getElementById('toastStack');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = message;
+  stack.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(6px)'; }, 2600);
+  setTimeout(() => el.remove(), 3000);
+}
+function setLoading(message='Checking administrator access…'){
+  document.getElementById('loadingState').textContent = message;
+  document.getElementById('loadingState').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('forbiddenState').style.display = 'none';
+}
+function showForbidden(message){
+  const box = document.getElementById('forbiddenState');
+  box.innerHTML = `<div class="card" style="padding:24px;max-width:560px;margin:0 auto"><div class="eyebrow">Access blocked</div><h1 style="font-size:2rem;margin:0 0 10px">Administrator access required</h1><div class="sub" style="margin-bottom:18px">${esc(message)}</div><a class="btn btn-primary" href="/">Back to dashboard</a></div>`;
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+  box.style.display = 'flex';
+}
+function showApp(){
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('forbiddenState').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+function populateRoleSelect(select, selectedRole){
+  select.innerHTML = ROLE_OPTIONS.map(role => `<option value="${role}" ${role === selectedRole ? 'selected' : ''}>${esc(displayRole(role))}</option>`).join('');
+}
+function filterUsers(){
+  const term = searchTerm.trim().toLowerCase();
+  filteredUsers = !term ? [...allUsers] : allUsers.filter((user) => {
+    const haystack = [fullName(user), user.email, user.role, displayRole(user.role)].join(' ').toLowerCase();
+    return haystack.includes(term);
+  });
+  renderTable();
+}
+function renderTable(){
+  const tbody = document.getElementById('usersTableBody');
+  document.getElementById('userCount').textContent = `${filteredUsers.length} user${filteredUsers.length === 1 ? '' : 's'}`;
+  if(!filteredUsers.length){
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">No users match this search.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filteredUsers.map((user) => {
+    const self = isSelf(user);
+    return `<tr data-email="${esc(user.email)}">
+      <td>
+        <div class="user-cell">
+          <span class="user-name">${esc(fullName(user))}</span>
+          <span class="user-note">${self ? 'Current administrator session' : 'Managed access user'}</span>
+        </div>
+      </td>
+      <td><span class="email">${esc(user.email || '—')}</span></td>
+      <td>
+        <select class="role-select" data-role-email="${esc(user.email)}" ${self ? 'disabled title="You cannot change your own role"' : ''}>
+          ${ROLE_OPTIONS.map((role) => `<option value="${role}" ${role === user.role ? 'selected' : ''}>${esc(displayRole(role))}</option>`).join('')}
+        </select>
+      </td>
+      <td><span class="status-pill ${user.active === false ? 'inactive' : 'active'}">${user.active === false ? 'Inactive' : 'Active'}</span></td>
+      <td>
+        <div class="toggle-wrap">
+          <label class="toggle" title="${self ? 'Self deactivation is disabled to avoid lockout.' : 'Toggle active state'}">
+            <input type="checkbox" data-active-email="${esc(user.email)}" ${user.active === false ? '' : 'checked'} ${self ? 'disabled' : ''}/>
+            <span class="slider"></span>
+          </label>
+          <span class="user-note">${user.active === false ? 'Off' : 'On'}</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  tbody.querySelectorAll('[data-role-email]').forEach((select) => {
+    select.addEventListener('change', async (event) => {
+      const email = event.target.getAttribute('data-role-email');
+      const role = event.target.value;
+      await patchUser(email, { role }, event.target);
+    });
+  });
+  tbody.querySelectorAll('[data-active-email]').forEach((input) => {
+    input.addEventListener('change', async (event) => {
+      const email = event.target.getAttribute('data-active-email');
+      const is_active = Boolean(event.target.checked);
+      await patchUser(email, { is_active }, event.target);
+    });
+  });
+}
+async function patchUser(email, patch, control){
+  const previous = allUsers.find((user) => String(user.email).toLowerCase() === String(email).toLowerCase());
+  if(!previous) return;
+  const prevRole = previous.role;
+  const prevActive = previous.active !== false;
+  if(control) control.disabled = true;
+  try{
+    const response = await fetch('/api/users', {
+      method:'PATCH',
+      credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ email, ...patch })
+    });
+    const result = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    allUsers = result.users || allUsers;
+    filterUsers();
+    if(patch.role !== undefined) toast(`${fullName(previous)} is now ${displayRole(patch.role)}.`);
+    else toast(`${fullName(previous)} is now ${patch.is_active ? 'active' : 'inactive'}.`);
+  }catch(error){
+    if(control instanceof HTMLSelectElement) control.value = prevRole;
+    if(control instanceof HTMLInputElement) control.checked = prevActive;
+    toast(error.message || 'Could not save the change.', 'error');
+  }finally{
+    if(control) control.disabled = false;
+  }
+}
+async function loadUsers(){
+  const response = await fetch('/api/users', { credentials:'same-origin', cache:'no-store' });
+  const result = await response.json().catch(() => ({}));
+  if(response.status === 403){
+    showForbidden('Only users with the Administrator / PMO role can manage dashboard access.');
+    return;
+  }
+  if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+  allUsers = Array.isArray(result.users) ? result.users : [];
+  filterUsers();
+}
+async function loadSession(){
+  const response = await fetch('/api/auth', { credentials:'same-origin', cache:'no-store' });
+  const result = await response.json().catch(() => ({}));
+  currentUser = result.user || null;
+  if(!currentUser){
+    window.location.replace('/');
+    return false;
+  }
+  if(currentUser.role !== 'PMO'){
+    showForbidden('Only PMO administrators can open User Management.');
+    return false;
+  }
+  document.getElementById('adminMeta').textContent = `${fullName(currentUser)} · Administrator`;
+  return true;
+}
+function resetAddForm(){
+  document.getElementById('newEmail').value = '';
+  document.getElementById('newFirstName').value = '';
+  document.getElementById('newLastName').value = '';
+  document.getElementById('newRole').value = 'Executive';
+}
+function toggleAddPanel(force){
+  const panel = document.getElementById('addPanel');
+  const open = typeof force === 'boolean' ? force : !panel.classList.contains('open');
+  panel.classList.toggle('open', open);
+  document.getElementById('toggleAddBtn').textContent = open ? 'Close form' : '+ Add user';
+  if(open) setTimeout(() => document.getElementById('newEmail').focus(), 20);
+  else resetAddForm();
+}
+async function createUser(){
+  const btn = document.getElementById('saveAddBtn');
+  const payload = {
+    email: document.getElementById('newEmail').value.trim(),
+    first_name: document.getElementById('newFirstName').value.trim(),
+    last_name: document.getElementById('newLastName').value.trim(),
+    role: document.getElementById('newRole').value,
+    is_active: true
+  };
+  if(!payload.email || !payload.first_name || !payload.last_name){
+    toast('Email, first name, and last name are required.', 'error');
+    return;
+  }
+  if(!payload.email.toLowerCase().endsWith('@azumo.co')){
+    toast('Only @azumo.co emails are allowed.', 'error');
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+  try{
+    const response = await fetch('/api/users', {
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    const result = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    allUsers = result.users || allUsers;
+    searchTerm = '';
+    document.getElementById('searchInput').value = '';
+    filterUsers();
+    toggleAddPanel(false);
+    toast(`${payload.first_name} ${payload.last_name} added as ${displayRole(payload.role)}.`);
+  }catch(error){
+    toast(error.message || 'Could not create the user.', 'error');
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Create user';
+  }
+}
+async function boot(){
+  setLoading();
+  populateRoleSelect(document.getElementById('newRole'), 'Executive');
+  const allowed = await loadSession();
+  if(!allowed) return;
+  showApp();
+  await loadUsers();
+}
+
+document.getElementById('searchInput').addEventListener('input', (event) => {
+  searchTerm = event.target.value || '';
+  filterUsers();
+});
+document.getElementById('toggleAddBtn').addEventListener('click', () => toggleAddPanel());
+document.getElementById('cancelAddBtn').addEventListener('click', () => toggleAddPanel(false));
+document.getElementById('saveAddBtn').addEventListener('click', createUser);
+boot().catch((error) => {
+  console.error(error);
+  showForbidden(error.message || 'Could not load User Management.');
+});
+</script>
+</body>
+</html>

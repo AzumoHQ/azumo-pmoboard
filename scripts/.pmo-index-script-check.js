@@ -279,18 +279,21 @@ function loginFromGate(){
 function updateAuthUi(){
   const status = document.getElementById('authStatusBtn');
   const logout = document.getElementById('authLogoutBtn');
+  const usersLink = document.getElementById('adminUsersLink');
   const avatar = document.getElementById('authAvatar');
   if(!status || !avatar) return;
   if(currentUser){
     status.textContent = currentUser.name || currentUser.email || 'Signed in';
     status.title = `${currentUser.email || ''} · ${currentUser.role || ''}`;
     if(logout) logout.style.display = '';
+    if(usersLink) usersLink.style.display = currentUser.role === 'PMO' ? '' : 'none';
     avatar.textContent = userInitials(currentUser);
     avatar.title = currentUser.email || currentUser.name || 'PMO';
   }else{
     status.textContent = 'Sign in with Google';
     status.title = 'Sign in with Google';
     if(logout) logout.style.display = 'none';
+    if(usersLink) usersLink.style.display = 'none';
     avatar.textContent = 'PMO';
     avatar.title = 'PMO';
   }
