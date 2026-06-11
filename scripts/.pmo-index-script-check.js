@@ -191,6 +191,7 @@ window.setAllModulesCollapsed = setAllModulesCollapsed;
 let currentUser = null;
 let authMode = 'login';
 let authAfterLogin = null;
+const AUTH_AFTER_LOGIN_KEY = 'pmo_auth_after_login';
 
 function userInitials(user){
   const name = String(user?.name || user?.email || 'PMO').trim();
@@ -204,6 +205,58 @@ function setGateAuthMessage(message=''){
   error.textContent = message || '';
   error.style.display = message ? 'block' : 'none';
 }
+function storeAuthAfterLogin(value=''){
+  try{
+    if(value) sessionStorage.setItem(AUTH_AFTER_LOGIN_KEY, String(value));
+    else sessionStorage.removeItem(AUTH_AFTER_LOGIN_KEY);
+  }catch(error){
+    console.info('Session storage unavailable:', error.message);
+  }
+}
+function readStoredAuthAfterLogin(){
+  try{
+    return String(sessionStorage.getItem(AUTH_AFTER_LOGIN_KEY) || '');
+  }catch(error){
+    return '';
+  }
+}
+function clearStoredAuthAfterLogin(){
+  storeAuthAfterLogin('');
+}
+function startGoogleSignIn(afterLogin=''){
+  if(location.protocol === 'file:'){
+    const message = 'Google sign-in requires the local server or deployed dashboard. Open http://127.0.0.1:4173 or the deployed app.';
+    setGateAuthMessage(message);
+    setAuthMessage('error', message);
+    return false;
+  }
+  const nextAction = String(afterLogin || authAfterLogin || '').trim();
+  storeAuthAfterLogin(nextAction);
+  window.location.assign('/api/auth?action=google');
+  return true;
+}
+async function resumeStoredAuthAction(){
+  const after = readStoredAuthAfterLogin();
+  if(!after || !currentUser) return;
+  clearStoredAuthAfterLogin();
+  if(after === 'snapshot'){
+    await manualSnapshot();
+    return;
+  }
+  if(after.startsWith('jiraTicket:')){
+    await createActionJiraTicket(after.slice('jiraTicket:'.length));
+    return;
+  }
+  if(after.startsWith('qaReview:')){
+    await markQaChecklistReviewed(after.slice('qaReview:'.length));
+    return;
+  }
+  if(after.startsWith('actionNote:')){
+    const id = after.slice('actionNote:'.length);
+    goTo('pmoActionCenter');
+    setTimeout(()=>document.getElementById(actionNoteInputId(id))?.focus(), 140);
+  }
+}
 function setAuthGateState(user){
   const locked = !user;
   document.body.classList.toggle('auth-locked', locked);
@@ -214,60 +267,30 @@ function setAuthGateState(user){
     gate.setAttribute('aria-hidden', locked ? 'false' : 'true');
   }
   if(locked){
-    setTimeout(()=>document.getElementById('gateEmail')?.focus(), 20);
+    setTimeout(()=>document.getElementById('gateLoginBtn')?.focus(), 20);
   }else{
     setGateAuthMessage('');
   }
 }
-async function loginWithCredentials(email, password){
-  const response = await fetch('/api/auth?action=login', {
-    method:'POST',
-    credentials:'same-origin',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({email,password})
-  });
-  const result = await response.json().catch(()=>({}));
-  if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
-  currentUser = result.user;
-  updateAuthUi();
-  if(!latest) await loadDashboardData();
-  return currentUser;
-}
-async function loginFromGate(){
-  const email = document.getElementById('gateEmail')?.value.trim() || '';
-  const password = document.getElementById('gatePassword')?.value || '';
-  if(!email || !password){ setGateAuthMessage('Email and password are required.'); return null; }
-  const btn = document.getElementById('gateLoginBtn');
-  if(btn){ btn.disabled = true; btn.textContent = 'Signing in...'; }
-  try{
-    await loginWithCredentials(email, password);
-    document.getElementById('gatePassword').value = '';
-    return currentUser;
-  }catch(error){
-    setGateAuthMessage(error.message || 'Invalid email or password.');
-    return null;
-  }finally{
-    if(btn){ btn.disabled = false; btn.textContent = 'Sign in'; }
-  }
+function loginFromGate(){
+  setGateAuthMessage('');
+  return startGoogleSignIn();
 }
 function updateAuthUi(){
   const status = document.getElementById('authStatusBtn');
-  const pwd = document.getElementById('authPasswordBtn');
   const logout = document.getElementById('authLogoutBtn');
   const avatar = document.getElementById('authAvatar');
   if(!status || !avatar) return;
   if(currentUser){
     status.textContent = currentUser.name || currentUser.email || 'Signed in';
     status.title = `${currentUser.email || ''} · ${currentUser.role || ''}`;
-    pwd.style.display = '';
-    logout.style.display = '';
+    if(logout) logout.style.display = '';
     avatar.textContent = userInitials(currentUser);
     avatar.title = currentUser.email || currentUser.name || 'PMO';
   }else{
-    status.textContent = 'Sign in';
-    status.title = 'Sign in';
-    pwd.style.display = 'none';
-    logout.style.display = 'none';
+    status.textContent = 'Sign in with Google';
+    status.title = 'Sign in with Google';
+    if(logout) logout.style.display = 'none';
     avatar.textContent = 'PMO';
     avatar.title = 'PMO';
   }
@@ -321,29 +344,30 @@ function showAuthModal(mode='login', afterLogin=null){
   const cancel = document.getElementById('authCancelBtn');
   setAuthMessage('', '');
   loginFields.style.display = mode === 'login' ? '' : 'none';
-  passwordFields.style.display = mode === 'password' ? '' : 'none';
+  passwordFields.style.display = 'none';
   accountFields.style.display = mode === 'account' ? '' : 'none';
-  if(mode === 'password'){
-    title.textContent = 'Change password';
-    copy.textContent = 'Update the password for your PMO dashboard user.';
-    submit.textContent = 'Save password';
-  }else if(mode === 'account'){
-    title.textContent = 'PMO user';
-    copy.textContent = 'You are signed in to the PMO dashboard.';
-    submit.textContent = 'Change password';
+  if(mode === 'account'){
+    title.textContent = 'Account';
+    copy.textContent = 'You are signed in with your Google Azumo account.';
+    submit.textContent = 'Close';
+    submit.style.display = 'none';
     document.getElementById('authAccountSummary').innerHTML = currentUser
       ? `<strong>${esc(currentUser.name || currentUser.email)}</strong><br/>${esc(currentUser.email || '')}<br/><span style="color:var(--muted)">Role: ${esc(currentUser.role || 'viewer')}</span>`
       : 'Not signed in.';
   }else{
     title.textContent = 'Sign in';
-    copy.textContent = 'Use your PMO dashboard user to continue.';
-    submit.textContent = 'Sign in';
+    copy.textContent = 'Use your Google Azumo account to continue.';
+    submit.textContent = 'Sign in with Google';
+    submit.style.display = '';
   }
-  if(cancel) cancel.style.display = (!currentUser && mode === 'login') ? 'none' : '';
+  if(cancel){
+    cancel.textContent = mode === 'account' ? 'Close' : 'Cancel';
+    cancel.style.display = (!currentUser && mode === 'login') ? 'none' : '';
+  }
   modal.classList.add('open');
   modal.setAttribute('aria-hidden','false');
   setTimeout(()=>{
-    const focusId = mode === 'password' ? 'authCurrentPassword' : (mode === 'login' ? 'authEmail' : 'authSubmitBtn');
+    const focusId = mode === 'login' ? 'authGoogleBtn' : 'authCancelBtn';
     document.getElementById(focusId)?.focus();
   }, 20);
 }
@@ -356,36 +380,23 @@ function closeAuthModal(){
 }
 async function submitAuthModal(){
   if(authMode === 'account'){
-    showAuthModal('password');
+    closeAuthModal();
     return;
   }
   if(authMode === 'password') return changeUserPassword();
   return loginUser();
 }
-async function loginUser(){
-  const email = document.getElementById('authEmail').value.trim();
-  const password = document.getElementById('authPassword').value;
-  if(!email || !password){ setAuthMessage('error','Email and password are required.'); return null; }
+function loginUser(){
   const submit = document.getElementById('authSubmitBtn');
   submit.disabled = true;
-  submit.textContent = 'Signing in...';
-  try{
-    await loginWithCredentials(email, password);
-    setAuthMessage('success','Signed in.');
-    const after = authAfterLogin;
-    authMode = 'account';
-    closeAuthModal();
-    if(after === 'snapshot') manualSnapshot();
-    if(String(after || '').startsWith('jiraTicket:')) createActionJiraTicket(String(after).slice('jiraTicket:'.length));
-    if(String(after || '').startsWith('qaReview:')) markQaChecklistReviewed(String(after).slice('qaReview:'.length));
-    return currentUser;
-  }catch(error){
-    setAuthMessage('error', error.message);
-    return null;
-  }finally{
+  submit.textContent = 'Redirecting...';
+  setAuthMessage('', '');
+  const redirected = startGoogleSignIn(authAfterLogin);
+  if(!redirected){
     submit.disabled = false;
-    submit.textContent = 'Sign in';
+    submit.textContent = 'Sign in with Google';
   }
+  return null;
 }
 async function changeUserPassword(){
   const currentPassword = document.getElementById('authCurrentPassword').value;
@@ -422,6 +433,7 @@ async function changeUserPassword(){
 async function logoutUser(){
   try{ await fetch('/api/auth?action=logout', {method:'POST', credentials:'same-origin'}); }
   catch(error){ console.info('Logout failed:', error.message); }
+  clearStoredAuthAfterLogin();
   currentUser = null;
   latest = null;
   prev = null;
@@ -3137,9 +3149,11 @@ async function bootDashboard(){
   await loadCurrentUser();
   if(currentUser){
     await loadDashboardData();
+    await resumeStoredAuthAction();
   }else{
     updateAuthUi();
   }
 }
 window.loginFromGate = loginFromGate;
+window.startGoogleSignIn = startGoogleSignIn;
 bootDashboard();

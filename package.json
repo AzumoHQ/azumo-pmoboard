@@ -8,6 +8,7 @@
     "import:data": "node scripts/import-pmo-data.js"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.1.0"
+    "@neondatabase/serverless": "^1.1.0",
+    "google-auth-library": "^10.7.0"
   }
 }

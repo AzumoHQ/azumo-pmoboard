@@ -71,7 +71,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(6,12,26,.88);backdrop-filt
 .auth-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:1rem;flex-wrap:wrap}
 .auth-error{display:none;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.1);color:#FCA5A5;border-radius:10px;padding:.7rem .8rem;font-size:.8rem;margin:.75rem 0}
 .auth-success{display:none;border:1px solid rgba(16,185,129,.35);background:rgba(16,185,129,.1);color:#6EE7B7;border-radius:10px;padding:.7rem .8rem;font-size:.8rem;margin:.75rem 0}
-.auth-gate{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;padding:1rem;background:radial-gradient(circle at 20% 0%,rgba(0,102,255,.22),transparent 34%),radial-gradient(circle at 78% 12%,rgba(124,58,237,.18),transparent 30%),var(--bg)}.auth-gate-card{width:min(460px,100%);background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 42%),var(--card);border:1px solid rgba(107,143,191,.38);border-radius:24px;box-shadow:0 30px 100px rgba(0,0,0,.48);padding:1.55rem}.auth-gate-logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--blue),#7C3AED);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:950;margin-bottom:1rem}.auth-gate-card h1{font-size:1.35rem;letter-spacing:-.03em;margin-bottom:.35rem}.auth-gate-copy{color:var(--muted);font-size:.84rem;line-height:1.5;margin-bottom:1.05rem}.auth-gate-foot{font-size:.72rem;color:var(--muted);margin-top:.9rem;line-height:1.4}.auth-gate .btn{width:100%;justify-content:center}.auth-locked nav,.auth-locked .hero,.auth-locked .side-index,.auth-locked main,.auth-locked footer{display:none!important}.auth-ready #authGate{display:none!important}body.light .auth-gate{background:radial-gradient(circle at 20% 0%,rgba(0,102,255,.12),transparent 34%),radial-gradient(circle at 78% 12%,rgba(124,58,237,.10),transparent 30%),var(--bg)}
+.auth-gate{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;padding:1rem;background:radial-gradient(circle at 20% 0%,rgba(0,102,255,.22),transparent 34%),radial-gradient(circle at 78% 12%,rgba(124,58,237,.18),transparent 30%),var(--bg)}.auth-gate-card{width:min(460px,100%);background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 42%),var(--card);border:1px solid rgba(107,143,191,.38);border-radius:24px;box-shadow:0 30px 100px rgba(0,0,0,.48);padding:1.55rem}.auth-gate-logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--blue),#7C3AED);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:950;margin-bottom:1rem}.auth-gate-card h1{font-size:1.35rem;letter-spacing:-.03em;margin-bottom:.35rem}.auth-gate-copy{color:var(--muted);font-size:.84rem;line-height:1.5;margin-bottom:1.05rem}.auth-gate-foot{font-size:.72rem;color:var(--muted);margin-top:.9rem;line-height:1.4}.auth-provider-block{display:grid;gap:.8rem}.auth-provider-row{display:flex;align-items:center;justify-content:center;gap:.6rem}.auth-provider-icon{font-size:1rem;line-height:1}.auth-gate .btn{width:100%;justify-content:center}.auth-locked nav,.auth-locked .hero,.auth-locked .side-index,.auth-locked main,.auth-locked footer{display:none!important}.auth-ready #authGate{display:none!important}body.light .auth-gate{background:radial-gradient(circle at 20% 0%,rgba(0,102,255,.12),transparent 34%),radial-gradient(circle at 78% 12%,rgba(124,58,237,.10),transparent 30%),var(--bg)}
 /* TAB NAV */
 .tabs{position:sticky;top:0;z-index:180;background:var(--surf);border-bottom:1px solid var(--brd);padding:0 32px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
 .tabs-inner{max-width:1280px;margin:0 auto;display:flex;gap:0}
@@ -560,18 +560,14 @@ section{margin-bottom:1.65rem!important}
   <div class="auth-gate-card">
     <div class="auth-gate-logo">PMO</div>
     <h1>Sign in to PMO Dashboard</h1>
-    <p class="auth-gate-copy">Access is restricted to authorized Azumo users. Use your PMO dashboard account to continue.</p>
+    <p class="auth-gate-copy">Access is restricted to authorized Azumo users. Sign in with your Google Azumo account to continue.</p>
     <div class="auth-error" id="gateAuthError"></div>
-    <div class="auth-field">
-      <label for="gateEmail">Email</label>
-      <input id="gateEmail" type="email" autocomplete="username" placeholder="name@azumo.co" onkeydown="if(event.key==='Enter') document.getElementById('gatePassword')?.focus()"/>
+    <div class="auth-provider-block">
+      <button class="btn btn-primary" id="gateLoginBtn" type="button" onclick="loginFromGate()">
+        <span class="auth-provider-row"><span class="auth-provider-icon">🔐</span><span>Sign in with Google</span></span>
+      </button>
     </div>
-    <div class="auth-field">
-      <label for="gatePassword">Password</label>
-      <input id="gatePassword" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter') loginFromGate()"/>
-    </div>
-    <button class="btn btn-primary" id="gateLoginBtn" onclick="loginFromGate()">Sign in</button>
-    <div class="auth-gate-foot">If you do not have a user, ask PMO to create one before opening staffing data.</div>
+    <div class="auth-gate-foot">Only pre-authorized <strong>@azumo.co</strong> users can access this dashboard. Contact PMO if you need access.</div>
   </div>
 </div>
 
@@ -598,7 +594,6 @@ section{margin-bottom:1.65rem!important}
       <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
       <button class="nav-refresh" data-sync-action onclick="manualSnapshot()">🔄 Sync all sources</button>
       <button class="auth-pill" id="authStatusBtn" onclick="showAuthModal(currentUser ? 'account' : 'login')">Sign in</button>
-      <button class="auth-link" id="authPasswordBtn" onclick="showAuthModal('password')" style="display:none">Password</button>
       <button class="auth-link" id="authLogoutBtn" onclick="logoutUser()" style="display:none">Logout</button>
       <span class="nav-date" id="navDate"></span>
       <div class="avatar" id="authAvatar" title="PMO">PMO</div>
@@ -610,18 +605,16 @@ section{margin-bottom:1.65rem!important}
 <div class="auth-modal" id="authModal" aria-hidden="true">
   <div class="auth-card">
     <h3 id="authModalTitle">Sign in</h3>
-    <p id="authModalCopy">Sign in with your PMO user to run manual snapshots and manage your password.</p>
+    <p id="authModalCopy">Sign in with your Google Azumo account to continue.</p>
     <div class="auth-error" id="authError"></div>
     <div class="auth-success" id="authSuccess"></div>
 
     <div id="authLoginFields">
-      <div class="auth-field">
-        <label for="authEmail">Email</label>
-        <input id="authEmail" type="email" autocomplete="username" placeholder="name@azumo.co"/>
-      </div>
-      <div class="auth-field">
-        <label for="authPassword">Password</label>
-        <input id="authPassword" type="password" autocomplete="current-password"/>
+      <div class="auth-provider-block">
+        <button class="btn btn-primary" id="authGoogleBtn" type="button" onclick="startGoogleSignIn(authAfterLogin)">
+          <span class="auth-provider-row"><span class="auth-provider-icon">🔐</span><span>Sign in with Google</span></span>
+        </button>
+        <div class="auth-gate-foot" style="margin-top:0">Only pre-authorized <strong>@azumo.co</strong> users can access this dashboard.</div>
       </div>
     </div>
 
@@ -646,7 +639,7 @@ section{margin-bottom:1.65rem!important}
 
     <div class="auth-actions">
       <button class="btn btn-ghost btn-sm" id="authCancelBtn" onclick="closeAuthModal()">Cancel</button>
-      <button class="btn btn-primary btn-sm" id="authSubmitBtn" onclick="submitAuthModal()">Sign in</button>
+      <button class="btn btn-primary btn-sm" id="authSubmitBtn" onclick="submitAuthModal()">Sign in with Google</button>
     </div>
   </div>
 </div>
@@ -1557,6 +1550,7 @@ window.setAllModulesCollapsed = setAllModulesCollapsed;
 let currentUser = null;
 let authMode = 'login';
 let authAfterLogin = null;
+const AUTH_AFTER_LOGIN_KEY = 'pmo_auth_after_login';
 const ROLE_PREVIEW_PARAM = 'previewRole';
 function normalizeRole(role){ return String(role || '').trim().toLowerCase(); }
 function displayRoleName(role){
@@ -1614,6 +1608,58 @@ function setGateAuthMessage(message=''){
   error.textContent = message || '';
   error.style.display = message ? 'block' : 'none';
 }
+function storeAuthAfterLogin(value=''){
+  try{
+    if(value) sessionStorage.setItem(AUTH_AFTER_LOGIN_KEY, String(value));
+    else sessionStorage.removeItem(AUTH_AFTER_LOGIN_KEY);
+  }catch(error){
+    console.info('Session storage unavailable:', error.message);
+  }
+}
+function readStoredAuthAfterLogin(){
+  try{
+    return String(sessionStorage.getItem(AUTH_AFTER_LOGIN_KEY) || '');
+  }catch(error){
+    return '';
+  }
+}
+function clearStoredAuthAfterLogin(){
+  storeAuthAfterLogin('');
+}
+function startGoogleSignIn(afterLogin=''){
+  if(location.protocol === 'file:'){
+    const message = 'Google sign-in requires the local server or deployed dashboard. Open http://127.0.0.1:4173 or the deployed app.';
+    setGateAuthMessage(message);
+    setAuthMessage('error', message);
+    return false;
+  }
+  const nextAction = String(afterLogin || authAfterLogin || '').trim();
+  storeAuthAfterLogin(nextAction);
+  window.location.assign('/api/auth?action=google');
+  return true;
+}
+async function resumeStoredAuthAction(){
+  const after = readStoredAuthAfterLogin();
+  if(!after || !currentUser) return;
+  clearStoredAuthAfterLogin();
+  if(after === 'snapshot'){
+    await manualSnapshot();
+    return;
+  }
+  if(after.startsWith('jiraTicket:')){
+    await createActionJiraTicket(after.slice('jiraTicket:'.length));
+    return;
+  }
+  if(after.startsWith('qaReview:')){
+    await markQaChecklistReviewed(after.slice('qaReview:'.length));
+    return;
+  }
+  if(after.startsWith('actionNote:')){
+    const id = after.slice('actionNote:'.length);
+    goTo('pmoActionCenter');
+    setTimeout(()=>document.getElementById(actionNoteInputId(id))?.focus(), 140);
+  }
+}
 function setAuthGateState(user){
   const locked = !user;
   document.body.classList.toggle('auth-locked', locked);
@@ -1624,45 +1670,17 @@ function setAuthGateState(user){
     gate.setAttribute('aria-hidden', locked ? 'false' : 'true');
   }
   if(locked){
-    setTimeout(()=>document.getElementById('gateEmail')?.focus(), 20);
+    setTimeout(()=>document.getElementById('gateLoginBtn')?.focus(), 20);
   }else{
     setGateAuthMessage('');
   }
 }
-async function loginWithCredentials(email, password){
-  const response = await fetch('/api/auth?action=login', {
-    method:'POST',
-    credentials:'same-origin',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({email,password})
-  });
-  const result = await response.json().catch(()=>({}));
-  if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
-  currentUser = result.user;
-  updateAuthUi();
-  if(!latest) await loadDashboardData();
-  return currentUser;
-}
-async function loginFromGate(){
-  const email = document.getElementById('gateEmail')?.value.trim() || '';
-  const password = document.getElementById('gatePassword')?.value || '';
-  if(!email || !password){ setGateAuthMessage('Email and password are required.'); return null; }
-  const btn = document.getElementById('gateLoginBtn');
-  if(btn){ btn.disabled = true; btn.textContent = 'Signing in...'; }
-  try{
-    await loginWithCredentials(email, password);
-    document.getElementById('gatePassword').value = '';
-    return currentUser;
-  }catch(error){
-    setGateAuthMessage(error.message || 'Invalid email or password.');
-    return null;
-  }finally{
-    if(btn){ btn.disabled = false; btn.textContent = 'Sign in'; }
-  }
+function loginFromGate(){
+  setGateAuthMessage('');
+  return startGoogleSignIn();
 }
 function updateAuthUi(){
   const status = document.getElementById('authStatusBtn');
-  const pwd = document.getElementById('authPasswordBtn');
   const logout = document.getElementById('authLogoutBtn');
   const avatar = document.getElementById('authAvatar');
   if(!status || !avatar) return;
@@ -1670,15 +1688,13 @@ function updateAuthUi(){
     const preview = requestedPreviewRole() && canPreviewRole();
     status.textContent = preview ? `${currentUser.name || currentUser.email || 'Signed in'} · ${effectiveRoleLabel()}` : (currentUser.name || currentUser.email || 'Signed in');
     status.title = `${currentUser.email || ''} · role: ${displayRoleName(currentUser.role || '')}${preview ? ` · viewing as: ${effectiveRoleLabel()}` : ''}`;
-    pwd.style.display = '';
-    logout.style.display = '';
+    if(logout) logout.style.display = '';
     avatar.textContent = userInitials(currentUser);
     avatar.title = currentUser.email || currentUser.name || 'PMO';
   }else{
-    status.textContent = 'Sign in';
-    status.title = 'Sign in';
-    pwd.style.display = 'none';
-    logout.style.display = 'none';
+    status.textContent = 'Sign in with Google';
+    status.title = 'Sign in with Google';
+    if(logout) logout.style.display = 'none';
     avatar.textContent = 'PMO';
     avatar.title = 'PMO';
   }
@@ -1725,29 +1741,30 @@ function showAuthModal(mode='login', afterLogin=null){
   const cancel = document.getElementById('authCancelBtn');
   setAuthMessage('', '');
   loginFields.style.display = mode === 'login' ? '' : 'none';
-  passwordFields.style.display = mode === 'password' ? '' : 'none';
+  passwordFields.style.display = 'none';
   accountFields.style.display = mode === 'account' ? '' : 'none';
-  if(mode === 'password'){
-    title.textContent = 'Change password';
-    copy.textContent = 'Update the password for your PMO dashboard user.';
-    submit.textContent = 'Save password';
-  }else if(mode === 'account'){
-    title.textContent = 'PMO user';
-    copy.textContent = 'You are signed in to the PMO dashboard.';
-    submit.textContent = 'Change password';
+  if(mode === 'account'){
+    title.textContent = 'Account';
+    copy.textContent = 'You are signed in with your Google Azumo account.';
+    submit.textContent = 'Close';
+    submit.style.display = 'none';
     document.getElementById('authAccountSummary').innerHTML = currentUser
       ? `<strong>${esc(currentUser.name || currentUser.email)}</strong><br/>${esc(currentUser.email || '')}<br/><span style="color:var(--muted)">Role: ${esc(displayRoleName(currentUser.role || 'Executive'))}</span>`
       : 'Not signed in.';
   }else{
     title.textContent = 'Sign in';
-    copy.textContent = 'Use your PMO dashboard user to continue.';
-    submit.textContent = 'Sign in';
+    copy.textContent = 'Use your Google Azumo account to continue.';
+    submit.textContent = 'Sign in with Google';
+    submit.style.display = '';
   }
-  if(cancel) cancel.style.display = (!currentUser && mode === 'login') ? 'none' : '';
+  if(cancel){
+    cancel.textContent = mode === 'account' ? 'Close' : 'Cancel';
+    cancel.style.display = (!currentUser && mode === 'login') ? 'none' : '';
+  }
   modal.classList.add('open');
   modal.setAttribute('aria-hidden','false');
   setTimeout(()=>{
-    const focusId = mode === 'password' ? 'authCurrentPassword' : (mode === 'login' ? 'authEmail' : 'authSubmitBtn');
+    const focusId = mode === 'login' ? 'authGoogleBtn' : 'authCancelBtn';
     document.getElementById(focusId)?.focus();
   }, 20);
 }
@@ -1760,36 +1777,23 @@ function closeAuthModal(){
 }
 async function submitAuthModal(){
   if(authMode === 'account'){
-    showAuthModal('password');
+    closeAuthModal();
     return;
   }
   if(authMode === 'password') return changeUserPassword();
   return loginUser();
 }
-async function loginUser(){
-  const email = document.getElementById('authEmail').value.trim();
-  const password = document.getElementById('authPassword').value;
-  if(!email || !password){ setAuthMessage('error','Email and password are required.'); return null; }
+function loginUser(){
   const submit = document.getElementById('authSubmitBtn');
   submit.disabled = true;
-  submit.textContent = 'Signing in...';
-  try{
-    await loginWithCredentials(email, password);
-    setAuthMessage('success','Signed in.');
-    const after = authAfterLogin;
-    authMode = 'account';
-    closeAuthModal();
-    if(after === 'snapshot') manualSnapshot();
-    if(String(after || '').startsWith('jiraTicket:')) createActionJiraTicket(String(after).slice('jiraTicket:'.length));
-    if(String(after || '').startsWith('qaReview:')) markQaChecklistReviewed(String(after).slice('qaReview:'.length));
-    return currentUser;
-  }catch(error){
-    setAuthMessage('error', error.message);
-    return null;
-  }finally{
+  submit.textContent = 'Redirecting...';
+  setAuthMessage('', '');
+  const redirected = startGoogleSignIn(authAfterLogin);
+  if(!redirected){
     submit.disabled = false;
-    submit.textContent = 'Sign in';
+    submit.textContent = 'Sign in with Google';
   }
+  return null;
 }
 async function changeUserPassword(){
   const currentPassword = document.getElementById('authCurrentPassword').value;
@@ -1826,6 +1830,7 @@ async function changeUserPassword(){
 async function logoutUser(){
   try{ await fetch('/api/auth?action=logout', {method:'POST', credentials:'same-origin'}); }
   catch(error){ console.info('Logout failed:', error.message); }
+  clearStoredAuthAfterLogin();
   currentUser = null;
   latest = null;
   prev = null;
@@ -5495,11 +5500,13 @@ async function bootDashboard(){
   await loadCurrentUser();
   if(currentUser){
     await loadDashboardData();
+    await resumeStoredAuthAction();
   }else{
     updateAuthUi();
   }
 }
 window.loginFromGate = loginFromGate;
+window.startGoogleSignIn = startGoogleSignIn;
 bootDashboard();
 </script>
 </body>

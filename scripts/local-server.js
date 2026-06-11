@@ -44,10 +44,31 @@ function send(res, status, body, headers = {}) {
   res.end(body);
 }
 
+function resolveStaticPath(pathname) {
+  const normalized = decodeURIComponent(pathname === '/' ? '/index.html' : pathname);
+  const candidates = [normalized];
+  if (!path.extname(normalized)) {
+    candidates.push(`${normalized}.html`);
+    candidates.push(path.join(normalized, 'index.html'));
+  }
+  for (const candidate of candidates) {
+    const filePath = path.normalize(path.join(ROOT, candidate));
+    if (!filePath.startsWith(ROOT)) continue;
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      return filePath;
+    }
+  }
+  return '';
+}
+
 function serveStatic(req, res) {
   const url = new URL(req.url, `http://${req.headers.host || `localhost:${PORT}`}`);
-  const pathname = decodeURIComponent(url.pathname === '/' ? '/index.html' : url.pathname);
-  const filePath = path.normalize(path.join(ROOT, pathname));
+  const filePath = resolveStaticPath(url.pathname);
+
+  if (!filePath) {
+    send(res, 404, 'Not found');
+    return;
+  }
 
   if (!filePath.startsWith(ROOT)) {
     send(res, 403, 'Forbidden');
