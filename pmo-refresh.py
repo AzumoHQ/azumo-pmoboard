@@ -1149,6 +1149,7 @@ def parse_jira(raw_issues: list, assignment_metrics: dict = None, bench_metrics:
         frameworks = eazy_assignment.get('frameworks', '')
         potential_next_assignment = eazy_assignment.get('potential_next_assignment', '')
         project_manager = first_non_empty(
+            jira_field_value(parent_fields.get(CF_PROJECT_MANAGER)),
             jira_field_value(f.get(CF_PROJECT_MANAGER)),
             eazy_assignment.get('project_manager', ''),
         )
