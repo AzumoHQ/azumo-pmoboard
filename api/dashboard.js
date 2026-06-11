@@ -31,6 +31,7 @@ module.exports = async function dashboardHandler(req, res) {
       return;
     }
 
+    const warnings = [];
     data.eazybi = clientReportConfig();
     const latest = data.snapshots.at(-1);
 
@@ -38,20 +39,35 @@ module.exports = async function dashboardHandler(req, res) {
       const internalProjects = await fetchInternalProjectsReport();
       if (internalProjects) latest.internal_projects = internalProjects;
     } catch (error) {
-      if (!latest.internal_projects) {
-        sendError(res, 502, `Failed to load Internal Projects report: ${error.message}`);
-        return;
-      }
+      warnings.push(`Internal Projects report failed: ${error.message}`);
+      latest.internal_projects = latest.internal_projects || {
+        source: 'EazyBI Internal Projects',
+        rows: [],
+        row_count: 0,
+        warning: error.message
+      };
     }
 
     try {
       const newSearchesTriage = await fetchNewSearchesTriageReport();
       if (newSearchesTriage) latest.new_searches_triage = newSearchesTriage;
     } catch (error) {
-      if (!latest.new_searches_triage) {
-        sendError(res, 502, `Failed to load New Searches Triage report: ${error.message}`);
-        return;
-      }
+      warnings.push(`New Searches Triage report failed: ${error.message}`);
+      latest.new_searches_triage = latest.new_searches_triage || {
+        source: 'EazyBI New Searches Triage',
+        rows: [],
+        row_count: 0,
+        warning: error.message
+      };
+    }
+
+    if (!latest || (!latest.internal_projects && !latest.new_searches_triage && warnings.length)) {
+      sendError(res, 500, 'Dashboard data is unavailable.');
+      return;
+    }
+
+    if (warnings.length) {
+      data.warnings = warnings;
     }
 
     res.status(200).json(data);
