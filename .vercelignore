@@ -1,0 +1,16 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+node_modules/
+.vercel/
+.git/
+__pycache__/
+*.pyc
+dist/
+coverage/
+npm-debug.log*
+pmo-data.json
+pmo-dashboard.html
+jira-raw.json
+*.zip

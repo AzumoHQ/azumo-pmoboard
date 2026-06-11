@@ -7,21 +7,33 @@ if (process.env.PMO_LOCAL_USE_DATABASE !== '1') {
 }
 
 const dashboardHandler = require('../api/dashboard');
+const authChangePasswordHandler = require('../api/auth/change-password');
+const authLoginHandler = require('../api/auth/login');
+const authLogoutHandler = require('../api/auth/logout');
+const authMeHandler = require('../api/auth/me');
+const cronSnapshotHandler = require('../api/cron-snapshot');
 const healthHandler = require('../api/health');
 const notesHandler = require('../api/notes');
 const refreshHandler = require('../api/refresh');
 const snapshotsHandler = require('../api/snapshots');
+const usersHandler = require('../api/users');
 
 const ROOT = path.join(__dirname, '..');
 const HOST = process.env.HOST || '127.0.0.1';
 const PORT = Number(process.env.PORT || 4173);
 
 const API_ROUTES = {
+  '/api/auth/change-password': authChangePasswordHandler,
+  '/api/auth/login': authLoginHandler,
+  '/api/auth/logout': authLogoutHandler,
+  '/api/auth/me': authMeHandler,
+  '/api/cron-snapshot': cronSnapshotHandler,
   '/api/dashboard': dashboardHandler,
   '/api/health': healthHandler,
   '/api/notes': notesHandler,
   '/api/refresh': refreshHandler,
-  '/api/snapshots': snapshotsHandler
+  '/api/snapshots': snapshotsHandler,
+  '/api/users': usersHandler
 };
 
 const MIME_TYPES = {
@@ -68,6 +80,9 @@ function decorateJsonResponse(res) {
     const body = JSON.stringify(payload);
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.end(body);
+  };
+  res.send = (payload) => {
+    res.end(payload);
   };
 }
 

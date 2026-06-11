@@ -1,11 +1,8 @@
-.DS_Store
-.env
-.env.*
-!.env.example
 node_modules/
-.vercel/
 .next/
-dist/
-coverage/
+.vercel/
+.env
+.env.local
+*.log
 npm-debug.log*
 .env*.local

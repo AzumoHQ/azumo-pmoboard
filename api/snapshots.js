@@ -1,4 +1,5 @@
 const { getDashboardData, saveSnapshot } = require('../lib/data-store');
+const { canRefresh, getSessionUser } = require('../lib/auth');
 
 function readJson(req) {
   return new Promise((resolve, reject) => {
@@ -22,14 +23,25 @@ function readJson(req) {
   });
 }
 
-function isAuthorized(req) {
+async function isAuthorized(req) {
   const token = process.env.PMO_REFRESH_TOKEN;
-  if (!token) return true;
-  return req.headers['x-pmo-token'] === token || req.headers.authorization === `Bearer ${token}`;
+  if (token && (req.headers['x-pmo-token'] === token || req.headers.authorization === `Bearer ${token}`)) {
+    return true;
+  }
+
+  const user = await getSessionUser(req);
+  if (canRefresh(user)) return true;
+
+  return !token;
 }
 
 module.exports = async function snapshotsHandler(req, res) {
   try {
+    const user = await getSessionUser(req);
+    if (!user || user.active === false) {
+      res.status(401).json({ error: 'Sign in required' });
+      return;
+    }
     if (req.method === 'GET') {
       const data = await getDashboardData();
       res.status(200).json(data.snapshots || []);
@@ -37,7 +49,7 @@ module.exports = async function snapshotsHandler(req, res) {
     }
 
     if (req.method === 'POST') {
-      if (!isAuthorized(req)) {
+      if (!(await isAuthorized(req))) {
         res.status(401).json({ error: 'Unauthorized' });
         return;
       }

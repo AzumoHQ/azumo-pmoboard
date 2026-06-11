@@ -1,4 +1,6 @@
 const { addNote, deleteNote, getNotes } = require('../lib/data-store');
+const { createPmoActionIssue } = require('../lib/jira-client');
+const { canRefresh, getSessionUser } = require('../lib/auth');
 
 function readJson(req) {
   return new Promise((resolve, reject) => {
@@ -22,14 +24,17 @@ function readJson(req) {
   });
 }
 
-function hasNotesAccess(req) {
-  const password = process.env.PMO_NOTES_PASSWORD;
-  if (!password) return false;
-  return req.headers['x-pmo-password'] === password;
+async function getNotesAccess(req) {
+  const user = await getSessionUser(req);
+  if (!user || user.active === false) {
+    return { read: false, write: false };
+  }
+  return { read: true, write: canRefresh(user) };
 }
 
 module.exports = async function notesHandler(req, res) {
-  if (!hasNotesAccess(req)) {
+  const access = await getNotesAccess(req);
+  if (!access.read) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
@@ -41,13 +46,28 @@ module.exports = async function notesHandler(req, res) {
     }
 
     if (req.method === 'POST') {
+      if (!access.write) {
+        res.status(403).json({ error: 'Forbidden' });
+        return;
+      }
       const note = await readJson(req);
+
+      if (note.type === 'jira_action_ticket') {
+        const ticket = await createPmoActionIssue(note.action || {});
+        res.status(201).json({ ticket });
+        return;
+      }
+
       await addNote(note);
       res.status(201).json({ notes: await getNotes() });
       return;
     }
 
     if (req.method === 'DELETE') {
+      if (!access.write) {
+        res.status(403).json({ error: 'Forbidden' });
+        return;
+      }
       const url = new URL(req.url, `https://${req.headers.host || 'localhost'}`);
       const id = url.searchParams.get('id');
       if (!id) {

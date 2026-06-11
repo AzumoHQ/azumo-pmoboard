@@ -10,5 +10,21 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/pmo-data.json",
+      "destination": "/api/dashboard"
+    },
+    {
+      "source": "/pmo-dashboard.html",
+      "destination": "/"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron-snapshot",
+      "schedule": "0 12 * * *"
+    }
   ]
 }
