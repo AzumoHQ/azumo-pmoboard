@@ -1012,7 +1012,7 @@ section{margin-bottom:1.65rem!important}
     </div>
     <div class="fc-table-wrap">
       <table>
-        <thead><tr><th>Client</th><th>Status</th><th>PM Assigned</th><th>CSM Assigned</th><th>TL Assigned</th><th>Coverage</th><th>Assignees</th><th>Link</th></tr></thead>
+        <thead><tr><th>Client</th><th>Status</th><th>PM Assigned</th><th>CSM Assigned</th><th>TL Assigned</th><th>Accounts Coverage</th><th>Assignees</th><th>Link</th></tr></thead>
         <tbody id="accountCoverageTbody"></tbody>
       </table>
     </div>
@@ -1420,7 +1420,7 @@ function sidebarNavConfig(){
         {id:'newSearchesTriage', icon:'', label:'New Searches Triage'}
       ]}
     ]},
-    {id:'accountCoverage', icon:'📋', label:'Coverage'},
+    {id:'accountCoverage', icon:'📋', label:'Accounts Coverage'},
     {id:'harvestGroup', icon:'🌾', label:'Harvest', children:[
       {id:'harvestHours', icon:'', label:'Control'},
       {id:'harvestAccess', icon:'', label:'Assignments'}
@@ -3473,7 +3473,7 @@ async function persistActionState(id, patch){
 }
 function severityRank(severity){ return {critical:0,error:0,warning:1,info:2,ok:3}[severity] ?? 2; }
 function actionCategoryLabel(category){
-  return ({urgent:'Due date', qa:'Data QA', harvest:'Harvest QA', billing:'Billing', coverage:'Coverage', freshness:'Freshness'}[category] || category || 'Action');
+  return ({urgent:'Due date', qa:'Data QA', harvest:'Harvest QA', billing:'Billing', coverage:'Accounts Coverage', freshness:'Freshness'}[category] || category || 'Action');
 }
 function normalizeActionSeverity(severity){ return severity === 'error' ? 'critical' : (severity || 'info'); }
 function rowActionKey(row, fallback='row'){
@@ -3849,7 +3849,7 @@ function actionStatusLabel(severity){
 }
 function actionModuleTarget(action){
   if(action.category === 'harvest') return {label:'Open Harvest QA', onclick:"activateModuleTab('harvestAccess')"};
-  if(action.category === 'coverage') return {label:'Open Coverage', onclick:"activateModuleTab('accountCoverage')"};
+  if(action.category === 'coverage') return {label:'Open Accounts Coverage', onclick:"activateModuleTab('accountCoverage')"};
   if(action.category === 'billing') return {label:'Open Billing', onclick:"activateModuleTab('dashboard')"};
   if(action.category === 'freshness') return {label:'Open Billing', onclick:"activateModuleTab('dashboard')"};
   if(action.category === 'urgent') return {label:'Open Due Dates', onclick:"activateModuleTab('dueDates')"};
@@ -3964,7 +3964,7 @@ function renderPmoActionCenter(){
   if(tabs){
     const tabDefs = [
       ['open','Current',counts.open], ['urgent','Urgent',counts.urgent], ['qa','Data QA',counts.qa], ['harvest','Harvest',counts.harvest],
-      ['billing','Billing',counts.billing], ['coverage','Coverage',counts.coverage]
+      ['billing','Billing',counts.billing], ['coverage','Accounts Coverage',counts.coverage]
     ];
     tabs.innerHTML = tabDefs.map(([id,label,count]) => `<button class="action-filter ${actionFilter === id ? 'active' : ''}" onclick="setActionFilter('${id}')">${label} · ${count}</button>`).join('');
   }
