@@ -609,6 +609,7 @@ section{margin-bottom:1.65rem!important}
       <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
       <button class="nav-refresh" data-sync-action onclick="manualSnapshot()">🔄 Sync all sources</button>
       <a class="auth-link" id="adminUsersLink" href="/admin/users" style="display:none">Users</a>
+      <a class="auth-link" id="adminViewAsLink" href="/admin/users" style="display:none">View as</a>
       <button class="auth-pill" id="authStatusBtn" onclick="showAuthModal(currentUser ? 'account' : 'login')">Sign in</button>
       <button class="auth-link" id="authLogoutBtn" onclick="logoutUser()" style="display:none">Logout</button>
       <span class="nav-date" id="navDate"></span>
@@ -1794,14 +1795,17 @@ function updateAuthUi(){
   const status = document.getElementById('authStatusBtn');
   const logout = document.getElementById('authLogoutBtn');
   const usersLink = document.getElementById('adminUsersLink');
+  const viewAsLink = document.getElementById('adminViewAsLink');
   const avatar = document.getElementById('authAvatar');
   if(!status || !avatar) return;
   if(currentUser){
     const preview = isImpersonating() || (requestedPreviewRole() && canPreviewRole());
+    const canUseAdminTools = ['pmo','admin'].includes(realUserRole()) && !isImpersonating();
     status.textContent = preview ? `${currentUser.name || currentUser.email || 'Signed in'} · ${effectiveRoleLabel()}` : (currentUser.name || currentUser.email || 'Signed in');
     status.title = `${currentUser.email || ''} · role: ${displayRoleName(currentUser.role || '')}${preview ? ` · viewing as: ${effectiveRoleLabel()}` : ''}`;
     if(logout) logout.style.display = '';
-    if(usersLink) usersLink.style.display = currentUser.role === 'PMO' && !isImpersonating() ? '' : 'none';
+    if(usersLink) usersLink.style.display = canUseAdminTools ? '' : 'none';
+    if(viewAsLink) viewAsLink.style.display = canUseAdminTools ? '' : 'none';
     avatar.textContent = userInitials(currentUser);
     avatar.title = currentUser.email || currentUser.name || 'PMO';
   }else{
@@ -1809,6 +1813,7 @@ function updateAuthUi(){
     status.title = 'Sign in with Google';
     if(logout) logout.style.display = 'none';
     if(usersLink) usersLink.style.display = 'none';
+    if(viewAsLink) viewAsLink.style.display = 'none';
     avatar.textContent = 'PMO';
     avatar.title = 'PMO';
   }
