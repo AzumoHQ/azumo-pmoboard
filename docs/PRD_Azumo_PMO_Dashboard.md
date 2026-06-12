@@ -122,8 +122,8 @@ The dashboard has two permission layers:
 | **Reports → New Searches Reports** | ✅ | ✅ | ✅ | ⚠️ approved only | ⚠️ approved only | ❌ default | New Searches Triage is a report source view. |
 | **Reports → History** | ✅ | ✅ | ✅ | ❌ default | ❌ default | ❌ default | Month-over-month/history trends are executive/PMO by default. |
 | **Coverage** | ✅ | ✅ | ✅ | ⚠️ scoped target | ✅ own clients target | ⚠️ read-only | Account Coverage shows PM, CSM, TL, and Status from PSA. |
-| **Harvest → Control** | ✅ | ✅ | ✅ | ❌ default | ❌ default | ❌ default | C-Level can see Harvest Control read-only. Harvest is never modified by the dashboard. |
-| **Harvest → Assignments** | ✅ | ✅ | ✅ | ❌ default | ❌ default | ❌ default | C-Level can see Harvest assignment/access QA read-only. Used for Jira vs Harvest access comparison. |
+| **Harvest → Control** | ✅ | ✅ | ✅ | ✅ read-only | ✅ read-only | ❌ default | PM and CSM can review Harvest hours without modifying Harvest. |
+| **Harvest → Assignments** | ✅ | ✅ | ✅ | ✅ read-only | ✅ read-only | ❌ default | PM and CSM can review Harvest assignment/access QA read-only. Used for Jira vs Harvest access comparison. |
 | **Forecast** | ✅ | ✅ | ✅ | ✅ own PM assignments target | ✅ own CSM clients target | ⚠️ read-only | Shows upcoming assignment due dates. Bench due dates are ignored. |
 | **PMO → QA** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | Hidden from non-PMO users. |
 | **PMO → Due Dates** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | PMO operational queue; non-PMO users may still see Forecast. |

@@ -1377,8 +1377,8 @@ function sectionAllowedForCurrentRole(id){
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
   if(['executive','viewer','c-level','clevel','hr'].includes(role)) return true;
-  if(role === 'pm') return ['opsViews','forecast'].includes(id);
-  if(role === 'csm') return ['opsViews','bench','accountCoverage','forecast'].includes(id);
+  if(role === 'pm') return ['opsViews','forecast','harvestHours','harvestAccess'].includes(id);
+  if(role === 'csm') return ['opsViews','bench','accountCoverage','forecast','harvestHours','harvestAccess'].includes(id);
   if(role === 'tl') return ['opsViews','accountCoverage','forecast'].includes(id);
   if(role === 'assignee') return ['opsViews','forecast'].includes(id);
   return false;

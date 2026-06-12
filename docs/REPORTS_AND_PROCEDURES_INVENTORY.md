@@ -98,6 +98,10 @@ A value of `90%` means the company has the equivalent of 90 fully utilized billa
 | `EAZYBI_BENCH_BY_MONTH_REPORT_ID` | Bench by Month report. **Needed.** |
 | `EAZYBI_INTERNAL_PROJECTS_ACCOUNT_ID` | Internal Projects account, currently `216082`. |
 | `EAZYBI_INTERNAL_PROJECTS_REPORT_ID` | Internal Projects report, currently `5259086`. |
+| `EAZYBI_INTERNAL_PROJECTS_TOKEN` | Optional embed token. If absent, the dashboard uses the main EazyBI API token. |
+| `EAZYBI_NEW_SEARCHES_ACCOUNT_ID` | New Searches account, currently `232624`. |
+| `EAZYBI_NEW_SEARCHES_REPORT_ID` | New Searches Triage report, currently `5434977`. |
+| `EAZYBI_NEW_SEARCHES_TOKEN` | Optional embed token. If absent, the dashboard uses the main EazyBI API token. |
 | `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` | Jira API access. |
 | `HARVEST_ACCOUNT_ID`, `HARVEST_ACCESS_TOKEN` | Harvest read-only API access. |
 | `DATABASE_URL` | Neon snapshot/account coverage storage. |
