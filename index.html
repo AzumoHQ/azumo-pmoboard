@@ -19,6 +19,7 @@
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:"azo-sans-web",sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-weight:400;letter-spacing:-.008em}
+body.impersonating{padding-top:58px}
 
 body.light{
   --bg:#F6F8FC; --surf:#EEF3FA; --card:#FFFFFF; --brd:#D9E3F2;
@@ -72,6 +73,13 @@ nav{position:sticky;top:0;z-index:200;background:rgba(6,12,26,.88);backdrop-filt
 .auth-error{display:none;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.1);color:#FCA5A5;border-radius:10px;padding:.7rem .8rem;font-size:.8rem;margin:.75rem 0}
 .auth-success{display:none;border:1px solid rgba(16,185,129,.35);background:rgba(16,185,129,.1);color:#6EE7B7;border-radius:10px;padding:.7rem .8rem;font-size:.8rem;margin:.75rem 0}
 .auth-gate{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;padding:1rem;background:radial-gradient(circle at 20% 0%,rgba(0,102,255,.22),transparent 34%),radial-gradient(circle at 78% 12%,rgba(124,58,237,.18),transparent 30%),var(--bg)}.auth-gate-card{width:min(460px,100%);background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 42%),var(--card);border:1px solid rgba(107,143,191,.38);border-radius:24px;box-shadow:0 30px 100px rgba(0,0,0,.48);padding:1.55rem}.auth-gate-logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--blue),#7C3AED);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:950;margin-bottom:1rem}.auth-gate-card h1{font-size:1.35rem;letter-spacing:-.03em;margin-bottom:.35rem}.auth-gate-copy{color:var(--muted);font-size:.84rem;line-height:1.5;margin-bottom:1.05rem}.auth-gate-foot{font-size:.72rem;color:var(--muted);margin-top:.9rem;line-height:1.4}.auth-provider-block{display:grid;gap:.8rem}.auth-provider-row{display:flex;align-items:center;justify-content:center;gap:.6rem}.auth-provider-icon{font-size:1rem;line-height:1}.auth-gate .btn{width:100%;justify-content:center}.auth-locked nav,.auth-locked .hero,.auth-locked .side-index,.auth-locked main,.auth-locked footer{display:none!important}.auth-ready #authGate{display:none!important}body.light .auth-gate{background:radial-gradient(circle at 20% 0%,rgba(0,102,255,.12),transparent 34%),radial-gradient(circle at 78% 12%,rgba(124,58,237,.10),transparent 30%),var(--bg)}
+.impersonation-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:1000;background:linear-gradient(90deg,rgba(245,158,11,.98),rgba(249,115,22,.96));color:#2B1700;border-bottom:1px solid rgba(146,64,14,.35);box-shadow:0 10px 28px rgba(0,0,0,.18)}
+.impersonation-banner.show{display:block}
+.impersonation-banner-inner{max-width:1280px;margin:0 auto;padding:12px 32px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.impersonation-banner strong{font-weight:950}
+.impersonation-banner-copy{font-size:.86rem;font-weight:800;letter-spacing:-.01em}
+.impersonation-banner .auth-link{color:#2B1700;font-size:.82rem;font-weight:950;text-decoration:underline}
+.impersonation-banner .auth-link:hover{color:#1F1200}
 /* TAB NAV */
 .tabs{position:sticky;top:0;z-index:180;background:var(--surf);border-bottom:1px solid var(--brd);padding:0 32px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
 .tabs-inner{max-width:1280px;margin:0 auto;display:flex;gap:0}
@@ -571,6 +579,13 @@ section{margin-bottom:1.65rem!important}
   </div>
 </div>
 
+<div class="impersonation-banner" id="impersonationBanner" aria-live="polite" aria-hidden="true">
+  <div class="impersonation-banner-inner">
+    <div class="impersonation-banner-copy" id="impersonationBannerCopy">Viewing as —</div>
+    <button class="auth-link" type="button" id="impersonationExitBtn" onclick="stopImpersonation()">Exit</button>
+  </div>
+</div>
+
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
@@ -579,12 +594,12 @@ section{margin-bottom:1.65rem!important}
       <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Dashboard</div><div class="nav-wip-pill"><span>Work in Progress</span><a href="https://azumo.slack.com/app_redirect?channel=U08R6NSMWFJ" target="_blank" rel="noopener noreferrer">Feedback</a></div></div><div class="nav-sub">Project Management Office</div></div>
     </div>
     <div class="nav-links">
-      <button class="nav-link" onclick="goTo('dashboard')">💳 Billing</button>
-      <button class="nav-link" onclick="goTo('opsViews')">🧭 Operating Views</button>
+      <button class="nav-link" id="billingNavLink" onclick="goTo('dashboard')">💳 Billing</button>
+      <button class="nav-link" id="opsNavLink" onclick="goTo('opsViews')">🧭 Operating Views</button>
       <div class="nav-menu" id="pmoNavMenu">
         <button class="nav-link" type="button" onclick="goTo('pmoActionCenter')">🔔 PMO <span class="nav-badge" id="actionNavBadge">0</span></button>
       </div>
-      <div class="pmo-subnav" aria-label="PMO quick views">
+      <div class="pmo-subnav" id="pmoQuickLinks" aria-label="PMO quick views">
         <button class="nav-link" onclick="goTo('pmoActionCenter')">QA <span class="nav-badge" id="actionNavDropdownBadge">0</span></button>
         <button class="nav-link" onclick="goTo('dueDates')">Due Dates</button>
         <button class="nav-link" onclick="goTo('pendingAssignments')">Pending Assignments <span class="nav-badge" id="pendingNavBadge">0</span></button>
@@ -1271,6 +1286,7 @@ async function loadDashboardData(){
       const response = await fetch('/api/dashboard', {cache:'no-store', credentials:'same-origin'});
       if(response.status === 401 || response.status === 403){
         currentUser = null;
+        impersonatedUser = null;
         updateAuthUi();
         setGateAuthMessage('Please sign in to open the dashboard.');
         return;
@@ -1360,10 +1376,12 @@ function sectionAllowedForCurrentRole(id){
   const role = effectiveUserRole();
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
+  if(['executive','viewer','c-level','clevel','hr'].includes(role)) return true;
   if(role === 'pm') return ['opsViews','forecast'].includes(id);
   if(role === 'csm') return ['opsViews','bench','accountCoverage','forecast'].includes(id);
-  if(role === 'viewer') return ['dashboard','forecast'].includes(id);
-  return true;
+  if(role === 'tl') return ['opsViews','accountCoverage','forecast'].includes(id);
+  if(role === 'assignee') return ['opsViews','forecast'].includes(id);
+  return false;
 }
 function allModuleSections(){
   const seen = new Set();
@@ -1549,6 +1567,7 @@ window.toggleModule = toggleModule;
 window.setAllModulesCollapsed = setAllModulesCollapsed;
 
 let currentUser = null;
+let impersonatedUser = null;
 let authMode = 'login';
 let authAfterLogin = null;
 const AUTH_AFTER_LOGIN_KEY = 'pmo_auth_after_login';
@@ -1566,18 +1585,29 @@ function displayRoleName(role){
   if(normalized === 'c-level' || normalized === 'clevel') return 'C-Level';
   return String(role || '');
 }
+function fullNameFromUser(user){
+  const first = String(user?.first_name || '').trim();
+  const last = String(user?.last_name || '').trim();
+  return `${first} ${last}`.trim() || String(user?.name || user?.email || '').trim();
+}
 function realUserRole(){ return normalizeRole(currentUser?.role || ''); }
+function effectiveSessionUser(){
+  return impersonatedUser || currentUser || null;
+}
 function requestedPreviewRole(){
   if(location.protocol === 'file:') return '';
   const role = normalizeRole(new URLSearchParams(location.search).get(ROLE_PREVIEW_PARAM));
   return ['c-level','clevel','executive','viewer','pm','csm'].includes(role) ? role : '';
 }
 function canPreviewRole(){ return ['admin','pmo'].includes(realUserRole()); }
+function isImpersonating(){ return Boolean(impersonatedUser); }
 function effectiveUserRole(){
+  if(impersonatedUser?.role) return normalizeRole(impersonatedUser.role);
   const preview = requestedPreviewRole();
   return preview && canPreviewRole() ? preview : realUserRole();
 }
 function effectiveRoleLabel(){
+  if(impersonatedUser?.role) return displayRoleName(impersonatedUser.role);
   const role = effectiveUserRole();
   if(role === 'admin' || role === 'pmo') return 'Administrator';
   if(role === 'c-level' || role === 'clevel') return 'C-Level preview';
@@ -1587,14 +1617,84 @@ function effectiveRoleLabel(){
   if(role === 'csm') return 'CSM preview';
   return displayRoleName(currentUser?.role || '');
 }
+function effectiveUserEmail(){
+  return String(effectiveSessionUser()?.email || '').trim().toLowerCase();
+}
+function userIdentityTokens(user){
+  const tokens = new Set();
+  const email = String(user?.email || '').trim().toLowerCase();
+  const full = normalizeIdentity(fullNameFromUser(user));
+  const first = normalizeIdentity(user?.first_name || '');
+  const last = normalizeIdentity(user?.last_name || '');
+  if(email) {
+    tokens.add(email);
+    tokens.add(email.split('@')[0]);
+  }
+  if(full) tokens.add(full);
+  if(first) tokens.add(first);
+  if(last) tokens.add(last);
+  return tokens;
+}
+function effectiveUserTokens(){
+  return userIdentityTokens(effectiveSessionUser());
+}
+function identityMatchesTokens(value, tokens = effectiveUserTokens()){
+  const normalized = normalizeIdentity(value);
+  if(!normalized || !tokens.size) return false;
+  return tokens.has(normalized);
+}
+function effectivePersonMatch(row){
+  const tokens = effectiveUserTokens();
+  if(!tokens.size) return false;
+  return identityMatchesTokens(row.email || '', tokens)
+    || identityMatchesTokens(row.assignee || row.name || '', tokens);
+}
+function effectiveOwnedClientKeys(){
+  const role = effectiveUserRole();
+  const field = role === 'csm' ? 'csm_assigned' : role === 'tl' ? 'tl_assigned' : '';
+  const allowed = new Set();
+  if(!field || !latest) return allowed;
+  (latest.account_coverage || []).forEach(row => {
+    if(identityMatchesTokens(row[field])) allowed.add(normalizeClientKey(row.client || ''));
+  });
+  return allowed;
+}
+function executiveLikeRole(role = effectiveUserRole()){
+  return ['admin','pmo','executive','viewer','c-level','clevel','hr'].includes(role);
+}
 function canRunRefresh(){ return ['admin','pmo'].includes(effectiveUserRole()); }
+function renderImpersonationBanner(){
+  const banner = document.getElementById('impersonationBanner');
+  const copy = document.getElementById('impersonationBannerCopy');
+  if(!banner || !copy) return;
+  if(isImpersonating()){
+    const viewedName = fullNameFromUser(impersonatedUser) || impersonatedUser.email || 'Unknown user';
+    copy.innerHTML = `Viewing as <strong>${esc(viewedName)}</strong> (${esc(displayRoleName(impersonatedUser.role || ''))}) — temporary administrator preview`;
+    banner.classList.add('show');
+    banner.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('impersonating');
+  }else{
+    banner.classList.remove('show');
+    banner.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('impersonating');
+  }
+}
 function updateRoleSensitiveUi(){
   const canSync = canRunRefresh();
   document.querySelectorAll('[data-sync-action]').forEach(btn => {
     btn.style.display = canSync ? '' : 'none';
     btn.disabled = !canSync;
   });
+  const billingNav = document.getElementById('billingNavLink');
+  const opsNav = document.getElementById('opsNavLink');
+  const pmoNav = document.getElementById('pmoNavMenu');
+  const pmoQuick = document.getElementById('pmoQuickLinks');
+  if(billingNav) billingNav.style.display = sectionAllowedForCurrentRole('dashboard') ? '' : 'none';
+  if(opsNav) opsNav.style.display = sectionAllowedForCurrentRole('opsViews') ? '' : 'none';
+  if(pmoNav) pmoNav.style.display = canSeePmoGroup() ? '' : 'none';
+  if(pmoQuick) pmoQuick.style.display = canSeePmoGroup() ? '' : 'none';
   document.body.classList.toggle('role-preview-active', Boolean(requestedPreviewRole() && canPreviewRole()));
+  renderImpersonationBanner();
 }
 
 function userInitials(user){
@@ -1626,6 +1726,24 @@ function readStoredAuthAfterLogin(){
 }
 function clearStoredAuthAfterLogin(){
   storeAuthAfterLogin('');
+}
+async function stopImpersonation(redirectUrl=''){
+  if(location.protocol === 'file:') return;
+  try{
+    const response = await fetch('/api/auth?action=stop-impersonation', {credentials:'same-origin', cache:'no-store'});
+    const result = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    impersonatedUser = null;
+    if(result?.user) currentUser = result.user;
+    updateAuthUi();
+    if(redirectUrl){
+      window.location.assign(redirectUrl);
+      return;
+    }
+    await loadDashboardData();
+  }catch(error){
+    alert(`Could not stop impersonation: ${error.message}`);
+  }
 }
 function startGoogleSignIn(afterLogin=''){
   if(location.protocol === 'file:'){
@@ -1687,11 +1805,11 @@ function updateAuthUi(){
   const avatar = document.getElementById('authAvatar');
   if(!status || !avatar) return;
   if(currentUser){
-    const preview = requestedPreviewRole() && canPreviewRole();
+    const preview = isImpersonating() || (requestedPreviewRole() && canPreviewRole());
     status.textContent = preview ? `${currentUser.name || currentUser.email || 'Signed in'} · ${effectiveRoleLabel()}` : (currentUser.name || currentUser.email || 'Signed in');
     status.title = `${currentUser.email || ''} · role: ${displayRoleName(currentUser.role || '')}${preview ? ` · viewing as: ${effectiveRoleLabel()}` : ''}`;
     if(logout) logout.style.display = '';
-    if(usersLink) usersLink.style.display = currentUser.role === 'PMO' ? '' : 'none';
+    if(usersLink) usersLink.style.display = currentUser.role === 'PMO' && !isImpersonating() ? '' : 'none';
     avatar.textContent = userInitials(currentUser);
     avatar.title = currentUser.email || currentUser.name || 'PMO';
   }else{
@@ -1717,6 +1835,7 @@ async function loadCurrentUser(){
     if(response.ok){
       const result = await response.json();
       currentUser = result.user || null;
+      impersonatedUser = result?.impersonation?.active ? (result.impersonation.user || null) : null;
     }
   }catch(error){
     console.info('Auth unavailable:', error.message);
@@ -1753,7 +1872,7 @@ function showAuthModal(mode='login', afterLogin=null){
     submit.textContent = 'Close';
     submit.style.display = 'none';
     document.getElementById('authAccountSummary').innerHTML = currentUser
-      ? `<strong>${esc(currentUser.name || currentUser.email)}</strong><br/>${esc(currentUser.email || '')}<br/><span style="color:var(--muted)">Role: ${esc(displayRoleName(currentUser.role || 'Executive'))}</span>`
+      ? `<strong>${esc(currentUser.name || currentUser.email)}</strong><br/>${esc(currentUser.email || '')}<br/><span style="color:var(--muted)">Role: ${esc(displayRoleName(currentUser.role || 'Executive'))}${isImpersonating() ? ` · Viewing as ${esc(fullNameFromUser(impersonatedUser) || impersonatedUser.email || 'User')} (${esc(displayRoleName(impersonatedUser.role || ''))})` : ''}</span>`
       : 'Not signed in.';
   }else{
     title.textContent = 'Sign in';
@@ -1836,6 +1955,7 @@ async function logoutUser(){
   catch(error){ console.info('Logout failed:', error.message); }
   clearStoredAuthAfterLogin();
   currentUser = null;
+  impersonatedUser = null;
   latest = null;
   prev = null;
   PMO = {cloudId:'', project:'AA', last_refresh:'', last_refresh_at:'', snapshots:[]};
@@ -1852,7 +1972,7 @@ async function manualSnapshot(){
     return;
   }
   if(!canRunRefresh()){
-    alert('This view is not PMO/admin. Sync is available only to PMO users. Remove the previewRole parameter or sign in as PMO to sync.');
+    alert('Sync is available only while viewing as an Administrator / PMO user. Exit impersonation or sign in as PMO to sync.');
     return;
   }
   const btns = [...document.querySelectorAll('[data-sync-action]')];
@@ -2775,7 +2895,7 @@ function renderBenchByMonthReport(){
     </tr>`).join('') || '<tr><td style="color:var(--muted);padding:1rem">No Bench by Month rows.</td></tr>';
 }
 function canSeeDataTraceability(){
-  return currentUser && ['admin','pmo','executive','c-level','clevel'].includes(effectiveUserRole());
+  return effectiveSessionUser() && ['admin','pmo','executive','c-level','clevel'].includes(effectiveUserRole());
 }
 function buildEpicDueBeforeChildDueRows(rows){
   const byEpic = new Map();
@@ -3028,7 +3148,7 @@ async function loadActionNotes(){
 function actionNoteState(id){ return actionNotes[id] || {}; }
 function actionNoteInputId(id){ return `actionNote_${String(id || '').replace(/[^a-zA-Z0-9_-]/g,'_')}`; }
 function canWritePmoNotes(){
-  return currentUser && ['admin','pmo'].includes(String(currentUser.role || '').toLowerCase());
+  return Boolean(effectiveSessionUser()) && ['admin','pmo'].includes(effectiveUserRole());
 }
 function actionNoteHtml(action){
   const state = actionNoteState(action.id);
@@ -4090,7 +4210,7 @@ function currentTracePayload(){
   const util = normalizeUtilBillingReport(latest.utilization_billing_rate || {});
   return {
     generated_at: new Date().toISOString(),
-    user: currentUser ? {email:currentUser.email, role:currentUser.role, name:currentUser.name} : null,
+    user: effectiveSessionUser() ? {email:effectiveSessionUser().email, role:effectiveSessionUser().role, name:effectiveSessionUser().name} : null,
     last_refresh: PMO.last_refresh,
     last_refresh_at: PMO.last_refresh_at,
     snapshot_date: latest.date,
@@ -4687,6 +4807,52 @@ function allAssignmentRows(){
     ...(latest.pending_list || [])
   ].filter(Boolean);
 }
+function scopedAssignmentRows(rows = allAssignmentRows()){
+  const role = effectiveUserRole();
+  if(executiveLikeRole(role)) return rows.slice();
+  if(role === 'assignee') return rows.filter(effectivePersonMatch);
+
+  let primaryRows = [];
+  if(role === 'pm'){
+    primaryRows = rows.filter(row => identityMatchesTokens(row.project_manager || ''));
+  }else if(role === 'csm' || role === 'tl'){
+    const allowedClients = effectiveOwnedClientKeys();
+    primaryRows = rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+  }else{
+    return rows.slice();
+  }
+
+  const visiblePeople = new Set(primaryRows.map(personId).filter(Boolean));
+  const visibleAssignments = new Set(primaryRows.map(row => `${row.key || ''}::${row.client || ''}::${personId(row)}`));
+  return rows.filter(row => {
+    const assignmentKey = `${row.key || ''}::${row.client || ''}::${personId(row)}`;
+    if(visibleAssignments.has(assignmentKey)) return true;
+    return isInternalCapacityRow(row) && visiblePeople.has(personId(row));
+  });
+}
+function scopedForecastRows(rows = []){
+  const role = effectiveUserRole();
+  if(executiveLikeRole(role)) return rows.slice();
+  if(role === 'assignee') return rows.filter(effectivePersonMatch);
+  if(role === 'pm') return rows.filter(row => identityMatchesTokens(row.project_manager || ''));
+  if(role === 'csm' || role === 'tl'){
+    const allowedClients = effectiveOwnedClientKeys();
+    return rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+  }
+  return rows.slice();
+}
+function scopedAccountCoverageRowsSource(rows = latest?.account_coverage || []){
+  const role = effectiveUserRole();
+  if(executiveLikeRole(role) || role === 'pm') return rows.slice();
+  if(role === 'csm'){
+    return rows.filter(row => identityMatchesTokens(row.csm_assigned || ''));
+  }
+  if(role === 'tl'){
+    return rows.filter(row => identityMatchesTokens(row.tl_assigned || ''));
+  }
+  if(role === 'assignee') return [];
+  return rows.slice();
+}
 function searchableRowText(row){
   return [
     row.key, displayName(row), row.assignee, row.name, row.client, row.position,
@@ -4705,7 +4871,7 @@ function opsRowMatches(row){
     && (!opsFilters.billingClass || rowBillingClass(row) === opsFilters.billingClass);
 }
 function filteredOpsRows(){
-  return allAssignmentRows().filter(opsRowMatches);
+  return scopedAssignmentRows(allAssignmentRows()).filter(opsRowMatches);
 }
 function countBy(items, getter){
   const counts = new Map();
@@ -4719,7 +4885,7 @@ function uniqueNonEmpty(values){
   return [...new Set(values.map(v => String(v || '').trim()).filter(Boolean))];
 }
 function renderOpsFilterControls(){
-  const rows = allAssignmentRows();
+  const rows = scopedAssignmentRows(allAssignmentRows());
   const clientCounts = countBy(rows, row => row.client || '');
   const positionCounts = countBy(rows, row => row.position || '');
   const projectManagerCounts = countBy(rows, row => row.project_manager || '');
@@ -4856,7 +5022,7 @@ function renderOpsAssignees(rows){
 }
 function accountCoverageMap(){
   const map = new Map();
-  (latest.account_coverage || []).forEach(row => {
+  scopedAccountCoverageRowsSource(latest.account_coverage || []).forEach(row => {
     const key = row.client_key || normalizeClientKey(row.client);
     if(key && !map.has(key)) map.set(key, row);
   });
@@ -4920,7 +5086,7 @@ function setAccountCoverageStatusFilter(value){
 }
 function accountCoverageRows(){
   const rowsByClient = new Map();
-  const assignmentClientRows = clientRowsFromAssignments(latest.assignment_rows || []);
+  const assignmentClientRows = clientRowsFromAssignments(scopedAssignmentRows(latest.assignment_rows || []));
   assignmentClientRows.forEach(row => {
     rowsByClient.set(normalizeClientKey(row.client), {
       client: row.client,
@@ -4929,7 +5095,7 @@ function accountCoverageRows(){
       coverage: row.coverage || coverageForClient(row.client)
     });
   });
-  (latest.account_coverage || []).forEach(row => {
+  scopedAccountCoverageRowsSource(latest.account_coverage || []).forEach(row => {
     const key = row.client_key || normalizeClientKey(row.client);
     if(!key) return;
     const existing = rowsByClient.get(key) || {client: row.client, assignees: [], positions: []};
@@ -5181,7 +5347,7 @@ function renderOpsViews(){
   renderOpsFilterControls();
   const rows = filteredOpsRows();
   renderOpsSummary(rows);
-  const totalRows = allAssignmentRows().length;
+  const totalRows = scopedAssignmentRows(allAssignmentRows()).length;
   const labelByView = {
     assignees: 'Assignees',
     projectManagers: 'Project Managers',
@@ -5313,7 +5479,7 @@ function renderHistory(){
 // FORECAST
 // ════════════════════════════════════════════════════
 function allForecastItems(){
-  return Object.values(latest.forecast || {}).flat().filter(Boolean);
+  return scopedForecastRows(Object.values(latest.forecast || {}).flat().filter(Boolean));
 }
 function countByForecastField(items, field){
   const counts = new Map();
@@ -5333,7 +5499,7 @@ function renderForecastFilterControls(){
   const assigneeCounts = countByForecastField(items, 'assignee');
   const monthCounts = new Map();
   Object.entries(latest.forecast || {}).forEach(([month, rows]) => {
-    const count = (rows || []).filter(row => {
+    const count = scopedForecastRows(rows || []).filter(row => {
       return (!forecastFilters.client || (row.client || '') === forecastFilters.client)
         && (!forecastFilters.position || (row.position || '') === forecastFilters.position)
         && (!forecastFilters.assignee || (row.assignee || '') === forecastFilters.assignee);
@@ -5399,7 +5565,7 @@ function filteredForecastByMonth(){
   return Object.fromEntries(
     Object.keys(fc).sort()
       .filter(month => !forecastFilters.month || month === forecastFilters.month)
-      .map(month => [month, (fc[month] || []).filter(forecastRowMatches)])
+      .map(month => [month, scopedForecastRows((fc[month] || []).filter(forecastRowMatches))])
       .filter(([, rows]) => rows.length)
   );
 }

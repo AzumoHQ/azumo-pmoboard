@@ -2,14 +2,17 @@ const crypto = require('node:crypto');
 const { OAuth2Client } = require('google-auth-library');
 const {
   changePassword,
+  clearSessionImpersonatedUser,
   clearOauthStateCookie,
   clearSessionCookie,
+  getSessionContext,
   getSessionUser,
   login,
   loginWithGoogle,
   logout,
   oauthStateCookie,
   readOauthState,
+  setSessionImpersonatedUser,
   sessionCookie
 } = require('../lib/auth');
 
@@ -134,10 +137,70 @@ module.exports = async function authHandler(req, res) {
 
   if (req.method === 'GET' && (!action || action === 'me')) {
     try {
-      const user = await getSessionUser(req);
-      res.status(200).json({ user });
+      const context = await getSessionContext(req);
+      res.status(200).json({
+        user: context.realUser || null,
+        effective_user: context.user || null,
+        impersonation: context.impersonatedUser
+          ? { active: true, user: context.impersonatedUser }
+          : { active: false, user: null }
+      });
     } catch (error) {
-      res.status(200).json({ user: null });
+      res.status(200).json({
+        user: null,
+        effective_user: null,
+        impersonation: { active: false, user: null }
+      });
+    }
+    return;
+  }
+
+  if (req.method === 'GET' && action === 'impersonate') {
+    try {
+      const context = await getSessionContext(req);
+      if (!context.realUser || context.realUser.active === false || context.realUser.role !== 'PMO') {
+        res.status(403).json({ error: 'Administrator access required.' });
+        return;
+      }
+
+      const email = String(url.searchParams.get('email') || '').trim().toLowerCase();
+      if (!email) {
+        res.status(400).json({ error: 'Email is required.' });
+        return;
+      }
+
+      const user = await setSessionImpersonatedUser(req, email);
+      res.status(200).json({
+        ok: true,
+        user: context.realUser,
+        effective_user: user,
+        impersonation: { active: true, user }
+      });
+    } catch (error) {
+      const message = error?.message || 'Could not start impersonation.';
+      const status = /access required/i.test(message) ? 403 : /required|cannot be impersonated|not found|inactive/i.test(message) ? 400 : 500;
+      res.status(status).json({ error: message });
+    }
+    return;
+  }
+
+  if (req.method === 'GET' && action === 'stop-impersonation') {
+    try {
+      const context = await getSessionContext(req);
+      if (!context.realUser || context.realUser.active === false || context.realUser.role !== 'PMO') {
+        res.status(403).json({ error: 'Administrator access required.' });
+        return;
+      }
+
+      const user = await clearSessionImpersonatedUser(req);
+      res.status(200).json({
+        ok: true,
+        user: user || context.realUser || null,
+        effective_user: user || context.realUser || null,
+        impersonation: { active: false, user: null }
+      });
+    } catch (error) {
+      res.status(500).json({ error: error?.message || 'Could not stop impersonation.' });
     }
     return;
   }

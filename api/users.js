@@ -1,6 +1,6 @@
 const {
   createManagedUser,
-  getSessionUser,
+  getSessionContext,
   listUsers,
   updateManagedUser,
   VALID_USER_ROLES
@@ -28,7 +28,7 @@ function jsonError(res, status, message) {
 
 module.exports = async function usersHandler(req, res) {
   try {
-    const currentUser = await getSessionUser(req);
+    const { realUser: currentUser } = await getSessionContext(req);
     if (!isPmo(currentUser)) {
       jsonError(res, 403, 'Administrator access required');
       return;

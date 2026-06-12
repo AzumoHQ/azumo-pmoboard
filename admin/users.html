@@ -14,7 +14,14 @@
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{font-family:"azo-sans-web",sans-serif;background:radial-gradient(circle at 20% 0%,rgba(0,102,255,.16),transparent 30%),var(--bg);color:var(--txt);min-height:100vh}
+body.impersonating{padding-top:60px}
 a{color:inherit}
+.impersonation-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:1200;background:linear-gradient(90deg,rgba(245,158,11,.98),rgba(249,115,22,.96));color:#2B1700;border-bottom:1px solid rgba(146,64,14,.35);box-shadow:0 12px 34px rgba(0,0,0,.18)}
+.impersonation-banner.show{display:block}
+.impersonation-banner-inner{max-width:1280px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.impersonation-banner-copy{font-size:.88rem;font-weight:900;letter-spacing:-.01em}
+.impersonation-banner .btn{background:rgba(43,23,0,.08);border-color:rgba(43,23,0,.18);color:#2B1700}
+.impersonation-banner .btn:hover{border-color:rgba(43,23,0,.32)}
 .page{max-width:1280px;margin:0 auto;padding:28px 24px 56px}
 .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:22px}
 .brand{display:flex;align-items:center;gap:14px}
@@ -58,6 +65,7 @@ tbody tr:hover td{background:rgba(0,102,255,.05)}
 .email{color:#BCD2F7;font-size:.86rem}
 .role-select{min-width:180px;background:rgba(255,255,255,.03);border:1px solid var(--brd);color:var(--txt);border-radius:12px;padding:10px 12px;font-weight:700}
 .role-select[disabled]{opacity:.55;cursor:not-allowed}
+.action-cell{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .status-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;font-size:.76rem;font-weight:900;border:1px solid transparent}
 .status-pill.active{background:rgba(16,185,129,.14);color:#86EFAC;border-color:rgba(16,185,129,.25)}
 .status-pill.inactive{background:rgba(239,68,68,.14);color:#FCA5A5;border-color:rgba(239,68,68,.26)}
@@ -83,6 +91,12 @@ tbody tr:hover td{background:rgba(0,102,255,.05)}
 </style>
 </head>
 <body>
+  <div class="impersonation-banner" id="impersonationBanner" aria-live="polite" aria-hidden="true">
+    <div class="impersonation-banner-inner">
+      <div class="impersonation-banner-copy" id="impersonationBannerCopy">Viewing as —</div>
+      <button class="btn btn-ghost" type="button" id="impersonationExitBtn">Exit</button>
+    </div>
+  </div>
   <div class="page">
     <div id="loadingState" class="loading">Checking administrator access…</div>
 
@@ -149,14 +163,15 @@ tbody tr:hover td{background:rgba(0,102,255,.05)}
               <thead>
                 <tr>
                   <th style="width:28%">User</th>
-                  <th style="width:26%">Email</th>
-                  <th style="width:20%">Role</th>
-                  <th style="width:12%">Status</th>
-                  <th style="width:14%">Active toggle</th>
+                  <th style="width:24%">Email</th>
+                  <th style="width:18%">Role</th>
+                  <th style="width:10%">Status</th>
+                  <th style="width:12%">Active toggle</th>
+                  <th style="width:8%">View as</th>
                 </tr>
               </thead>
               <tbody id="usersTableBody">
-                <tr><td colspan="5" class="empty">Loading users…</td></tr>
+                <tr><td colspan="6" class="empty">Loading users…</td></tr>
               </tbody>
             </table>
           </div>
@@ -172,6 +187,7 @@ tbody tr:hover td{background:rgba(0,102,255,.05)}
 <script>
 const ROLE_OPTIONS = ['PMO','Executive','CSM','PM','TL','HR','Assignee'];
 let currentUser = null;
+let impersonatedUser = null;
 let allUsers = [];
 let filteredUsers = [];
 let searchTerm = '';
@@ -189,6 +205,24 @@ function fullName(user){
 }
 function isSelf(user){
   return String(user?.email || '').trim().toLowerCase() === String(currentUser?.email || '').trim().toLowerCase();
+}
+function isCurrentlyImpersonated(user){
+  return String(user?.email || '').trim().toLowerCase() === String(impersonatedUser?.email || '').trim().toLowerCase();
+}
+function renderImpersonationBanner(){
+  const banner = document.getElementById('impersonationBanner');
+  const copy = document.getElementById('impersonationBannerCopy');
+  if(!banner || !copy) return;
+  if(impersonatedUser){
+    copy.innerHTML = `Viewing as <strong>${esc(fullName(impersonatedUser))}</strong> (${esc(displayRole(impersonatedUser.role || ''))}) — temporary administrator preview`;
+    banner.classList.add('show');
+    banner.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('impersonating');
+  }else{
+    banner.classList.remove('show');
+    banner.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('impersonating');
+  }
 }
 function toast(message, type='success'){
   const stack = document.getElementById('toastStack');
@@ -232,16 +266,18 @@ function renderTable(){
   const tbody = document.getElementById('usersTableBody');
   document.getElementById('userCount').textContent = `${filteredUsers.length} user${filteredUsers.length === 1 ? '' : 's'}`;
   if(!filteredUsers.length){
-    tbody.innerHTML = '<tr><td colspan="5" class="empty">No users match this search.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">No users match this search.</td></tr>';
     return;
   }
   tbody.innerHTML = filteredUsers.map((user) => {
     const self = isSelf(user);
+    const impersonatingThisUser = isCurrentlyImpersonated(user);
+    const canViewAs = !self && user.active !== false && user.role !== 'PMO';
     return `<tr data-email="${esc(user.email)}">
       <td>
         <div class="user-cell">
           <span class="user-name">${esc(fullName(user))}</span>
-          <span class="user-note">${self ? 'Current administrator session' : 'Managed access user'}</span>
+          <span class="user-note">${self ? 'Current administrator session' : impersonatingThisUser ? 'Current view-as target' : 'Managed access user'}</span>
         </div>
       </td>
       <td><span class="email">${esc(user.email || '—')}</span></td>
@@ -260,6 +296,11 @@ function renderTable(){
           <span class="user-note">${user.active === false ? 'Off' : 'On'}</span>
         </div>
       </td>
+      <td>
+        <div class="action-cell">
+          <button class="btn btn-ghost" type="button" data-view-as-email="${esc(user.email)}" ${canViewAs ? '' : 'disabled'}>${impersonatingThisUser ? 'Viewing as' : 'View as'}</button>
+        </div>
+      </td>
     </tr>`;
   }).join('');
 
@@ -275,6 +316,12 @@ function renderTable(){
       const email = event.target.getAttribute('data-active-email');
       const is_active = Boolean(event.target.checked);
       await patchUser(email, { is_active }, event.target);
+    });
+  });
+  tbody.querySelectorAll('[data-view-as-email]').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      const email = event.currentTarget.getAttribute('data-view-as-email');
+      await viewAsUser(email, event.currentTarget);
     });
   });
 }
@@ -320,6 +367,7 @@ async function loadSession(){
   const response = await fetch('/api/auth', { credentials:'same-origin', cache:'no-store' });
   const result = await response.json().catch(() => ({}));
   currentUser = result.user || null;
+  impersonatedUser = result?.impersonation?.active ? (result.impersonation.user || null) : null;
   if(!currentUser){
     window.location.replace('/');
     return false;
@@ -329,7 +377,43 @@ async function loadSession(){
     return false;
   }
   document.getElementById('adminMeta').textContent = `${fullName(currentUser)} · Administrator`;
+  renderImpersonationBanner();
   return true;
+}
+async function viewAsUser(email, button){
+  if(!email) return;
+  if(button){ button.disabled = true; button.textContent = 'Opening…'; }
+  try{
+    const response = await fetch(`/api/auth?action=impersonate&email=${encodeURIComponent(email)}`, {
+      credentials:'same-origin',
+      cache:'no-store'
+    });
+    const result = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    window.location.assign('/');
+  }catch(error){
+    toast(error.message || 'Could not start View as.', 'error');
+    if(button){
+      button.disabled = false;
+      button.textContent = 'View as';
+    }
+  }
+}
+async function stopImpersonation(){
+  try{
+    const response = await fetch('/api/auth?action=stop-impersonation', {
+      credentials:'same-origin',
+      cache:'no-store'
+    });
+    const result = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    impersonatedUser = null;
+    renderImpersonationBanner();
+    await loadUsers();
+    toast('Returned to your Administrator session.');
+  }catch(error){
+    toast(error.message || 'Could not stop View as.', 'error');
+  }
 }
 function resetAddForm(){
   document.getElementById('newEmail').value = '';
@@ -399,6 +483,7 @@ document.getElementById('searchInput').addEventListener('input', (event) => {
   searchTerm = event.target.value || '';
   filterUsers();
 });
+document.getElementById('impersonationExitBtn').addEventListener('click', stopImpersonation);
 document.getElementById('toggleAddBtn').addEventListener('click', () => toggleAddPanel());
 document.getElementById('cancelAddBtn').addEventListener('click', () => toggleAddPanel(false));
 document.getElementById('saveAddBtn').addEventListener('click', createUser);
