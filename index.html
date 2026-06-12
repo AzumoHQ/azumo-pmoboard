@@ -701,7 +701,7 @@ section{margin-bottom:1.65rem!important}
 <section id="newSearchesTriage">
   <div class="sec-head">
     <div class="sec-icon">🔎</div>
-    <h2>New Searches Reports</h2>
+    <h2>New Searches</h2>
     <div class="sec-tag">Source report</div>
   </div>
   <div class="reports-subsection">
@@ -722,7 +722,7 @@ section{margin-bottom:1.65rem!important}
         <div class="util-card">
           <div class="util-card-label">Report</div>
           <div class="util-card-value" style="font-size:1.05rem;line-height:1.15">New Searches Triage</div>
-          <div class="util-card-sub">Reports → New Searches Reports</div>
+          <div class="util-card-sub">Reports → New Searches</div>
         </div>
         <div class="util-card">
           <div class="util-card-label">Model</div>
@@ -873,12 +873,6 @@ section{margin-bottom:1.65rem!important}
     <div class="sec-tag" id="actionCenterTag">Actions + QA</div>
   </div>
   <div class="action-wrap">
-    <div class="pmo-branch-tabs" aria-label="PMO views">
-      <!-- PMO-LAYOUT: PMO branch subnav -->
-      <button class="pmo-branch-tab active" type="button" onclick="activateModuleTab('pmoActionCenter')">🚨 PMO QA</button>
-      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('dueDates')">📅 Due Dates</button>
-      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('pendingAssignments')">⏳ Pending Assignments</button>
-    </div>
     <div class="qa-center-hero">
       <div>
         <div class="qa-center-eyebrow">Operations quality queue</div>
@@ -1027,11 +1021,10 @@ section{margin-bottom:1.65rem!important}
     <div class="sec-tag" id="dueDatesTag">Next due dates</div>
   </div>
   <div class="tbl-wrap">
-    <div class="pmo-branch-tabs" aria-label="PMO views">
-      <!-- PMO-LAYOUT: PMO branch subnav -->
-      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('pmoActionCenter')">🚨 PMO QA</button>
-      <button class="pmo-branch-tab active" type="button" onclick="activateModuleTab('dueDates')">📅 Due Dates</button>
+    <div class="pmo-branch-tabs" aria-label="Assignment views">
       <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('pendingAssignments')">⏳ Pending Assignments</button>
+      <button class="pmo-branch-tab active" type="button" onclick="activateModuleTab('dueDates')">📅 Due Dates</button>
+      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('forecast')">🔮 Forecast</button>
     </div>
     <div class="tbl-head">
       <h3>📅 Upcoming Due Dates <span class="badge badge-yellow" id="expiringBadge">—</span></h3>
@@ -1052,11 +1045,10 @@ section{margin-bottom:1.65rem!important}
     <div class="sec-tag" id="pendingTag">—</div>
   </div>
   <div class="tbl-wrap">
-    <div class="pmo-branch-tabs" aria-label="PMO views">
-      <!-- PMO-LAYOUT: PMO branch subnav -->
-      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('pmoActionCenter')">🚨 PMO QA</button>
-      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('dueDates')">📅 Due Dates</button>
+    <div class="pmo-branch-tabs" aria-label="Assignment views">
       <button class="pmo-branch-tab active" type="button" onclick="activateModuleTab('pendingAssignments')">⏳ Pending Assignments</button>
+      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('dueDates')">📅 Due Dates</button>
+      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('forecast')">🔮 Forecast</button>
     </div>
     <div class="tbl-head"><h3>⏳ Pending <span class="badge badge-yellow" id="pendingBadge">—</span></h3></div>
     <table><thead><tr><th>Key</th><th>Assignee</th><th>Client</th><th>Role</th><th>Start</th></tr></thead><tbody id="pendingTbody"></tbody></table>
@@ -1166,6 +1158,12 @@ section{margin-bottom:1.65rem!important}
     <div class="sec-icon">🔭</div>
     <h2>Forecast — Assignment Due Dates</h2>
     <div class="sec-tag" id="forecastSourceTag">Jira In Progress due dates</div>
+  </div>
+
+  <div class="pmo-branch-tabs" aria-label="Assignment views">
+    <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('pendingAssignments')">⏳ Pending Assignments</button>
+    <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('dueDates')">📅 Due Dates</button>
+    <button class="pmo-branch-tab active" type="button" onclick="activateModuleTab('forecast')">🔮 Forecast</button>
   </div>
 
   <div class="forecast-wrap">
@@ -1395,44 +1393,37 @@ function uniqueModuleSections(){ return allModuleSections().filter(section => se
 function sidebarNavConfig(){
   const pendingCount = latest?.pending_list?.length || 0;
   const dueAlertCount = latest ? dueRowsForActionCenter().length : 0;
+  const qaCount = countOpenPmoActions();
   const entries = [
     {id:'generalGroup', icon:'⚙️', label:'General', children:[
-      {id:'opsViews', icon:'', label:'Operating Views'},
+      {id:'opsViews', icon:'🧭', label:'Operating Views'},
       {id:'bench', icon:'🪑', label:'Bench'},
       {id:'azumo', icon:'🏢', label:'Internal Projects'}
-    ]}
-  ];
-  if(canSeePmoGroup()){
-    entries.push({id:'pmoGroup', icon:'PMO', label:'PMO', count:countOpenPmoActions() + dueAlertCount + pendingCount, children:[
-      {id:'pmoActionCenter', icon:'', label:'QA', count:countOpenPmoActions()},
+    ]},
+    {id:'assignmentsGroup', icon:'🧾', label:'Assignments', count: dueAlertCount + pendingCount, children:[
+      {id:'pendingAssignments', icon:'⏳', label:'Pending Assignments', count:pendingCount},
       {id:'dueDates', icon:'📅', label:'Due Dates', count:dueAlertCount},
-      {id:'pendingAssignments', icon:'⏳', label:'Pending Assignments', count:pendingCount}
-    ]});
-  }
-  entries.push(
-    {id:'reportsGroup', icon:'📊', label:'Reports', children:[
-      {id:'billingReportsGroup', icon:'💳', label:'Billing', children:[
-        {id:'dashboard', icon:'📊', label:'Utilization Billing Rate', anchor:'utilBillingReportWrap'},
-        {id:'dashboard', icon:'🪑', label:'Bench by Month', anchor:'benchByMonthReportWrap'},
-        {id:'history', icon:'📜', label:'History'}
-      ]},
-      {id:'newSearchesReportsGroup', icon:'🔎', label:'New Searches Reports', children:[
-        {id:'newSearchesTriage', icon:'', label:'New Searches Triage'}
-      ]}
+      {id:'forecast', icon:'🔮', label:'Forecast'}
     ]},
     {id:'accountCoverage', icon:'📋', label:'Accounts Coverage'},
     {id:'harvestGroup', icon:'🌾', label:'Harvest', children:[
-      {id:'harvestHours', icon:'', label:'Control'},
-      {id:'harvestAccess', icon:'', label:'Assignments'}
+      {id:'harvestHours', icon:'⏱️', label:'Control'},
+      {id:'harvestAccess', icon:'🗂️', label:'Assignments'}
     ]},
-    {id:'forecast', icon:'🔮', label:'Forecast'}
-  );
+    {id:'reportsGroup', icon:'📊', label:'Reports', children:[
+      {id:'dashboard', icon:'💳', label:'Billing'},
+      {id:'history', icon:'📜', label:'History'},
+      {id:'newSearchesTriage', icon:'🔎', label:'New Searches'}
+    ]},
+    {id:'pmoActionCenter', icon:'🚨', label:'PMO QA', count: qaCount}
+  ];
   return entries;
 }
 function currentModuleTabId(sections){
   const stored = localStorage.getItem(MODULE_TAB_KEY);
   if(stored && sections.some(section => section.id === stored)) return stored;
-  return sections.some(section => section.id === 'pmoActionCenter') ? 'pmoActionCenter' : sections[0]?.id;
+  const preferred = ['opsViews','bench','azumo','pendingAssignments','dueDates','forecast','accountCoverage','harvestHours','harvestAccess','dashboard','history','newSearchesTriage','pmoActionCenter'];
+  return preferred.find(id => sections.some(section => section.id === id)) || sections[0]?.id;
 }
 function moduleLeafItems(entry){
   if(entry?.children) return entry.children.flatMap(moduleLeafItems);
