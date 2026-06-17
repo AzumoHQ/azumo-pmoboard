@@ -73,12 +73,10 @@ The renderer reads these automatically from existing globals. Targets shown for 
 |-----------------------|----------------------|--------------------------------------------------------------------|--------|
 | Greeting              | `#pmoGreeting`       | `currentUser.name` → first name (time-of-day prefix; no name → "Good morning") | ✅ |
 | Last refresh          | `#lastRefresh`       | `PMO.last_refresh_at` ?? `PMO.last_refresh`                        | ✅ |
-| People (hero + KPI)   | `#peopleCount` / `#kpiPeople` | `overviewPeopleCount(latest)`; fallback to `headcount_total`, then billable + bench | ✅ |
-| Active clients        | `#activeClients` / `#kpiActiveClients` | `latest.metrics.active_clients`; details use `active_clients` + `assignment_rows` | ✅ |
-| Utilization (billing) | `#utilizationBilling` / `#kpiUtilBilling` | `latest.metrics.utilization_billing`          | ✅ |
+| Active clients        | `#kpiActiveClients` | `latest.metrics.active_clients`; details use `active_clients` + `assignment_rows` | ✅ |
+| Utilization (billing) | `#kpiUtilBilling` | `latest.metrics.utilization_billing`          | ✅ |
 | Billable headcount    | `#billableHeadcount` | `latest.metrics.headcount_billable`                                | ✅ |
 | Bench                 | `#benchCount`        | `latest.metrics.bench`; details use `bench_list`                   | ✅ |
-| Headcount series      | `#headcountSeries`   | `PMO.snapshots[].metrics.headcount_billable` (one bar per snapshot) | ✅ |
 | Team composition      | —                    | Not shown. The overview intentionally avoids position/discipline breakdown. | ✅ |
 
 All KPI deltas are computed live against `prev` (the previous snapshot). Bench delta is inverted (a drop is "good").
@@ -96,15 +94,15 @@ These design blocks have no source field in the current API. They render a label
 
 ## id / class reference for Codex
 
-**Data ids** (filled by `renderPmoOverview`): `pmoGreeting`, `lastRefresh`, `peopleCount`, `activeClients`,
-`utilizationBilling`, `pmoOverviewKpis` (KPI container), `kpiPeople`, `billableHeadcount`, `benchCount`,
-`kpiActiveClients`, `kpiUtilBilling`, `pmoOverviewDetails`, `headcountSeries`.
+**Data ids** (filled by `renderPmoOverview`): `pmoGreeting`, `lastRefresh`,
+`pmoOverviewKpis` (KPI container), `billableHeadcount`, `benchCount`,
+`kpiActiveClients`, `kpiUtilBilling`, `pmoOverviewDetails`.
 
 **Section root:** `#pmoOverview.pmo-ov` (carries `data-state="loading|ready|empty"`).
 
 **Style classes** (all namespaced `pmo-ov-*`, no collision with existing app CSS):
-`pmo-ov-hero`, `pmo-ov-hero-stat`, `pmo-ov-kpis`, `pmo-ov-kpi`, `pmo-ov-delta` (`.up/.down/.flat`),
-`pmo-ov-cols`, `pmo-ov-panel`, `pmo-ov-chart`, `pmo-ov-bar`.
+`pmo-ov-hero`, `pmo-ov-kpis`, `pmo-ov-kpi`, `pmo-ov-delta` (`.up/.down/.flat`),
+`pmo-ov-details`, `pmo-ov-detail-panel`.
 
 **Public JS API:**
 ```js

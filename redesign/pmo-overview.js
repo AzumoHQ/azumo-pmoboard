@@ -363,8 +363,6 @@
     var activeDetail = root ? (root.getAttribute('data-detail') || '') : '';
     var m = snapshot.metrics || {};
     var pm = prevSnapshot && prevSnapshot.metrics || null;
-    var people = metricTotalPeople(snapshot);
-    var pPeople = prevSnapshot ? metricTotalPeople(prevSnapshot) : null;
     var clients = metricActiveClients(snapshot);
     var pClients = prevSnapshot ? metricActiveClients(prevSnapshot) : null;
 
@@ -372,8 +370,7 @@
       { id: 'billableHeadcount', icon: ICON.billable, label: 'Billable headcount', val: intStr(m.headcount_billable), delta: deltaBadge(m.headcount_billable, pm && pm.headcount_billable) },
       { id: 'benchCount',        icon: ICON.bench,    label: 'On bench',           val: intStr(m.bench),              delta: deltaBadge(m.bench, pm && pm.bench, { goodWhenDown: true }), detail: 'bench' },
       { id: 'kpiActiveClients',  icon: ICON.clients,  label: 'Active clients',     val: intStr(clients),              delta: deltaBadge(clients, pClients), detail: 'clients' },
-      { id: 'kpiUtilBilling',    icon: ICON.util,     label: 'Utilization (billing)', val: pct(m.utilization_billing), delta: deltaBadge(m.utilization_billing, pm && pm.utilization_billing, { suffix: 'pp' }) },
-      { id: 'kpiPeople',         icon: ICON.people,   label: 'Active assignees',   val: intStr(people),               delta: deltaBadge(people, pPeople) }
+      { id: 'kpiUtilBilling',    icon: ICON.util,     label: 'Utilization (billing)', val: pct(m.utilization_billing), delta: deltaBadge(m.utilization_billing, pm && pm.utilization_billing, { suffix: 'pp' }) }
     ];
 
     host.innerHTML = cards.map(function (c) {
@@ -386,37 +383,6 @@
         '<div class="pmo-ov-kpi-lbl">' + c.label + '</div>' +
         (c.detail ? detailButton(c.detail, activeDetail) : '') +
       '</article>';
-    }).join('');
-  }
-
-  /* ---- Headcount bar chart (real series) ---- */
-  function renderHeadcountSeries(snapshots) {
-    var host = el('headcountSeries');
-    if (!host) return;
-    var source = typeof global.overviewHeadcountSeries === 'function' ? global.overviewHeadcountSeries() : null;
-    var series = (source || snapshots || [])
-      .map(function (s) {
-        return {
-          label: String(s.label || s.date || '').split(/\s+/)[0],
-          value: num(s.value != null ? s.value : s.metrics && s.metrics.headcount_billable)
-        };
-      })
-      .filter(function (d) { return d.value !== null; });
-
-    if (!series.length) { host.innerHTML = ''; return; }
-    var max = Math.max.apply(null, series.map(function (d) { return d.value; }));
-    var min = Math.min.apply(null, series.map(function (d) { return d.value; }));
-    var floor = Math.max(0, min - (max - min) * 0.6 - 1);   // visual baseline so bars differ
-
-    host.innerHTML = series.map(function (d, i) {
-      var isCurrent = i === series.length - 1;
-      var h = max === floor ? 100 : Math.round(((d.value - floor) / (max - floor)) * 100);
-      h = Math.max(8, Math.min(100, h));
-      return '<div class="pmo-ov-bar-col">' +
-        '<span class="pmo-ov-bar-val' + (isCurrent ? ' is-current' : '') + '">' + d.value + '</span>' +
-        '<div class="pmo-ov-bar' + (isCurrent ? '' : ' is-muted') + '" style="height:' + h + '%"></div>' +
-        '<span class="pmo-ov-bar-lbl">' + d.label + '</span>' +
-      '</div>';
     }).join('');
   }
 
@@ -445,17 +411,8 @@
     }
     root.setAttribute('data-state', 'ready');
 
-    var m = snapshot.metrics;
-    var people = metricTotalPeople(snapshot);
-    var clients = metricActiveClients(snapshot);
-    // Hero stats
-    setText('peopleCount', intStr(people));
-    setText('activeClients', intStr(clients));
-    setText('utilizationBilling', pct(m.utilization_billing));
-
     renderKpis(snapshot, prev);
     renderOverviewDetails(snapshot, root.getAttribute('data-detail') || '');
-    renderHeadcountSeries(snapshots);
   }
 
   global.togglePmoOverviewDetail = function (kind) {

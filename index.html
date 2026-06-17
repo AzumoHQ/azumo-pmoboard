@@ -1230,26 +1230,10 @@ main{background:transparent!important}
           <span id="lastRefresh">—</span>
         </div>
       </div>
-      <div class="pmo-ov-hero-stats" aria-label="Current PMO summary">
-        <div class="pmo-ov-hero-stat"><div class="num" id="peopleCount">—</div><div class="lbl">Assignees</div></div>
-        <div class="pmo-ov-hero-stat"><div class="num" id="activeClients">—</div><div class="lbl">Clients</div></div>
-        <div class="pmo-ov-hero-stat"><div class="num" id="utilizationBilling">—</div><div class="lbl">Avg util.</div></div>
-      </div>
     </div>
 
     <div class="pmo-ov-kpis" id="pmoOverviewKpis"></div>
     <div class="pmo-ov-details" id="pmoOverviewDetails" aria-live="polite" hidden></div>
-
-    <div class="pmo-ov-cols">
-      <div class="pmo-ov-panel">
-        <div class="pmo-ov-panel-head">
-          <div class="pmo-ov-panel-eyebrow">Headcount growth</div>
-          <div class="pmo-ov-panel-title">Billable headcount by month</div>
-        </div>
-        <div class="pmo-ov-chart" id="headcountSeries"></div>
-      </div>
-
-    </div>
   </div>
 </section>
 
@@ -2115,7 +2099,6 @@ function renderDesignerOverview(){
     if(el) el.textContent = value;
   };
   const people = overviewPeopleCount(latest);
-  const previousPeople = prev ? overviewPeopleCount(prev) : null;
   const billable = metricValue(latest, 'headcount_billable');
   const bench = metricValue(latest, 'bench');
   const clients = metricValue(latest, 'active_clients') || latest.active_clients?.length || 0;
@@ -2129,10 +2112,10 @@ function renderDesignerOverview(){
   const grid = document.getElementById('overviewKpis');
   if(grid){
     grid.innerHTML = [
-      overviewKpiCard({icon:'HC', value:overviewFormatNumber(people), label:'Active assignees', delta:overviewMetricDelta(people, previousPeople, true)}),
       overviewKpiCard({icon:'BI', value:overviewFormatNumber(billable), label:'Billable headcount', delta:overviewDelta('headcount_billable', true)}),
       overviewKpiCard({icon:'BE', value:overviewFormatNumber(bench), label:'On bench', delta:overviewDelta('bench', false)}),
-      overviewKpiCard({icon:'CL', value:overviewFormatNumber(clients), label:'Active clients', delta:overviewDelta('active_clients', true)})
+      overviewKpiCard({icon:'CL', value:overviewFormatNumber(clients), label:'Active clients', delta:overviewDelta('active_clients', true)}),
+      overviewKpiCard({icon:'UT', value:overviewFormatNumber(util, '%'), label:'Utilization (billing)', delta:overviewDelta('utilization_billing', true)})
     ].join('');
   }
   renderOverviewHeadcountBars();
