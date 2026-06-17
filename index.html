@@ -1238,6 +1238,7 @@ main{background:transparent!important}
     </div>
 
     <div class="pmo-ov-kpis" id="pmoOverviewKpis"></div>
+    <div class="pmo-ov-details" id="pmoOverviewDetails" aria-live="polite" hidden></div>
 
     <div class="pmo-ov-cols">
       <div class="pmo-ov-panel">
@@ -2105,7 +2106,7 @@ function renderDesignerOverview(){
       snapshot: latest,
       prev,
       snapshots: PMO.snapshots || [],
-      user: currentUser,
+      user: typeof effectiveSessionUser === 'function' ? effectiveSessionUser() : currentUser,
       lastRefresh: {at: PMO.last_refresh_at, label: lastUpdated || PMO.last_refresh}
     });
   }

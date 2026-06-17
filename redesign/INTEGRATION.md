@@ -8,7 +8,7 @@ redesign/
   pmo-overview.css   clean CSS, Azumo design tokens (scoped to .pmo-ov)
   pmo-overview.html  semantic markup for the overview section (empty, data-driven)
   pmo-overview.js    vanilla JS renderer — fills the markup from REAL data
-  pmo-sections.css   CSS-only reskin of Operating Views + Bench (no JS/markup changes)
+  pmo-sections.css   CSS-only reskin of the operational tabs (no JS/markup changes)
   INTEGRATION.md     this file
 ```
 
@@ -74,10 +74,10 @@ The renderer reads these automatically from existing globals. Targets shown for 
 | Greeting              | `#pmoGreeting`       | `currentUser.name` → first name (time-of-day prefix; no name → "Good morning") | ✅ |
 | Last refresh          | `#lastRefresh`       | `PMO.last_refresh_at` ?? `PMO.last_refresh`                        | ✅ |
 | People (hero + KPI)   | `#peopleCount` / `#kpiPeople` | `overviewPeopleCount(latest)`; fallback to `headcount_total`, then billable + bench | ✅ |
-| Active clients        | `#activeClients` / `#kpiActiveClients` | `latest.metrics.active_clients`                  | ✅ |
+| Active clients        | `#activeClients` / `#kpiActiveClients` | `latest.metrics.active_clients`; details use `active_clients` + `assignment_rows` | ✅ |
 | Utilization (billing) | `#utilizationBilling` / `#kpiUtilBilling` | `latest.metrics.utilization_billing`          | ✅ |
 | Billable headcount    | `#billableHeadcount` | `latest.metrics.headcount_billable`                                | ✅ |
-| Bench                 | `#benchCount`        | `latest.metrics.bench`                                             | ✅ |
+| Bench                 | `#benchCount`        | `latest.metrics.bench`; details use `bench_list`                   | ✅ |
 | Headcount series      | `#headcountSeries`   | `PMO.snapshots[].metrics.headcount_billable` (one bar per snapshot) | ✅ |
 | Team composition      | —                    | Not shown. The overview intentionally avoids position/discipline breakdown. | ✅ |
 
@@ -98,7 +98,7 @@ These design blocks have no source field in the current API. They render a label
 
 **Data ids** (filled by `renderPmoOverview`): `pmoGreeting`, `lastRefresh`, `peopleCount`, `activeClients`,
 `utilizationBilling`, `pmoOverviewKpis` (KPI container), `kpiPeople`, `billableHeadcount`, `benchCount`,
-`kpiActiveClients`, `kpiUtilBilling`, `headcountSeries`.
+`kpiActiveClients`, `kpiUtilBilling`, `pmoOverviewDetails`, `headcountSeries`.
 
 **Section root:** `#pmoOverview.pmo-ov` (carries `data-state="loading|ready|empty"`).
 
@@ -110,15 +110,16 @@ These design blocks have no source field in the current API. They render a label
 ```js
 renderPmoOverview();                         // reads PMO / latest / prev / currentUser
 renderPmoOverview({ snapshot, prev, snapshots, user, lastRefresh });  // explicit
+togglePmoOverviewDetail('bench' | 'clients');                         // KPI drilldowns
 ```
 
 ---
 
-## Operating Views + Bench — CSS-only reskin (`pmo-sections.css`)
+## Operational tabs — CSS-only reskin (`pmo-sections.css`)
 
-These two sections already render from real data via `renderOpsViews()` and `renderBench()`.
+These sections already render from real data through their existing render functions.
 **Nothing in their logic, filters, role-scoping or markup changes.** The reskin works by
-redefining the app's own CSS custom properties **scoped to `#opsViews` and `#bench`**, so every
+redefining the app's own CSS custom properties **scoped to operational section roots**, so every
 existing rule inside repaints in the Azumo People Ops palette, plus a thin layer of structural
 polish (white rounded cards, uppercase tracked headers, cerulean tabs/chips, soft shadows).
 
@@ -131,7 +132,9 @@ Symbols fonts already added in edit #1.
 That's the whole integration. No JS, no DOM changes.
 
 ### Markup hooks it relies on (already present in index.html)
-Section roots `#opsViews`, `#bench`; the app tokens `--card --surf --brd --txt --muted --blue
+Section roots `#newSearchesTriage`, `#dashboard`, `#opsViews`, `#pmoActionCenter`, `#harvestAccess`,
+`#accountCoverage`, `#dueDates`, `#pendingAssignments`, `#bench`, `#azumo`, `#harvestHours`,
+`#history`, `#forecast`; the app tokens `--card --surf --brd --txt --muted --blue
 --blue-lt --blue-dk --rl --r`; classes `.sec-head/.sec-icon/.sec-tag`, `.ops-wrap`,
 `.view-tab(.active)`, `.filter-field`, `.ops-summary-card`, `.ops-table-wrap`, `.tbl-wrap`,
 `.tbl-head`, `.bench-table-wrap`, `table/th/td`, `.chip` (positions), `.badge-green/blue/yellow/red`,

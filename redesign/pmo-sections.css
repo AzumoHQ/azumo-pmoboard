@@ -1,5 +1,5 @@
 /* ============================================================
-   PMO People Ops reskin — Operating Views + Bench
+   PMO People Ops reskin — operational dashboard tabs
    Pure CSS. NO markup or JS changes required.
 
    How it works: the existing sections render through the app's
@@ -14,13 +14,24 @@
    Requires the People Ops fonts (already added for the overview):
      Lato + Material Symbols Outlined  (see INTEGRATION.md, edit #1)
 
-   To extend the reskin to more sections later, just add their
-   section id to the two selector lists below.
+   The selector list below intentionally covers the operational tabs
+   while keeping the custom Overview isolated in pmo-overview.css.
    ============================================================ */
 
 /* ---- 1. Token remap (re-themes everything inside) ---------- */
+#newSearchesTriage,
+#dashboard,
 #opsViews,
-#bench{
+#pmoActionCenter,
+#harvestAccess,
+#accountCoverage,
+#dueDates,
+#pendingAssignments,
+#bench,
+#azumo,
+#harvestHours,
+#history,
+#forecast{
   --card:#FFFFFF;          /* surface            */
   --surf:#F4F9FD;          /* surface-2 (inputs, th, chips) */
   --brd:#E7EEF6;           /* border             */
@@ -44,21 +55,54 @@
 }
 
 /* ---- 2. Section header (cerulean tile + display title) ----- */
+#newSearchesTriage .sec-icon,
+#dashboard .sec-icon,
 #opsViews .sec-icon,
-#bench .sec-icon{
+#pmoActionCenter .sec-icon,
+#harvestAccess .sec-icon,
+#accountCoverage .sec-icon,
+#dueDates .sec-icon,
+#pendingAssignments .sec-icon,
+#bench .sec-icon,
+#azumo .sec-icon,
+#harvestHours .sec-icon,
+#history .sec-icon,
+#forecast .sec-icon{
   background:#E2F1FB !important;
   color:#0077B6;
   border-radius:11px !important;
 }
+#newSearchesTriage .sec-head h2,
+#dashboard .sec-head h2,
 #opsViews .sec-head h2,
-#bench .sec-head h2{
+#pmoActionCenter .sec-head h2,
+#harvestAccess .sec-head h2,
+#accountCoverage .sec-head h2,
+#dueDates .sec-head h2,
+#pendingAssignments .sec-head h2,
+#bench .sec-head h2,
+#azumo .sec-head h2,
+#harvestHours .sec-head h2,
+#history .sec-head h2,
+#forecast .sec-head h2{
   font-family:'Batica Sans','Lato',sans-serif;
   font-weight:900;
   letter-spacing:0;
   color:var(--txt);
 }
+#newSearchesTriage .sec-tag,
+#dashboard .sec-tag,
 #opsViews .sec-tag,
-#bench .sec-tag{
+#pmoActionCenter .sec-tag,
+#harvestAccess .sec-tag,
+#accountCoverage .sec-tag,
+#dueDates .sec-tag,
+#pendingAssignments .sec-tag,
+#bench .sec-tag,
+#azumo .sec-tag,
+#harvestHours .sec-tag,
+#history .sec-tag,
+#forecast .sec-tag{
   background:#E2F1FB;
   border-color:#CFE6F7;
   color:#0A6FA8;
@@ -67,7 +111,8 @@
 
 /* ---- 3. Card containers (soft Azumo shadow, not heavy dark) - */
 #opsViews .ops-wrap,
-#bench .tbl-wrap{
+#bench .tbl-wrap,
+:is(#newSearchesTriage,#dashboard,#pmoActionCenter,#harvestAccess,#accountCoverage,#dueDates,#pendingAssignments,#azumo,#harvestHours,#history,#forecast) :is(.tbl-wrap,.qa-wrap,.action-wrap,.forecast-wrap,.util-card,.qa-card,.coverage-card,.harvest-summary-card,.harvest-card,.mini-card,.fc-table-wrap,.reports-subsection,.report-embed-wrap,.history-card){
   background:var(--card);
   border:1px solid var(--brd);
   border-radius:var(--rl);
@@ -118,30 +163,64 @@
 
 /* ---- 5. Tables (Operating Views + Bench) ------------------- */
 #opsViews table,
-#bench table{ border-collapse:collapse; width:100%; }
+#bench table,
+:is(#newSearchesTriage,#dashboard,#pmoActionCenter,#harvestAccess,#accountCoverage,#dueDates,#pendingAssignments,#azumo,#harvestHours,#history,#forecast) table{ border-collapse:collapse; width:100%; }
 
+#newSearchesTriage th,
+#dashboard th,
 #opsViews th,
-#bench th{
+#pmoActionCenter th,
+#harvestAccess th,
+#accountCoverage th,
+#dueDates th,
+#pendingAssignments th,
+#bench th,
+#azumo th,
+#harvestHours th,
+#history th,
+#forecast th{
   background:var(--surf) !important;
   color:var(--muted) !important;
   font-size:11px !important;
   font-weight:800 !important;
-  letter-spacing:.09em;
+  letter-spacing:0;
   text-transform:uppercase;
   text-align:left;
   padding:13px 16px !important;
   border-bottom:1px solid var(--brd);
 }
+#newSearchesTriage td,
+#dashboard td,
 #opsViews td,
-#bench td{
+#pmoActionCenter td,
+#harvestAccess td,
+#accountCoverage td,
+#dueDates td,
+#pendingAssignments td,
+#bench td,
+#azumo td,
+#harvestHours td,
+#history td,
+#forecast td{
   color:var(--txt);
   font-size:13.5px;
   padding:14px 16px !important;
   border-bottom:1px solid var(--brd);
   vertical-align:middle;
 }
+#newSearchesTriage tbody tr:hover td,
+#dashboard tbody tr:hover td,
 #opsViews tbody tr:hover td,
-#bench tbody tr:hover td{ background:var(--surf); }
+#pmoActionCenter tbody tr:hover td,
+#harvestAccess tbody tr:hover td,
+#accountCoverage tbody tr:hover td,
+#dueDates tbody tr:hover td,
+#pendingAssignments tbody tr:hover td,
+#bench tbody tr:hover td,
+#azumo tbody tr:hover td,
+#harvestHours tbody tr:hover td,
+#history tbody tr:hover td,
+#forecast tbody tr:hover td{ background:var(--surf); }
 #bench .bench-table-wrap tbody tr:nth-child(even) td{ background:rgba(0,119,182,.022); }
 
 /* nested PM detail table */
@@ -156,6 +235,9 @@
 
 /* ---- 6. Chips, badges, availability, due-date colors ------- */
 /* position chips: keep their per-position hue but soften to pill */
+#newSearchesTriage .chip,#dashboard .chip,#pmoActionCenter .chip,#harvestAccess .chip,
+#accountCoverage .chip,#dueDates .chip,#pendingAssignments .chip,#azumo .chip,
+#harvestHours .chip,#history .chip,#forecast .chip,
 #opsViews .chip,
 #bench .chip{
   border-radius:7px;
@@ -165,20 +247,64 @@
 }
 
 /* status badges → Azumo semantic palette */
+#newSearchesTriage .badge-green,#dashboard .badge-green,#pmoActionCenter .badge-green,#harvestAccess .badge-green,#accountCoverage .badge-green,#dueDates .badge-green,#pendingAssignments .badge-green,#azumo .badge-green,#harvestHours .badge-green,#history .badge-green,#forecast .badge-green,
 #opsViews .badge-green,#bench .badge-green{ background:rgba(30,158,99,.12); color:#1E9E63; }
+#newSearchesTriage .badge-blue,#dashboard .badge-blue,#pmoActionCenter .badge-blue,#harvestAccess .badge-blue,#accountCoverage .badge-blue,#dueDates .badge-blue,#pendingAssignments .badge-blue,#azumo .badge-blue,#harvestHours .badge-blue,#history .badge-blue,#forecast .badge-blue,
 #opsViews .badge-blue, #bench .badge-blue { background:#E2F1FB; color:#0A6FA8; }
+#newSearchesTriage .badge-yellow,#dashboard .badge-yellow,#pmoActionCenter .badge-yellow,#harvestAccess .badge-yellow,#accountCoverage .badge-yellow,#dueDates .badge-yellow,#pendingAssignments .badge-yellow,#azumo .badge-yellow,#harvestHours .badge-yellow,#history .badge-yellow,#forecast .badge-yellow,
 #opsViews .badge-yellow,#bench .badge-yellow{ background:rgba(232,162,39,.15); color:#B97708; }
+#newSearchesTriage .badge-red,#dashboard .badge-red,#pmoActionCenter .badge-red,#harvestAccess .badge-red,#accountCoverage .badge-red,#dueDates .badge-red,#pendingAssignments .badge-red,#azumo .badge-red,#harvestHours .badge-red,#history .badge-red,#forecast .badge-red,
 #opsViews .badge-red,  #bench .badge-red  { background:rgba(239,68,68,.12); color:#D92D20; }
 
 /* availability text colors */
+#newSearchesTriage .avail-hi,#dashboard .avail-hi,#pmoActionCenter .avail-hi,#harvestAccess .avail-hi,#accountCoverage .avail-hi,#dueDates .avail-hi,#pendingAssignments .avail-hi,#azumo .avail-hi,#harvestHours .avail-hi,#history .avail-hi,#forecast .avail-hi,
 #opsViews .avail-hi,#bench .avail-hi{ color:#1E9E63; font-weight:800; }
+#newSearchesTriage .avail-md,#dashboard .avail-md,#pmoActionCenter .avail-md,#harvestAccess .avail-md,#accountCoverage .avail-md,#dueDates .avail-md,#pendingAssignments .avail-md,#azumo .avail-md,#harvestHours .avail-md,#history .avail-md,#forecast .avail-md,
 #opsViews .avail-md,#bench .avail-md{ color:#B97708; font-weight:800; }
+#newSearchesTriage .avail-lo,#dashboard .avail-lo,#pmoActionCenter .avail-lo,#harvestAccess .avail-lo,#accountCoverage .avail-lo,#dueDates .avail-lo,#pendingAssignments .avail-lo,#azumo .avail-lo,#harvestHours .avail-lo,#history .avail-lo,#forecast .avail-lo,
 #opsViews .avail-lo,#bench .avail-lo{ color:#D92D20; font-weight:800; }
 
 /* due-date / expiry colors */
+#newSearchesTriage .exp-soon,#dashboard .exp-soon,#pmoActionCenter .exp-soon,#harvestAccess .exp-soon,#accountCoverage .exp-soon,#dueDates .exp-soon,#pendingAssignments .exp-soon,#azumo .exp-soon,#harvestHours .exp-soon,#history .exp-soon,#forecast .exp-soon,
 #opsViews .exp-soon,#bench .exp-soon{ color:#D92D20; font-weight:800; }
+#newSearchesTriage .exp-mid,#dashboard .exp-mid,#pmoActionCenter .exp-mid,#harvestAccess .exp-mid,#accountCoverage .exp-mid,#dueDates .exp-mid,#pendingAssignments .exp-mid,#azumo .exp-mid,#harvestHours .exp-mid,#history .exp-mid,#forecast .exp-mid,
 #opsViews .exp-mid, #bench .exp-mid { color:#B97708; font-weight:800; }
+#newSearchesTriage .exp-ok,#dashboard .exp-ok,#pmoActionCenter .exp-ok,#harvestAccess .exp-ok,#accountCoverage .exp-ok,#dueDates .exp-ok,#pendingAssignments .exp-ok,#azumo .exp-ok,#harvestHours .exp-ok,#history .exp-ok,#forecast .exp-ok,
 #opsViews .exp-ok,  #bench .exp-ok  { color:var(--muted); }
 
 /* people lists muted */
 #opsViews .ops-people{ color:var(--muted); }
+
+/* ---- 7. Shared controls and summary cards across tabs ------- */
+:is(#newSearchesTriage,#dashboard,#opsViews,#pmoActionCenter,#harvestAccess,#accountCoverage,#dueDates,#pendingAssignments,#bench,#azumo,#harvestHours,#history,#forecast) :is(.inline-filter,a.inline-filter){
+  color:var(--blue);
+  font-weight:800;
+}
+:is(#newSearchesTriage,#dashboard,#opsViews,#pmoActionCenter,#harvestAccess,#accountCoverage,#dueDates,#pendingAssignments,#bench,#azumo,#harvestHours,#history,#forecast) :is(input,select,textarea){
+  background:var(--surf);
+  border:1px solid var(--brd);
+  color:var(--txt);
+  border-radius:10px;
+}
+:is(#newSearchesTriage,#dashboard,#opsViews,#pmoActionCenter,#harvestAccess,#accountCoverage,#dueDates,#pendingAssignments,#bench,#azumo,#harvestHours,#history,#forecast) :is(input,select,textarea):focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(0,119,182,.16);
+  outline:none;
+}
+#dashboard .mc,
+:is(#azumo,#harvestHours,#accountCoverage,#pmoActionCenter,#history,#forecast) :is(.util-card,.qa-card,.harvest-summary-card,.coverage-card,.mini-card){
+  background:var(--card);
+  border:1px solid var(--brd);
+  border-radius:var(--rl);
+  box-shadow:0 2px 8px rgba(7,24,59,.05),0 1px 2px rgba(7,24,59,.04) !important;
+}
+#dashboard .mc-name,
+:is(#azumo,#harvestHours,#accountCoverage,#pmoActionCenter,#history,#forecast) :is(.util-card-label,.qa-label,.harvest-summary-label){
+  color:var(--muted);
+  font-weight:800;
+  letter-spacing:0;
+}
+#dashboard .mc-val,
+:is(#azumo,#harvestHours,#accountCoverage,#pmoActionCenter,#history,#forecast) :is(.util-card-value,.qa-value,.harvest-summary-value){
+  color:var(--txt);
+}
