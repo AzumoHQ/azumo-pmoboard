@@ -1198,7 +1198,7 @@ main{background:transparent!important}
     <h1>Operations Center — <span>Azumo PMO</span></h1>
     <p class="hero-copy">Current snapshot for staffing capacity, utilization, client coverage, and delivery risk.</p>
     <div class="hero-stats" aria-label="Current PMO snapshot summary">
-      <div class="hero-stat"><div class="hero-stat-value" id="heroPeopleStat">—</div><div class="hero-stat-label">People</div></div>
+      <div class="hero-stat"><div class="hero-stat-value" id="heroPeopleStat">—</div><div class="hero-stat-label">Assignees</div></div>
       <div class="hero-stat"><div class="hero-stat-value" id="heroClientsStat">—</div><div class="hero-stat-label">Clients</div></div>
       <div class="hero-stat"><div class="hero-stat-value" id="heroBillingStat">—</div><div class="hero-stat-label">Billing util.</div></div>
       <div class="hero-stat"><div class="hero-stat-value" id="heroBenchStat">—</div><div class="hero-stat-label">Bench</div></div>
@@ -1231,7 +1231,7 @@ main{background:transparent!important}
         </div>
       </div>
       <div class="pmo-ov-hero-stats" aria-label="Current PMO summary">
-        <div class="pmo-ov-hero-stat"><div class="num" id="peopleCount">—</div><div class="lbl">People</div></div>
+        <div class="pmo-ov-hero-stat"><div class="num" id="peopleCount">—</div><div class="lbl">Assignees</div></div>
         <div class="pmo-ov-hero-stat"><div class="num" id="activeClients">—</div><div class="lbl">Clients</div></div>
         <div class="pmo-ov-hero-stat"><div class="num" id="utilizationBilling">—</div><div class="lbl">Avg util.</div></div>
       </div>
@@ -1248,13 +1248,6 @@ main{background:transparent!important}
         <div class="pmo-ov-chart" id="headcountSeries"></div>
       </div>
 
-      <div class="pmo-ov-panel">
-        <div class="pmo-ov-panel-head">
-          <div class="pmo-ov-panel-eyebrow">Team composition</div>
-          <div class="pmo-ov-panel-title">By discipline</div>
-        </div>
-        <div id="disciplineRows"></div>
-      </div>
     </div>
   </div>
 </section>
@@ -1690,7 +1683,7 @@ main{background:transparent!important}
     <div class="audit-note" id="hhStatus" style="display:none"></div>
     <div id="hhResults" style="display:none">
       <div class="action-summary harvest-hours-summary">
-        <div class="action-card"><div class="action-label">Total people</div><div class="action-value" id="hhMetricTotal">—</div></div>
+        <div class="action-card"><div class="action-label">Harvest users</div><div class="action-value" id="hhMetricTotal">—</div></div>
         <div class="action-card ok"><div class="action-label">Complete</div><div class="action-value" id="hhMetricComplete">—</div></div>
         <div class="action-card warning"><div class="action-label">Incomplete</div><div class="action-value" id="hhMetricIncomplete">—</div></div>
       </div>
@@ -1822,7 +1815,7 @@ let qaChecklistReviews = {};
 let qaChecklistReviewsLoaded = false;
 let qaChecklistReviewsPromise = null;
 let harvestHoursReportData = [];
-let internalProjectsExpanded = false;
+let internalProjectsExpanded = true;
 
 document.getElementById('navDate').textContent =
   today.toLocaleDateString('en-US',{weekday:'short',day:'numeric',month:'short'});
@@ -2077,12 +2070,13 @@ function overviewDisciplineRows(){
   return result;
 }
 function renderOverviewDiscipline(){
-  const rows = overviewDisciplineRows();
-  const total = rows.reduce((sum, row) => sum + row.count, 0) || overviewPeopleCount(latest);
-  const colors = ['var(--sky-600)','var(--sky-400)','var(--mist-500)','var(--saffron)','var(--mist-300)','var(--blue-300)','var(--neutral-300)'];
   const donut = document.getElementById('overviewDisciplineDonut');
   const totalEl = document.getElementById('overviewDisciplineTotal');
   const list = document.getElementById('overviewDisciplineList');
+  if(!donut && !totalEl && !list) return;
+  const rows = overviewDisciplineRows();
+  const total = rows.reduce((sum, row) => sum + row.count, 0) || overviewPeopleCount(latest);
+  const colors = ['var(--sky-600)','var(--sky-400)','var(--mist-500)','var(--saffron)','var(--mist-300)','var(--blue-300)','var(--neutral-300)'];
   if(totalEl) totalEl.textContent = overviewFormatNumber(total);
   if(donut){
     let cursor = 0;
@@ -2112,8 +2106,7 @@ function renderDesignerOverview(){
       prev,
       snapshots: PMO.snapshots || [],
       user: currentUser,
-      lastRefresh: {at: PMO.last_refresh_at, label: lastUpdated || PMO.last_refresh},
-      disciplineRows: overviewDisciplineRows()
+      lastRefresh: {at: PMO.last_refresh_at, label: lastUpdated || PMO.last_refresh}
     });
   }
   const set = (id, value) => {
@@ -2224,6 +2217,7 @@ function sidebarNavConfig(){
 }
 function currentModuleTabId(sections){
   const stored = localStorage.getItem(MODULE_TAB_KEY);
+  if(sections.some(section => section.id === 'overview')) return 'overview';
   if(stored && sections.some(section => section.id === stored)) return stored;
   const preferred = ['overview','opsViews','bench','azumo','pendingAssignments','dueDates','forecast','accountCoverage','harvestHours','harvestAccess','dashboard','history','newSearchesTriage','pmoActionCenter'];
   return preferred.find(id => sections.some(section => section.id === id)) || sections[0]?.id;
@@ -2828,7 +2822,7 @@ async function manualSnapshot(){
 // METRICS CARDS
 // ════════════════════════════════════════════════════
 const METRIC_CFG = [
-  {key:'headcount_total',        label:'Headcount Total',               unit:'',   color:'#0EA5E9', higherBetter:true,  size:'large', target:'headcount', spark:false},
+  {key:'headcount_total',        label:'Active Assignees',              unit:'',   color:'#0EA5E9', higherBetter:true,  size:'large', target:'headcount', spark:false},
   {key:'headcount_billable',     label:'Billable',                      unit:'',   color:'#0066FF', higherBetter:true,  size:'small', target:'billable'},
   {key:'headcount_nonbillable',  label:'Non-Billable',                  unit:'',   color:'#F59E0B', higherBetter:false, size:'small', target:'nonbillable'},
   {key:'freelancers',            label:'Freelancers',                   unit:'',   color:'#7C3AED', higherBetter:false, size:'small', target:'freelancers', hover:'freelancers'},
@@ -2863,12 +2857,7 @@ function freelancerMetricRows(snapshot = latest){
 function metricValue(snapshot, key){
   const metrics = snapshot?.metrics || {};
   if(key === 'headcount_total'){
-    const billable = Number(metrics.headcount_billable || 0);
-    const nonBillable = Number(metrics.headcount_nonbillable || 0);
-    const sum = billable + nonBillable;
-    if(sum > 0) return sum;
-    const direct = Number(metrics.headcount_total);
-    return Number.isNaN(direct) ? 0 : direct;
+    return overviewPeopleCount(snapshot);
   }
   if(key === 'freelancers') return freelancerMetricRows(snapshot).length;
   return metrics[key];

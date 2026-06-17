@@ -125,10 +125,10 @@
 .pmo-ov-kpi-lbl{font-size:13px;font-weight:600;color:var(--ov-text-2);margin-top:6px;}
 
 /* ============================================================
-   TWO-COLUMN PANELS (chart + composition)
+   PANELS
    ============================================================ */
 .pmo-ov-cols{
-  display:grid;grid-template-columns:1.55fr 1fr;gap:16px;
+  display:grid;grid-template-columns:1fr;gap:16px;
 }
 @media(max-width:960px){.pmo-ov-cols{grid-template-columns:1fr;}}
 .pmo-ov-panel{

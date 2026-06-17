@@ -14,7 +14,7 @@
        updates on login. It reads the globals itself.
 
    You can also call it explicitly for tests:
-     renderPmoOverview({ snapshot, prev, snapshots, user, lastRefresh, disciplineRows })
+     renderPmoOverview({ snapshot, prev, snapshots, user, lastRefresh })
    ============================================================ */
 (function (global) {
   'use strict';
@@ -154,44 +154,6 @@
     }).join('');
   }
 
-  /* ---- Team composition (disciplineRows) ---- */
-  /* Render real bars ONLY if discipline data is supplied; otherwise show
-     the "requires data mapping" state. Expected shape when available:
-       disciplineRows = [{ label:'Engineering', count:58 }, ...]
-  */
-  function renderDisciplines(rows) {
-    var host = el('disciplineRows');
-    if (!host) return;
-    var valid = Array.isArray(rows) && rows.filter(function (r) { return r && num(r.count) !== null; });
-    if (!valid || !valid.length) {
-      host.innerHTML =
-        '<div class="pmo-ov-needs-map">' +
-          '<span class="msi">analytics</span>' +
-          '<div class="t">Team composition by discipline</div>' +
-          '<div class="d">No discipline breakdown is returned by <code>/api/dashboard</code> yet. Provide <code>disciplineRows</code> to render this.</div>' +
-          '<span class="tag">Requires data mapping</span>' +
-        '</div>';
-      return;
-    }
-    var total = valid.reduce(function (a, r) { return a + r.count; }, 0) || 1;
-    host.innerHTML = valid
-      .sort(function (a, b) { return b.count - a.count; })
-      .map(function (r) {
-        var w = Math.round((r.count / total) * 100);
-        return '<div class="pmo-ov-comp-row">' +
-          '<span class="pmo-ov-comp-name">' + escapeHtml(r.label) + '</span>' +
-          '<span class="pmo-ov-comp-track"><span class="pmo-ov-comp-fill" style="width:' + w + '%"></span></span>' +
-          '<span class="pmo-ov-comp-num">' + r.count + '</span>' +
-        '</div>';
-      }).join('');
-  }
-
-  function escapeHtml(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-
   /* ---- Public entry point ---- */
   function renderPmoOverview(opts) {
     opts = opts || {};
@@ -218,11 +180,6 @@
     var m = snapshot.metrics;
     var people = metricTotalPeople(snapshot);
     var clients = metricActiveClients(snapshot);
-    var disciplineRows = opts.disciplineRows;
-    if (!disciplineRows && typeof global.overviewDisciplineRows === 'function') {
-      disciplineRows = global.overviewDisciplineRows();
-    }
-
     // Hero stats
     setText('peopleCount', intStr(people));
     setText('activeClients', intStr(clients));
@@ -230,7 +187,6 @@
 
     renderKpis(snapshot, prev);
     renderHeadcountSeries(snapshots);
-    renderDisciplines(disciplineRows);
   }
 
   global.renderPmoOverview = renderPmoOverview;

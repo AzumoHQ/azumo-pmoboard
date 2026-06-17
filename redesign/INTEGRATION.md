@@ -79,29 +79,17 @@ The renderer reads these automatically from existing globals. Targets shown for 
 | Billable headcount    | `#billableHeadcount` | `latest.metrics.headcount_billable`                                | ✅ |
 | Bench                 | `#benchCount`        | `latest.metrics.bench`                                             | ✅ |
 | Headcount series      | `#headcountSeries`   | `PMO.snapshots[].metrics.headcount_billable` (one bar per snapshot) | ✅ |
-| Team composition      | `#disciplineRows`    | `overviewDisciplineRows()` derived from active `assignment_rows` positions | ✅ |
+| Team composition      | —                    | Not shown. The overview intentionally avoids position/discipline breakdown. | ✅ |
 
 All KPI deltas are computed live against `prev` (the previous snapshot). Bench delta is inverted (a drop is "good").
 
 ### ⚠️ Requires data mapping (do NOT fake)
 These design blocks have no source field in the current API. They render a labelled "requires data mapping" state until wired:
 
-1. **Team composition by discipline** — `#disciplineRows`.
-   This repo now passes real data from `overviewDisciplineRows()`. If the renderer is used elsewhere, pass real data:
-   ```js
-   renderPmoOverview({ disciplineRows: [
-     { label:'Engineering', count: 58 },
-     { label:'Project Mgmt', count: 12 },
-     // ...
-   ]});
-   ```
-   Source in this repo: aggregate `position` across active assignment rows already ingested from Jira
-   (`Epic → Position - Assignee`).
-
-2. **Attendance (early loggers / late starts / missing timesheet)** — not built here.
+1. **Attendance (early loggers / late starts / missing timesheet)** — not built here.
    Source would be `/api/harvest-hours` (already exists), keyed by day; needs a per-person log-time mapping.
 
-3. **Top performers · utilization** — not built here.
+2. **Top performers · utilization** — not built here.
    Needs per-person utilization, which `/api/dashboard` does not return today.
 
 ---
@@ -110,18 +98,18 @@ These design blocks have no source field in the current API. They render a label
 
 **Data ids** (filled by `renderPmoOverview`): `pmoGreeting`, `lastRefresh`, `peopleCount`, `activeClients`,
 `utilizationBilling`, `pmoOverviewKpis` (KPI container), `kpiPeople`, `billableHeadcount`, `benchCount`,
-`kpiActiveClients`, `kpiUtilBilling`, `headcountSeries`, `disciplineRows`.
+`kpiActiveClients`, `kpiUtilBilling`, `headcountSeries`.
 
 **Section root:** `#pmoOverview.pmo-ov` (carries `data-state="loading|ready|empty"`).
 
 **Style classes** (all namespaced `pmo-ov-*`, no collision with existing app CSS):
 `pmo-ov-hero`, `pmo-ov-hero-stat`, `pmo-ov-kpis`, `pmo-ov-kpi`, `pmo-ov-delta` (`.up/.down/.flat`),
-`pmo-ov-cols`, `pmo-ov-panel`, `pmo-ov-chart`, `pmo-ov-bar`, `pmo-ov-comp-row`, `pmo-ov-needs-map`.
+`pmo-ov-cols`, `pmo-ov-panel`, `pmo-ov-chart`, `pmo-ov-bar`.
 
 **Public JS API:**
 ```js
 renderPmoOverview();                         // reads PMO / latest / prev / currentUser
-renderPmoOverview({ snapshot, prev, snapshots, user, lastRefresh, disciplineRows });  // explicit
+renderPmoOverview({ snapshot, prev, snapshots, user, lastRefresh });  // explicit
 ```
 
 ---
