@@ -114,11 +114,11 @@
     var c = num(cur), p = num(prev);
     if (c === null || p === null) return '';
     var diff = Math.round((c - p) * 100) / 100;
-    var dir = diff > 0 ? 'up' : (diff < 0 ? 'down' : 'flat');
+    if (diff === 0) return '';
     var good = diff === 0 ? 'flat' : ((opts.goodWhenDown ? diff < 0 : diff > 0) ? 'up' : 'down');
     var arrow = diff > 0 ? 'arrow_upward' : (diff < 0 ? 'arrow_downward' : 'remove');
     var mag = Math.abs(diff);
-    var txt = diff === 0 ? 'no change' : (opts.suffix ? mag + opts.suffix : (diff > 0 ? '+' : '−') + mag);
+    var txt = opts.suffix ? mag + opts.suffix : (diff > 0 ? '+' : '−') + mag;
     return '<span class="pmo-ov-delta ' + good + '"><span class="msi">' + arrow + '</span>' + txt + '</span>';
   }
 
@@ -295,6 +295,12 @@
       if (benchBtn && typeof global.openMetricOperatingView === 'function') {
         event.stopPropagation();
         global.openMetricOperatingView('bench');
+        return;
+      }
+      var clientsBtn = event.target.closest && event.target.closest('[data-pmo-open-clients]');
+      if (clientsBtn && typeof global.openMetricOperatingView === 'function') {
+        event.stopPropagation();
+        global.openMetricOperatingView('clients');
       }
     });
   }
@@ -312,7 +318,7 @@
             '<div class="pmo-ov-popover-pct">' + pct(row.availability) + '</div>' +
           '</div>';
         }).join('') +
-        (rows.length > visible.length ? '<div class="pmo-ov-popover-more">+' + (rows.length - visible.length) + ' more</div>' : '') +
+        (rows.length > visible.length ? '<button type="button" class="pmo-ov-popover-more is-action" data-pmo-open-bench>+' + (rows.length - visible.length) + ' more</button>' : '') +
       '</div>' : '<div class="pmo-ov-popover-empty">No active bench people in the current snapshot.</div>') +
     '</div>';
   }
@@ -332,7 +338,7 @@
             '<div class="pmo-ov-popover-pct">' + row.sows + '</div>' +
           '</div>';
         }).join('') +
-        (rows.length > visible.length ? '<div class="pmo-ov-popover-more">+' + (rows.length - visible.length) + ' more clients</div>' : '') +
+        (rows.length > visible.length ? '<button type="button" class="pmo-ov-popover-more is-action" data-pmo-open-clients>+' + (rows.length - visible.length) + ' more clients</button>' : '') +
       '</div>' : '<div class="pmo-ov-popover-empty">No active external clients in the current snapshot.</div>') +
     '</div>';
   }

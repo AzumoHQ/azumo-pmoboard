@@ -2094,7 +2094,7 @@ function overviewMetricDelta(currentValue, previousValue, higherBetter=true){
   if(Number.isNaN(cur) || Number.isNaN(old)) return {text:'—', cls:'flat'};
   const delta = deltaStr(cur, old, higherBetter);
   return {
-    text: delta.text === 'no change' ? 'no change' : delta.text,
+    text: delta.text,
     cls: delta.cls === 'delta-up' ? 'good' : delta.cls === 'delta-dn' ? 'bad' : 'flat'
   };
 }
@@ -2105,7 +2105,7 @@ function overviewDelta(key, higherBetter=true){
   if(Number.isNaN(cur) || Number.isNaN(old)) return {text:'—', cls:'flat'};
   const delta = deltaStr(cur, old, higherBetter);
   return {
-    text: delta.text === 'no change' ? 'no change' : delta.text,
+    text: delta.text,
     cls: delta.cls === 'delta-up' ? 'good' : delta.cls === 'delta-dn' ? 'bad' : 'flat'
   };
 }
@@ -2113,7 +2113,7 @@ function overviewKpiCard({icon, value, label, delta}){
   return `<div class="az-kpi">
     <div class="az-kpi-top">
       <div class="az-kpi-icon">${esc(icon)}</div>
-      <div class="az-kpi-delta ${esc(delta.cls)}">${esc(delta.text)}</div>
+      ${delta.text ? `<div class="az-kpi-delta ${esc(delta.cls)}">${esc(delta.text)}</div>` : ''}
     </div>
     <div>
       <div class="az-kpi-value">${esc(value)}</div>
@@ -2985,7 +2985,7 @@ function metricValue(snapshot, key){
 function deltaStr(cur, prv, higherBetter){
   if(prv === undefined || prv === null) return {text:'—', cls:'delta-flat'};
   const d = (cur - prv);
-  if(Math.abs(d) < 0.01) return {text:'no change', cls:'delta-flat'};
+  if(Math.abs(d) < 0.01) return {text:'', cls:'delta-flat'};
   const sign = d > 0 ? '+' : '';
   const pct  = typeof cur === 'number' && Math.abs(cur) < 200 ? `${sign}${d.toFixed(1)}` : `${sign}${Math.round(d)}`;
   const good = higherBetter ? d > 0 : d < 0;
@@ -6391,7 +6391,7 @@ function renderHistory(){
       <div class="hist-vals">
         <div class="hist-cur" style="color:${cfg.color}">${typeof cur==='number'?(cur%1!==0?cur.toFixed(2):cur):'—'}${cfg.unit}</div>
         ${prv!=null?`<div class="hist-prev">prev month: ${typeof prv==='number'?(prv%1!==0?prv.toFixed(2):prv):'—'}${cfg.unit}</div>`:''}
-        <div class="hist-delta ${cls}">${text}</div>
+        ${text ? `<div class="hist-delta ${cls}">${text}</div>` : ''}
       </div>
       ${sparklineSVG(monthly, cfg.key, cfg.color)}
       <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">

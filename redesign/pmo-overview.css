@@ -179,6 +179,12 @@
 .pmo-ov-popover-more,.pmo-ov-popover-empty{
   color:var(--ov-text-2);font-size:12px;font-weight:800;text-align:center;padding:4px 0 1px;
 }
+.pmo-ov-popover-more.is-action{
+  width:100%;border:0;background:transparent;cursor:pointer;font:800 12px/1.25 var(--ov-font);
+}
+.pmo-ov-popover-more.is-action:hover,.pmo-ov-popover-more.is-action:focus-visible{
+  color:var(--ov-link);text-decoration:underline;outline:none;
+}
 .pmo-ov-client-link{
   border:0;background:transparent;color:var(--ov-link);font:800 12px/1.25 var(--ov-font);
   cursor:pointer;padding:0;text-align:left;
