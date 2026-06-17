@@ -1931,7 +1931,7 @@ function updateHeroStats(snapshot){
     return;
   }
   const clients = metricValue(snapshot, 'active_clients') || snapshot.active_clients?.length || 0;
-  set('heroPeopleStat', formatHeroStat(metricValue(snapshot, 'headcount_total')));
+  set('heroPeopleStat', formatHeroStat(overviewPeopleCount(snapshot)));
   set('heroClientsStat', formatHeroStat(clients));
   set('heroBillingStat', formatHeroStat(metricValue(snapshot, 'utilization_billing'), '%'));
   set('heroBenchStat', formatHeroStat(metricValue(snapshot, 'bench')));
@@ -1954,6 +1954,42 @@ function overviewFormatNumber(value, unit=''){
   if(Number.isNaN(n)) return '—';
   const formatted = Math.abs(n) >= 100 || n % 1 === 0 ? n.toFixed(0) : n.toFixed(1);
   return `${formatted}${unit}`;
+}
+function overviewPersonKey(row){
+  return normalizeIdentity(row?.email || row?.assignee || row?.name || row?.key || '');
+}
+function overviewBenchByMonthPeople(snapshot=latest){
+  const rows = Array.isArray(snapshot?.bench_by_month?.rows) ? snapshot.bench_by_month.rows : [];
+  const ignored = new Set(['assignees','assignee','total','totals']);
+  return rows.filter(row => {
+    const name = String(row?.assignee || row?.name || '').trim();
+    return name && !ignored.has(name.toLowerCase());
+  }).length;
+}
+function overviewAssignmentPeople(snapshot=latest){
+  const rows = Array.isArray(snapshot?.assignment_rows) ? snapshot.assignment_rows : [];
+  return new Set(rows.map(overviewPersonKey).filter(Boolean)).size;
+}
+function overviewPeopleCount(snapshot=latest){
+  const benchByMonthCount = overviewBenchByMonthPeople(snapshot);
+  if(benchByMonthCount > 0) return benchByMonthCount;
+  const assignmentCount = overviewAssignmentPeople(snapshot);
+  if(assignmentCount > 0) return assignmentCount;
+  const direct = Number(snapshot?.metrics?.headcount_total || 0);
+  if(direct > 0) return direct;
+  const billable = Number(snapshot?.metrics?.headcount_billable || 0);
+  const bench = Array.isArray(snapshot?.bench_list) ? snapshot.bench_list.length : Number(snapshot?.metrics?.bench || 0);
+  return billable || bench ? billable + bench : 0;
+}
+function overviewMetricDelta(currentValue, previousValue, higherBetter=true){
+  const cur = Number(currentValue);
+  const old = Number(previousValue);
+  if(Number.isNaN(cur) || Number.isNaN(old)) return {text:'—', cls:'flat'};
+  const delta = deltaStr(cur, old, higherBetter);
+  return {
+    text: delta.text === 'no change' ? 'no change' : delta.text,
+    cls: delta.cls === 'delta-up' ? 'good' : delta.cls === 'delta-dn' ? 'bad' : 'flat'
+  };
 }
 function overviewDelta(key, higherBetter=true){
   if(!prev) return {text:'—', cls:'flat'};
@@ -2030,13 +2066,19 @@ function overviewDisciplineRows(){
   });
   const counts = new Map();
   byPerson.forEach(label => counts.set(label, (counts.get(label) || 0) + 1));
-  return [...counts.entries()]
+  const result = [...counts.entries()]
     .map(([label, count]) => ({label, count}))
     .sort((a,b) => b.count - a.count || a.label.localeCompare(b.label));
+  const expectedTotal = overviewPeopleCount(latest);
+  const countedTotal = result.reduce((sum, row) => sum + row.count, 0);
+  if(expectedTotal > countedTotal){
+    result.push({label:'Unmapped', count:expectedTotal - countedTotal});
+  }
+  return result;
 }
 function renderOverviewDiscipline(){
   const rows = overviewDisciplineRows();
-  const total = rows.reduce((sum, row) => sum + row.count, 0) || Number(metricValue(latest, 'headcount_total') || 0);
+  const total = rows.reduce((sum, row) => sum + row.count, 0) || overviewPeopleCount(latest);
   const colors = ['var(--sky-600)','var(--sky-400)','var(--mist-500)','var(--saffron)','var(--mist-300)','var(--blue-300)','var(--neutral-300)'];
   const donut = document.getElementById('overviewDisciplineDonut');
   const totalEl = document.getElementById('overviewDisciplineTotal');
@@ -2068,7 +2110,8 @@ function renderDesignerOverview(){
     const el = document.getElementById(id);
     if(el) el.textContent = value;
   };
-  const people = metricValue(latest, 'headcount_total');
+  const people = overviewPeopleCount(latest);
+  const previousPeople = prev ? overviewPeopleCount(prev) : null;
   const billable = metricValue(latest, 'headcount_billable');
   const bench = metricValue(latest, 'bench');
   const clients = metricValue(latest, 'active_clients') || latest.active_clients?.length || 0;
@@ -2082,7 +2125,7 @@ function renderDesignerOverview(){
   const grid = document.getElementById('overviewKpis');
   if(grid){
     grid.innerHTML = [
-      overviewKpiCard({icon:'HC', value:overviewFormatNumber(people), label:'Active assignees', delta:overviewDelta('headcount_total', true)}),
+      overviewKpiCard({icon:'HC', value:overviewFormatNumber(people), label:'Active assignees', delta:overviewMetricDelta(people, previousPeople, true)}),
       overviewKpiCard({icon:'BI', value:overviewFormatNumber(billable), label:'Billable headcount', delta:overviewDelta('headcount_billable', true)}),
       overviewKpiCard({icon:'BE', value:overviewFormatNumber(bench), label:'On bench', delta:overviewDelta('bench', false)}),
       overviewKpiCard({icon:'CL', value:overviewFormatNumber(clients), label:'Active clients', delta:overviewDelta('active_clients', true)})
