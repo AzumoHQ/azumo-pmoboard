@@ -2940,7 +2940,7 @@ async function manualSnapshot(){
 // METRICS CARDS
 // ════════════════════════════════════════════════════
 const METRIC_CFG = [
-  {key:'headcount_total',        label:'Active Assignees',              unit:'',   color:'#0EA5E9', higherBetter:true,  size:'large', target:'headcount', spark:false},
+  {key:'headcount_total',        label:'Active Assignees',              unit:'',   color:'#0EA5E9', higherBetter:true,  size:'large', target:'headcount', spark:false, hideInBilling:true},
   {key:'headcount_billable',     label:'Billable',                      unit:'',   color:'#0066FF', higherBetter:true,  size:'small', target:'billable'},
   {key:'headcount_nonbillable',  label:'Non-Billable',                  unit:'',   color:'#F59E0B', higherBetter:false, size:'small', target:'nonbillable'},
   {key:'freelancers',            label:'Freelancers',                   unit:'',   color:'#7C3AED', higherBetter:false, size:'small', target:'freelancers', hover:'freelancers'},
@@ -3021,6 +3021,7 @@ function renderMetrics(){
       grid.appendChild(divider);
       return;
     }
+    if(cfg.hideInBilling) return;
     const cur = metricValue(latest, cfg.key);
     const card = document.createElement('div');
     card.className = `mc${cfg.size === 'large' ? ' metric-large' : ''}${cfg.size === 'small' ? ' metric-small' : ''}${cfg.hover ? ' has-floating-tooltip' : ''}`;

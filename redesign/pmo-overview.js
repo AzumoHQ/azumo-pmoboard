@@ -360,6 +360,11 @@
     var pm = prevSnapshot && prevSnapshot.metrics || null;
     var clients = metricActiveClients(snapshot);
     var pClients = prevSnapshot ? metricActiveClients(prevSnapshot) : null;
+    var totalHeadcount = metricTotalPeople(snapshot);
+    var pTotalHeadcount = prevSnapshot ? metricTotalPeople(prevSnapshot) : null;
+    var headcountSub = (num(m.headcount_billable) !== null && num(m.headcount_nonbillable) !== null)
+      ? intStr(m.headcount_billable) + ' Billable · ' + intStr(m.headcount_nonbillable) + ' Non-billable'
+      : '';
     var benchRows = benchDetailRows(snapshot);
     var clientRows = clientDetailRows(snapshot);
 
@@ -367,7 +372,9 @@
       { id: 'billableHeadcount', icon: ICON.billable, label: 'Billable headcount', val: intStr(m.headcount_billable), delta: deltaBadge(m.headcount_billable, pm && pm.headcount_billable) },
       { id: 'benchCount',        icon: ICON.bench,    label: 'On bench',           val: intStr(m.bench),              delta: deltaBadge(m.bench, pm && pm.bench, { goodWhenDown: true }), detail: 'bench', detailCount: intStr(benchRows.length) },
       { id: 'kpiActiveClients',  icon: ICON.clients,  label: 'Active clients',     val: intStr(clients),              delta: deltaBadge(clients, pClients), detail: 'clients', detailCount: intStr(clientRows.length) },
-      { id: 'kpiUtilBilling',    icon: ICON.util,     label: 'Utilization (billing)', val: pct(m.utilization_billing), delta: deltaBadge(m.utilization_billing, pm && pm.utilization_billing, { suffix: 'pp' }) }
+      { id: 'kpiUtilBilling',    icon: ICON.util,     label: 'Utilization Rate (Billing)', val: pct(m.utilization_billing), delta: deltaBadge(m.utilization_billing, pm && pm.utilization_billing, { suffix: 'pp' }) },
+      { id: 'kpiUtilAssignment', icon: ICON.util,     label: 'Utilization Rate (Assignment)', val: pct(m.utilization_assignment), delta: deltaBadge(m.utilization_assignment, pm && pm.utilization_assignment, { suffix: 'pp' }) },
+      { id: 'kpiHeadcountTotal', icon: ICON.people,   label: 'Headcount Total',    val: intStr(totalHeadcount),      delta: deltaBadge(totalHeadcount, pTotalHeadcount), sub: headcountSub }
     ];
 
     host.innerHTML = cards.map(function (c) {
@@ -379,6 +386,7 @@
         '</div>' +
         '<div class="pmo-ov-kpi-val" id="' + c.id + '">' + c.val + '</div>' +
         '<div class="pmo-ov-kpi-lbl">' + c.label + '</div>' +
+        (c.sub ? '<div class="pmo-ov-kpi-sub">' + esc(c.sub) + '</div>' : '') +
         (c.detail ? detailButton(c.detail, activeDetail, c.detailCount) : '') +
         (open ? (c.detail === 'bench' ? renderBenchDetail(snapshot) : renderClientsDetail(snapshot)) : '') +
       '</article>';

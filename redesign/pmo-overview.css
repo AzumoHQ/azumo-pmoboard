@@ -128,6 +128,7 @@
 .pmo-ov-delta.flat{background:var(--ov-surface-3);color:var(--ov-text-3);}
 .pmo-ov-kpi-val{font-size:30px;font-weight:900;line-height:1;margin-top:16px;letter-spacing:0;}
 .pmo-ov-kpi-lbl{font-size:13px;font-weight:600;color:var(--ov-text-2);margin-top:6px;}
+.pmo-ov-kpi-sub{font-size:11.5px;font-weight:500;color:var(--ov-text-3);margin-top:4px;}
 .pmo-ov-card-action{
   margin-top:12px;padding:6px 10px;border-radius:999px;border:1px solid rgba(30,158,99,.24);
   background:rgba(30,158,99,.10);color:var(--ov-good);
