@@ -118,18 +118,27 @@ module.exports = async function authHandler(req, res) {
       const email = String(payload.email || '').trim().toLowerCase();
       const emailVerified = Boolean(payload.email_verified);
       if (!emailVerified || !email.endsWith('@azumo.co')) {
+        console.error('[auth-debug] domain/verification check failed', { email, emailVerified });
         redirect(res, authErrorUrl('Access not authorized. Contact PMO.'), [clearOauthStateCookie()]);
         return;
       }
 
-      const result = await loginWithGoogle(email);
+      let result;
+      try {
+        result = await loginWithGoogle(email);
+      } catch (dbError) {
+        console.error('[auth-debug] loginWithGoogle threw', email, dbError && dbError.stack || dbError);
+        throw dbError;
+      }
       if (!result || !result.user || result.user.active === false) {
+        console.error('[auth-debug] loginWithGoogle returned no active user', { email, result: result ? { hasUser: !!result.user, active: result.user && result.user.active } : null });
         redirect(res, authErrorUrl('Access not authorized. Contact PMO.'), [clearOauthStateCookie()]);
         return;
       }
 
       redirect(res, '/', [clearOauthStateCookie(), sessionCookie(result.token)]);
     } catch (error) {
+      console.error('[auth-debug] callback outer catch', error && error.stack || error);
       redirect(res, authErrorUrl('Authentication failed. Please try again.'), [clearOauthStateCookie()]);
     }
     return;
