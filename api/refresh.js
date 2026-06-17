@@ -61,7 +61,7 @@ async function runRefresh(body = {}) {
   const previousSnapshot = (existing.snapshots || []).at(-1);
   const previousMetrics = previousSnapshot?.metrics || {};
 
-  if (hasEazyBIConfig() && body.useEazyBI !== false) {
+  if (hasEazyBIConfig() && body.useEazyBI !== false && (body.eazybiReportId || process.env.EAZYBI_REPORT_ID)) {
     try {
       const eazybiReport = await exportReport(body.eazybiReportId, body.eazybiAccountId);
       const eazybiMetrics = summarizeEazyBIReport(eazybiReport);

@@ -3184,18 +3184,6 @@ const UTIL_BILLING_PROCEDURE_HTML = `
     <p><strong>How to read it.</strong> A value of 90% means the team has the equivalent of 90 fully utilized billable resources for every 100 billable headcount in that month. Lower values can come from bench, internal work, partial allocations, mid-month starts/ends, or missing assignment data.</p>
     <p><strong>QA checks.</strong> PMO should verify that Bench and Azumo are excluded from utilization, freelancers are excluded from Total Headcount, only Billable epics are counted in Total Headcount, Assignment (%) is populated, and start/due dates correctly prorate partial-month workdays. Jira and Harvest hourly rates are not used for this KPI.</p>
   </div>`;
-const STALE_UTIL_BILLING_IMPORT = {'Apr 2026':80.26,'May 2026':91.24,'Jun 2026':89.95,'Jul 2026':72.32,'Aug 2026':71.48};
-const CURRENT_UTIL_BILLING_EAZYBI_FALLBACK = {'Apr 2026':79.24,'May 2026':89.25,'Jun 2026':89.08,'Jul 2026':81.20,'Aug 2026':80.36};
-function applyCurrentUtilBillingFallback(rows){
-  const hasKey = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
-  const staleRows = rows.filter(row => hasKey(STALE_UTIL_BILLING_IMPORT, row.month));
-  const isStaleImport = staleRows.length >= 5 && staleRows.every(row => Math.abs(Number(row.utilization_billing_rate || 0) - STALE_UTIL_BILLING_IMPORT[row.month]) < 0.01);
-  if(!isStaleImport) return rows;
-  return rows.map(row => hasKey(CURRENT_UTIL_BILLING_EAZYBI_FALLBACK, row.month)
-    ? {...row, utilization_billing_rate: CURRENT_UTIL_BILLING_EAZYBI_FALLBACK[row.month]}
-    : row
-  );
-}
 function normalizeUtilBillingReport(report={}){
   const rates = report.rates || {};
   const months = (report.months && report.months.length) ? report.months : Object.keys(rates);
@@ -3211,11 +3199,10 @@ function normalizeUtilBillingReport(report={}){
         utilization_billing_rate: reportNumber(toPct(rates[month])),
         total_headcount: totalHeadcount || ''
       }));
-  const modeled = applyCurrentUtilBillingFallback(modeledBase);
   return {
     ...report,
     months,
-    modeled_rows: modeled,
+    modeled_rows: modeledBase,
     formula: report.formula || {
       label:'Utilization Billing Rate',
       calculation:'Utilization Billing Rate = Utilization ÷ Total Headcount.',
