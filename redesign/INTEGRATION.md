@@ -73,9 +73,10 @@ The renderer reads these automatically from existing globals. Targets shown for 
 |-----------------------|----------------------|--------------------------------------------------------------------|--------|
 | Greeting              | `#pmoGreeting`       | `currentUser.name` → first name (time-of-day prefix; no name → "Good morning") | ✅ |
 | Last refresh          | `#lastRefresh`       | `PMO.last_refresh_at` ?? `PMO.last_refresh`                        | ✅ |
-| Active clients        | `#kpiActiveClients` | `latest.metrics.active_clients`; popover uses `active_clients` + `assignment_rows` | ✅ |
-| Utilization (billing) | `#kpiUtilBilling` | `latest.metrics.utilization_billing`          | ✅ |
-| Billable headcount    | `#billableHeadcount` | `latest.metrics.headcount_billable`                                | ✅ |
+| Active clients        | `#kpiActiveClients` | `latest.metrics.active_clients`; popover uses `active_clients` + `assignment_rows`; opens right-aligned (`popoverAlign:'right'`) | ✅ |
+| Utilization Rate (Billing) | `#kpiUtilBilling` | `latest.metrics.utilization_billing`          | ✅ |
+| Utilization Rate (Assignment) | `#kpiUtilAssignment` | `latest.metrics.utilization_assignment`          | ✅ |
+| Headcount Total       | `#kpiHeadcountTotal` | `metricTotalPeople()` (total); sub-line breaks down `headcount_billable` / `headcount_nonbillable` | ✅ |
 | Bench                 | `#benchCount`        | `latest.metrics.bench`; popover uses `bench_list` and intentionally ignores due dates | ✅ |
 | Team composition      | —                    | Not shown. The overview intentionally avoids position/discipline breakdown. | ✅ |
 
@@ -95,8 +96,8 @@ These design blocks have no source field in the current API. They render a label
 ## id / class reference for Codex
 
 **Data ids** (filled by `renderPmoOverview`): `pmoGreeting`, `lastRefresh`,
-`pmoOverviewKpis` (KPI container), `billableHeadcount`, `benchCount`,
-`kpiActiveClients`, `kpiUtilBilling`, `pmoOverviewDetails`.
+`pmoOverviewKpis` (KPI container), `benchCount`, `kpiActiveClients`,
+`kpiUtilBilling`, `kpiUtilAssignment`, `kpiHeadcountTotal`, `pmoOverviewDetails`.
 
 **Section root:** `#pmoOverview.pmo-ov` (carries `data-state="loading|ready|empty"`).
 

@@ -369,9 +369,8 @@
     var clientRows = clientDetailRows(snapshot);
 
     var cards = [
-      { id: 'billableHeadcount', icon: ICON.billable, label: 'Billable headcount', val: intStr(m.headcount_billable), delta: deltaBadge(m.headcount_billable, pm && pm.headcount_billable) },
       { id: 'benchCount',        icon: ICON.bench,    label: 'On bench',           val: intStr(m.bench),              delta: deltaBadge(m.bench, pm && pm.bench, { goodWhenDown: true }), detail: 'bench', detailCount: intStr(benchRows.length) },
-      { id: 'kpiActiveClients',  icon: ICON.clients,  label: 'Active clients',     val: intStr(clients),              delta: deltaBadge(clients, pClients), detail: 'clients', detailCount: intStr(clientRows.length) },
+      { id: 'kpiActiveClients',  icon: ICON.clients,  label: 'Active clients',     val: intStr(clients),              delta: deltaBadge(clients, pClients), detail: 'clients', detailCount: intStr(clientRows.length), popoverAlign: 'right' },
       { id: 'kpiUtilBilling',    icon: ICON.util,     label: 'Utilization Rate (Billing)', val: pct(m.utilization_billing), delta: deltaBadge(m.utilization_billing, pm && pm.utilization_billing, { suffix: 'pp' }) },
       { id: 'kpiUtilAssignment', icon: ICON.util,     label: 'Utilization Rate (Assignment)', val: pct(m.utilization_assignment), delta: deltaBadge(m.utilization_assignment, pm && pm.utilization_assignment, { suffix: 'pp' }) },
       { id: 'kpiHeadcountTotal', icon: ICON.people,   label: 'Headcount Total',    val: intStr(totalHeadcount),      delta: deltaBadge(totalHeadcount, pTotalHeadcount), sub: headcountSub }
@@ -379,7 +378,7 @@
 
     host.innerHTML = cards.map(function (c) {
       var open = c.detail && c.detail === activeDetail;
-      return '<article class="pmo-ov-kpi' + (c.detail ? ' has-popover' : '') + (open ? ' is-open' : '') + '">' +
+      return '<article class="pmo-ov-kpi' + (c.detail ? ' has-popover' : '') + (open ? ' is-open' : '') + (c.popoverAlign === 'right' ? ' pmo-ov-kpi--popover-right' : '') + '">' +
         '<div class="pmo-ov-kpi-top">' +
           '<span class="pmo-ov-kpi-icon"><span class="msi">' + c.icon + '</span></span>' +
           c.delta +
