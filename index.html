@@ -1430,7 +1430,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <div class="util-model-grid" id="utilBillingCards"></div>
       <div class="billing-resource-panel" id="benchByMonthReportWrap">
         <div class="billing-panel-head">
-          <span>Utilization Billing Rate per Resource</span>
+          <span>Bench by Month per Resource</span>
           <span class="badge badge-blue" id="benchByMonthSource">Source</span>
         </div>
         <div class="fc-table-wrap">
@@ -3781,7 +3781,7 @@ function renderBenchByMonthReport(){
   const embedDetails = document.getElementById('benchByMonthEmbedDetails');
   const embedFrame = document.getElementById('benchByMonthEmbedFrame');
   if(!thead || !tbody) return;
-  if(source) source.textContent = reportSourceLabel(report, 'Source');
+  if(source) source.textContent = reportSourceLabel(report, 'Bench by Month');
   if(embedFrame){
     const nextSrc = eazybiEmbedPath('bench_by_month');
     if(nextSrc && embedFrame.getAttribute('src') !== nextSrc) embedFrame.setAttribute('src', nextSrc);
@@ -3793,6 +3793,8 @@ function renderBenchByMonthReport(){
     return;
   }
   const rows = (report.rows || [])
+    .filter(row => row && typeof row === 'object')
+    .filter(row => String(row.assignee || '').trim())
     .filter(row => String(row.assignee || '').trim().toLowerCase() !== 'assignees');
   thead.innerHTML = `<tr><th rowspan="2">Assignee</th><th colspan="${months.length}">Availability</th><th colspan="${months.length}">Utilization</th></tr>
     <tr>${months.map(month => `<th>${esc(reportMonthLabel(month))}</th>`).join('')}${months.map(month => `<th>${esc(reportMonthLabel(month))}</th>`).join('')}</tr>`;
