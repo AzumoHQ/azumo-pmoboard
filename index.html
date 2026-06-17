@@ -775,6 +775,284 @@ footer{background:transparent}
   .nav-logo{min-width:88px}
 }
 
+/* AZUMO DESIGN TOKENS: source = Azumo Design Tokens.html */
+:root{
+  --azumo-blue:#07183B;
+  --highlight-blue:#0000FF;
+  --light-grey:#EAEBEE;
+  --azumo-black:#101828;
+  --white:#FEFEFE;
+  --neutral-50:#F7F8FA;
+  --neutral-100:#EAEBEE;
+  --neutral-200:#D7D9E0;
+  --neutral-300:#B6BAC5;
+  --neutral-400:#8A90A2;
+  --neutral-500:#5C6476;
+  --neutral-600:#3E475A;
+  --neutral-700:#273149;
+  --neutral-800:#101828;
+  --neutral-900:#07183B;
+  --blue-50:#EEF0FF;
+  --blue-100:#D6DBFF;
+  --blue-200:#A7B0FF;
+  --blue-300:#6F7CFF;
+  --blue-400:#3848FF;
+  --blue-500:#0000FF;
+  --blue-600:#0000D1;
+  --blue-700:#0000A0;
+  --blue-800:#000070;
+  --blue-900:#07183B;
+  --sky-50:#CAF0F8;
+  --sky-100:#C3E7F1;
+  --sky-200:#90E0EF;
+  --sky-400:#00B4D8;
+  --sky-500:#519CAB;
+  --sky-600:#0077B6;
+  --sky-900:#03045E;
+  --mist-50:#EDF4FA;
+  --mist-100:#CFE3F1;
+  --mist-300:#8FB6D8;
+  --mist-500:#5F86A6;
+  --mist-700:#243A5E;
+  --mist-900:#20373B;
+  --saffron-soft:#FFE0A3;
+  --saffron:#FFC64F;
+  --saffron-deep:#E8A227;
+  --success:#00C26E;
+  --warning:#FFB800;
+  --danger:#FF3355;
+  --info:#0000FF;
+  --fg-1:var(--azumo-black);
+  --fg-2:var(--neutral-600);
+  --fg-3:var(--neutral-500);
+  --fg-mute:var(--neutral-400);
+  --fg-accent:var(--highlight-blue);
+  --fg-inverted:var(--white);
+  --bg-1:var(--white);
+  --bg-2:var(--neutral-50);
+  --bg-3:var(--neutral-100);
+  --bg-inverted:var(--azumo-blue);
+  --border-subtle:var(--neutral-100);
+  --border-default:var(--neutral-200);
+  --border-strong:var(--neutral-300);
+  --border-focus:var(--highlight-blue);
+  --link:var(--highlight-blue);
+  --link-hover:#0000C4;
+  --font-sans:"Lato","azo-sans-web",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --font-display:"Batica Sans","Lato","azo-sans-web",-apple-system,BlinkMacSystemFont,sans-serif;
+  --fs-xs:12px;
+  --fs-sm:14px;
+  --fs-base:16px;
+  --fs-md:18px;
+  --fs-lg:22px;
+  --fs-xl:28px;
+  --fs-2xl:36px;
+  --fs-3xl:48px;
+  --fs-4xl:64px;
+  --fs-5xl:88px;
+  --fw-regular:400;
+  --fw-medium:500;
+  --fw-semibold:600;
+  --fw-bold:700;
+  --fw-black:900;
+  --lh-tight:1.05;
+  --lh-snug:1.15;
+  --lh-normal:1.45;
+  --lh-relaxed:1.6;
+  --ls-normal:0;
+  --ls-wide:.04em;
+  --ls-eyebrow:.12em;
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:24px;
+  --space-6:32px;
+  --space-7:48px;
+  --radius-xs:4px;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:16px;
+  --radius-xl:24px;
+  --radius-pill:999px;
+  --shadow-xs:0 1px 2px rgba(7,24,59,.06);
+  --shadow-sm:0 2px 6px rgba(7,24,59,.06),0 1px 2px rgba(7,24,59,.04);
+  --shadow-md:0 6px 18px rgba(7,24,59,.08),0 2px 4px rgba(7,24,59,.04);
+  --shadow-lg:0 20px 40px rgba(7,24,59,.12),0 4px 8px rgba(7,24,59,.04);
+  --shadow-focus:0 0 0 3px rgba(0,0,255,.25);
+  --bg:var(--bg-3);
+  --surf:var(--bg-2);
+  --card:var(--bg-1);
+  --brd:var(--border-default);
+  --blue:var(--highlight-blue);
+  --blue-lt:var(--blue-500);
+  --blue-dk:var(--azumo-blue);
+  --txt:var(--fg-1);
+  --muted:var(--fg-3);
+  --green:var(--success);
+  --yellow:var(--warning);
+  --red:var(--danger);
+  --orange:var(--saffron-deep);
+  --purple:var(--blue-300);
+  --teal:var(--sky-400);
+  --r:var(--radius-md);
+  --rl:var(--radius-lg);
+}
+body,body.light{
+  background:var(--bg-3)!important;
+  color:var(--fg-1)!important;
+  font-family:var(--font-sans)!important;
+  letter-spacing:var(--ls-normal)!important;
+}
+.theme-toggle{display:none!important}
+nav{
+  background:var(--white)!important;
+  border-bottom:1px solid var(--border-subtle)!important;
+  box-shadow:var(--shadow-sm)!important;
+}
+.nav-logo{background:var(--white)!important;border-color:var(--border-subtle)!important;box-shadow:none!important}
+.nav-title,.sec-head h2,.tbl-head h3{color:var(--azumo-blue)!important}
+.nav-link{color:var(--fg-2)!important;border-radius:var(--radius-md)!important}
+.nav-link:hover,.nav-link.active{background:var(--blue-50)!important;color:var(--highlight-blue)!important}
+.nav-refresh,.btn-primary{background:var(--highlight-blue)!important;color:var(--white)!important;box-shadow:var(--shadow-md)!important}
+.btn-ghost,.auth-pill{background:var(--white)!important;border-color:var(--border-default)!important;color:var(--fg-1)!important}
+.side-index{background:rgba(254,254,254,.96)!important;border-color:var(--border-default)!important;box-shadow:var(--shadow-md)!important}
+.side-index .sidebar-item{background:var(--white)!important;color:var(--fg-2)!important;border-color:transparent!important;border-radius:var(--radius-pill)!important}
+.side-index .sidebar-item:hover{background:var(--blue-50)!important;color:var(--highlight-blue)!important;border-color:var(--blue-100)!important}
+.side-index .sidebar-item.active,.pmo-branch-tab.active,.view-tab.active{background:var(--highlight-blue)!important;color:var(--white)!important;box-shadow:var(--shadow-md)!important}
+.hero{display:none!important}
+main{background:transparent!important}
+.mc,.tbl-wrap,.qa-wrap,.action-wrap,.forecast-wrap,.ops-wrap,.util-card,.qa-card,.ops-summary-card,.coverage-card,.harvest-summary-card,.harvest-card,.mini-card{
+  background:var(--white)!important;
+  border-color:var(--border-subtle)!important;
+  border-radius:var(--radius-lg)!important;
+  box-shadow:var(--shadow-sm)!important;
+}
+.tbl-head,.billing-panel-head,th{background:var(--neutral-50)!important}
+.badge,.chip{border-radius:var(--radius-pill)!important}
+.az-overview{display:grid;gap:var(--space-5)}
+.az-overview-hero{
+  background:linear-gradient(135deg,var(--azumo-blue) 0%,var(--mist-700) 58%,var(--sky-600) 100%);
+  border-radius:0;
+  color:var(--white);
+  padding:var(--space-7) var(--space-7);
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(320px,520px);
+  gap:var(--space-6);
+  align-items:center;
+  margin:-2rem -32px 0;
+}
+.az-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid rgba(254,254,254,.28);
+  background:rgba(254,254,254,.10);
+  color:var(--white);
+  border-radius:var(--radius-pill);
+  padding:7px 14px;
+  font-size:var(--fs-xs);
+  font-weight:var(--fw-bold);
+  letter-spacing:var(--ls-eyebrow);
+  text-transform:uppercase;
+}
+.az-overview-hero h1{
+  color:var(--white)!important;
+  font-family:var(--font-display)!important;
+  font-size:clamp(42px,5vw,64px)!important;
+  line-height:var(--lh-tight)!important;
+  letter-spacing:0!important;
+  margin:var(--space-4) 0 var(--space-3)!important;
+}
+.az-overview-hero h1 span{color:var(--saffron)!important}
+.az-overview-meta{display:flex;flex-wrap:wrap;gap:12px 18px;color:rgba(254,254,254,.78);font-size:var(--fs-md);font-weight:var(--fw-medium)}
+.az-sync-dot{width:10px;height:10px;border-radius:50%;background:var(--success);display:inline-block;box-shadow:0 0 0 4px rgba(0,194,110,.16)}
+.az-hero-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.az-hero-stat{
+  border:1px solid rgba(254,254,254,.24);
+  background:rgba(254,254,254,.12);
+  border-radius:var(--radius-lg);
+  padding:22px 20px;
+}
+.az-hero-value{font-size:var(--fs-2xl);font-weight:var(--fw-black);line-height:1;color:var(--white)}
+.az-hero-label{margin-top:8px;color:rgba(254,254,254,.76);font-size:var(--fs-xs);font-weight:var(--fw-black);letter-spacing:var(--ls-wide);text-transform:uppercase}
+.az-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-5)}
+.az-kpi{
+  background:var(--white);
+  border:1px solid var(--border-subtle);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);
+  padding:var(--space-5);
+  min-height:150px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.az-kpi-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.az-kpi-icon{width:40px;height:40px;border-radius:var(--radius-md);display:grid;place-items:center;background:var(--blue-50);color:var(--sky-600);font-size:22px}
+.az-kpi-delta{border-radius:var(--radius-pill);padding:5px 10px;font-size:var(--fs-xs);font-weight:var(--fw-black)}
+.az-kpi-delta.good{background:#E7F6EE;color:#1E9E63}
+.az-kpi-delta.bad{background:#FBE7EE;color:#C43B66}
+.az-kpi-delta.flat{background:var(--neutral-100);color:var(--fg-3)}
+.az-kpi-value{font-size:var(--fs-3xl);font-weight:var(--fw-black);line-height:1;color:var(--azumo-blue);letter-spacing:0}
+.az-kpi-label{margin-top:8px;color:var(--fg-3);font-size:var(--fs-base);font-weight:var(--fw-bold)}
+.az-panel-grid{display:grid;grid-template-columns:2fr 1fr;gap:var(--space-5)}
+.az-card{
+  background:var(--white);
+  border:1px solid var(--border-subtle);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);
+  padding:var(--space-6);
+  min-width:0;
+}
+.az-card-eyebrow{font-size:var(--fs-xs);font-weight:var(--fw-black);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;color:var(--sky-600);margin-bottom:8px}
+.az-card h2{font-size:var(--fs-lg)!important;line-height:var(--lh-snug)!important;color:var(--azumo-blue)!important;margin:0!important;letter-spacing:0!important}
+.az-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:var(--space-5)}
+.az-legend{display:flex;align-items:center;gap:14px;color:var(--fg-3);font-size:var(--fs-sm);font-weight:var(--fw-bold)}
+.az-legend span{display:inline-flex;align-items:center;gap:7px}
+.az-legend i{width:12px;height:12px;border-radius:4px;display:inline-block;background:var(--sky-600)}
+.az-legend i.warm{background:var(--saffron)}
+.az-bars{height:280px;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(52px,1fr);gap:24px;align-items:end;padding:20px 8px 0;overflow:auto}
+.az-bar-wrap{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:10px;min-width:54px}
+.az-bar-value{font-size:var(--fs-sm);font-weight:var(--fw-black);color:var(--fg-2)}
+.az-bar{width:38px;min-height:12px;border-radius:9px;background:var(--sky-600);box-shadow:0 6px 14px rgba(0,119,182,.15)}
+.az-bar.current{background:var(--saffron)}
+.az-bar-label{font-size:var(--fs-sm);font-weight:var(--fw-bold);color:var(--fg-mute)}
+.az-donut-layout{display:grid;grid-template-columns:170px 1fr;gap:var(--space-5);align-items:center;margin-top:var(--space-6)}
+.az-donut{
+  width:170px;height:170px;border-radius:50%;
+  background:conic-gradient(var(--sky-600) 0deg,var(--sky-600) 1deg,var(--mist-300) 1deg,var(--mist-300) 360deg);
+  display:grid;place-items:center;
+}
+.az-donut::after{content:'';width:96px;height:96px;border-radius:50%;background:var(--white);position:absolute}
+.az-donut{position:relative}
+.az-donut-center{position:relative;z-index:1;text-align:center}
+.az-donut-total{font-size:var(--fs-2xl);font-weight:var(--fw-black);color:var(--azumo-blue);line-height:1}
+.az-donut-label{font-size:var(--fs-xs);font-weight:var(--fw-black);letter-spacing:var(--ls-wide);text-transform:uppercase;color:var(--fg-mute);margin-top:8px}
+.az-comp-list{display:grid;gap:14px}
+.az-comp-row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;color:var(--fg-2);font-size:var(--fs-sm);font-weight:var(--fw-bold)}
+.az-dot{width:12px;height:12px;border-radius:4px;background:var(--sky-600)}
+.az-embed-shell{background:var(--white);border-top:1px solid var(--border-subtle);overflow:hidden}
+.az-eazybi-frame,.report-embed-frame,.delivery-report-frame{
+  width:100%!important;
+  min-width:100%!important;
+  height:1120px!important;
+  min-height:72vh!important;
+  border:0!important;
+  display:block!important;
+  background:var(--white)!important;
+}
+@media(max-width:1080px){
+  .az-overview-hero{grid-template-columns:1fr;margin-left:-24px;margin-right:-24px;padding:var(--space-6)}
+  .az-panel-grid{grid-template-columns:1fr}
+  .az-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:640px){
+  .az-overview-hero{padding:var(--space-5)}
+  .az-hero-stats,.az-kpi-grid,.az-donut-layout{grid-template-columns:1fr}
+  .az-bars{gap:16px}
+}
+
 </style>
 </head>
 <body class="auth-locked light">
@@ -821,6 +1099,7 @@ footer{background:transparent}
       <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span>V1</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">People Ops Command Center</div></div>
     </div>
     <div class="nav-links">
+      <button class="nav-link" id="overviewNavLink" onclick="goTo('overview')">Overview</button>
       <button class="nav-link" id="billingNavLink" onclick="goTo('dashboard')">💳 Billing</button>
       <button class="nav-link" id="opsNavLink" onclick="goTo('opsViews')">🧭 Operating Views</button>
       <div class="nav-menu" id="pmoNavMenu">
@@ -932,6 +1211,55 @@ footer{background:transparent}
 
 <main>
 
+<!-- ── OVERVIEW ─────────────────────────────── -->
+<section id="overview">
+  <div class="az-overview">
+    <div class="az-overview-hero">
+      <div>
+        <div class="az-pill">Azumo · People Ops</div>
+        <h1><span id="overviewGreeting">Good morning</span>, <span id="overviewUserName">PMO</span></h1>
+        <div class="az-overview-meta">
+          <span><span class="az-sync-dot"></span> Synced from Jira & Harvest</span>
+          <span id="overviewLastRefresh">Last refresh: —</span>
+        </div>
+      </div>
+      <div class="az-hero-stats" aria-label="Current PMO summary">
+        <div class="az-hero-stat"><div class="az-hero-value" id="overviewHeroPeople">—</div><div class="az-hero-label">People</div></div>
+        <div class="az-hero-stat"><div class="az-hero-value" id="overviewHeroClients">—</div><div class="az-hero-label">Clients</div></div>
+        <div class="az-hero-stat"><div class="az-hero-value" id="overviewHeroUtil">—</div><div class="az-hero-label">Avg util.</div></div>
+      </div>
+    </div>
+
+    <div class="az-kpi-grid" id="overviewKpis"></div>
+
+    <div class="az-panel-grid">
+      <div class="az-card">
+        <div class="az-card-head">
+          <div>
+            <div class="az-card-eyebrow">Headcount growth</div>
+            <h2>Billable headcount by month</h2>
+          </div>
+          <div class="az-legend"><span><i></i> Headcount</span><span><i class="warm"></i> Current</span></div>
+        </div>
+        <div class="az-bars" id="overviewHeadcountBars"></div>
+      </div>
+
+      <div class="az-card">
+        <div class="az-card-head">
+          <div>
+            <div class="az-card-eyebrow">Team composition</div>
+            <h2>By discipline</h2>
+          </div>
+        </div>
+        <div class="az-donut-layout">
+          <div class="az-donut" id="overviewDisciplineDonut"><div class="az-donut-center"><div class="az-donut-total" id="overviewDisciplineTotal">—</div><div class="az-donut-label">Total</div></div></div>
+          <div class="az-comp-list" id="overviewDisciplineList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ── NEW SEARCHES REPORTS ─────────────────── -->
 <section id="newSearchesTriage">
   <div class="sec-head">
@@ -1022,6 +1350,12 @@ footer{background:transparent}
             <tbody id="benchByMonthTbody"></tbody>
           </table>
         </div>
+        <details class="audit-details" id="benchByMonthEmbedDetails">
+          <summary>Embedded EazyBI Bench by Month</summary>
+          <div class="az-embed-shell">
+            <iframe class="az-eazybi-frame" id="benchByMonthEmbedFrame" title="Bench by Month" src="" loading="lazy" frameborder="0"></iframe>
+          </div>
+        </details>
       </div>
       <details class="audit-details" id="utilBillingProcedureDetails">
         <summary>Source details</summary>
@@ -1482,7 +1816,7 @@ let billingDiscountEditingId = '';
 let actionReviewsLoaded = false;
 let actionReviewsPromise = null;
 const PMO_JIRA_BOARD_URL = 'https://azumohq.atlassian.net/jira/software/c/projects/PMO/boards/629?search_id=06f11380-7c46-411e-addf-dfa9131314de&referrer=quick-find';
-const MODULE_TAB_KEY = 'pmo_active_module_tab_v1';
+const MODULE_TAB_KEY = 'pmo_active_module_tab_v2';
 let actionFilter = 'open';
 let qaChecklistReviews = {};
 let qaChecklistReviewsLoaded = false;
@@ -1556,6 +1890,7 @@ function initDashboard(){
   document.getElementById('historySnapshotsTag').textContent  = `${PMO.snapshots.length} snapshots`;
   updateHeroStats(latest);
 
+  renderDesignerOverview();
   renderMetrics();
   renderNewSearchesTriageReport();
   renderPmoActionCenter();
@@ -1602,15 +1937,170 @@ function updateHeroStats(snapshot){
   set('heroBenchStat', formatHeroStat(metricValue(snapshot, 'bench')));
 }
 
+function overviewGreetingText(){
+  const hour = new Date().getHours();
+  if(hour < 12) return 'Good morning';
+  if(hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+function overviewUserFirstName(){
+  const name = fullNameFromUser(currentUser) || currentUser?.email || 'PMO';
+  const first = String(name).trim().split(/\s+/)[0];
+  return first && first.includes('@') ? 'PMO' : (first || 'PMO');
+}
+function overviewFormatNumber(value, unit=''){
+  if(value === undefined || value === null || value === '') return '—';
+  const n = Number(value);
+  if(Number.isNaN(n)) return '—';
+  const formatted = Math.abs(n) >= 100 || n % 1 === 0 ? n.toFixed(0) : n.toFixed(1);
+  return `${formatted}${unit}`;
+}
+function overviewDelta(key, higherBetter=true){
+  if(!prev) return {text:'—', cls:'flat'};
+  const cur = Number(metricValue(latest, key));
+  const old = Number(metricValue(prev, key));
+  if(Number.isNaN(cur) || Number.isNaN(old)) return {text:'—', cls:'flat'};
+  const delta = deltaStr(cur, old, higherBetter);
+  return {
+    text: delta.text === 'no change' ? 'no change' : delta.text,
+    cls: delta.cls === 'delta-up' ? 'good' : delta.cls === 'delta-dn' ? 'bad' : 'flat'
+  };
+}
+function overviewKpiCard({icon, value, label, delta}){
+  return `<div class="az-kpi">
+    <div class="az-kpi-top">
+      <div class="az-kpi-icon">${esc(icon)}</div>
+      <div class="az-kpi-delta ${esc(delta.cls)}">${esc(delta.text)}</div>
+    </div>
+    <div>
+      <div class="az-kpi-value">${esc(value)}</div>
+      <div class="az-kpi-label">${esc(label)}</div>
+    </div>
+  </div>`;
+}
+function overviewHeadcountSeries(){
+  const report = normalizeUtilBillingReport(latest?.utilization_billing_rate || {});
+  const rows = (report.modeled_rows || [])
+    .map(row => ({
+      label: reportMonthLabel(row.month),
+      value: Number(row.total_headcount || metricValue(latest, 'headcount_billable') || 0)
+    }))
+    .filter(row => row.label && row.value > 0);
+  if(rows.length) return rows.slice(-8);
+  return (PMO.snapshots || []).slice(-8).map(snapshot => ({
+    label: snapshot.label || '',
+    value: Number(metricValue(snapshot, 'headcount_billable') || metricValue(snapshot, 'headcount_total') || 0)
+  })).filter(row => row.value > 0);
+}
+function renderOverviewHeadcountBars(){
+  const el = document.getElementById('overviewHeadcountBars');
+  if(!el) return;
+  const series = overviewHeadcountSeries();
+  const max = Math.max(...series.map(row => row.value), 1);
+  el.innerHTML = series.map((row, idx) => {
+    const isCurrent = idx === series.length - 1;
+    const height = Math.max(24, Math.round((row.value / max) * 200));
+    return `<div class="az-bar-wrap">
+      <div class="az-bar-value">${esc(overviewFormatNumber(row.value))}</div>
+      <div class="az-bar ${isCurrent ? 'current' : ''}" style="height:${height}px"></div>
+      <div class="az-bar-label">${esc(row.label)}</div>
+    </div>`;
+  }).join('') || '<div style="color:var(--fg-mute);font-weight:700">No monthly headcount data yet.</div>';
+}
+function overviewDisciplineName(position){
+  const raw = String(position || '').trim();
+  if(!raw) return 'Unspecified';
+  const lower = raw.toLowerCase();
+  if(lower.includes('project') || lower === 'pm' || lower.includes('scrum') || lower.includes('ba')) return 'Project Mgmt';
+  if(lower.includes('qa') || lower.includes('quality')) return 'QA';
+  if(lower.includes('design') || lower.includes('ux') || lower.includes('ui')) return 'Design';
+  if(lower.includes('business')) return 'Business';
+  if(lower.includes('data')) return 'Data';
+  if(lower.includes('devops')) return 'DevOps';
+  if(lower.includes('engineer') || lower.includes('developer') || lower.includes('frontend') || lower.includes('backend') || lower.includes('full')) return 'Engineering';
+  return raw;
+}
+function overviewDisciplineRows(){
+  const rows = scopedAssignmentRows(allAssignmentRows()).filter(isActiveCapacityRow);
+  const byPerson = new Map();
+  rows.forEach(row => {
+    const id = personId(row);
+    if(!id || byPerson.has(id)) return;
+    byPerson.set(id, overviewDisciplineName(row.epic_position || row.position || row.role));
+  });
+  const counts = new Map();
+  byPerson.forEach(label => counts.set(label, (counts.get(label) || 0) + 1));
+  return [...counts.entries()]
+    .map(([label, count]) => ({label, count}))
+    .sort((a,b) => b.count - a.count || a.label.localeCompare(b.label));
+}
+function renderOverviewDiscipline(){
+  const rows = overviewDisciplineRows();
+  const total = rows.reduce((sum, row) => sum + row.count, 0) || Number(metricValue(latest, 'headcount_total') || 0);
+  const colors = ['var(--sky-600)','var(--sky-400)','var(--mist-500)','var(--saffron)','var(--mist-300)','var(--blue-300)','var(--neutral-300)'];
+  const donut = document.getElementById('overviewDisciplineDonut');
+  const totalEl = document.getElementById('overviewDisciplineTotal');
+  const list = document.getElementById('overviewDisciplineList');
+  if(totalEl) totalEl.textContent = overviewFormatNumber(total);
+  if(donut){
+    let cursor = 0;
+    const gradient = rows.length
+      ? rows.map((row, idx) => {
+          const start = cursor;
+          const end = cursor + (row.count / Math.max(total, 1)) * 360;
+          cursor = end;
+          return `${colors[idx % colors.length]} ${start.toFixed(1)}deg ${end.toFixed(1)}deg`;
+        }).join(',')
+      : 'var(--neutral-200) 0deg 360deg';
+    donut.style.background = `conic-gradient(${gradient})`;
+  }
+  if(list){
+    list.innerHTML = rows.slice(0, 6).map((row, idx) => `<div class="az-comp-row">
+      <span class="az-dot" style="background:${colors[idx % colors.length]}"></span>
+      <span>${esc(row.label)}</span>
+      <strong>${esc(row.count)}</strong>
+    </div>`).join('') || '<div style="color:var(--fg-mute);font-weight:700">No discipline data yet.</div>';
+  }
+}
+function renderDesignerOverview(){
+  if(!latest) return;
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = value;
+  };
+  const people = metricValue(latest, 'headcount_total');
+  const billable = metricValue(latest, 'headcount_billable');
+  const bench = metricValue(latest, 'bench');
+  const clients = metricValue(latest, 'active_clients') || latest.active_clients?.length || 0;
+  const util = metricValue(latest, 'utilization_billing');
+  set('overviewGreeting', overviewGreetingText());
+  set('overviewUserName', overviewUserFirstName());
+  set('overviewHeroPeople', overviewFormatNumber(people));
+  set('overviewHeroClients', overviewFormatNumber(clients));
+  set('overviewHeroUtil', overviewFormatNumber(util, '%'));
+  set('overviewLastRefresh', `Last refresh: ${lastUpdated || '—'}`);
+  const grid = document.getElementById('overviewKpis');
+  if(grid){
+    grid.innerHTML = [
+      overviewKpiCard({icon:'HC', value:overviewFormatNumber(people), label:'Active assignees', delta:overviewDelta('headcount_total', true)}),
+      overviewKpiCard({icon:'BI', value:overviewFormatNumber(billable), label:'Billable headcount', delta:overviewDelta('headcount_billable', true)}),
+      overviewKpiCard({icon:'BE', value:overviewFormatNumber(bench), label:'On bench', delta:overviewDelta('bench', false)}),
+      overviewKpiCard({icon:'CL', value:overviewFormatNumber(clients), label:'Active clients', delta:overviewDelta('active_clients', true)})
+    ].join('');
+  }
+  renderOverviewHeadcountBars();
+  renderOverviewDiscipline();
+}
+
 const THEME_KEY = 'pmo_dashboard_theme';
 function applyTheme(theme){
-  const light = theme === 'light';
+  const light = true;
   document.body.classList.toggle('light', light);
   const btn = document.getElementById('themeToggle');
-  if(btn) btn.textContent = light ? 'Dark' : 'Light';
+  if(btn) btn.textContent = 'Azumo';
 }
 function toggleTheme(){
-  const next = document.body.classList.contains('light') ? 'dark' : 'light';
+  const next = 'light';
   localStorage.setItem(THEME_KEY, next);
   applyTheme(next);
 }
@@ -1634,10 +2124,10 @@ function sectionAllowedForCurrentRole(id){
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
   if(['executive','viewer','c-level','clevel','hr'].includes(role)) return true;
-  if(role === 'pm') return ['opsViews','forecast','harvestHours','harvestAccess'].includes(id);
-  if(role === 'csm') return ['opsViews','bench','accountCoverage','forecast','harvestHours','harvestAccess'].includes(id);
-  if(role === 'tl') return ['opsViews','accountCoverage','forecast'].includes(id);
-  if(role === 'assignee') return ['opsViews','forecast'].includes(id);
+  if(role === 'pm') return ['overview','opsViews','forecast','harvestHours','harvestAccess'].includes(id);
+  if(role === 'csm') return ['overview','opsViews','bench','accountCoverage','forecast','harvestHours','harvestAccess'].includes(id);
+  if(role === 'tl') return ['overview','opsViews','accountCoverage','forecast'].includes(id);
+  if(role === 'assignee') return ['overview','opsViews','forecast'].includes(id);
   return false;
 }
 function allModuleSections(){
@@ -1655,6 +2145,7 @@ function sidebarNavConfig(){
   const qaCount = countOpenPmoActions();
   const entries = [
     {id:'generalGroup', icon:'⚙️', label:'General', children:[
+      {id:'overview', icon:'□', label:'Overview'},
       {id:'opsViews', icon:'🧭', label:'Operating Views'},
       {id:'bench', icon:'🪑', label:'Bench'},
       {id:'azumo', icon:'🏢', label:'Internal Projects'}
@@ -1681,7 +2172,7 @@ function sidebarNavConfig(){
 function currentModuleTabId(sections){
   const stored = localStorage.getItem(MODULE_TAB_KEY);
   if(stored && sections.some(section => section.id === stored)) return stored;
-  const preferred = ['opsViews','bench','azumo','pendingAssignments','dueDates','forecast','accountCoverage','harvestHours','harvestAccess','dashboard','history','newSearchesTriage','pmoActionCenter'];
+  const preferred = ['overview','opsViews','bench','azumo','pendingAssignments','dueDates','forecast','accountCoverage','harvestHours','harvestAccess','dashboard','history','newSearchesTriage','pmoActionCenter'];
   return preferred.find(id => sections.some(section => section.id === id)) || sections[0]?.id;
 }
 function moduleLeafItems(entry){
@@ -1936,10 +2427,12 @@ function updateRoleSensitiveUi(){
     btn.style.display = canSync ? '' : 'none';
     btn.disabled = !canSync;
   });
+  const overviewNav = document.getElementById('overviewNavLink');
   const billingNav = document.getElementById('billingNavLink');
   const opsNav = document.getElementById('opsNavLink');
   const pmoNav = document.getElementById('pmoNavMenu');
   const pmoQuick = document.getElementById('pmoQuickLinks');
+  if(overviewNav) overviewNav.style.display = sectionAllowedForCurrentRole('overview') ? '' : 'none';
   if(billingNav) billingNav.style.display = sectionAllowedForCurrentRole('dashboard') ? '' : 'none';
   if(opsNav) opsNav.style.display = sectionAllowedForCurrentRole('opsViews') ? '' : 'none';
   if(pmoNav) pmoNav.style.display = canSeePmoGroup() ? '' : 'none';
@@ -3140,8 +3633,15 @@ function renderBenchByMonthReport(){
   const thead = document.getElementById('benchByMonthThead');
   const tbody = document.getElementById('benchByMonthTbody');
   const source = document.getElementById('benchByMonthSource');
+  const embedDetails = document.getElementById('benchByMonthEmbedDetails');
+  const embedFrame = document.getElementById('benchByMonthEmbedFrame');
   if(!thead || !tbody) return;
   if(source) source.textContent = reportSourceLabel(report, 'Source');
+  if(embedFrame){
+    const nextSrc = eazybiEmbedPath('bench_by_month');
+    if(nextSrc && embedFrame.getAttribute('src') !== nextSrc) embedFrame.setAttribute('src', nextSrc);
+    if(embedDetails) embedDetails.style.display = nextSrc ? '' : 'none';
+  }
   if(!months.length){
     thead.innerHTML = '<tr><th>Report</th></tr>';
     tbody.innerHTML = '<tr><td style="color:var(--muted);padding:1rem">No Bench by Month report loaded yet.</td></tr>';
