@@ -1780,7 +1780,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   </div>
   <div class="tbl-wrap harvest-hours-module">
     <div class="tbl-head">
-      <h3>⏱️ Billing hours review</h3>
+      <h3>⏱️ Harvest Hours Control</h3>
       <span class="badge badge-blue">Harvest API</span>
     </div>
     <div class="harvest-hours-controls">
@@ -3111,7 +3111,7 @@ const POS_COLOR = {
 function posChip(p){ if(!p) return '<span style="color:var(--muted)">—</span>'; const c=POS_COLOR[p]||'#6B8FBF'; return `<span class="chip" style="background:${c}18;color:${c}">${esc(p)}</span>`; }
 function availCls(v){ return v>=70?'avail-hi':v>=40?'avail-md':'avail-lo'; }
 function parseLocalDate(s){ if(!s) return null; const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/); return m ? new Date(Number(m[1]), Number(m[2])-1, Number(m[3])) : new Date(s); }
-function expCls(dateStr){ const parsed=parseLocalDate(dateStr); if(!parsed || Number.isNaN(parsed.getTime())) return 'exp-ok'; const base=new Date(today.getFullYear(), today.getMonth(), today.getDate()); const d=Math.ceil((parsed-base)/86400000); if(d<0) return 'exp-urgent'; if(d<=30) return 'exp-soon'; return 'exp-ok'; }
+function expCls(dateStr){ const parsed=parseLocalDate(dateStr); if(!parsed || Number.isNaN(parsed.getTime())) return 'exp-ok'; const base=new Date(today.getFullYear(), today.getMonth(), today.getDate()); const d=Math.ceil((parsed-base)/86400000); return d<0?'exp-urgent':'exp-soon'; }
 function fmtDate(s){ const parsed=parseLocalDate(s); return parsed && !Number.isNaN(parsed.getTime()) ? parsed.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'; }
 function esc(s){ return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function toPct(v){
@@ -5771,16 +5771,14 @@ function searchableRowText(row){
     row.freelance, rowBillingClass(row)
   ].filter(Boolean).join(' ').toLowerCase();
 }
-function opsRowMatchesBase(row){
+function opsRowMatches(row){
   const search = String(opsFilters.search || '').trim().toLowerCase();
   return (!search || searchableRowText(row).includes(search))
     && (!opsFilters.client || (row.client || '') === opsFilters.client)
     && (!opsFilters.position || (row.position || '') === opsFilters.position)
     && (!opsFilters.projectManager || (row.project_manager || '') === opsFilters.projectManager)
-    && (!opsFilters.freelance || (isFreelance(row) ? 'Yes' : 'No') === opsFilters.freelance);
-}
-function opsRowMatches(row){
-  return opsRowMatchesBase(row) && (!opsFilters.billingClass || rowBillingClass(row) === opsFilters.billingClass);
+    && (!opsFilters.freelance || (isFreelance(row) ? 'Yes' : 'No') === opsFilters.freelance)
+    && (!opsFilters.billingClass || rowBillingClass(row) === opsFilters.billingClass);
 }
 function filteredOpsRows(){
   return scopedAssignmentRows(allAssignmentRows()).filter(opsRowMatches);
@@ -5837,16 +5835,7 @@ function summaryCard(label, value, sub=''){
   return `<div class="ops-summary-card"><div class="ops-summary-label">${esc(label)}</div><div class="ops-summary-value">${esc(value)}</div>${sub ? `<div class="mc-sub">${esc(sub)}</div>` : ''}</div>`;
 }
 function renderOpsSummary(rows){
-  const baseRows = scopedAssignmentRows(allAssignmentRows()).filter(opsRowMatchesBase);
-  let people;
-  if(opsFilters.billingClass === 'Billable'){
-    people = new Set(baseRows.filter(row => rowBillingClass(row) === 'Billable').map(personId).filter(Boolean));
-  }else if(opsFilters.billingClass === 'Non-Billable'){
-    const billableIds = new Set(baseRows.filter(row => rowBillingClass(row) === 'Billable').map(personId).filter(Boolean));
-    people = new Set(baseRows.filter(row => rowBillingClass(row) === 'Non-Billable').map(personId).filter(Boolean).filter(id => !billableIds.has(id)));
-  }else{
-    people = new Set(baseRows.map(personId).filter(Boolean));
-  }
+  const people = new Set(rows.map(personId).filter(Boolean));
   const clientRows = rows.filter(isClientRow);
   const clients = new Set(clientRows.map(row => row.client).filter(Boolean));
   const uniqueLabel = opsFilters.freelance === 'No'
