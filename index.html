@@ -1432,7 +1432,6 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     <h2>Billing — <span id="currentSnapshotLabel" style="color:var(--blue-lt)"></span></h2>
     <div class="sec-tag" id="lastRefreshTag">Last refresh: —</div>
   </div>
-  <div class="wip-banner" id="billingWipBanner"><strong>Work in progress</strong></div>
   <div class="metrics-grid" id="metricsGrid"></div>
   <div class="reports-subsection">
     <div class="tbl-wrap has-floating-tooltip billing-report-combined" id="utilBillingReportWrap">
@@ -1611,7 +1610,6 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         <button class="btn btn-ghost btn-sm" onclick="goTo('pmoActionCenter')">PMO actions</button>
       </div>
     </div>
-    <div class="wip-banner" id="harvestWipBanner"><strong>Work in progress</strong></div>
     <div class="action-summary harvest-summary" id="harvestSummaryCards"></div>
     <div class="harvest-users-panel" id="harvestUsersPanel">
       <div class="harvest-users-head">
@@ -1662,7 +1660,6 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         <button class="btn btn-ghost btn-sm" data-sync-action onclick="manualSnapshot()">Sync all sources</button>
       </div>
     </div>
-    <div class="wip-banner" id="accountCoverageWipBanner"><strong>Work in progress</strong></div>
     <div class="action-summary" id="accountCoverageSummaryCards"></div>
     <div class="qa-toolbar" style="margin:.9rem 0 1rem">
       <label class="harvest-search">
@@ -1824,7 +1821,6 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     <h2>Trends</h2>
     <div class="sec-tag" id="historySnapshotsTag">—</div>
   </div>
-  <div class="wip-banner" id="historyWipBanner"><strong>Work in progress</strong></div>
   <div class="history-grid" id="historyGrid"></div>
 </section>
 
@@ -5851,7 +5847,6 @@ function renderOpsSummary(rows){
   if(!grid) return;
   grid.innerHTML = [
     summaryCard(uniqueLabel, people.size),
-    summaryCard('Billable HC', latest.metrics?.headcount_billable ?? '—', 'Source metric'),
     summaryCard('Clients', clients.size, 'External clients only')
   ].join('');
 }
