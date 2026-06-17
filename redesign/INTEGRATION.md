@@ -73,10 +73,10 @@ The renderer reads these automatically from existing globals. Targets shown for 
 |-----------------------|----------------------|--------------------------------------------------------------------|--------|
 | Greeting              | `#pmoGreeting`       | `currentUser.name` → first name (time-of-day prefix; no name → "Good morning") | ✅ |
 | Last refresh          | `#lastRefresh`       | `PMO.last_refresh_at` ?? `PMO.last_refresh`                        | ✅ |
-| Active clients        | `#kpiActiveClients` | `latest.metrics.active_clients`; details use `active_clients` + `assignment_rows` | ✅ |
+| Active clients        | `#kpiActiveClients` | `latest.metrics.active_clients`; popover uses `active_clients` + `assignment_rows` | ✅ |
 | Utilization (billing) | `#kpiUtilBilling` | `latest.metrics.utilization_billing`          | ✅ |
 | Billable headcount    | `#billableHeadcount` | `latest.metrics.headcount_billable`                                | ✅ |
-| Bench                 | `#benchCount`        | `latest.metrics.bench`; details use `bench_list`                   | ✅ |
+| Bench                 | `#benchCount`        | `latest.metrics.bench`; popover uses `bench_list` and intentionally ignores due dates | ✅ |
 | Team composition      | —                    | Not shown. The overview intentionally avoids position/discipline breakdown. | ✅ |
 
 All KPI deltas are computed live against `prev` (the previous snapshot). Bench delta is inverted (a drop is "good").
@@ -102,13 +102,13 @@ These design blocks have no source field in the current API. They render a label
 
 **Style classes** (all namespaced `pmo-ov-*`, no collision with existing app CSS):
 `pmo-ov-hero`, `pmo-ov-kpis`, `pmo-ov-kpi`, `pmo-ov-delta` (`.up/.down/.flat`),
-`pmo-ov-details`, `pmo-ov-detail-panel`.
+`pmo-ov-popover`, `pmo-ov-popover-row`.
 
 **Public JS API:**
 ```js
 renderPmoOverview();                         // reads PMO / latest / prev / currentUser
 renderPmoOverview({ snapshot, prev, snapshots, user, lastRefresh });  // explicit
-togglePmoOverviewDetail('bench' | 'clients');                         // KPI drilldowns
+togglePmoOverviewDetail('bench' | 'clients');                         // KPI popovers
 ```
 
 ---

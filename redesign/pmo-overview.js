@@ -238,9 +238,7 @@
             return {
               name: row.assignee || row.name || 'Unnamed',
               position: row.position || '—',
-              availability: firstNum(row.pct, row.avail, row.availability_pct),
-              billing: firstNum(row.billing, row.billing_pct),
-              due: dueValue(row)
+              availability: firstNum(row.pct, row.avail, row.availability_pct)
             };
           });
         }
@@ -259,9 +257,7 @@
         byPerson[id] = {
           name: name,
           position: row.epic_position || row.position || row.assignment_position || '—',
-          availability: availability,
-          billing: firstNum(row.billing_pct, row.billing, row.epic_billing),
-          due: dueValue(row)
+          availability: availability
         };
       }
     });
@@ -270,28 +266,34 @@
     });
   }
 
-  function detailButton(kind, activeKind) {
+  function detailButton(kind, activeKind, count) {
     var open = kind === activeKind;
-    return '<button type="button" class="pmo-ov-card-action' + (open ? ' is-open' : '') + '" ' +
+    var isClients = kind === 'clients';
+    var label = isClients ? 'Client list' : 'Bench people';
+    var icon = isClients ? ICON.clients : ICON.bench;
+    return '<button type="button" class="pmo-ov-card-action' + (open ? ' is-open' : '') + (isClients ? ' is-clients' : '') + '" ' +
       'aria-expanded="' + (open ? 'true' : 'false') + '" data-pmo-detail="' + kind + '" ' +
       'onclick="window.togglePmoOverviewDetail && window.togglePmoOverviewDetail(\'' + kind + '\')">' +
-        '<span>' + (open ? 'Hide details' : 'Show details') + '</span>' +
-        '<span class="msi" aria-hidden="true">' + (open ? 'expand_less' : 'expand_more') + '</span>' +
+        '<span class="msi" aria-hidden="true">' + icon + '</span>' +
+        '<span>' + label + '</span>' +
+        '<strong>' + esc(count) + '</strong>' +
       '</button>';
   }
 
   function bindDetailActions() {
-    var host = el('pmoOverviewDetails');
-    if (!host || host.getAttribute('data-bound') === '1') return;
-    host.setAttribute('data-bound', '1');
-    host.addEventListener('click', function (event) {
+    var root = el('pmoOverview');
+    if (!root || root.getAttribute('data-actions-bound') === '1') return;
+    root.setAttribute('data-actions-bound', '1');
+    root.addEventListener('click', function (event) {
       var clientBtn = event.target.closest && event.target.closest('[data-pmo-client]');
       if (clientBtn && typeof global.openMetricClient === 'function') {
+        event.stopPropagation();
         global.openMetricClient(clientBtn.getAttribute('data-pmo-client') || '');
         return;
       }
       var benchBtn = event.target.closest && event.target.closest('[data-pmo-open-bench]');
       if (benchBtn && typeof global.openMetricOperatingView === 'function') {
+        event.stopPropagation();
         global.openMetricOperatingView('bench');
       }
     });
@@ -300,59 +302,46 @@
   function renderBenchDetail(snapshot) {
     var rows = benchDetailRows(snapshot);
     var visible = rows.slice(0, 12);
-    return '<section class="pmo-ov-detail-panel" aria-label="Bench people details">' +
-      '<div class="pmo-ov-detail-head">' +
-        '<div><div class="pmo-ov-panel-eyebrow">Bench</div><div class="pmo-ov-detail-title">Active bench people</div></div>' +
-        '<button type="button" class="pmo-ov-detail-link" data-pmo-open-bench>Open Bench view</button>' +
-      '</div>' +
-      (rows.length ? '<div class="pmo-ov-detail-list">' +
+    return '<div class="pmo-ov-popover" role="dialog" aria-label="Active bench people">' +
+      '<div class="pmo-ov-popover-title">Active Bench people</div>' +
+      (rows.length ? '<div class="pmo-ov-popover-list">' +
         visible.map(function (row) {
-          return '<div class="pmo-ov-detail-row">' +
-            '<div><strong>' + esc(row.name) + '</strong><span>' + esc(row.position || '—') + '</span></div>' +
-            '<div><b>' + pct(row.availability) + '</b><span>Available</span></div>' +
-            '<div><b>' + (row.billing === null ? '—' : pct(row.billing)) + '</b><span>Billing</span></div>' +
-            '<div><b>' + esc(dateLabel(row.due)) + '</b><span>Due</span></div>' +
+          return '<div class="pmo-ov-popover-row">' +
+            '<div class="pmo-ov-popover-name">' + esc(row.name) + '</div>' +
+            '<div class="pmo-ov-popover-muted">' + esc(row.position || '—') + '</div>' +
+            '<div class="pmo-ov-popover-pct">' + pct(row.availability) + '</div>' +
           '</div>';
         }).join('') +
-        (rows.length > visible.length ? '<div class="pmo-ov-detail-more">+' + (rows.length - visible.length) + ' more in Bench view</div>' : '') +
-      '</div>' : '<div class="pmo-ov-detail-empty">No active bench people in the current snapshot.</div>') +
-    '</section>';
+        (rows.length > visible.length ? '<div class="pmo-ov-popover-more">+' + (rows.length - visible.length) + ' more</div>' : '') +
+      '</div>' : '<div class="pmo-ov-popover-empty">No active bench people in the current snapshot.</div>') +
+    '</div>';
   }
 
   function renderClientsDetail(snapshot) {
     var rows = clientDetailRows(snapshot);
     var visible = rows.slice(0, 14);
-    return '<section class="pmo-ov-detail-panel" aria-label="Active clients details">' +
-      '<div class="pmo-ov-detail-head">' +
-        '<div><div class="pmo-ov-panel-eyebrow">Clients</div><div class="pmo-ov-detail-title">Active client roster</div></div>' +
-        '<button type="button" class="pmo-ov-detail-link" onclick="window.openMetricOperatingView && window.openMetricOperatingView(\'clients\')">Open Clients view</button>' +
-      '</div>' +
-      (rows.length ? '<div class="pmo-ov-detail-list">' +
+    return '<div class="pmo-ov-popover" role="dialog" aria-label="Active clients">' +
+      '<div class="pmo-ov-popover-title">Active clients</div>' +
+      (rows.length ? '<div class="pmo-ov-popover-list">' +
         visible.map(function (row) {
           var pms = row.projectManagers.length ? row.projectManagers.join(', ') : '—';
-          return '<div class="pmo-ov-detail-row is-client">' +
-            '<div><button type="button" class="pmo-ov-client-link" data-pmo-client="' + esc(row.client) + '">' + esc(row.client) + '</button><span>PM: ' + esc(pms) + '</span></div>' +
-            '<div><b>' + row.resources + '</b><span>Resources</span></div>' +
-            '<div><b>' + row.sows + '</b><span>SOWs</span></div>' +
-            '<div><b>' + esc(dateLabel(row.nextDue)) + '</b><span>Next due</span></div>' +
+          return '<div class="pmo-ov-popover-row is-client">' +
+            '<div class="pmo-ov-popover-name"><button type="button" class="pmo-ov-client-link" data-pmo-client="' + esc(row.client) + '">' + esc(row.client) + '</button></div>' +
+            '<div class="pmo-ov-popover-muted">Resources: ' + row.resources + '</div>' +
+            '<div class="pmo-ov-popover-muted">PM: ' + esc(pms) + '</div>' +
+            '<div class="pmo-ov-popover-pct">' + row.sows + '</div>' +
           '</div>';
         }).join('') +
-        (rows.length > visible.length ? '<div class="pmo-ov-detail-more">+' + (rows.length - visible.length) + ' more clients</div>' : '') +
-      '</div>' : '<div class="pmo-ov-detail-empty">No active external clients in the current snapshot.</div>') +
-    '</section>';
+        (rows.length > visible.length ? '<div class="pmo-ov-popover-more">+' + (rows.length - visible.length) + ' more clients</div>' : '') +
+      '</div>' : '<div class="pmo-ov-popover-empty">No active external clients in the current snapshot.</div>') +
+    '</div>';
   }
 
   function renderOverviewDetails(snapshot, activeKind) {
     var host = el('pmoOverviewDetails');
     if (!host) return;
-    if (!activeKind) {
-      host.hidden = true;
-      host.innerHTML = '';
-      return;
-    }
-    host.hidden = false;
-    host.innerHTML = activeKind === 'bench' ? renderBenchDetail(snapshot) : renderClientsDetail(snapshot);
-    bindDetailActions();
+    host.hidden = true;
+    host.innerHTML = '';
   }
 
   /* ---- KPI cards (data-driven) ---- */
@@ -365,25 +354,30 @@
     var pm = prevSnapshot && prevSnapshot.metrics || null;
     var clients = metricActiveClients(snapshot);
     var pClients = prevSnapshot ? metricActiveClients(prevSnapshot) : null;
+    var benchRows = benchDetailRows(snapshot);
+    var clientRows = clientDetailRows(snapshot);
 
     var cards = [
       { id: 'billableHeadcount', icon: ICON.billable, label: 'Billable headcount', val: intStr(m.headcount_billable), delta: deltaBadge(m.headcount_billable, pm && pm.headcount_billable) },
-      { id: 'benchCount',        icon: ICON.bench,    label: 'On bench',           val: intStr(m.bench),              delta: deltaBadge(m.bench, pm && pm.bench, { goodWhenDown: true }), detail: 'bench' },
-      { id: 'kpiActiveClients',  icon: ICON.clients,  label: 'Active clients',     val: intStr(clients),              delta: deltaBadge(clients, pClients), detail: 'clients' },
+      { id: 'benchCount',        icon: ICON.bench,    label: 'On bench',           val: intStr(m.bench),              delta: deltaBadge(m.bench, pm && pm.bench, { goodWhenDown: true }), detail: 'bench', detailCount: intStr(benchRows.length) },
+      { id: 'kpiActiveClients',  icon: ICON.clients,  label: 'Active clients',     val: intStr(clients),              delta: deltaBadge(clients, pClients), detail: 'clients', detailCount: intStr(clientRows.length) },
       { id: 'kpiUtilBilling',    icon: ICON.util,     label: 'Utilization (billing)', val: pct(m.utilization_billing), delta: deltaBadge(m.utilization_billing, pm && pm.utilization_billing, { suffix: 'pp' }) }
     ];
 
     host.innerHTML = cards.map(function (c) {
-      return '<article class="pmo-ov-kpi">' +
+      var open = c.detail && c.detail === activeDetail;
+      return '<article class="pmo-ov-kpi' + (c.detail ? ' has-popover' : '') + (open ? ' is-open' : '') + '">' +
         '<div class="pmo-ov-kpi-top">' +
           '<span class="pmo-ov-kpi-icon"><span class="msi">' + c.icon + '</span></span>' +
           c.delta +
         '</div>' +
         '<div class="pmo-ov-kpi-val" id="' + c.id + '">' + c.val + '</div>' +
         '<div class="pmo-ov-kpi-lbl">' + c.label + '</div>' +
-        (c.detail ? detailButton(c.detail, activeDetail) : '') +
+        (c.detail ? detailButton(c.detail, activeDetail, c.detailCount) : '') +
+        (open ? (c.detail === 'bench' ? renderBenchDetail(snapshot) : renderClientsDetail(snapshot)) : '') +
       '</article>';
     }).join('');
+    bindDetailActions();
   }
 
   /* ---- Public entry point ---- */
