@@ -46,8 +46,8 @@ body.light ::-webkit-scrollbar-track{background:#F6F8FC}
 nav{position:sticky;top:0;z-index:200;background:rgba(6,12,26,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--brd)}
 .nav-inner{max-width:1280px;margin:0 auto;padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:0;flex:0 1 auto}
-.nav-logo{background:linear-gradient(135deg,#06245E,#0066FF);border:1px solid rgba(96,165,250,.38);border-radius:10px;height:36px;min-width:94px;padding:0 12px;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 20px rgba(0,102,255,.22)}
-.nav-wordmark{display:block;width:72px;height:auto;filter:brightness(1.22) contrast(1.06)}
+.nav-logo{background:var(--white,#FEFEFE);border:1px solid rgba(0,0,255,.18);border-radius:10px;height:36px;min-width:94px;padding:0 12px;display:flex;align-items:center;justify-content:center;color:#0000FF;box-shadow:0 8px 20px rgba(0,102,255,.12)}
+.nav-wordmark{display:block;width:84px;height:auto;filter:none}
 .nav-brand-copy{min-width:0}.nav-title-row{display:flex;align-items:center;gap:8px;min-width:0}.nav-title{font-size:.96rem;font-weight:780;letter-spacing:-.025em;white-space:nowrap}.nav-sub{font-size:.68rem;color:var(--muted);margin-top:1px;font-weight:650;letter-spacing:.02em}.nav-wip-pill{display:inline-flex;align-items:center;gap:6px;min-height:23px;border:1px solid rgba(245,158,11,.36);background:rgba(245,158,11,.12);color:#FDBA74;border-radius:999px;padding:2px 8px;font-size:.62rem;font-weight:900;letter-spacing:.02em;white-space:nowrap}.nav-wip-pill span{text-transform:uppercase;color:#FCD34D}.nav-wip-pill a{color:#FDBA74;text-decoration:none;font-weight:800}.nav-wip-pill a:hover{text-decoration:underline}
 .nav-links{display:flex;gap:10px;align-items:center}
 .nav-link{padding:6px 12px;border-radius:8px;font-size:.8rem;font-weight:760;letter-spacing:-.01em;color:var(--muted);background:none;border:none;cursor:pointer;transition:all .15s;white-space:nowrap}
@@ -149,7 +149,7 @@ section{margin-bottom:2.5rem}
 /* PMO-UX: keep metric dropdowns inside viewport */
 #activeClientsHoverPanel{left:0;right:auto;width:min(720px,calc(100vw - 56px));}
 #activeClientsHoverPanel::before{left:18px;right:auto;}
-#activeClientsHoverPanel .bench-tip-row{grid-template-columns:minmax(140px,1.1fr) minmax(86px,.55fr) minmax(130px,1fr) minmax(130px,1fr);}
+#activeClientsHoverPanel .bench-tip-row{grid-template-columns:minmax(150px,1.2fr) minmax(86px,.55fr) minmax(150px,1fr);}
 .bench-tip-pm{font-size:.7rem;color:var(--muted);line-height:1.25;text-align:right;font-weight:850}
 #freelancersHoverPanel{right:0;left:auto;}
 .bench-tip-title{font-size:.78rem;font-weight:950;margin-bottom:.25rem}.bench-tip-sub{font-size:.7rem;color:var(--muted);line-height:1.35;margin-bottom:.7rem}
@@ -654,7 +654,7 @@ body.light nav{
   color:#fff;
 }
 .auth-gate-brandmark{display:flex;align-items:center;gap:12px}
-.auth-gate-brandmark img{height:34px;width:auto}
+.auth-gate-brandmark img{height:34px;width:auto;background:var(--white,#FEFEFE);border-radius:999px;padding:7px 12px;box-shadow:0 8px 18px rgba(7,24,59,.16)}
 .auth-gate-eyebrow{
   color:rgba(255,255,255,.72);
   font-size:.68rem;
@@ -916,6 +916,7 @@ nav{
   box-shadow:var(--shadow-sm)!important;
 }
 .nav-logo{position:relative}
+.nav-logo .nav-wordmark{display:block!important;width:86px;height:auto;filter:none!important}
 body.light .nav-logo{
   background:transparent!important;
   border-color:transparent!important;
@@ -924,15 +925,7 @@ body.light .nav-logo{
   min-width:104px;
   padding:0!important;
 }
-body.light .nav-logo .nav-wordmark{display:none!important}
-body.light .nav-logo::before{
-  content:"azumo";
-  color:var(--highlight-blue);
-  font-size:26px;
-  font-weight:900;
-  line-height:1;
-  letter-spacing:0;
-}
+body.light .nav-logo .nav-wordmark{display:block!important}
 .nav-title,.sec-head h2,.tbl-head h3{color:var(--azumo-blue)!important}
 .nav-link{color:var(--fg-2)!important;border-radius:var(--radius-md)!important}
 .nav-link:hover,.nav-link.active{background:var(--blue-50)!important;color:var(--highlight-blue)!important}
@@ -1110,6 +1103,12 @@ body:not(.light) .theme-toggle{
   border-color:rgba(255,255,255,.14)!important;
   color:var(--txt)!important;
 }
+body:not(.light) .nav-logo{
+  background:var(--white)!important;
+  border-color:rgba(254,254,254,.24)!important;
+  color:var(--highlight-blue)!important;
+  box-shadow:0 10px 24px rgba(0,0,0,.22)!important;
+}
 body:not(.light) .nav-title,
 body:not(.light) .sec-head h2,
 body:not(.light) .tbl-head h3{color:var(--txt)!important}
@@ -1196,7 +1195,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   <div class="auth-gate-card">
     <div class="auth-gate-brand">
       <div class="auth-gate-brandmark">
-        <img src="https://cdn.prod.website-files.com/60bf1f474febc8bc145ee778/6873d18c089332e17fe80043_azumo_logo_90x30.avif" alt="Azumo" onerror="this.style.display='none'"/>
+        <img src="assets/azumo-logo.png" alt="Azumo"/>
         <span class="auth-gate-eyebrow">PMO · People Ops</span>
       </div>
       <div>
@@ -1230,7 +1229,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <nav>
   <div class="nav-inner">
     <div class="nav-brand">
-      <div class="nav-logo"><img class="nav-wordmark" src="https://cdn.prod.website-files.com/60bf1f474febc8bc145ee778/6873d18c089332e17fe80043_azumo_logo_90x30.avif" alt="Azumo" onerror="this.closest('.nav-logo').textContent='azumo'"/></div>
+      <div class="nav-logo"><img class="nav-wordmark" src="assets/azumo-logo.png" alt="Azumo"/></div>
       <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span>V1</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">People Ops Command Center</div></div>
     </div>
     <div class="nav-links">
@@ -1876,7 +1875,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 
 </main>
 <footer>
-  <img src="https://cdn.prod.website-files.com/60bf1f474febc8bc145ee778/6873d18c089332e17fe80043_azumo_logo_90x30.avif" alt="Azumo" height="16" style="opacity:.45" onerror="this.style.display='none'"/>
+  <img src="assets/azumo-logo.png" alt="Azumo" height="16" style="opacity:.7"/>
   PMO Board · Azumo · <span id="footerLastUpdated">Last updated: —</span>
 </footer>
 
@@ -3730,12 +3729,12 @@ function activeClientMetricRows(){
     .map(row => {
       const deliveryPm = uniqueNonEmpty((row.items || []).map(item => item.project_manager)).join(', ');
       const accountPm = row.coverage?.pm_assigned || '';
+      const pm = deliveryPm || accountPm || '—';
       return {
         client: row.client,
         people: row.people || [],
         resources: (row.people || []).length,
-        deliveryPm: deliveryPm || '—',
-        accountPm: accountPm || '—',
+        pm,
         nextDue: row.nextDue || ''
       };
     });
@@ -3753,7 +3752,7 @@ function renderMetricActiveClientsHover(){
   panel.innerHTML = `
     <div class="bench-tip-title">Active clients</div>
     <div class="bench-tip-list">
-      ${rows.map(row => `<div class="bench-tip-row"><div class="bench-tip-name"><button class="inline-filter" type="button" onclick='event.stopPropagation();openMetricClient(${jsArg(row.client)})'>${esc(row.client)}</button></div><div class="bench-tip-position">Resources: ${row.resources}</div><div class="bench-tip-pm">PM: ${esc(row.deliveryPm || '—')}</div><div class="bench-tip-pm">Account PM: ${esc(row.accountPm || '—')}</div></div>`).join('')}
+      ${rows.map(row => `<div class="bench-tip-row"><div class="bench-tip-name"><button class="inline-filter" type="button" onclick='event.stopPropagation();openMetricClient(${jsArg(row.client)})'>${esc(row.client)}</button></div><div class="bench-tip-position">Resources: ${row.resources}</div><div class="bench-tip-pm">PM: ${esc(row.pm || '—')}</div></div>`).join('')}
     </div>
   `;
 }
@@ -6161,19 +6160,19 @@ function renderCoverageAlert(){
 }
 function renderOpsClients(rows){
   const clientRows = sortClientRows(clientRowsFromAssignments(rows));
-  document.getElementById('opsThead').innerHTML = '<tr><th>Client</th><th>Resources</th><th>PM</th><th>Account PM</th><th>Next Due</th><th>Assignees</th></tr>';
+  document.getElementById('opsThead').innerHTML = '<tr><th>Client</th><th>Resources</th><th>PM</th><th>Next Due</th><th>Assignees</th></tr>';
   document.getElementById('opsTbody').innerHTML = clientRows.map(row => {
-    const deliveryPm = uniqueNonEmpty((row.items || []).map(item => item.project_manager)).join(', ') || '—';
-    const accountPm = row.coverage?.pm_assigned || '—';
+    const deliveryPm = uniqueNonEmpty((row.items || []).map(item => item.project_manager)).join(', ');
+    const accountPm = row.coverage?.pm_assigned || '';
+    const pm = deliveryPm || accountPm || '—';
     return `<tr>
       <td style="font-weight:800"><button class="inline-filter" onclick='setOpsFilter("client", ${jsArg(row.client)})'>${esc(row.client)}</button></td>
       <td>${row.people.length}</td>
-      <td>${esc(deliveryPm)}</td>
-      <td>${esc(accountPm)}</td>
+      <td>${esc(pm)}</td>
       <td><span class="${row.nextDue ? expCls(row.nextDue) : ''}">${fmtDate(row.nextDue)}</span></td>
       <td class="ops-people">${esc(row.people.slice(0,10).join(', ') || '—')}${row.people.length > 10 ? ` +${row.people.length-10} more` : ''}</td>
     </tr>`;
-  }).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No client rows match the selected filters</td></tr>';
+  }).join('') || '<tr><td colspan="5" style="text-align:center;padding:1rem;color:var(--muted)">No client rows match the selected filters</td></tr>';
 }
 function renderOpsProjectManagers(rows){
   const grouped = new Map();

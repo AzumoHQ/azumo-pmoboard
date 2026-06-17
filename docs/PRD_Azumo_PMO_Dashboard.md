@@ -120,7 +120,7 @@ The dashboard has two permission layers:
 | **General → Internal Projects** | ✅ | ✅ | ✅ | ⚠️ scoped/approved | ❌ default | ❌ default | Azumo/internal work is visible to PMO/C-Level; broader access should be deliberate. |
 | **Reports → Billing** | ✅ | ✅ | ✅ | ❌ default | ❌ default | ⚠️ approved only | Includes Utilization Billing Rate and Bench by Month. |
 | **Reports → New Searches Reports** | ✅ | ✅ | ✅ | ⚠️ approved only | ⚠️ approved only | ❌ default | New Searches Triage is a report source view. |
-| **Reports → History** | ✅ | ✅ | ✅ | ❌ default | ❌ default | ❌ default | Month-over-month/history trends are executive/PMO by default. |
+| **Reports → Trends** | ✅ | ✅ | ✅ | ❌ default | ❌ default | ❌ default | Month-over-month trends are executive/PMO by default. |
 | **Coverage** | ✅ | ✅ | ✅ | ⚠️ scoped target | ✅ own clients target | ⚠️ read-only | Account Coverage shows PM, CSM, TL, and Status from PSA. |
 | **Harvest → Control** | ✅ | ✅ | ✅ | ✅ read-only | ✅ read-only | ❌ default | PM and CSM can review Harvest hours without modifying Harvest. |
 | **Harvest → Assignments** | ✅ | ✅ | ✅ | ✅ read-only | ✅ read-only | ❌ default | PM and CSM can review Harvest assignment/access QA read-only. Used for Jira vs Harvest access comparison. |
@@ -358,9 +358,9 @@ Legend: ✅ available; ❌ hidden/not available; ⚠️ requires scoped/approved
 
 - System MUST group active external client rows only.
 - System MUST exclude both Bench and Azumo from the client list.
-- System MUST show: Client, Resources, Delivery PM, Account PM, Next Due, and Assignees.
+- System MUST show: Client, Resources, PM, Next Due, and Assignees.
 - **Delivery PM** MUST come from Jira AA Assignment/SOW `Project Manager`.
-- **Account PM** MUST come from Jira PSA Account Coverage `PM Assigned`.
+- **PM** MUST prefer the delivery PM from Jira assignments and fall back to Jira PSA Account Coverage `PM Assigned` when delivery PM is empty.
 - System MUST provide a Clients subview called **Accounts Coverage** showing Client, PM Assigned, CSM Assigned, TL Assigned, and completion alert/status.
 - System MUST alert when any active external client is missing PM Assigned, CSM Assigned, or TL Assigned.
 - System MUST run a PMO QA check comparing Jira PSA client Epics against the external active clients feeding Operating Views from AA. Any client present on only one side must be shown as a PSA / Operating Views mismatch with clear ✓ / × source presence indicators.
@@ -387,7 +387,7 @@ Legend: ✅ available; ❌ hidden/not available; ⚠️ requires scoped/approved
 - System MUST use the AA Epic field `Position - Assignee` as the visible Position source.
 - System SHOULD continue running Position QA to identify missing or inconsistent Epic Position values.
 
-### 6.10 History & Trends
+### 6.10 Trends
 
 - System MUST show historical trend cards when at least two snapshots exist.
 - System MUST show a clear empty state when only one snapshot exists.
@@ -623,12 +623,12 @@ Functional colors:
 
 **Typography.** Use a clean system sans-serif optimized for tables and KPI cards. Numeric values should be large and scan-friendly; table text should remain compact enough for operational density.
 
-**Iconography.** Use simple emoji/icon labels only where they improve scanning: Dashboard, Views, Bench, History, Forecast, Snapshot. Avoid decorative icon clutter in dense tables.
+**Iconography.** Use simple emoji/icon labels only where they improve scanning: Dashboard, Views, Bench, Trends, Forecast, Snapshot. Avoid decorative icon clutter in dense tables.
 
 ### 15.2 Layout & Composition
 
 - Max content width approximately 1300px.
-- Sticky top navigation with quick access to Dashboard, Views, Bench, History, Forecast.
+- Sticky top navigation with quick access to Dashboard, Views, Bench, Trends, Forecast.
 - KPI cards above operational detail.
 - Tables with horizontal overflow to preserve data fidelity on smaller screens.
 - Summary cards at the top of each operational view.
