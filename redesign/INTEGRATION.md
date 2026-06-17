@@ -77,6 +77,7 @@ The renderer reads these automatically from existing globals. Targets shown for 
 | Utilization Rate (Billing) | `#kpiUtilBilling` | `latest.metrics.utilization_billing`          | ✅ |
 | Utilization Rate (Assignment) | `#kpiUtilAssignment` | `latest.metrics.utilization_assignment`          | ✅ |
 | Headcount Total       | `#kpiHeadcountTotal` | `metricTotalPeople()` (total); sub-line breaks down `headcount_billable` / `headcount_nonbillable` | ✅ |
+| Unassigned Capacity   | `#kpiUnassignedCapacity` | `latest.metrics.unassigned_capacity` (lower is better) | ✅ |
 | Bench                 | `#benchCount`        | `latest.metrics.bench`; popover uses `bench_list` and intentionally ignores due dates | ✅ |
 | Team composition      | —                    | Not shown. The overview intentionally avoids position/discipline breakdown. | ✅ |
 
@@ -97,7 +98,7 @@ These design blocks have no source field in the current API. They render a label
 
 **Data ids** (filled by `renderPmoOverview`): `pmoGreeting`, `lastRefresh`,
 `pmoOverviewKpis` (KPI container), `benchCount`, `kpiActiveClients`,
-`kpiUtilBilling`, `kpiUtilAssignment`, `kpiHeadcountTotal`, `pmoOverviewDetails`.
+`kpiUtilBilling`, `kpiUtilAssignment`, `kpiHeadcountTotal`, `kpiUnassignedCapacity`, `pmoOverviewDetails`.
 
 **Section root:** `#pmoOverview.pmo-ov` (carries `data-state="loading|ready|empty"`).
 
