@@ -1,17 +1,17 @@
 /* ============================================================
-   PMO People Ops reskin — operational dashboard tabs
+   PMO Operations Command Center reskin — operational dashboard tabs
    Pure CSS. NO markup or JS changes required.
 
    How it works: the existing sections render through the app's
    own CSS custom properties (--card, --surf, --brd, --txt, ...).
    We REDEFINE those tokens *scoped to the section roots*, so all
-   existing rules inside repaint in the Azumo People Ops palette
+   existing rules inside repaint in the Azumo Operations Command Center palette
    automatically. A thin layer below adds the structural polish
    (rounded white cards, uppercase tracked headers, cerulean chips).
 
    Logic, filters, role-scoping and render functions are untouched.
 
-   Requires the People Ops fonts (already added for the overview):
+   Requires the Operations Command Center fonts (already added for the overview):
      Lato + Material Symbols Outlined  (see INTEGRATION.md, edit #1)
 
    The selector list below intentionally covers the operational tabs
@@ -43,7 +43,7 @@
   --rl:18px;
   --r:12px;
 
-  /* People Ops page surface behind the cards, so the section header
+  /* Operations Command Center page surface behind the cards, so the section header
      (which renders outside the white card) is legible regardless of
      the host app's dark/light body background. */
   background:#EBF3FB;

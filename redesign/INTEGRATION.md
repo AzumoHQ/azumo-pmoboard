@@ -1,6 +1,6 @@
 # PMO Overview redesign — integration guide
 
-Production integration of the Azumo **People Ops** overview design onto the existing `index.html`.
+Production integration of the Azumo **Operations Command Center** overview design onto the existing `index.html`.
 **No full-app replacement.** These are additive files + 4 small edits.
 
 ```
@@ -118,7 +118,7 @@ togglePmoOverviewDetail('bench' | 'clients');                         // KPI pop
 These sections already render from real data through their existing render functions.
 **Nothing in their logic, filters, role-scoping or markup changes.** The reskin works by
 redefining the app's own CSS custom properties **scoped to operational section roots**, so every
-existing rule inside repaints in the Azumo People Ops palette, plus a thin layer of structural
+existing rule inside repaints in the Azumo Operations Command Center palette, plus a thin layer of structural
 polish (white rounded cards, uppercase tracked headers, cerulean tabs/chips, soft shadows).
 
 ### Integration — 1 edit
@@ -141,7 +141,7 @@ If any class is renamed in the app, mirror it in `pmo-sections.css`.
 
 ### Extending to other sections
 The reskin is scoped to a selector list at the top of the file. To bring another section into the
-People Ops look, add its `#sectionId` to the `#opsViews, #bench { … }` token block (and the
+Operations Command Center look, add its `#sectionId` to the `#opsViews, #bench { … }` token block (and the
 matching polish selectors). Sections that use the same `.tbl-wrap`/`table`/`.badge` vocabulary
 (e.g. `#pendingAssignments`, `#dueDates`, `#history`) will pick up most of the styling for free.
 

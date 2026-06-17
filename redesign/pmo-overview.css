@@ -1,5 +1,5 @@
 /* ============================================================
-   PMO Overview — Azumo "People Ops" redesign
+   PMO Overview — Azumo "Operations Command Center" redesign
    Production CSS. Self-contained: all design tokens are scoped
    to .pmo-ov so this can drop into the existing index.html
    without colliding with its current dark theme variables.
@@ -11,7 +11,7 @@
    ============================================================ */
 
 .pmo-ov{
-  /* ---- Azumo People Ops design tokens (light) ---- */
+  /* ---- Azumo Operations Command Center design tokens (light) ---- */
   --ov-page:#EBF3FB;
   --ov-surface:#FFFFFF;
   --ov-surface-2:#F4F9FD;
