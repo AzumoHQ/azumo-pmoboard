@@ -7,7 +7,7 @@
    Fonts expected (load once in <head>, see INTEGRATION.md):
      - Lato (body)                  Google Fonts
      - Material Symbols Outlined    Google Fonts (icon font)
-     - Batica Sans (display, opt.)  self-hosted .otf, falls back to Lato
+     - Lato (display + body)        Google Fonts
    ============================================================ */
 
 .pmo-ov{
@@ -37,7 +37,7 @@
   --ov-radius-sm:14px;
 
   --ov-font:'Lato',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --ov-font-display:'Batica Sans','Lato',sans-serif;
+  --ov-font-display:'Lato',sans-serif;
 
   background:var(--ov-page);
   color:var(--ov-text);

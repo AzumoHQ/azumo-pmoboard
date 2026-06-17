@@ -4,16 +4,25 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>User Management — PMO Dashboard</title>
-<link rel="stylesheet" href="https://use.typekit.net/yer2bzk.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#060C1A; --surf:#0D1626; --card:#112035; --brd:#1C3154;
   --blue:#0066FF; --blue-lt:#3385FF; --txt:#EEF4FF; --muted:#6B8FBF;
   --green:#10B981; --red:#EF4444; --orange:#F59E0B;
+  --font-sans:"Lato",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{font-family:"azo-sans-web",sans-serif;background:radial-gradient(circle at 20% 0%,rgba(0,102,255,.16),transparent 30%),var(--bg);color:var(--txt);min-height:100vh}
+body{font-family:var(--font-sans);background:radial-gradient(circle at 20% 0%,rgba(0,102,255,.16),transparent 30%),var(--bg);color:var(--txt);min-height:100vh;letter-spacing:0}
+body.light{
+  --bg:#EBF3FB; --surf:#F4F9FD; --card:#FFFFFF; --brd:#D7D9E0;
+  --blue:#0000FF; --blue-lt:#0000FF; --txt:#15243C; --muted:#566377;
+  --green:#00A861; --red:#C43B66; --orange:#E8A227;
+  background:var(--bg);
+}
 body.impersonating{padding-top:60px}
 a{color:inherit}
 .impersonation-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:1200;background:linear-gradient(90deg,rgba(245,158,11,.98),rgba(249,115,22,.96));color:#2B1700;border-bottom:1px solid rgba(146,64,14,.35);box-shadow:0 12px 34px rgba(0,0,0,.18)}
@@ -35,6 +44,7 @@ h1{font-size:clamp(1.8rem,3.5vw,2.7rem);line-height:1.02;letter-spacing:-.04em;m
 .btn:hover{transform:translateY(-1px);border-color:rgba(51,133,255,.45)}
 .btn-primary{background:linear-gradient(135deg,var(--blue),#0057D9);border-color:transparent}
 .btn-ghost{background:rgba(255,255,255,.03)}
+.theme-toggle{min-width:74px}
 .btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}
 .meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.85rem}
 .card{background:linear-gradient(180deg,rgba(255,255,255,.03),transparent 35%),var(--card);border:1px solid rgba(107,143,191,.30);border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,.28)}
@@ -85,12 +95,24 @@ tbody tr:hover td{background:rgba(0,102,255,.05)}
 .loading,.forbidden{display:flex;align-items:center;justify-content:center;min-height:55vh;color:var(--muted)}
 .tag{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(107,143,191,.18);font-size:.72rem;font-weight:800;color:#CFE0FF}
 .count{padding:7px 10px;border-radius:999px;background:rgba(0,102,255,.10);border:1px solid rgba(51,133,255,.24);color:#AFCBFF;font-size:.76rem;font-weight:900}
+body.light .eyebrow,body.light .count{color:#0000FF;background:#EEF0FF;border-color:#D6DBFF}
+body.light .brand-badge{background:#07183B;color:#fff}
+body.light .btn-ghost{background:#fff}
+body.light .card{background:#fff;border-color:#EAEBEE;box-shadow:0 20px 40px rgba(7,24,59,.08)}
+body.light .search input,body.light .field input,body.light .field select,body.light .role-select{background:#F7F8FA;border-color:#D7D9E0;color:#15243C}
+body.light .email{color:#0000D1}
+body.light .table-shell{background:#fff;border-color:#EAEBEE}
+body.light thead th{background:#F7F8FA;color:#566377;border-bottom-color:#EAEBEE}
+body.light tbody td{border-bottom-color:#EAEBEE}
+body.light tbody tr:nth-child(odd) td{background:#FEFEFE}
+body.light tbody tr:hover td{background:#EEF0FF}
+body.light .toast{background:#fff}
 @keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media (max-width: 980px){.add-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width: 640px){.page{padding:20px 14px 42px}.add-grid{grid-template-columns:1fr}.actions{width:100%}.actions .btn{flex:1}.toolbar{padding:14px 14px 0}.add-panel{padding:0 14px 14px}.table-wrap{padding:0 14px 14px}}
 </style>
 </head>
-<body>
+<body class="light">
   <div class="impersonation-banner" id="impersonationBanner" aria-live="polite" aria-hidden="true">
     <div class="impersonation-banner-inner">
       <div class="impersonation-banner-copy" id="impersonationBannerCopy">Viewing as —</div>
@@ -114,6 +136,7 @@ tbody tr:hover td{background:rgba(0,102,255,.05)}
         </div>
         <div class="actions">
           <a class="btn btn-ghost" href="/">← Back to dashboard</a>
+          <button class="btn btn-ghost theme-toggle" type="button" id="themeToggle">Dark</button>
           <button class="btn btn-primary" type="button" id="toggleAddBtn">+ Add user</button>
         </div>
       </div>
@@ -185,6 +208,26 @@ tbody tr:hover td{background:rgba(0,102,255,.05)}
   <div class="toast-stack" id="toastStack"></div>
 
 <script>
+const THEME_KEY = 'pmo_dashboard_theme';
+function applyTheme(theme){
+  const normalized = theme === 'dark' ? 'dark' : 'light';
+  const light = normalized === 'light';
+  document.body.classList.toggle('light', light);
+  document.body.classList.toggle('dark', !light);
+  const btn = document.getElementById('themeToggle');
+  if(btn){
+    btn.textContent = light ? 'Dark' : 'Light';
+    btn.setAttribute('aria-label', light ? 'Switch to dark view' : 'Switch to light view');
+    btn.setAttribute('aria-pressed', light ? 'false' : 'true');
+  }
+}
+function toggleTheme(){
+  const next = document.body.classList.contains('light') ? 'dark' : 'light';
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+}
+applyTheme(localStorage.getItem(THEME_KEY) || 'light');
+
 const ROLE_OPTIONS = ['PMO','Executive','CSM','PM','TL','HR','Assignee'];
 let currentUser = null;
 let impersonatedUser = null;
@@ -484,6 +527,7 @@ document.getElementById('searchInput').addEventListener('input', (event) => {
   filterUsers();
 });
 document.getElementById('impersonationExitBtn').addEventListener('click', stopImpersonation);
+document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 document.getElementById('toggleAddBtn').addEventListener('click', () => toggleAddPanel());
 document.getElementById('cancelAddBtn').addEventListener('click', () => toggleAddPanel(false));
 document.getElementById('saveAddBtn').addEventListener('click', createUser);

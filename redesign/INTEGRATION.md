@@ -26,7 +26,7 @@ it pulls from the live globals, never from fixtures.
 ## The 4 edits to `index.html`
 
 ### 1) `<head>` — load fonts + stylesheet
-Insert right after the existing Typekit link (line ~7, `<link rel="stylesheet" href="https://use.typekit.net/yer2bzk.css">`):
+Insert in the document `<head>`:
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,7 +35,7 @@ Insert right after the existing Typekit link (line ~7, `<link rel="stylesheet" h
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="redesign/pmo-overview.css">
 ```
-> Batica Sans (display face) is optional. To use it, add an `@font-face` for `BaticaSans-Regular.otf` named `'Batica Sans'`; the CSS already falls back to Lato.
+Lato is the open Google font used for both display and UI text.
 
 ### 2) `<body>` — mount the section
 Paste the entire contents of `redesign/pmo-overview.html` as the **first child of `<main>`** (line ~699, immediately before `<section id="newSearchesTriage">`).

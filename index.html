@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>PMO Board — Azumo</title>
-<link rel="stylesheet" href="https://use.typekit.net/yer2bzk.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
@@ -19,12 +18,12 @@
   --txt:#EEF4FF; --muted:#6B8FBF; --green:#10B981;
   --yellow:#F59E0B; --red:#EF4444; --orange:#F97316;
   --purple:#7C3AED; --teal:#06B6D4; --r:12px; --rl:18px;
-  --font-sans:'azo-sans-web',sans-serif;
-  --font-display:'azo-sans-web',sans-serif;
+  --font-sans:'Lato',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-display:'Lato',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"azo-sans-web",sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-weight:400;letter-spacing:-.008em}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--txt);min-height:100vh;font-weight:400;letter-spacing:0}
 body.impersonating{padding-top:58px}
 
 body.light{
@@ -472,7 +471,7 @@ main{width:min(1280px,100%);padding-left:32px;padding-right:32px}
 @media(max-width:720px){main{padding-left:24px;padding-right:24px}.nav-brand .nav-sub{display:none}.nav-title{max-width:112px}.auth-pill{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 
 /* PMO-LAYOUT: font brand */
-html,body,button,input,select,textarea{font-family:"azo-sans-web",sans-serif}
+html,body,button,input,select,textarea{font-family:"Lato",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 
 /* PMO-LAYOUT: horizontal top module tabs */
 :root{--pmo-sidebar-width:0px;--pmo-content-pad:24px}
@@ -573,8 +572,8 @@ section{margin-bottom:1.65rem!important}
   --txt:#EDF4FB; --muted:#AEBCD0; --green:#00C26E;
   --yellow:#FFC64F; --red:#FF3355; --orange:#FF8A3D;
   --purple:#6B47C4; --teal:#00B4D8; --r:10px; --rl:16px;
-  --font-sans:"Lato","azo-sans-web",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  --font-display:"azo-sans-web","Lato",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --font-sans:"Lato",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --font-display:"Lato",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 body.light{
   --bg:#EBF3FB; --surf:#F4F9FD; --card:#FFFFFF; --brd:#E4EDF6;
@@ -844,8 +843,8 @@ footer{background:transparent}
   --border-focus:var(--highlight-blue);
   --link:var(--highlight-blue);
   --link-hover:#0000C4;
-  --font-sans:"Lato","azo-sans-web",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-  --font-display:"Batica Sans","Lato","azo-sans-web",-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-sans:"Lato",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --font-display:"Lato",-apple-system,BlinkMacSystemFont,sans-serif;
   --fs-xs:12px;
   --fs-sm:14px;
   --fs-base:16px;
@@ -904,13 +903,13 @@ footer{background:transparent}
   --r:var(--radius-md);
   --rl:var(--radius-lg);
 }
-body,body.light{
+body.light{
   background:var(--bg-3)!important;
   color:var(--fg-1)!important;
   font-family:var(--font-sans)!important;
   letter-spacing:var(--ls-normal)!important;
 }
-.theme-toggle{display:none!important}
+.theme-toggle{display:inline-flex!important;align-items:center;justify-content:center}
 nav{
   background:var(--white)!important;
   border-bottom:1px solid var(--border-subtle)!important;
@@ -1058,6 +1057,118 @@ main{background:transparent!important}
   .az-hero-stats,.az-kpi-grid,.az-donut-layout{grid-template-columns:1fr}
   .az-bars{gap:16px}
 }
+
+/* Restored theme views: light keeps the designer handoff, dark mirrors it with Azumo navy tokens. */
+body:not(.light){
+  --bg:#07183B;
+  --surf:#0D1E36;
+  --card:#10243F;
+  --brd:rgba(255,255,255,.12);
+  --txt:#EDF4FB;
+  --muted:#AEBCD0;
+  --blue:#00B4D8;
+  --blue-lt:#90E0EF;
+  --blue-dk:#FEFEFE;
+  --green:#00C26E;
+  --yellow:#FFC64F;
+  --red:#FF6680;
+  --orange:#FFC64F;
+  --purple:#A7B0FF;
+  --teal:#00B4D8;
+  background:linear-gradient(180deg,#07183B 0%,#0A1A2F 100%)!important;
+  color:var(--txt)!important;
+  font-family:var(--font-sans)!important;
+  letter-spacing:0!important;
+}
+body:not(.light) nav{
+  background:rgba(7,24,59,.94)!important;
+  border-bottom-color:rgba(255,255,255,.12)!important;
+  box-shadow:0 12px 34px rgba(0,0,0,.28)!important;
+}
+body:not(.light) .nav-logo,
+body:not(.light) .btn-ghost,
+body:not(.light) .auth-pill,
+body:not(.light) .theme-toggle{
+  background:rgba(255,255,255,.06)!important;
+  border-color:rgba(255,255,255,.14)!important;
+  color:var(--txt)!important;
+}
+body:not(.light) .nav-title,
+body:not(.light) .sec-head h2,
+body:not(.light) .tbl-head h3{color:var(--txt)!important}
+body:not(.light) .nav-link{color:var(--muted)!important}
+body:not(.light) .nav-link:hover,
+body:not(.light) .nav-link.active{background:rgba(0,180,216,.14)!important;color:var(--blue-lt)!important}
+body:not(.light) .side-index{
+  background:rgba(7,24,59,.94)!important;
+  border-color:rgba(255,255,255,.10)!important;
+  box-shadow:0 18px 40px rgba(0,0,0,.28)!important;
+}
+body:not(.light) .side-index .sidebar-item{
+  background:rgba(255,255,255,.045)!important;
+  color:var(--muted)!important;
+  border-color:transparent!important;
+}
+body:not(.light) .side-index .sidebar-item:hover{
+  background:rgba(0,180,216,.14)!important;
+  color:var(--blue-lt)!important;
+  border-color:rgba(0,180,216,.18)!important;
+}
+body:not(.light) .side-index .sidebar-item.active,
+body:not(.light) .pmo-branch-tab.active,
+body:not(.light) .view-tab.active{
+  background:var(--sky-600)!important;
+  color:#fff!important;
+  box-shadow:0 10px 22px rgba(0,119,182,.28)!important;
+}
+body:not(.light) .mc,
+body:not(.light) .tbl-wrap,
+body:not(.light) .qa-wrap,
+body:not(.light) .action-wrap,
+body:not(.light) .forecast-wrap,
+body:not(.light) .ops-wrap,
+body:not(.light) .util-card,
+body:not(.light) .qa-card,
+body:not(.light) .ops-summary-card,
+body:not(.light) .coverage-card,
+body:not(.light) .harvest-summary-card,
+body:not(.light) .harvest-card,
+body:not(.light) .mini-card{
+  background:var(--card)!important;
+  border-color:var(--brd)!important;
+  box-shadow:0 18px 40px rgba(0,0,0,.24)!important;
+}
+body:not(.light) .tbl-head,
+body:not(.light) .billing-panel-head,
+body:not(.light) th{background:rgba(255,255,255,.055)!important}
+body:not(.light) .auth-gate-form{background:var(--card)!important}
+body:not(.light) .pmo-ov{
+  --ov-page:#07183B;
+  --ov-surface:#10243F;
+  --ov-surface-2:#0D1E36;
+  --ov-surface-3:#183257;
+  --ov-text:#EDF4FB;
+  --ov-text-2:#AEBCD0;
+  --ov-text-3:#8FB6D8;
+  --ov-border:rgba(255,255,255,.12);
+  --ov-border-strong:rgba(255,255,255,.2);
+  --ov-chip-bg:rgba(0,180,216,.14);
+  --ov-chip-fg:#90E0EF;
+}
+body:not(.light) :is(#newSearchesTriage,#dashboard,#opsViews,#pmoActionCenter,#harvestAccess,#accountCoverage,#dueDates,#pendingAssignments,#bench,#azumo,#harvestHours,#history,#forecast){
+  --card:#10243F;
+  --surf:#0D1E36;
+  --brd:rgba(255,255,255,.12);
+  --txt:#EDF4FB;
+  --muted:#AEBCD0;
+  --blue:#00B4D8;
+  --blue-lt:#90E0EF;
+  --blue-dk:#00B4D8;
+  background:#07183B!important;
+  color:var(--txt)!important;
+}
+body:not(.light) .pmo-ov-detail-row{background:#10243F}
+body:not(.light) .pmo-ov-detail-row:nth-child(even){background:#0D1E36}
 
 </style>
 </head>
@@ -1689,11 +1800,11 @@ main{background:transparent!important}
   </div>
 </section>
 
-<!-- ── HISTORY ─────────────────────────────── -->
+<!-- ── TRENDS ──────────────────────────────── -->
 <section id="history">
   <div class="sec-head">
     <div class="sec-icon">📈</div>
-    <h2>Historical Trends</h2>
+    <h2>Trends</h2>
     <div class="sec-tag" id="historySnapshotsTag">—</div>
   </div>
   <div class="wip-banner" id="historyWipBanner"><strong>Work in progress</strong></div>
@@ -2124,13 +2235,19 @@ function renderDesignerOverview(){
 
 const THEME_KEY = 'pmo_dashboard_theme';
 function applyTheme(theme){
-  const light = true;
+  const normalized = theme === 'dark' ? 'dark' : 'light';
+  const light = normalized === 'light';
   document.body.classList.toggle('light', light);
+  document.body.classList.toggle('dark', !light);
   const btn = document.getElementById('themeToggle');
-  if(btn) btn.textContent = 'Azumo';
+  if(btn){
+    btn.textContent = light ? 'Dark' : 'Light';
+    btn.setAttribute('aria-label', light ? 'Switch to dark view' : 'Switch to light view');
+    btn.setAttribute('aria-pressed', light ? 'false' : 'true');
+  }
 }
 function toggleTheme(){
-  const next = 'light';
+  const next = document.body.classList.contains('light') ? 'dark' : 'light';
   localStorage.setItem(THEME_KEY, next);
   applyTheme(next);
 }
@@ -2192,7 +2309,7 @@ function sidebarNavConfig(){
     ]},
     {id:'reportsGroup', icon:'📊', label:'Reports', children:[
       {id:'dashboard', icon:'💳', label:'Billing'},
-      {id:'history', icon:'📜', label:'History'},
+      {id:'history', icon:'📈', label:'Trends'},
       {id:'newSearchesTriage', icon:'🔎', label:'New Searches'}
     ]},
     {id:'pmoActionCenter', icon:'🚨', label:'PMO QA', count: qaCount}
@@ -2905,7 +3022,7 @@ function renderMetrics(){
       </div>
       <div class="mc-val">${typeof cur === 'number' ? (cur % 1 !== 0 ? cur.toFixed(2) : cur) : '—'}<span class="mc-unit"> ${cfg.unit}</span></div>
       ${hoverHtml}
-      <!-- Metric sparklines intentionally hidden outside History. -->
+      <!-- Metric sparklines intentionally hidden outside Trends. -->
     `;
     grid.appendChild(card);
   });
@@ -6218,7 +6335,7 @@ window.setOpsClientSort = setOpsClientSort;
 
 
 // ════════════════════════════════════════════════════
-// HISTORY CARDS
+// TRENDS CARDS
 // ════════════════════════════════════════════════════
 function monthlyHistorySnapshots(){
   const byMonth = new Map();
