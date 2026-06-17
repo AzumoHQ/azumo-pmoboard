@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>PMO Board — Azumo</title>
 <link rel="stylesheet" href="https://use.typekit.net/yer2bzk.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="redesign/pmo-overview.css">
+<link rel="stylesheet" href="redesign/pmo-sections.css">
 <!-- PMO-LAYOUT: font brand -->
 <style>
 :root{
@@ -1213,48 +1219,41 @@ main{background:transparent!important}
 
 <!-- ── OVERVIEW ─────────────────────────────── -->
 <section id="overview">
-  <div class="az-overview">
-    <div class="az-overview-hero">
-      <div>
-        <div class="az-pill">Azumo · People Ops</div>
-        <h1><span id="overviewGreeting">Good morning</span>, <span id="overviewUserName">PMO</span></h1>
-        <div class="az-overview-meta">
-          <span><span class="az-sync-dot"></span> Synced from Jira & Harvest</span>
-          <span id="overviewLastRefresh">Last refresh: —</span>
+  <div id="pmoOverview" class="pmo-ov" data-state="loading" aria-label="PMO overview">
+    <div class="pmo-ov-hero">
+      <div class="pmo-ov-hero-copy">
+        <div class="pmo-ov-eyebrow">Azumo · People Ops</div>
+        <h1 id="pmoGreeting">Welcome back</h1>
+        <div class="pmo-ov-hero-meta">
+          <span>Synced from Jira &amp; Harvest</span>
+          <span class="dot"></span>
+          <span id="lastRefresh">—</span>
         </div>
       </div>
-      <div class="az-hero-stats" aria-label="Current PMO summary">
-        <div class="az-hero-stat"><div class="az-hero-value" id="overviewHeroPeople">—</div><div class="az-hero-label">People</div></div>
-        <div class="az-hero-stat"><div class="az-hero-value" id="overviewHeroClients">—</div><div class="az-hero-label">Clients</div></div>
-        <div class="az-hero-stat"><div class="az-hero-value" id="overviewHeroUtil">—</div><div class="az-hero-label">Avg util.</div></div>
+      <div class="pmo-ov-hero-stats" aria-label="Current PMO summary">
+        <div class="pmo-ov-hero-stat"><div class="num" id="peopleCount">—</div><div class="lbl">People</div></div>
+        <div class="pmo-ov-hero-stat"><div class="num" id="activeClients">—</div><div class="lbl">Clients</div></div>
+        <div class="pmo-ov-hero-stat"><div class="num" id="utilizationBilling">—</div><div class="lbl">Avg util.</div></div>
       </div>
     </div>
 
-    <div class="az-kpi-grid" id="overviewKpis"></div>
+    <div class="pmo-ov-kpis" id="pmoOverviewKpis"></div>
 
-    <div class="az-panel-grid">
-      <div class="az-card">
-        <div class="az-card-head">
-          <div>
-            <div class="az-card-eyebrow">Headcount growth</div>
-            <h2>Billable headcount by month</h2>
-          </div>
-          <div class="az-legend"><span><i></i> Headcount</span><span><i class="warm"></i> Current</span></div>
+    <div class="pmo-ov-cols">
+      <div class="pmo-ov-panel">
+        <div class="pmo-ov-panel-head">
+          <div class="pmo-ov-panel-eyebrow">Headcount growth</div>
+          <div class="pmo-ov-panel-title">Billable headcount by month</div>
         </div>
-        <div class="az-bars" id="overviewHeadcountBars"></div>
+        <div class="pmo-ov-chart" id="headcountSeries"></div>
       </div>
 
-      <div class="az-card">
-        <div class="az-card-head">
-          <div>
-            <div class="az-card-eyebrow">Team composition</div>
-            <h2>By discipline</h2>
-          </div>
+      <div class="pmo-ov-panel">
+        <div class="pmo-ov-panel-head">
+          <div class="pmo-ov-panel-eyebrow">Team composition</div>
+          <div class="pmo-ov-panel-title">By discipline</div>
         </div>
-        <div class="az-donut-layout">
-          <div class="az-donut" id="overviewDisciplineDonut"><div class="az-donut-center"><div class="az-donut-total" id="overviewDisciplineTotal">—</div><div class="az-donut-label">Total</div></div></div>
-          <div class="az-comp-list" id="overviewDisciplineList"></div>
-        </div>
+        <div id="disciplineRows"></div>
       </div>
     </div>
   </div>
@@ -1774,6 +1773,7 @@ main{background:transparent!important}
   PMO Board · Azumo · <span id="footerLastUpdated">Last updated: —</span>
 </footer>
 
+<script src="redesign/pmo-overview.js"></script>
 <script>
 // ════════════════════════════════════════════════════
 // DATA — injected by pmo-refresh.py
@@ -2106,6 +2106,16 @@ function renderOverviewDiscipline(){
 }
 function renderDesignerOverview(){
   if(!latest) return;
+  if(typeof renderPmoOverview === 'function'){
+    renderPmoOverview({
+      snapshot: latest,
+      prev,
+      snapshots: PMO.snapshots || [],
+      user: currentUser,
+      lastRefresh: {at: PMO.last_refresh_at, label: lastUpdated || PMO.last_refresh},
+      disciplineRows: overviewDisciplineRows()
+    });
+  }
   const set = (id, value) => {
     const el = document.getElementById(id);
     if(el) el.textContent = value;
@@ -2614,6 +2624,7 @@ function updateAuthUi(){
   setAuthGateState(currentUser);
   updateRoleSensitiveUi();
   renderPmoActionCenter();
+  renderDesignerOverview();
   if(latest) renderDataTraceability();
 }
 async function loadCurrentUser(){

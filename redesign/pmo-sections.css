@@ -1,0 +1,184 @@
+/* ============================================================
+   PMO People Ops reskin — Operating Views + Bench
+   Pure CSS. NO markup or JS changes required.
+
+   How it works: the existing sections render through the app's
+   own CSS custom properties (--card, --surf, --brd, --txt, ...).
+   We REDEFINE those tokens *scoped to the section roots*, so all
+   existing rules inside repaint in the Azumo People Ops palette
+   automatically. A thin layer below adds the structural polish
+   (rounded white cards, uppercase tracked headers, cerulean chips).
+
+   Logic, filters, role-scoping and render functions are untouched.
+
+   Requires the People Ops fonts (already added for the overview):
+     Lato + Material Symbols Outlined  (see INTEGRATION.md, edit #1)
+
+   To extend the reskin to more sections later, just add their
+   section id to the two selector lists below.
+   ============================================================ */
+
+/* ---- 1. Token remap (re-themes everything inside) ---------- */
+#opsViews,
+#bench{
+  --card:#FFFFFF;          /* surface            */
+  --surf:#F4F9FD;          /* surface-2 (inputs, th, chips) */
+  --brd:#E7EEF6;           /* border             */
+  --txt:#15243C;           /* primary text       */
+  --muted:#566377;         /* secondary text     */
+  --blue:#0077B6;          /* accent             */
+  --blue-lt:#0077B6;       /* link               */
+  --blue-dk:#00B4D8;       /* accent-2 (icon)    */
+  --rl:18px;
+  --r:12px;
+
+  /* People Ops page surface behind the cards, so the section header
+     (which renders outside the white card) is legible regardless of
+     the host app's dark/light body background. */
+  background:#EBF3FB;
+  padding:22px 22px 24px;
+  border-radius:22px;
+
+  font-family:'Lato',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--txt);
+}
+
+/* ---- 2. Section header (cerulean tile + display title) ----- */
+#opsViews .sec-icon,
+#bench .sec-icon{
+  background:#E2F1FB !important;
+  color:#0077B6;
+  border-radius:11px !important;
+}
+#opsViews .sec-head h2,
+#bench .sec-head h2{
+  font-family:'Batica Sans','Lato',sans-serif;
+  font-weight:900;
+  letter-spacing:0;
+  color:var(--txt);
+}
+#opsViews .sec-tag,
+#bench .sec-tag{
+  background:#E2F1FB;
+  border-color:#CFE6F7;
+  color:#0A6FA8;
+  font-weight:700;
+}
+
+/* ---- 3. Card containers (soft Azumo shadow, not heavy dark) - */
+#opsViews .ops-wrap,
+#bench .tbl-wrap{
+  background:var(--card);
+  border:1px solid var(--brd);
+  border-radius:var(--rl);
+  box-shadow:0 2px 8px rgba(7,24,59,.05),0 1px 2px rgba(7,24,59,.04) !important;
+}
+
+/* ---- 4. Operating Views: tabs + filters -------------------- */
+#opsViews .view-tab{
+  background:var(--surf);
+  border:1px solid var(--brd);
+  color:var(--muted);
+  font-weight:700;
+}
+#opsViews .view-tab:hover{ border-color:var(--blue-dk); color:var(--txt); background:#EAF5FC; }
+#opsViews .view-tab.active{
+  background:#0077B6;
+  border-color:#0077B6;
+  color:#fff;
+}
+#opsViews .filter-field label{ color:var(--muted); font-weight:800; }
+#opsViews .filter-field select,
+#opsViews .filter-field input{
+  background:var(--surf);
+  border:1px solid var(--brd);
+  color:var(--txt);
+  border-radius:10px;
+}
+#opsViews .filter-field select:focus,
+#opsViews .filter-field input:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(0,119,182,.16);
+}
+#opsViews .ops-summary-card{
+  background:var(--surf);
+  border:1px solid var(--brd);
+  border-radius:14px;
+}
+#opsViews .ops-summary-label{ color:var(--muted); }
+#opsViews .ops-summary-value{ color:var(--txt); }
+#opsViews .ops-table-wrap{ border:1px solid var(--brd); border-radius:14px; }
+#opsViews .ops-expand{
+  background:var(--surf);
+  border:1px solid var(--brd);
+  color:var(--blue);
+  border-radius:8px;
+}
+#opsViews .inline-filter{ color:var(--blue); font-weight:700; }
+
+/* ---- 5. Tables (Operating Views + Bench) ------------------- */
+#opsViews table,
+#bench table{ border-collapse:collapse; width:100%; }
+
+#opsViews th,
+#bench th{
+  background:var(--surf) !important;
+  color:var(--muted) !important;
+  font-size:11px !important;
+  font-weight:800 !important;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  text-align:left;
+  padding:13px 16px !important;
+  border-bottom:1px solid var(--brd);
+}
+#opsViews td,
+#bench td{
+  color:var(--txt);
+  font-size:13.5px;
+  padding:14px 16px !important;
+  border-bottom:1px solid var(--brd);
+  vertical-align:middle;
+}
+#opsViews tbody tr:hover td,
+#bench tbody tr:hover td{ background:var(--surf); }
+#bench .bench-table-wrap tbody tr:nth-child(even) td{ background:rgba(0,119,182,.022); }
+
+/* nested PM detail table */
+#opsViews .nested-table{ background:var(--surf); border-radius:12px; }
+#opsViews .nested-table th{ background:#EAF2FA !important; }
+#opsViews .assignment-chip{
+  background:var(--surf);
+  border:1px solid var(--brd);
+  border-radius:999px;
+  color:var(--txt);
+}
+
+/* ---- 6. Chips, badges, availability, due-date colors ------- */
+/* position chips: keep their per-position hue but soften to pill */
+#opsViews .chip,
+#bench .chip{
+  border-radius:7px;
+  font-size:12px;
+  font-weight:700;
+  padding:4px 9px;
+}
+
+/* status badges → Azumo semantic palette */
+#opsViews .badge-green,#bench .badge-green{ background:rgba(30,158,99,.12); color:#1E9E63; }
+#opsViews .badge-blue, #bench .badge-blue { background:#E2F1FB; color:#0A6FA8; }
+#opsViews .badge-yellow,#bench .badge-yellow{ background:rgba(232,162,39,.15); color:#B97708; }
+#opsViews .badge-red,  #bench .badge-red  { background:rgba(239,68,68,.12); color:#D92D20; }
+
+/* availability text colors */
+#opsViews .avail-hi,#bench .avail-hi{ color:#1E9E63; font-weight:800; }
+#opsViews .avail-md,#bench .avail-md{ color:#B97708; font-weight:800; }
+#opsViews .avail-lo,#bench .avail-lo{ color:#D92D20; font-weight:800; }
+
+/* due-date / expiry colors */
+#opsViews .exp-soon,#bench .exp-soon{ color:#D92D20; font-weight:800; }
+#opsViews .exp-mid, #bench .exp-mid { color:#B97708; font-weight:800; }
+#opsViews .exp-ok,  #bench .exp-ok  { color:var(--muted); }
+
+/* people lists muted */
+#opsViews .ops-people{ color:var(--muted); }

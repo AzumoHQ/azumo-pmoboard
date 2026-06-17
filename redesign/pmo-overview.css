@@ -1,0 +1,183 @@
+/* ============================================================
+   PMO Overview — Azumo "People Ops" redesign
+   Production CSS. Self-contained: all design tokens are scoped
+   to .pmo-ov so this can drop into the existing index.html
+   without colliding with its current dark theme variables.
+
+   Fonts expected (load once in <head>, see INTEGRATION.md):
+     - Lato (body)                  Google Fonts
+     - Material Symbols Outlined    Google Fonts (icon font)
+     - Batica Sans (display, opt.)  self-hosted .otf, falls back to Lato
+   ============================================================ */
+
+.pmo-ov{
+  /* ---- Azumo People Ops design tokens (light) ---- */
+  --ov-page:#EBF3FB;
+  --ov-surface:#FFFFFF;
+  --ov-surface-2:#F4F9FD;
+  --ov-surface-3:#E9F2FA;
+  --ov-text:#15243C;
+  --ov-text-2:#566377;
+  --ov-text-3:#8A97AB;
+  --ov-border:#E7EEF6;
+  --ov-border-strong:#D6E1EC;
+  --ov-accent:#0077B6;
+  --ov-accent-2:#00B4D8;
+  --ov-accent-text:#0077B6;
+  --ov-link:#0077B6;
+  --ov-warm:#FFC64F;
+  --ov-warm-deep:#E8A227;
+  --ov-good:#1E9E63;
+  --ov-bad:#EF4444;
+  --ov-chip-bg:#E2F1FB;
+  --ov-chip-fg:#0A6FA8;
+  --ov-shadow:0 2px 8px rgba(7,24,59,.05),0 1px 2px rgba(7,24,59,.04);
+  --ov-shadow-md:0 16px 38px rgba(7,24,59,.10);
+  --ov-radius:18px;
+  --ov-radius-sm:14px;
+
+  --ov-font:'Lato',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --ov-font-display:'Batica Sans','Lato',sans-serif;
+
+  background:var(--ov-page);
+  color:var(--ov-text);
+  font-family:var(--ov-font);
+  -webkit-font-smoothing:antialiased;
+  padding:24px 28px 32px;
+}
+.pmo-ov *{box-sizing:border-box;}
+
+/* ---- Material Symbols helper ---- */
+.pmo-ov .msi{
+  font-family:'Material Symbols Outlined';
+  font-weight:normal;font-style:normal;line-height:1;
+  display:inline-flex;align-items:center;justify-content:center;
+  vertical-align:middle;white-space:nowrap;
+  font-variation-settings:'opsz' 24,'wght' 400,'GRAD' 0,'FILL' 0;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.pmo-ov-hero{
+  background:linear-gradient(120deg,#0A2A4A 0%,#0077B6 70%,#00B4D8 130%);
+  border-radius:var(--ov-radius);
+  padding:26px 30px;
+  color:#fff;
+  display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  box-shadow:var(--ov-shadow-md);
+  margin-bottom:18px;
+}
+.pmo-ov-hero-copy{min-width:0;flex:1 1 320px;}
+.pmo-ov-eyebrow{
+  font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.78);margin-bottom:8px;
+}
+.pmo-ov-hero h1{
+  font-family:var(--ov-font-display);
+  font-size:30px;font-weight:900;line-height:1.1;letter-spacing:0;margin:0 0 8px;
+}
+.pmo-ov-hero-meta{
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  font-size:13px;font-weight:600;color:rgba(255,255,255,.82);
+}
+.pmo-ov-hero-meta .dot{width:5px;height:5px;border-radius:999px;background:rgba(255,255,255,.55);}
+
+.pmo-ov-hero-stats{display:flex;gap:10px;flex-wrap:wrap;}
+.pmo-ov-hero-stat{
+  min-width:108px;padding:13px 16px;border-radius:var(--ov-radius-sm);
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.20);
+  backdrop-filter:blur(4px);
+}
+.pmo-ov-hero-stat .num{font-size:26px;font-weight:900;line-height:1;color:#fff;}
+.pmo-ov-hero-stat .lbl{
+  font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(255,255,255,.78);margin-top:6px;
+}
+
+/* ============================================================
+   KPI GRID
+   ============================================================ */
+.pmo-ov-kpis{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:16px;margin-bottom:18px;
+}
+.pmo-ov-kpi{
+  background:var(--ov-surface);border:1px solid var(--ov-border);
+  border-radius:16px;box-shadow:var(--ov-shadow);padding:18px;
+}
+.pmo-ov-kpi-top{display:flex;align-items:center;justify-content:space-between;}
+.pmo-ov-kpi-icon{
+  width:38px;height:38px;border-radius:11px;flex:0 0 38px;
+  background:var(--ov-chip-bg);color:var(--ov-accent-text);
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.pmo-ov-kpi-icon .msi{font-size:21px;}
+.pmo-ov-delta{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:12px;font-weight:800;border-radius:999px;padding:3px 9px;
+}
+.pmo-ov-delta .msi{font-size:14px;}
+.pmo-ov-delta.up{background:rgba(30,158,99,.12);color:var(--ov-good);}
+.pmo-ov-delta.down{background:rgba(239,68,68,.12);color:var(--ov-bad);}
+.pmo-ov-delta.flat{background:var(--ov-surface-3);color:var(--ov-text-3);}
+.pmo-ov-kpi-val{font-size:30px;font-weight:900;line-height:1;margin-top:16px;letter-spacing:-.01em;}
+.pmo-ov-kpi-lbl{font-size:13px;font-weight:600;color:var(--ov-text-2);margin-top:6px;}
+
+/* ============================================================
+   TWO-COLUMN PANELS (chart + composition)
+   ============================================================ */
+.pmo-ov-cols{
+  display:grid;grid-template-columns:1.55fr 1fr;gap:16px;
+}
+@media(max-width:960px){.pmo-ov-cols{grid-template-columns:1fr;}}
+.pmo-ov-panel{
+  background:var(--ov-surface);border:1px solid var(--ov-border);
+  border-radius:var(--ov-radius);box-shadow:var(--ov-shadow);
+  padding:20px 22px;
+}
+.pmo-ov-panel-head{margin-bottom:16px;}
+.pmo-ov-panel-eyebrow{
+  font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ov-accent-text);
+}
+.pmo-ov-panel-title{font-size:16px;font-weight:800;color:var(--ov-text);margin-top:3px;}
+
+/* ---- Headcount bar chart ---- */
+.pmo-ov-chart{display:flex;align-items:flex-end;gap:12px;height:210px;padding-top:14px;}
+.pmo-ov-bar-col{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:9px;min-width:0;}
+.pmo-ov-bar-val{font-size:12px;font-weight:800;color:var(--ov-text-2);}
+.pmo-ov-bar-val.is-current{color:var(--ov-accent);}
+.pmo-ov-bar{
+  width:100%;max-width:46px;border-radius:8px 8px 0 0;
+  background:linear-gradient(180deg,var(--ov-accent-2),var(--ov-accent));
+  transition:height .4s cubic-bezier(.4,0,.2,1);
+}
+.pmo-ov-bar.is-muted{background:var(--ov-surface-3);}
+.pmo-ov-bar-lbl{font-size:11px;font-weight:700;color:var(--ov-text-3);text-transform:uppercase;letter-spacing:.04em;}
+
+/* ---- Composition / generic rows ---- */
+.pmo-ov-comp-row{display:flex;align-items:center;gap:11px;margin-bottom:12px;}
+.pmo-ov-comp-row:last-child{margin-bottom:0;}
+.pmo-ov-comp-name{font-size:13.5px;font-weight:700;color:var(--ov-text);flex:0 0 120px;}
+.pmo-ov-comp-track{flex:1;height:10px;border-radius:999px;background:var(--ov-surface-3);overflow:hidden;}
+.pmo-ov-comp-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--ov-accent-2),var(--ov-accent));}
+.pmo-ov-comp-num{font-size:13.5px;font-weight:800;color:var(--ov-text);flex:0 0 34px;text-align:right;}
+
+/* ---- "requires data mapping" empty state ---- */
+.pmo-ov-needs-map{
+  border:1px dashed var(--ov-border-strong);border-radius:var(--ov-radius-sm);
+  background:var(--ov-surface-2);padding:22px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.pmo-ov-needs-map .msi{font-size:30px;color:var(--ov-accent-2);}
+.pmo-ov-needs-map .t{font-size:13.5px;font-weight:800;color:var(--ov-text);}
+.pmo-ov-needs-map .d{font-size:12.5px;font-weight:600;color:var(--ov-text-3);line-height:1.45;max-width:280px;}
+.pmo-ov-needs-map .tag{
+  font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ov-warm-deep);background:rgba(255,198,79,.18);
+  border-radius:999px;padding:3px 10px;
+}
+
+/* ---- skeleton (pre-data) ---- */
+.pmo-ov[data-state="loading"] .pmo-ov-skel-hide{visibility:hidden;}
