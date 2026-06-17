@@ -915,7 +915,24 @@ nav{
   border-bottom:1px solid var(--border-subtle)!important;
   box-shadow:var(--shadow-sm)!important;
 }
-.nav-logo{background:var(--white)!important;border-color:var(--border-subtle)!important;box-shadow:none!important}
+.nav-logo{position:relative}
+body.light .nav-logo{
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+  justify-content:flex-start!important;
+  min-width:104px;
+  padding:0!important;
+}
+body.light .nav-logo .nav-wordmark{display:none!important}
+body.light .nav-logo::before{
+  content:"azumo";
+  color:var(--highlight-blue);
+  font-size:26px;
+  font-weight:900;
+  line-height:1;
+  letter-spacing:0;
+}
 .nav-title,.sec-head h2,.tbl-head h3{color:var(--azumo-blue)!important}
 .nav-link{color:var(--fg-2)!important;border-radius:var(--radius-md)!important}
 .nav-link:hover,.nav-link.active{background:var(--blue-50)!important;color:var(--highlight-blue)!important}
