@@ -88,6 +88,7 @@ async function runRefresh(body = {}) {
       };
     } catch (error) {
       console.warn('EazyBI refresh skipped:', error.message);
+      warnings.push(`EazyBI metrics refresh skipped: ${error.message}`);
     }
   }
 
@@ -116,6 +117,7 @@ async function runRefresh(body = {}) {
       if (report) parsed.bench_by_month = report;
     } catch (error) {
       console.warn('EazyBI Bench by Month report skipped:', error.message);
+      warnings.push(`EazyBI Bench by Month report skipped: ${error.message}`);
     }
 
     try {
@@ -126,6 +128,7 @@ async function runRefresh(body = {}) {
       if (report) parsed.utilization_billing_rate = report;
     } catch (error) {
       console.warn('EazyBI Utilization Billing Rate report skipped:', error.message);
+      warnings.push(`EazyBI Utilization Billing Rate report skipped: ${error.message}`);
     }
 
   }
