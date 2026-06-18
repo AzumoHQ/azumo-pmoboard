@@ -63,6 +63,18 @@
     var nonbill = num(m.headcount_nonbillable);
     return (billable === null && nonbill === null) ? null : (billable || 0) + (nonbill || 0);
   }
+  // "Headcount Total" must equal the Billable + Non-billable breakdown shown in its subtitle.
+  // metricTotalPeople() returns a distinct-assignee count, which is a different definition and
+  // does not necessarily match (and can be lower than) the Billable figure. Use the sum of the
+  // headcount metrics so the card stays internally consistent for any snapshot. Falls back to
+  // metricTotalPeople() only when neither headcount metric is present.
+  function headcountTotalFromMetrics(snapshot) {
+    var m = snapshot && snapshot.metrics || {};
+    var billable = num(m.headcount_billable);
+    var nonbill = num(m.headcount_nonbillable);
+    if (billable === null && nonbill === null) return metricTotalPeople(snapshot);
+    return (billable || 0) + (nonbill || 0);
+  }
   function metricActiveClients(snapshot) {
     var m = snapshot && snapshot.metrics || {};
     var direct = num(m.active_clients);
@@ -360,8 +372,8 @@
     var pm = prevSnapshot && prevSnapshot.metrics || null;
     var clients = metricActiveClients(snapshot);
     var pClients = prevSnapshot ? metricActiveClients(prevSnapshot) : null;
-    var totalHeadcount = metricTotalPeople(snapshot);
-    var pTotalHeadcount = prevSnapshot ? metricTotalPeople(prevSnapshot) : null;
+    var totalHeadcount = headcountTotalFromMetrics(snapshot);
+    var pTotalHeadcount = prevSnapshot ? headcountTotalFromMetrics(prevSnapshot) : null;
     var headcountSub = (num(m.headcount_billable) !== null && num(m.headcount_nonbillable) !== null)
       ? intStr(m.headcount_billable) + ' Billable · ' + intStr(m.headcount_nonbillable) + ' Non-billable'
       : '';
