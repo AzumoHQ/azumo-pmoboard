@@ -1,3 +1,6 @@
+CREATE SCHEMA IF NOT EXISTS pmo;
+SET search_path TO pmo, public;
+
 CREATE TABLE IF NOT EXISTS pmo_meta (
   key text PRIMARY KEY,
   value text NOT NULL
