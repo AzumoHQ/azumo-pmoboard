@@ -6,7 +6,7 @@ const {
   summarizeEazyBIReport
 } = require('../lib/eazybi-client');
 const { fetchHarvestSnapshot, hasHarvestConfig, harvestConfigStatus } = require('../lib/harvest-client');
-const { getAccountCoverageIssues, getIssues } = require('../lib/jira-client');
+const { getAccountCoverageIssues, getIssues, countIssues } = require('../lib/jira-client');
 const { canRefresh, getSessionUser } = require('../lib/auth');
 const { getDashboardData, saveSnapshot } = require('../lib/data-store');
 const {
@@ -89,6 +89,28 @@ async function runRefresh(body = {}) {
     } catch (error) {
       console.warn('EazyBI refresh skipped:', error.message);
       warnings.push(`EazyBI metrics refresh skipped: ${error.message}`);
+    }
+  }
+
+  // Headcount Billable / Non-Billable from an auditable Jira filter (active billable
+  // Epics, excluding freelancers) takes precedence over the EazyBI aggregate column,
+  // which could include freelancers/inactive Epics. Enable by configuring
+  // JIRA_HEADCOUNT_BILLABLE_JQL / JIRA_HEADCOUNT_NONBILLABLE_JQL. Explicit body
+  // overrides still win; on error the refresh continues and keeps the EazyBI value.
+  const billableJql = body.headcountBillableJql || process.env.JIRA_HEADCOUNT_BILLABLE_JQL;
+  const nonBillableJql = body.headcountNonBillableJql || process.env.JIRA_HEADCOUNT_NONBILLABLE_JQL;
+  if (billableJql && nonBillableJql) {
+    try {
+      const [hb, hnb] = await Promise.all([countIssues(billableJql), countIssues(nonBillableJql)]);
+      const jqlHeadcount = {};
+      if (!explicitOverrideKeys.has('headcount_billable')) jqlHeadcount.headcount_billable = hb;
+      if (!explicitOverrideKeys.has('headcount_nonbillable')) jqlHeadcount.headcount_nonbillable = hnb;
+      if (!explicitOverrideKeys.has('headcount_total')) jqlHeadcount.headcount_total = hb + hnb;
+      ['headcount_billable', 'headcount_nonbillable', 'headcount_total'].forEach((key) => authoritativeMetricKeys.add(key));
+      overrides = { ...overrides, ...jqlHeadcount };
+    } catch (error) {
+      console.warn('Jira headcount JQL skipped:', error.message);
+      warnings.push(`Jira headcount JQL skipped: ${error.message}`);
     }
   }
 
