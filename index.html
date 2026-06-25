@@ -5466,7 +5466,7 @@ function harvestHoursBillingHubNames(incomplete, noDescriptionRows=[]){
   }
   const noDescriptionNames = [...new Set((noDescriptionRows || []).map(row => row.name).filter(Boolean))].sort((a,b) => a.localeCompare(b));
   if(noDescriptionNames.length){
-    sections.push(`No description\n${noDescriptionNames.map(name => `• ${name}`).join("\n")}`);
+    sections.push(`Empty\n${noDescriptionNames.map(name => `• ${name}`).join("\n")}`);
   }
   if(!sections.length) return "All active users are complete in Harvest and all descriptions are filled.";
   return sections.join("\n\n");
@@ -5478,7 +5478,7 @@ function harvestHoursStatusTag(row){
 }
 function harvestHoursDescriptionTag(row){
   return row.missingDescription
-    ? `<span class="badge badge-red">No description</span>`
+    ? `<span class="badge badge-red">Empty</span>`
     : `<span class="badge badge-green">OK</span>`;
 }
 function renderHarvestHoursReport(){
@@ -5560,7 +5560,7 @@ function hhCsvCell(value){
 function exportHarvestHoursCSV(){
   const from = document.getElementById("hhDateFrom")?.value || "";
   const to = document.getElementById("hhDateTo")?.value || "";
-  const rows = [["Name","Client","Hours loaded","Days filled","Description","Percent complete","Status"]].concat(harvestHoursReportData.map(row => [row.name,row.clients.join(", "),row.hours,row.daysFilled || 0,row.missingDescription ? "No description" : "OK",`${row.pct}%`,row.complete ? "Complete" : row.pct >= 50 ? "Partial" : "Incomplete"]));
+  const rows = [["Name","Client","Hours loaded","Days filled","Description","Percent complete","Status"]].concat(harvestHoursReportData.map(row => [row.name,row.clients.join(", "),row.hours,row.daysFilled || 0,row.missingDescription ? "Empty" : "OK",`${row.pct}%`,row.complete ? "Complete" : row.pct >= 50 ? "Partial" : "Incomplete"]));
   const csv = rows.map(row => row.map(hhCsvCell).join(",")).join("\n");
   const link = document.createElement("a");
   link.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8;"}));
