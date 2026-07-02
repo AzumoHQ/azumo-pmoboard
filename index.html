@@ -1347,7 +1347,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 
 <!-- ── OVERVIEW ─────────────────────────────── -->
 <section id="overview">
-  <div id="pmoOverview" class="pmo-ov" data-state="loading" aria-label="PMO overview">
+  <div id="overdueAlert" style="display:none;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;align-items:center;justify-content:space-between;gap:1rem"><span style="color:#991B1B;font-weight:700">🚨 <span id="overdueAlertCount"></span> overdue assignment(s) require action</span><button class="btn btn-primary btn-sm" onclick="goTo('dueDates')">View Due Dates →</button></div><div id="pmoOverview" class="pmo-ov" data-state="loading" aria-label="PMO overview">
     <div class="pmo-ov-hero">
       <div class="pmo-ov-hero-copy">
         <div class="pmo-ov-eyebrow">Azumo · Operations Command Center</div>
@@ -2302,6 +2302,18 @@ function uniqueModuleSections(){ return allModuleSections().filter(section => se
 function sidebarNavConfig(){
   const pendingCount = latest?.pending_list?.length || 0;
   const dueAlertCount = latest ? dueRowsForActionCenter().length : 0;
+  // Overdue alert banner
+  const overdueRows = dueRowsForActionCenter().filter(r => r.severity === 'critical');
+  const overdueAlertEl = document.getElementById('overdueAlert');
+  const overdueAlertCount = document.getElementById('overdueAlertCount');
+  if (overdueAlertEl) {
+    if (overdueRows.length > 0) {
+      if (overdueAlertCount) overdueAlertCount.textContent = overdueRows.length;
+      overdueAlertEl.style.display = 'flex';
+    } else {
+      overdueAlertEl.style.display = 'none';
+    }
+  }
   const qaCount = countOpenPmoActions();
   const entries = [
     {id:'generalGroup', icon:'⚙️', label:'General', children:[
