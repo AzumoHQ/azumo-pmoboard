@@ -1643,6 +1643,34 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 </section>
 
 <!-- ── ACCOUNT COVERAGE ───────────────────────── -->
+<section id="psaProjectStatus">
+  <div class="sec-head">
+    <div class="sec-icon">📈</div>
+    <h2>Project Status</h2>
+    <div class="sec-tag">Live from Jira PSA reports</div>
+  </div>
+  <div class="qa-wrap">
+    <div class="qa-toolbar">
+      <div>
+        <h3 style="font-size:.95rem;margin-bottom:.25rem">Last reported status per project</h3>
+        <div class="mc-sub">Projects with no report in 30+ days are flagged as stale.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="loadPsaProjectStatus(true)">Refresh</button>
+      </div>
+    </div>
+    <div class="action-summary" id="psaProjectStatusSummaryCards"></div>
+    <div id="psaProjectStatusLoading" style="padding:2rem;text-align:center;color:var(--muted)">Loading project reports from Jira…</div>
+    <div id="psaProjectStatusError" style="display:none;padding:1rem;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:12px;color:#991B1B;margin-bottom:1rem"></div>
+    <div class="fc-table-wrap" id="psaProjectStatusTableWrap" style="display:none">
+      <table>
+        <thead><tr><th>Project</th><th>PM Assigned</th><th>Last Report</th><th>Days Since</th><th>Status</th><th>Link</th></tr></thead>
+        <tbody id="psaProjectStatusTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
 <section id="accountCoverage">
   <div class="sec-head">
     <div class="sec-icon">🤝</div>
@@ -2284,7 +2312,7 @@ function sectionAllowedForCurrentRole(id){
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
   if(['executive','viewer','c-level','clevel','hr'].includes(role)) return true;
-  if(role === 'pm') return ['overview','opsViews','forecast','harvestHours','harvestAccess'].includes(id);
+  if(role === 'pm') return ['overview','opsViews','forecast','harvestHours','harvestAccess','psaProjectStatus'].includes(id);
   if(role === 'csm') return ['overview','opsViews','bench','accountCoverage','forecast','harvestHours','harvestAccess'].includes(id);
   if(role === 'tl') return ['overview','opsViews','accountCoverage','forecast'].includes(id);
   if(role === 'assignee') return ['overview','opsViews','forecast'].includes(id);
@@ -2327,7 +2355,10 @@ function sidebarNavConfig(){
       {id:'dueDates', icon:'📅', label:'Due Dates', count:dueAlertCount},
       {id:'forecast', icon:'🔮', label:'Forecast'}
     ]},
-    {id:'accountCoverage', icon:'📋', label:'Accounts Coverage'},
+    {id:'clientsGroup', icon:'🏛️', label:'Clients', children:[
+      {id:'psaProjectStatus', icon:'📈', label:'Project Status'},
+      {id:'accountCoverage', icon:'📋', label:'Accounts Coverage'}
+    ]},
     {id:'harvestGroup', icon:'🌾', label:'Harvest', children:[
       {id:'harvestHours', icon:'⏱️', label:'Control'},
       {id:'harvestAccess', icon:'🗂️', label:'Assignments'}
@@ -2421,6 +2452,7 @@ function activateModuleTab(id, options={}){
     section.setAttribute('aria-hidden', active ? 'false' : 'true');
   });
   renderModuleTabButtons(activeId);
+  if(activeId === 'psaProjectStatus') loadPsaProjectStatus();
   if(options.scroll !== false){
     const main = document.querySelector('main');
     const moduleTabs = document.querySelector('.side-index');
@@ -6038,6 +6070,77 @@ function accountCoverageRows(){
     };
   }).sort((a,b)=>a.client.localeCompare(b.client));
 }
+let psaProjectStatusData = null;
+let psaProjectStatusLoaded = false;
+
+async function loadPsaProjectStatus(forceRefresh=false){
+  if(psaProjectStatusLoaded && !forceRefresh) return;
+  const loadingEl = document.getElementById('psaProjectStatusLoading');
+  const errorEl = document.getElementById('psaProjectStatusError');
+  const tableWrap = document.getElementById('psaProjectStatusTableWrap');
+  if(loadingEl) loadingEl.style.display = 'block';
+  if(errorEl){ errorEl.style.display = 'none'; errorEl.textContent = ''; }
+  if(tableWrap) tableWrap.style.display = 'none';
+  try{
+    const response = await fetch('/api/psa-reports', {cache:'no-store', credentials:'same-origin'});
+    const result = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    psaProjectStatusData = result.projects || [];
+    psaProjectStatusLoaded = true;
+    renderPsaProjectStatusModule();
+  }catch(error){
+    if(errorEl){
+      errorEl.style.display = 'block';
+      errorEl.textContent = `Could not load project reports: ${error.message}`;
+    }
+  }finally{
+    if(loadingEl) loadingEl.style.display = 'none';
+  }
+}
+window.loadPsaProjectStatus = loadPsaProjectStatus;
+
+function psaProjectJiraUrl(epicKey){
+  const base = (typeof JIRA_BASE_URL !== 'undefined' && JIRA_BASE_URL) || (PMO?.jira_base_url) || '';
+  return base ? `${base}/browse/${epicKey}` : '#';
+}
+
+function renderPsaProjectStatusModule(){
+  const rows = psaProjectStatusData || [];
+  const tableWrap = document.getElementById('psaProjectStatusTableWrap');
+  const tbody = document.getElementById('psaProjectStatusTbody');
+  const cards = document.getElementById('psaProjectStatusSummaryCards');
+  if(!tbody) return;
+
+  const staleCount = rows.filter(r => r.stale).length;
+  const total = rows.length;
+
+  if(cards){
+    cards.innerHTML = [
+      `<div class="action-card"><div class="action-label">Projects tracked</div><div class="action-value">${total}</div><div class="action-copy">Active + closed PSA projects</div></div>`,
+      `<div class="action-card ${staleCount ? 'warning' : 'ok'}"><div class="action-label">Missing recent report</div><div class="action-value">${staleCount}</div><div class="action-copy">30+ days without a report</div></div>`
+    ].join('');
+  }
+
+  tableWrap.style.display = '';
+  tbody.innerHTML = rows.map(row => {
+    const pmName = row.pmAssigned?.name || '—';
+    const lastDate = row.lastReport?.date || null;
+    const days = row.daysSinceLastReport;
+    const statusLabel = row.lastReport?.projectStatus || '—';
+    const staleBadge = row.stale
+      ? `<span class="badge badge-red">${lastDate ? `${days}d ago` : 'No report'}</span>`
+      : `<span class="badge badge-green">${days != null ? `${days}d ago` : '—'}</span>`;
+    return `<tr>
+      <td style="font-weight:900">${esc(row.epicName || row.epicKey)}</td>
+      <td>${esc(pmName)}</td>
+      <td>${esc(lastDate || '—')}</td>
+      <td>${staleBadge}</td>
+      <td>${esc(statusLabel)}</td>
+      <td><a class="btn btn-ghost btn-sm" href="${psaProjectJiraUrl(row.epicKey)}" target="_blank" rel="noopener noreferrer">Open in Jira</a></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No projects found.</td></tr>';
+}
+
 function renderAccountCoverageModule(){
   if(!latest) return;
   const sourceTag = document.getElementById('accountCoverageTag');
