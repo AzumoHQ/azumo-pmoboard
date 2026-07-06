@@ -144,14 +144,6 @@ module.exports = async function authHandler(req, res) {
     return;
   }
 
-  if (req.method === 'GET' && action === 'debug-env') {
-    res.status(200).json({
-      VERCEL_ENV: process.env.VERCEL_ENV || null,
-      PMO_DEV_BYPASS: process.env.PMO_DEV_BYPASS || null
-    });
-    return;
-  }
-
   if (req.method === 'GET' && (!action || action === 'me')) {
     try {
       const context = await getSessionContext(req);
