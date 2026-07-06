@@ -1,5 +1,6 @@
 const {
   exportReport,
+  exportEmbeddedReport,
   fetchBenchByMonthReport,
   fetchUtilizationBillingRateReport,
   hasEazyBIConfig,
@@ -63,7 +64,12 @@ async function runRefresh(body = {}) {
 
   if (hasEazyBIConfig() && body.useEazyBI !== false && (body.eazybiReportId || process.env.EAZYBI_REPORT_ID)) {
     try {
-      const eazybiReport = await exportReport(body.eazybiReportId, body.eazybiAccountId);
+      const eazybiEmbedToken = process.env.EAZYBI_UTILIZATION_BILLING_TOKEN;
+      const eazybiReportId = body.eazybiReportId || process.env.EAZYBI_UTILIZATION_BILLING_REPORT_ID || process.env.EAZYBI_REPORT_ID;
+      const eazybiAccountId = body.eazybiAccountId || process.env.EAZYBI_UTILIZATION_BILLING_ACCOUNT_ID || process.env.EAZYBI_ACCOUNT_ID;
+      const eazybiReport = eazybiEmbedToken
+        ? await exportEmbeddedReport(eazybiReportId, eazybiAccountId, eazybiEmbedToken)
+        : await exportReport(body.eazybiReportId, body.eazybiAccountId);
       const eazybiMetrics = summarizeEazyBIReport(eazybiReport);
       const hasUsefulEazyBIMetrics = [
         eazybiMetrics.utilization_assignment,
