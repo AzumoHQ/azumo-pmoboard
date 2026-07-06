@@ -3223,7 +3223,7 @@ function normalizeUtilBillingReport(report={}){
     },
     raw_table: report.raw_table || {
       columns:['Month','Utilization Billing %'],
-      rows: modeled.map(row => [row.month, `${row.utilization_billing_rate}%`])
+      rows: modeledBase.map(row => [row.month, `${row.utilization_billing_rate}%`])
     }
   };
 }
