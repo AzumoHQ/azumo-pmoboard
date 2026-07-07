@@ -6153,8 +6153,7 @@ async function loadPsaProjectStatus(forceRefresh=false){
 window.loadPsaProjectStatus = loadPsaProjectStatus;
 
 function psaProjectJiraUrl(epicKey){
-  const base = (typeof JIRA_BASE_URL !== 'undefined' && JIRA_BASE_URL) || (PMO?.jira_base_url) || '';
-  return base ? `${base}/browse/${epicKey}` : '#';
+  return jiraIssueUrl(epicKey) || '#';
 }
 
 function renderPsaProjectStatusModule(){
