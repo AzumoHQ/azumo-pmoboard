@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/png" href="/assets/azumo-favicon.png">
+<link rel="apple-touch-icon" href="/assets/azumo-favicon.png">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>PMO Board — Azumo</title>
@@ -3427,6 +3429,43 @@ function renderInternalProjectsReport(){
 }
 window.toggleInternalProjects = toggleInternalProjects;
 function harvestPayload(){ return latest?.harvest || {}; }
+function myEffectiveEmail(){
+  return String(effectiveSessionUser()?.email || '').trim().toLowerCase();
+}
+function myScopedClientKeys(){
+  const role = effectiveUserRole();
+  if(['admin','pmo','executive','c-level','clevel','viewer'].includes(role)) return null;
+  const email = myEffectiveEmail();
+  if(!email) return new Set();
+  const fieldByRole = {
+    pm: 'pm_assigned_email',
+    csm: 'csm_assigned_email',
+    tl: 'tl_assigned_email'
+  };
+  const field = fieldByRole[role];
+  if(!field) return new Set();
+  const keys = new Set();
+  (latest?.account_coverage || []).forEach(row => {
+    if(String(row[field] || '').trim().toLowerCase() === email){
+      const key = row.client_key || normalizeClientKey(row.client);
+      if(key) keys.add(key);
+    }
+  });
+  return keys;
+}
+function isHarvestScopedToSelf(){
+  return effectiveUserRole() === 'assignee';
+}
+function harvestRowAllowedForCurrentUser(row = {}){
+  if(isHarvestScopedToSelf()){
+    return harvestIdentityKey(row) === harvestIdentityKey({email: myEffectiveEmail()});
+  }
+  const scopedKeys = myScopedClientKeys();
+  if(scopedKeys === null) return true;
+  const clientKey = normalizeClientKey(row.client_name || row.client || '');
+  return clientKey ? scopedKeys.has(clientKey) : false;
+}
+
 function harvestIdentityKey(row = {}){
   const email = String(row.email || row.user_email || '').trim().toLowerCase();
   if(email) return `email:${email}`;
@@ -3497,7 +3536,9 @@ function renderHarvestAccess(){
   const activeUsers = (harvest.users || []).filter(user => user.is_active !== false);
   const rawActiveAssignments = (harvest.user_assignments || []).filter(row => row.is_active !== false && row.project_is_active !== false);
   const nonBillableTeamIndex = harvestNonBillableTeamIndex();
-  const activeAssignments = rawActiveAssignments.filter(row => !isHarvestNonBillableTeamMember(row, nonBillableTeamIndex));
+  const activeAssignments = rawActiveAssignments
+    .filter(row => !isHarvestNonBillableTeamMember(row, nonBillableTeamIndex))
+    .filter(row => harvestRowAllowedForCurrentUser(row));
   const hiddenNonBillableTeamRows = rawActiveAssignments.length - activeAssignments.length;
   const harvestStatus = serviceHealth?.harvest_status || {};
   const missingHarvest = harvestStatus.missing || [];
@@ -3525,7 +3566,10 @@ function renderHarvestAccess(){
     }
   });
 
+  const scopedToSelf = isHarvestScopedToSelf();
+  const myEmail = myEffectiveEmail();
   const userRows = activeUsers
+    .filter(user => !scopedToSelf || String(user.email || '').trim().toLowerCase() === myEmail)
     .slice()
     .sort((a,b)=>String(a.name || '').localeCompare(String(b.name || '')))
     .map(user => {
@@ -5472,6 +5516,14 @@ function setHarvestHoursStatus(message, type="info"){
   el.style.display = message ? "block" : "none";
   el.innerHTML = message ? `<div class="${type === "error" ? "err-box" : "info-box"}" style="margin:0">${esc(message)}</div>` : "";
 }
+function harvestHoursRowAllowedForCurrentUser(row = {}){
+  if(isHarvestScopedToSelf()){
+    return normalizeIdentity(row.name) === normalizeIdentity(effectiveSessionUser()?.name || effectiveSessionUser()?.email || '');
+  }
+  const scopedKeys = myScopedClientKeys();
+  if(scopedKeys === null) return true;
+  return (row.clients || []).some(client => scopedKeys.has(normalizeClientKey(client)));
+}
 function harvestHoursClientMap(){
   const map = {};
   try{
@@ -5588,7 +5640,8 @@ async function runHarvestHoursReport(){
       const ratio = expected ? (hours / expected) : 0;
       const pct = Math.round(ratio * 100);
       return {name, hours, daysFilled, missingDescription, expected, pct, complete:ratio >= threshold, clients:clientMap[normalizeIdentity(name)] || []};
-    }).sort((a,b) => a.pct - b.pct || a.name.localeCompare(b.name));
+    }).filter(row => harvestHoursRowAllowedForCurrentUser(row))
+      .sort((a,b) => a.pct - b.pct || a.name.localeCompare(b.name));
     renderHarvestHoursReport();
     setHarvestHoursStatus(`Report generated from Harvest. ${harvestHoursReportData.length} active users reviewed. Target for selected range: ${expected}h (${rangeTarget.businessDays} business day${rangeTarget.businessDays === 1 ? "" : "s"} × ${Math.round(rangeTarget.dailyExpected * 10) / 10}h/day).`, "info");
   }catch(error){
