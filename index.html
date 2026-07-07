@@ -3618,7 +3618,8 @@ function renderHarvestAccess(){
   }
 
   const projectsByClient = new Map();
-  activeProjects.forEach(project => {
+  const visibleProjects = activeProjects.filter(project => harvestRowAllowedForCurrentUser(project));
+  visibleProjects.forEach(project => {
     const projectKey = harvestProjectKey(project);
     const assignments = assignmentsByProject.get(projectKey) || [];
     const people = assignments.map(row => row.user_name || row.user_email).filter(Boolean);
@@ -3669,8 +3670,8 @@ function renderHarvestAccess(){
   const visibleProjectCount = clientGroups.reduce((sum, client) => sum + client.projects.length, 0);
   if(projectsSummary){
     projectsSummary.textContent = query
-      ? `${visibleProjectCount} of ${activeProjects.length} active projects · ${clientGroups.length} matching clients`
-      : `${activeProjects.length} active projects under ${projectsByClient.size} clients · ${activeAssignments.length} billable team access rows${hiddenNonBillableTeamRows ? ` · ${hiddenNonBillableTeamRows} non-billable hidden` : ''}`;
+      ? `${visibleProjectCount} of ${visibleProjects.length} active projects · ${clientGroups.length} matching clients`
+      : `${visibleProjects.length} active projects under ${projectsByClient.size} clients · ${activeAssignments.length} billable team access rows${hiddenNonBillableTeamRows ? ` · ${hiddenNonBillableTeamRows} non-billable hidden` : ''}`;
   }
 
   const list = document.getElementById('harvestClientsList');
@@ -3680,7 +3681,7 @@ function renderHarvestAccess(){
     list.innerHTML = '';
     if(empty){
       empty.style.display = '';
-      empty.textContent = activeProjects.length ? 'No active Harvest projects match the current search.' : 'No active Harvest projects loaded yet.';
+      empty.textContent = visibleProjects.length ? 'No active Harvest projects match the current search.' : 'No active Harvest projects loaded yet.';
     }
     return;
   }
