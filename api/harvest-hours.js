@@ -97,14 +97,6 @@ function normalizeEntry(entry = {}) {
 }
 
 module.exports = async function harvestHoursHandler(req, res) {
-  if (req.query.debug === '1') {
-    res.status(200).json({
-      HARVEST_ACCOUNT_ID: process.env.HARVEST_ACCOUNT_ID ? 'SET' : 'MISSING',
-      HARVEST_ACCESS_TOKEN: process.env.HARVEST_ACCESS_TOKEN ? 'SET' : 'MISSING',
-      VERCEL_ENV: process.env.VERCEL_ENV
-    });
-    return;
-  }
 
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
