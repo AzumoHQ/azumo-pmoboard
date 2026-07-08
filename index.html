@@ -1658,6 +1658,14 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         <div class="mc-sub">Projects with no report in 30+ days are flagged as stale.</div>
       </div>
       <div class="btn-row">
+        <div class="filter-field">
+          <label for="psaProjectStatusFilter">View</label>
+          <select id="psaProjectStatusFilter" onchange="setPsaProjectStatusFilter(this.value)">
+            <option value="current">Current</option>
+            <option value="former">Former (closed)</option>
+            <option value="all">All</option>
+          </select>
+        </div>
         <button class="btn btn-ghost btn-sm" onclick="loadPsaProjectStatus(true)">Refresh</button>
       </div>
     </div>
@@ -6126,6 +6134,13 @@ function accountCoverageRows(){
 }
 let psaProjectStatusData = null;
 let psaProjectStatusLoaded = false;
+let psaProjectStatusFilter = 'current';
+
+function setPsaProjectStatusFilter(value){
+  psaProjectStatusFilter = value;
+  renderPsaProjectStatusModule();
+}
+window.setPsaProjectStatusFilter = setPsaProjectStatusFilter;
 
 async function loadPsaProjectStatus(forceRefresh=false){
   if(psaProjectStatusLoaded && !forceRefresh) return;
@@ -6158,7 +6173,12 @@ function psaProjectJiraUrl(epicKey){
 }
 
 function renderPsaProjectStatusModule(){
-  const rows = psaProjectStatusData || [];
+  const allRows = psaProjectStatusData || [];
+  const rows = psaProjectStatusFilter === 'all'
+    ? allRows
+    : psaProjectStatusFilter === 'former'
+      ? allRows.filter(r => r.isClosed)
+      : allRows.filter(r => !r.isClosed);
   const tableWrap = document.getElementById('psaProjectStatusTableWrap');
   const tbody = document.getElementById('psaProjectStatusTbody');
   const cards = document.getElementById('psaProjectStatusSummaryCards');

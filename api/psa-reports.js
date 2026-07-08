@@ -50,6 +50,7 @@ module.exports = async function psaReportsHandler(req, res) {
       return {
         ...project,
         daysSinceLastReport: days,
+        isClosed,
         stale: !isClosed && (days === null || days >= STALE_DAYS_THRESHOLD)
       };
     });
