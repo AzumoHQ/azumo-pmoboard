@@ -2257,6 +2257,9 @@ function renderDesignerOverview(){
       user: typeof effectiveSessionUser === 'function' ? effectiveSessionUser() : currentUser,
       lastRefresh: {at: PMO.last_refresh_at, label: lastUpdated || PMO.last_refresh}
     });
+    renderOpsCharts(typeof effectiveSessionUser === 'function' ? effectiveSessionUser() : currentUser);
+    renderActivityFeed(typeof effectiveSessionUser === 'function' ? effectiveSessionUser() : currentUser);
+    return;
   }
   const set = (id, value) => {
     const el = document.getElementById(id);
@@ -2291,7 +2294,7 @@ function renderDesignerOverview(){
 
 
 function renderOpsCharts(user) {
-  var host = document.getElementById('overviewActivityFeed');
+  var host = document.getElementById('pmoOverviewCharts') || document.getElementById('overviewActivityFeed');
   if (!host) return;
   var ovRole = String((user && user.role) || (typeof effectiveUserRole === 'function' ? effectiveUserRole() : '') || '').trim().toLowerCase();
   var isPmoOrExec = ['pmo','admin','executive'].indexOf(ovRole) !== -1;
