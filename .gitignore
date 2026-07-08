@@ -8,3 +8,7 @@ npm-debug.log*
 .env*.local
 .vercel
 .env*
+activity_feed_patch2.py
+overview_pm_patch.py
+scripts/audit-design-system.js
+web/
