@@ -1365,6 +1365,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     <div class="pmo-ov-kpis" id="pmoOverviewKpis"></div>
     <div class="pmo-ov-details" id="pmoOverviewDetails" aria-live="polite" hidden></div>
   </div>
+<div id="overviewActivityFeed" hidden></div>
 </section>
 
 <!-- ── NEW SEARCHES REPORTS ─────────────────── -->
@@ -2283,6 +2284,66 @@ function renderDesignerOverview(){
   }
   renderOverviewHeadcountBars();
   renderOverviewDiscipline();
+  renderActivityFeed(PMO && PMO.user);
+}
+
+
+function renderActivityFeed(user) {
+  const host = document.getElementById('overviewActivityFeed');
+  if (!host) return;
+  const latest = PMO && PMO.latest;
+  const events = (latest && latest.activity_log) || [];
+  if (!events.length) { host.hidden = true; return; }
+  host.hidden = false;
+
+  const role = String((user && user.role) || effectiveUserRole() || '').toLowerCase();
+  const isPmo = ['pmo','admin','executive'].includes(role);
+  const email = (user && user.email || '').toLowerCase();
+
+  const filtered = events.filter(e => {
+    if (isPmo) return true;
+    if (role === 'pm') return (e.project_manager||'').toLowerCase().includes(email.split('@')[0]);
+    if (role === 'csm' || role === 'tl') return effectiveOwnedClientKeys && effectiveOwnedClientKeys().has((e.client||'').toLowerCase().replace(/\s+/g,'-'));
+    return (e.assignee||'').toLowerCase().includes(email.split('@')[0]);
+  }).slice(0, 20);
+
+  if (!filtered.length) { host.hidden = true; return; }
+
+  const typeIcon = {
+    new_assignment: '⊕', assignment_done: '✓', pct_change: '~',
+    due_change: '◷', psa_report: '↑'
+  };
+  const typeColor = {
+    new_assignment: 'var(--success)',
+    assignment_done: 'var(--fg-3)',
+    pct_change: 'var(--warning)',
+    due_change: 'var(--saffron)',
+    psa_report: 'var(--highlight-blue)'
+  };
+
+  function fmt(iso) {
+    const d = new Date(iso);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const diff = Math.floor((today - new Date(d.toDateString())) / 86400000);
+    if (diff === 0) return d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+    if (diff === 1) return 'Yesterday';
+    return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  }
+
+  host.innerHTML = `
+    <div style="margin-top:24px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3)">Live activity</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${filtered.map(e => `
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--bg-2);border:1px solid var(--border-subtle);border-radius:10px">
+            <span style="font-size:13px;min-width:28px;text-align:center;color:${typeColor[e.type]||'var(--fg-3)'};margin-top:1px">${typeIcon[e.type]||'·'}</span>
+            <span style="flex:1;font-size:13px;color:var(--fg-1);line-height:1.45">${esc(e.label)}</span>
+            <span style="font-size:11px;color:var(--fg-mute);white-space:nowrap;margin-top:2px">${fmt(e.ts)}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
 }
 
 const THEME_KEY = 'pmo_dashboard_theme';
