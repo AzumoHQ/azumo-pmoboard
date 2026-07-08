@@ -534,6 +534,75 @@
       +   clientHtml
       + '</div>'
       + '</div>';
+
+    // Operative overlay (feature-flagged)
+    if (global.PMO_FLAGS && global.PMO_FLAGS.overviewOperative) {
+      renderOperativeOverview(host, user);
+    }
+  }
+
+  /* ---- renderOperativeOverview ---- */
+  function renderOperativeOverview(host, user) {
+    var status = document.createElement('p');
+    status.className = 'pmo-ov-chart-sub';
+    status.style.padding = '1rem 0';
+    status.textContent = 'Loading projects…';
+    host.appendChild(status);
+
+    fetch('/api/pm-overview', { credentials: 'same-origin', cache: 'no-store' })
+      .then(function(r) {
+        if (r.status === 401) { status.textContent = 'Session expired. Please sign in again.'; return null; }
+        return r.json();
+      })
+      .then(function(data) {
+        if (!data) return;
+        if (!data.projects || !data.projects.length) {
+          status.textContent = 'No active projects found for your account.';
+          return;
+        }
+        host.removeChild(status);
+
+        var wrap = document.createElement('div');
+        wrap.className = 'pmo-ov-charts-grid';
+        wrap.style.marginTop = '1rem';
+
+        data.projects.forEach(function(proj) {
+          var isInProgress = proj.status === 'In Progress';
+          var billing = proj.billingPct !== null ? proj.billingPct + '%' : '—';
+          var lastRpt = proj.lastReport && proj.lastReport.date ? proj.lastReport.date.slice(0, 10) : null;
+          var daysSince = lastRpt ? Math.floor((Date.now() - new Date(lastRpt)) / 86400000) : null;
+          var rptColor = daysSince === null ? '#94A3B8' : daysSince <= 14 ? '#10B981' : daysSince <= 30 ? '#F59E0B' : '#EF4444';
+          var rptLabel = daysSince === null ? 'No report' : daysSince + 'd ago';
+
+          var assigneeList = (proj.assignments || []).slice(0, 6).map(function(a) {
+            return '<li style="font-size:.75rem;color:var(--ov-text-2);padding:2px 0">'
+              + esc(a.name || '—')
+              + (a.position ? ' <span style="color:var(--ov-text-3)">(' + esc(a.position) + ')</span>' : '')
+              + (a.assignmentPct !== null ? ' · ' + a.assignmentPct + '%' : '')
+              + '</li>';
+          }).join('');
+
+          var card = document.createElement('div');
+          card.className = 'pmo-ov-chart-panel';
+          card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem">'
+            + '<div>'
+            +   '<div class="pmo-ov-chart-title">' + esc(proj.epicName || proj.epicKey || '—') + '</div>'
+            +   '<div class="pmo-ov-chart-sub" style="margin-bottom:0">' + esc(proj.client || '') + (billing !== '—' ? ' · ' + billing + ' billing' : '') + '</div>'
+            + '</div>'
+            + '<span style="font-size:.7rem;font-weight:800;color:' + rptColor + ';white-space:nowrap;margin-left:.5rem">'
+            +   esc(rptLabel)
+            + '</span>'
+            + '</div>'
+            + (assigneeList ? '<ul style="margin:.5rem 0 0;padding-left:1rem;list-style:disc">' + assigneeList + '</ul>' : '')
+            + (!isInProgress ? '<div style="margin-top:.5rem;font-size:.7rem;color:var(--ov-text-3)">Status: ' + esc(proj.status || 'Unknown') + '</div>' : '');
+          wrap.appendChild(card);
+        });
+
+        host.appendChild(wrap);
+      })
+      .catch(function(err) {
+        status.textContent = 'Could not load projects: ' + err.message;
+      });
   }
 
   /* ---- Public entry point ---- */
