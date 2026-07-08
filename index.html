@@ -2346,6 +2346,47 @@ function renderActivityFeed(user) {
     </div>`;
 }
 
+
+// ---- Assign from bench modal ----
+function openAssignModal(name, avail, key) {
+  const maxPct = avail != null ? Math.round(avail) : 100;
+  document.getElementById('assignModalTitle').textContent = 'Assign ' + (name || '');
+  document.getElementById('assignMaxLabel').textContent = '(max ' + maxPct + '% available)';
+  const pctInput = document.getElementById('assignPctInput');
+  pctInput.max = maxPct;
+  pctInput.value = Math.min(100, maxPct);
+
+  const sel = document.getElementById('assignClientSelect');
+  const clients = (PMO && PMO.latest && PMO.latest.active_clients) || [];
+  sel.innerHTML = clients.map(c => {
+    const name = typeof c === 'string' ? c : (c.client || c.name || '');
+    return '<option value="' + esc(name) + '">' + esc(name) + '</option>';
+  }).join('');
+
+  document.getElementById('assignDraftOut').style.display = 'none';
+  const m = document.getElementById('assignBenchModal');
+  m.setAttribute('aria-hidden', 'false');
+  m.classList.add('open');
+}
+function closeAssignModal() {
+  const m = document.getElementById('assignBenchModal');
+  m.setAttribute('aria-hidden', 'true');
+  m.classList.remove('open');
+}
+function copyAssignDraft() {
+  const client = document.getElementById('assignClientSelect').value;
+  const pct = document.getElementById('assignPctInput').value;
+  const name = document.getElementById('assignModalTitle').textContent.replace('Assign ', '');
+  const draft = name + ' → ' + client + ' at ' + pct + '%';
+  navigator.clipboard.writeText(draft).catch(() => {});
+  const out = document.getElementById('assignDraftOut');
+  out.textContent = draft;
+  out.style.display = 'block';
+}
+window.openAssignModal = openAssignModal;
+window.closeAssignModal = closeAssignModal;
+window.copyAssignDraft = copyAssignDraft;
+
 const THEME_KEY = 'pmo_dashboard_theme';
 function applyTheme(theme){
   const normalized = theme === 'dark' ? 'dark' : 'light';
@@ -5447,7 +5488,12 @@ function renderBench(){
       <td>${statusChip(displayStatus(p))}</td>
       <td style="color:var(--muted);font-size:.78rem">${esc(p.potential_next_assignment || '—')}</td>
       <td style="color:var(--muted);font-size:.78rem">${esc(tech || '—')}</td>
-      <td style="color:var(--muted);font-size:.78rem;white-space:nowrap"></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" style="font-size:.72rem;padding:3px 10px"
+          onclick="openAssignModal(${jsArg(p.name)},${jsArg(p.avail)},${jsArg(p.key||'')})">
+          Assign
+        </button>
+      </td>
     </tr>`;
   }).join('') || '<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--muted)">No bench data</td></tr>';
 }
@@ -6839,5 +6885,32 @@ window.loginFromGate = loginFromGate;
 window.startGoogleSignIn = startGoogleSignIn;
 bootDashboard();
 </script>
+
+<!-- Assign from bench modal -->
+<div class="auth-modal" id="assignBenchModal" aria-hidden="true">
+  <div class="auth-card" style="max-width:480px;width:min(480px,92vw)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h3 style="margin:0" id="assignModalTitle">Assign</h3>
+      <button class="btn btn-ghost btn-sm" onclick="closeAssignModal()">✕</button>
+    </div>
+    <div style="margin-bottom:1rem">
+      <label style="font-size:.78rem;color:var(--fg-3);font-weight:700;display:block;margin-bottom:4px">Client</label>
+      <select id="assignClientSelect" style="width:100%;padding:.5rem .7rem;border:1px solid var(--border-default);border-radius:8px;background:var(--bg-2);color:var(--fg-1);font-size:.88rem"></select>
+    </div>
+    <div style="margin-bottom:1.2rem">
+      <label style="font-size:.78rem;color:var(--fg-3);font-weight:700;display:block;margin-bottom:4px">
+        Allocation % <span id="assignMaxLabel" style="color:var(--fg-mute);font-weight:400"></span>
+      </label>
+      <input type="number" id="assignPctInput" min="10" max="100" step="10"
+        style="width:100%;padding:.5rem .7rem;border:1px solid var(--border-default);border-radius:8px;background:var(--bg-2);color:var(--fg-1);font-size:.88rem"/>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost btn-sm" onclick="closeAssignModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="copyAssignDraft()">Copy draft</button>
+    </div>
+    <div id="assignDraftOut" style="display:none;margin-top:1rem;padding:.75rem;background:var(--bg-2);border:1px solid var(--border-subtle);border-radius:8px;font-size:.82rem;color:var(--fg-2);white-space:pre-wrap"></div>
+  </div>
+</div>
+
 </body>
 </html>
