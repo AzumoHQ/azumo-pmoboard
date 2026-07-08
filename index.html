@@ -1212,7 +1212,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <div class="auth-error" id="gateAuthError"></div>
       <div class="auth-provider-block">
         <button class="btn btn-primary" id="gateLoginBtn" type="button" onclick="loginFromGate()">
-          <span class="auth-provider-row"><span class="auth-provider-icon">🔐</span><span>Sign in with Google</span></span>
+          <span class="auth-provider-row"><span class="auth-provider-icon"><i class="ti ti-lock"></i></span><span>Sign in with Google</span></span>
         </button>
       </div>
       <div class="auth-gate-foot">Only pre-authorized <strong>@azumo.co</strong> users can access this dashboard. Contact PMO if you need access.</div>
@@ -1236,10 +1236,10 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     </div>
     <div class="nav-links">
       <button class="nav-link" id="overviewNavLink" onclick="goTo('overview')">Overview</button>
-      <button class="nav-link" id="billingNavLink" onclick="goTo('dashboard')">💳 Billing</button>
-      <button class="nav-link" id="opsNavLink" onclick="goTo('opsViews')">🧭 Operating Views</button>
+      <button class="nav-link" id="billingNavLink" onclick="goTo('dashboard')"><i class="ti ti-credit-card"></i> Billing</button>
+      <button class="nav-link" id="opsNavLink" onclick="goTo('opsViews')"><i class="ti ti-compass"></i> Operating Views</button>
       <div class="nav-menu" id="pmoNavMenu">
-        <button class="nav-link" type="button" onclick="goTo('pmoActionCenter')">🔔 PMO <span class="nav-badge" id="actionNavBadge">0</span></button>
+        <button class="nav-link" type="button" onclick="goTo('pmoActionCenter')"><i class="ti ti-bell"></i> PMO <span class="nav-badge" id="actionNavBadge">0</span></button>
       </div>
       <div class="pmo-subnav" id="pmoQuickLinks" aria-label="PMO quick views" style="display:none">
         <button class="nav-link" onclick="goTo('pmoActionCenter')">QA <span class="nav-badge" id="actionNavDropdownBadge">0</span></button>
@@ -1271,7 +1271,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     <div id="authLoginFields">
       <div class="auth-provider-block">
         <button class="btn btn-primary" id="authGoogleBtn" type="button" onclick="startGoogleSignIn(authAfterLogin)">
-          <span class="auth-provider-row"><span class="auth-provider-icon">🔐</span><span>Sign in with Google</span></span>
+          <span class="auth-provider-row"><span class="auth-provider-icon"><i class="ti ti-lock"></i></span><span>Sign in with Google</span></span>
         </button>
         <div class="auth-gate-foot" style="margin-top:0">Only pre-authorized <strong>@azumo.co</strong> users can access this dashboard.</div>
       </div>
@@ -1349,7 +1349,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 
 <!-- ── OVERVIEW ─────────────────────────────── -->
 <section id="overview">
-  <div id="overdueAlert" style="display:none;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;align-items:center;justify-content:space-between;gap:1rem"><span style="color:#991B1B;font-weight:700">🚨 <span id="overdueAlertCount"></span> overdue assignment(s) require action</span><button class="btn btn-primary btn-sm" onclick="goTo('dueDates')">View Due Dates →</button></div><div id="pmoOverview" class="pmo-ov" data-state="loading" aria-label="PMO overview">
+  <div id="overdueAlert" style="display:none;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;align-items:center;justify-content:space-between;gap:1rem"><span style="color:#991B1B;font-weight:700"><i class="ti ti-alert-triangle"></i> <span id="overdueAlertCount"></span> overdue assignment(s) require action</span><button class="btn btn-primary btn-sm" onclick="goTo('dueDates')">View Due Dates →</button></div><div id="pmoOverview" class="pmo-ov" data-state="loading" aria-label="PMO overview">
     <div class="pmo-ov-hero">
       <div class="pmo-ov-hero-copy">
         <div class="pmo-ov-eyebrow">Azumo · Operations Command Center</div>
@@ -1372,14 +1372,14 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- ── NEW SEARCHES REPORTS ─────────────────── -->
 <section id="newSearchesTriage">
   <div class="sec-head">
-    <div class="sec-icon">🔎</div>
+    <div class="sec-icon"><i class="ti ti-search"></i></div>
     <h2>New Searches</h2>
     <div class="sec-tag">Source report</div>
   </div>
   <div class="reports-subsection">
     <div class="tbl-wrap report-embed-wrap">
       <div class="tbl-head">
-        <h3>🔎 New Searches Triage</h3>
+        <h3><i class="ti ti-search"></i> New Searches Triage</h3>
         <div class="tbl-actions">
           <a class="btn btn-ghost btn-sm" id="newSearchesOpenSource" href="#" target="_blank" rel="noopener noreferrer">Open source</a>
           <span class="badge badge-blue">Source</span>
@@ -1432,7 +1432,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- ── BILLING ──────────────────────────────── -->
 <section id="dashboard">
   <div class="sec-head">
-    <div class="sec-icon">📊</div>
+    <div class="sec-icon"><i class="ti ti-chart-bar"></i></div>
     <h2>Billing — <span id="currentSnapshotLabel" style="color:var(--blue-lt)"></span></h2>
     <div class="sec-tag" id="lastRefreshTag">Last refresh: —</div>
   </div>
@@ -1440,7 +1440,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   <div class="reports-subsection">
     <div class="tbl-wrap has-floating-tooltip billing-report-combined" id="utilBillingReportWrap">
       <div class="tbl-head">
-        <h3>📊 Billing Reports</h3>
+        <h3><i class="ti ti-chart-bar"></i> Billing Reports</h3>
         <div class="tbl-actions">
           <a class="btn btn-ghost btn-sm" id="utilBillingOpenSource" href="#" target="_blank" rel="noopener noreferrer">Open source</a>
           <span class="badge badge-blue" id="utilBillingSource">Source</span>
@@ -1476,7 +1476,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- ── OPERATING VIEWS ───────────────────────── -->
 <section id="opsViews">
   <div class="sec-head">
-    <div class="sec-icon">🧭</div>
+    <div class="sec-icon"><i class="ti ti-compass"></i></div>
     <h2>Operating Views</h2>
     <div class="sec-tag" id="opsViewsTag">Assignees · PMs · Clients</div>
   </div>
@@ -1546,7 +1546,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- ── PMO ACTION CENTER ───────────────────────── -->
 <section id="pmoActionCenter">
   <div class="sec-head">
-    <div class="sec-icon">🔔</div>
+    <div class="sec-icon"><i class="ti ti-bell"></i></div>
     <h2>PMO QA Center</h2>
     <div class="sec-tag" id="actionCenterTag">Actions + QA</div>
   </div>
@@ -1599,7 +1599,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- ── HARVEST ACCESS ───────────────────────── -->
 <section id="harvestAccess">
   <div class="sec-head">
-    <div class="sec-icon">🌾</div>
+    <div class="sec-icon"><i class="ti ti-clock"></i></div>
     <h2>Harvest assignments</h2>
     <div class="sec-tag" id="harvestAccessTag">Harvest API · assignments</div>
   </div>
@@ -1637,7 +1637,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         <div class="mc-sub" id="harvestProjectsSummary">Only active Harvest projects/files are shown.</div>
       </div>
       <label class="harvest-search">
-        🔎
+        <i class="ti ti-search"></i>
         <input id="harvestSearchInput" type="search" placeholder="Search client, project, team member or PM" oninput="setHarvestSearch(this.value)"/>
       </label>
     </div>
@@ -1649,7 +1649,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- ── ACCOUNT COVERAGE ───────────────────────── -->
 <section id="psaProjectStatus">
   <div class="sec-head">
-    <div class="sec-icon">📈</div>
+    <div class="sec-icon"><i class="ti ti-trending-up"></i></div>
     <h2>Project Status</h2>
     <div class="sec-tag">Live from Jira PSA reports</div>
   </div>
@@ -1703,7 +1703,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     <div class="action-summary" id="accountCoverageSummaryCards"></div>
     <div class="qa-toolbar" style="margin:.9rem 0 1rem">
       <label class="harvest-search">
-        🔎
+        <i class="ti ti-search"></i>
         <input id="accountCoverageSearchInput" type="search" placeholder="Search client, PM, CSM or TL" oninput="setAccountCoverageSearch(this.value)"/>
       </label>
       <div class="filter-field">
@@ -1728,18 +1728,18 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- ── DUE DATES ──────────────────── -->
 <section id="dueDates">
   <div class="sec-head">
-    <div class="sec-icon">📅</div>
+    <div class="sec-icon"><i class="ti ti-calendar"></i></div>
     <h2>Due Dates</h2>
     <div class="sec-tag" id="dueDatesTag">Next due dates</div>
   </div>
   <div class="tbl-wrap">
     <div class="pmo-branch-tabs" aria-label="Assignment views">
-      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('pendingAssignments')">⏳ Pending Assignments</button>
-      <button class="pmo-branch-tab active" type="button" onclick="activateModuleTab('dueDates')">📅 Due Dates</button>
-      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('forecast')">🔮 Forecast</button>
+      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('pendingAssignments')"><i class="ti ti-hourglass"></i> Pending Assignments</button>
+      <button class="pmo-branch-tab active" type="button" onclick="activateModuleTab('dueDates')"><i class="ti ti-calendar"></i> Due Dates</button>
+      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('forecast')"><i class="ti ti-chart-arrows"></i> Forecast</button>
     </div>
     <div class="tbl-head">
-      <h3>📅 Upcoming Due Dates <span class="badge badge-yellow" id="expiringBadge">—</span></h3>
+      <h3><i class="ti ti-calendar"></i> Upcoming Due Dates <span class="badge badge-yellow" id="expiringBadge">—</span></h3>
       <div class="tbl-actions">
         <button class="btn btn-ghost btn-sm" type="button" onclick="openDueAssignmentsSlackDraft()">Slack overdue follow-up</button>
         <span style="font-size:.75rem;color:var(--muted)">Upcoming from Jira due dates</span>
@@ -1752,17 +1752,17 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- ── PENDING ASSIGNMENTS ──────────────────── -->
 <section id="pendingAssignments">
   <div class="sec-head">
-    <div class="sec-icon">⏳</div>
+    <div class="sec-icon"><i class="ti ti-hourglass"></i></div>
     <h2>Pending Assignments</h2>
     <div class="sec-tag" id="pendingTag">—</div>
   </div>
   <div class="tbl-wrap">
     <div class="pmo-branch-tabs" aria-label="Assignment views">
-      <button class="pmo-branch-tab active" type="button" onclick="activateModuleTab('pendingAssignments')">⏳ Pending Assignments</button>
-      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('dueDates')">📅 Due Dates</button>
-      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('forecast')">🔮 Forecast</button>
+      <button class="pmo-branch-tab active" type="button" onclick="activateModuleTab('pendingAssignments')"><i class="ti ti-hourglass"></i> Pending Assignments</button>
+      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('dueDates')"><i class="ti ti-calendar"></i> Due Dates</button>
+      <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('forecast')"><i class="ti ti-chart-arrows"></i> Forecast</button>
     </div>
-    <div class="tbl-head"><h3>⏳ Pending <span class="badge badge-yellow" id="pendingBadge">—</span></h3></div>
+    <div class="tbl-head"><h3><i class="ti ti-hourglass"></i> Pending <span class="badge badge-yellow" id="pendingBadge">—</span></h3></div>
     <table><thead><tr><th>Key</th><th>Assignee</th><th>Client</th><th>Role</th><th>Start</th></tr></thead><tbody id="pendingTbody"></tbody></table>
   </div>
 </section>
@@ -1770,13 +1770,13 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- ── BENCH ──────────────────── -->
 <section id="bench">
   <div class="sec-head">
-    <div class="sec-icon">🪑</div>
+    <div class="sec-icon"><i class="ti ti-armchair"></i></div>
     <h2>Bench</h2>
     <div class="sec-tag" id="benchTag">—</div>
   </div>
   <div class="tbl-wrap">
     <div class="tbl-head">
-      <h3>🪑 Bench Report <span class="badge badge-red" id="benchBadge">—</span></h3>
+      <h3><i class="ti ti-armchair"></i> Bench Report <span class="badge badge-red" id="benchBadge">—</span></h3>
       <span style="font-size:.75rem;color:var(--muted)" id="benchSourceTag">Active/New Hires only</span>
     </div>
     <div class="bench-table-wrap"><table><thead><tr><th>Name</th><th>Position</th><th>Available</th><th>Status</th><th>Next Assignment</th><th>Technology</th><th>Due</th></tr></thead><tbody id="benchTbody"></tbody></table></div>
@@ -1786,13 +1786,13 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- ── INTERNAL PROJECTS ──────────────────── -->
 <section id="azumo">
   <div class="sec-head compact-head">
-    <div class="sec-icon">🏢</div>
+    <div class="sec-icon"><i class="ti ti-building"></i></div>
     <h2>Internal Projects</h2>
     <div class="sec-tag" id="internalProjectsTag">Internal allocation</div>
   </div>
   <div class="tbl-wrap">
     <div class="tbl-head">
-      <h3>🏢 Internal Projects</h3>
+      <h3><i class="ti ti-building"></i> Internal Projects</h3>
       <div class="tbl-actions">
         <span class="badge badge-blue" id="internalProjectsSourceBadge">Source</span>
       </div>
@@ -1814,13 +1814,13 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- ── HARVEST HOURS ──────────────────── -->
 <section id="harvestHours">
   <div class="sec-head compact-head">
-    <div class="sec-icon">⏱️</div>
+    <div class="sec-icon"><i class="ti ti-stopwatch"></i></div>
     <h2>Harvest Hours Control</h2>
     <div class="sec-tag">Billing hours review</div>
   </div>
   <div class="tbl-wrap harvest-hours-module">
     <div class="tbl-head">
-      <h3>⏱️ Harvest Hours Control</h3>
+      <h3><i class="ti ti-stopwatch"></i> Harvest Hours Control</h3>
       <span class="badge badge-blue">Harvest API</span>
     </div>
     <div class="harvest-hours-controls">
@@ -1857,7 +1857,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- ── TRENDS ──────────────────────────────── -->
 <section id="history">
   <div class="sec-head">
-    <div class="sec-icon">📈</div>
+    <div class="sec-icon"><i class="ti ti-trending-up"></i></div>
     <h2>Trends</h2>
     <div class="sec-tag" id="historySnapshotsTag">—</div>
   </div>
@@ -1873,9 +1873,9 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   </div>
 
   <div class="pmo-branch-tabs" aria-label="Assignment views">
-    <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('pendingAssignments')">⏳ Pending Assignments</button>
-    <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('dueDates')">📅 Due Dates</button>
-    <button class="pmo-branch-tab active" type="button" onclick="activateModuleTab('forecast')">🔮 Forecast</button>
+    <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('pendingAssignments')"><i class="ti ti-hourglass"></i> Pending Assignments</button>
+    <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('dueDates')"><i class="ti ti-calendar"></i> Due Dates</button>
+    <button class="pmo-branch-tab active" type="button" onclick="activateModuleTab('forecast')"><i class="ti ti-chart-arrows"></i> Forecast</button>
   </div>
 
   <div class="forecast-wrap">
@@ -2545,31 +2545,31 @@ function sidebarNavConfig(){
   }
   const qaCount = countOpenPmoActions();
   const entries = [
-    {id:'generalGroup', icon:'⚙️', label:'General', children:[
+    {id:'generalGroup', icon:'<i class="ti ti-settings"></i>', label:'General', children:[
       {id:'overview', icon:'□', label:'Overview'},
-      {id:'opsViews', icon:'🧭', label:'Operating Views'},
-      {id:'bench', icon:'🪑', label:'Bench'},
-      {id:'azumo', icon:'🏢', label:'Internal Projects'}
+      {id:'opsViews', icon:'<i class="ti ti-compass"></i>', label:'Operating Views'},
+      {id:'bench', icon:'<i class="ti ti-armchair"></i>', label:'Bench'},
+      {id:'azumo', icon:'<i class="ti ti-building"></i>', label:'Internal Projects'}
     ]},
     {id:'assignmentsGroup', icon:'🧾', label:'Assignments', count: dueAlertCount + pendingCount, children:[
-      {id:'pendingAssignments', icon:'⏳', label:'Pending Assignments', count:pendingCount},
-      {id:'dueDates', icon:'📅', label:'Due Dates', count:dueAlertCount},
-      {id:'forecast', icon:'🔮', label:'Forecast'}
+      {id:'pendingAssignments', icon:'<i class="ti ti-hourglass"></i>', label:'Pending Assignments', count:pendingCount},
+      {id:'dueDates', icon:'<i class="ti ti-calendar"></i>', label:'Due Dates', count:dueAlertCount},
+      {id:'forecast', icon:'<i class="ti ti-chart-arrows"></i>', label:'Forecast'}
     ]},
-    {id:'clientsGroup', icon:'🏛️', label:'Clients', children:[
-      {id:'psaProjectStatus', icon:'📈', label:'Project Status'},
-      {id:'accountCoverage', icon:'📋', label:'Accounts Coverage'}
+    {id:'clientsGroup', icon:'<i class="ti ti-building-bank"></i>', label:'Clients', children:[
+      {id:'psaProjectStatus', icon:'<i class="ti ti-trending-up"></i>', label:'Project Status'},
+      {id:'accountCoverage', icon:'<i class="ti ti-clipboard-list"></i>', label:'Accounts Coverage'}
     ]},
-    {id:'harvestGroup', icon:'🌾', label:'Harvest', children:[
-      {id:'harvestHours', icon:'⏱️', label:'Control'},
-      {id:'harvestAccess', icon:'🗂️', label:'Assignments'}
+    {id:'harvestGroup', icon:'<i class="ti ti-clock"></i>', label:'Harvest', children:[
+      {id:'harvestHours', icon:'<i class="ti ti-stopwatch"></i>', label:'Control'},
+      {id:'harvestAccess', icon:'<i class="ti ti-folders"></i>', label:'Assignments'}
     ]},
-    {id:'reportsGroup', icon:'📊', label:'Reports', children:[
-      {id:'dashboard', icon:'💳', label:'Billing'},
-      {id:'history', icon:'📈', label:'Trends'},
-      {id:'newSearchesTriage', icon:'🔎', label:'New Searches'}
+    {id:'reportsGroup', icon:'<i class="ti ti-chart-bar"></i>', label:'Reports', children:[
+      {id:'dashboard', icon:'<i class="ti ti-credit-card"></i>', label:'Billing'},
+      {id:'history', icon:'<i class="ti ti-trending-up"></i>', label:'Trends'},
+      {id:'newSearchesTriage', icon:'<i class="ti ti-search"></i>', label:'New Searches'}
     ]},
-    {id:'pmoActionCenter', icon:'🚨', label:'PMO QA', count: qaCount}
+    {id:'pmoActionCenter', icon:'<i class="ti ti-alert-triangle"></i>', label:'PMO QA', count: qaCount}
   ];
   return entries;
 }
@@ -3139,7 +3139,7 @@ async function manualSnapshot(){
     return;
   }
   const btns = [...document.querySelectorAll('[data-sync-action]')];
-  btns.forEach(btn => { btn.disabled = true; btn.dataset.originalText = btn.dataset.originalText || btn.textContent; btn.textContent = '⏳ Syncing...'; });
+  btns.forEach(btn => { btn.disabled = true; btn.dataset.originalText = btn.dataset.originalText || btn.textContent; btn.textContent = '<i class="ti ti-hourglass"></i> Syncing...'; });
   try{
     const response = await fetch('/api/refresh', {
       method:'POST',
@@ -3268,7 +3268,7 @@ function renderMetrics(){
     card.className = `mc${cfg.size === 'large' ? ' metric-large' : ''}${cfg.size === 'small' ? ' metric-small' : ''}${cfg.hover ? ' has-floating-tooltip' : ''}`;
     card.style.setProperty('--mc', cfg.color);
     const hoverHtml = cfg.hover === 'bench'
-      ? `<div class="mc-extra"><span class="bench-hover" id="utilBenchHover" tabindex="0" onclick="event.stopPropagation()">🪑 Bench people <strong id="utilBenchHoverCount">—</strong><span class="bench-hover-panel" id="utilBenchHoverPanel" role="tooltip">Loading bench list…</span></span></div>`
+      ? `<div class="mc-extra"><span class="bench-hover" id="utilBenchHover" tabindex="0" onclick="event.stopPropagation()"><i class="ti ti-armchair"></i> Bench people <strong id="utilBenchHoverCount">—</strong><span class="bench-hover-panel" id="utilBenchHoverPanel" role="tooltip">Loading bench list…</span></span></div>`
       : cfg.hover === 'freelancers'
         ? `<div class="mc-extra"><span class="bench-hover freelancers" id="freelancersHover" tabindex="0" onclick="event.stopPropagation()">Freelancers <strong id="freelancersHoverCount">—</strong><span class="bench-hover-panel" id="freelancersHoverPanel" role="tooltip">Loading freelancers…</span></span></div>`
         : cfg.hover === 'clients'
