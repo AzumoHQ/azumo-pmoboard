@@ -179,6 +179,7 @@ async function runRefresh(body = {}) {
   harvestSynced = Boolean(parsed.harvest?.fetched_at && parsed.harvest?.fetched_at !== previousSnapshot?.harvest?.fetched_at);
 
   const snapshot = buildSnapshot(parsed, overrides);
+  snapshot.activity_log = buildActivityLog(parsed.assignment_rows||[], previousSnapshot, parsed.psaProjects||[]);
   preservePreviousMetricFallbacks(snapshot, previousMetrics, explicitOverrideKeys, authoritativeMetricKeys);
   const refreshedAt = new Date().toISOString();
   const data = await saveSnapshot(snapshot, {
