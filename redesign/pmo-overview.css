@@ -257,3 +257,78 @@
 
 /* ---- skeleton (pre-data) ---- */
 .pmo-ov[data-state="loading"] .pmo-ov-skel-hide{visibility:hidden;}
+
+/* Role-scoped centered KPI layout */
+.pmo-ov-kpis--centered{
+  grid-template-columns:repeat(3,minmax(210px,240px));
+  justify-content:center;
+}
+@media(max-width:720px){
+  .pmo-ov-kpis--centered{grid-template-columns:1fr;}
+}
+
+/* Ops charts block (PM/CSM/TL only) */
+.pmo-ov-charts{margin-top:20px;}
+.pmo-ov-charts-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+@media(max-width:760px){
+  .pmo-ov-charts-grid{grid-template-columns:1fr;}
+}
+.pmo-ov-chart-panel{
+  background:var(--ov-surf,var(--surf));
+  border:1px solid var(--ov-brd,var(--brd));
+  border-radius:14px;
+  padding:1rem 1.1rem 1.1rem;
+}
+.pmo-ov-chart-title{
+  font-size:.82rem;
+  font-weight:800;
+  color:var(--ov-text-1,var(--txt));
+  margin-bottom:2px;
+}
+.pmo-ov-chart-sub{
+  font-size:.7rem;
+  color:var(--ov-text-3,var(--muted));
+  margin-bottom:.75rem;
+}
+.pmo-ov-chart-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:5px 4px;
+  border-radius:7px;
+  transition:background .12s;
+  margin-bottom:2px;
+}
+.pmo-ov-chart-row:hover{background:var(--ov-hover,rgba(0,102,255,.06));}
+.pmo-ov-chart-lbl{
+  font-size:.75rem;
+  font-weight:700;
+  color:var(--ov-text-2,var(--muted));
+  min-width:54px;
+  white-space:nowrap;
+}
+.pmo-ov-chart-bar-wrap{
+  flex:1;
+  height:12px;
+  background:var(--ov-brd,var(--brd));
+  border-radius:4px;
+  overflow:hidden;
+}
+.pmo-ov-chart-bar{
+  display:block;
+  height:100%;
+  border-radius:4px;
+  transition:width .3s;
+}
+.pmo-ov-chart-count{
+  font-size:.72rem;
+  font-weight:800;
+  color:var(--ov-text-2,var(--muted));
+  min-width:54px;
+  text-align:right;
+  white-space:nowrap;
+}
