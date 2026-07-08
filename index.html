@@ -5586,58 +5586,26 @@ function harvestHoursDescriptionTag(row){
     ? `<span class="badge badge-red">Empty</span>`
     : `<span class="badge badge-green">OK</span>`;
 }
-let hhExpandedRows = new Set();
-function toggleHhRow(key){
-  if(hhExpandedRows.has(key)) hhExpandedRows.delete(key); else hhExpandedRows.add(key);
-  renderHarvestHoursReport();
-}
-window.toggleHhRow = toggleHhRow;
 function renderHarvestHoursReport(){
   const results = document.getElementById("hhResults");
   const tbody = document.getElementById("hhReportBody");
   if(!results || !tbody) return;
   results.style.display = "block";
-  const peopleCount = new Set(harvestHoursReportData.map(row => row.person)).size;
-  const completePeople = new Set(harvestHoursReportData.filter(row => row.complete).map(row => row.person)).size;
-  document.getElementById("hhMetricTotal").textContent = peopleCount;
-  document.getElementById("hhMetricComplete").textContent = completePeople;
-  document.getElementById("hhMetricIncomplete").textContent = peopleCount - completePeople;
-
+  document.getElementById("hhMetricTotal").textContent = harvestHoursReportData.length;
+  document.getElementById("hhMetricComplete").textContent = harvestHoursReportData.filter(row => row.complete).length;
+  document.getElementById("hhMetricIncomplete").textContent = harvestHoursReportData.filter(row => !row.complete).length;
   const grouped = {};
   harvestHoursReportData.forEach(row => {
-    const key = row.client || "No client / PTO / Other";
+    const key = row.clients.length ? row.clients.join(", ") : "No client";
     if(!grouped[key]) grouped[key] = [];
     grouped[key].push(row);
   });
-
-  tbody.innerHTML = Object.entries(grouped).sort(([a],[b]) => a.localeCompare(b)).map(([client, rowsForClient]) => {
-    const rowsHtml = rowsForClient.map(row => {
+  tbody.innerHTML = Object.entries(grouped).sort(([a],[b]) => a.localeCompare(b)).map(([client, people]) => {
+    const rows = people.map(row => {
       const color = row.complete ? "#10B981" : row.pct >= 50 ? "#F59E0B" : "#EF4444";
-      const rowKey = row.person + "::" + row.client;
-      const isExpanded = hhExpandedRows.has(rowKey);
-      const hasProjects = (row.projects || []).length > 0;
-      const expandBtn = hasProjects
-        ? `<button type="button" onclick="toggleHhRow(${JSON.stringify(rowKey)})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.8rem;margin-right:6px">${isExpanded ? "▾" : "▸"}</button>`
-        : `<span style="display:inline-block;width:18px"></span>`;
-      const otherBadge = row.isOther ? ` <span class="badge badge-yellow" style="font-size:.62rem">Other</span>` : "";
-      const noDataBadge = (!row.hasHarvestData && !row.isOther) ? ` <span class="badge badge-red" style="font-size:.62rem">No Harvest data</span>` : "";
-      const totalNote = `<div style="color:var(--muted);font-size:.68rem;margin-top:2px">Total across all clients: ${esc(row.personTotalHours)}h / ${esc(row.personTotalDays)} day(s)</div>`;
-      const mainRow = `<tr>
-        <td style="font-weight:700">${expandBtn}${esc(row.name)}${otherBadge}${noDataBadge}${totalNote}</td>
-        <td style="color:var(--muted)">${esc(client)}</td>
-        <td>${esc(row.hours)}h</td>
-        <td>${esc(row.daysFilled || 0)}</td>
-        <td>${harvestHoursDescriptionTag(row)}</td>
-        <td>${esc(row.pct)}%</td>
-        <td><div class="hh-progress"><div class="hh-progress-fill" style="width:${Math.min(row.pct,100)}%;background:${color}"></div></div></td>
-        <td>${harvestHoursStatusTag(row)}</td>
-      </tr>`;
-      const projectRows = (isExpanded && hasProjects)
-        ? row.projects.map(p => `<tr style="background:rgba(255,255,255,.02)"><td colspan="2" style="padding-left:2.5rem;color:var(--muted);font-size:.82rem">${esc(p.name)}</td><td style="color:var(--muted);font-size:.82rem">${esc(p.howrs)}h</td><td style="color:var(--muted);font-size:.82rem">${esc(p.days)}</td><td colspan="4"></td></tr>`).join("")
-        : "";
-      return mainRow + projectRows;
+      return `<tr><td style="font-weight:700">${esc(row.name)}</td><td style="color:var(--muted)">${esc(row.clients.join(", ") || "—")}</td><td>${esc(row.hours)}h</td><td>${esc(row.daysFilled || 0)}</td><td>${harvestHoursDescriptionTag(row)}</td><td>${esc(row.pct)}%</td><td><div class="hh-progress"><div class="hh-progress-fill" style="width:${Math.min(row.pct,100)}%;background:${color}"></div></div></td><td>${harvestHoursStatusTag(row)}</td></tr>`;
     }).join("");
-    return `<tr><td colspan="8" class="section-divider">${esc(client)}</td></tr>${rowsHtml}`;
+    return `<tr><td colspan="8" class="section-divider">${esc(client)}</td></tr>${rows}`;
   }).join("");
 }
 async function runHarvestHoursReport(){
@@ -5656,101 +5624,35 @@ async function runHarvestHoursReport(){
     const payload = await response.json().catch(() => ({}));
     if(response.status === 401){ showAuthModal("login"); throw new Error("Please sign in again."); }
     if(!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
-
-    function expectedClientsByPerson(){
-      const map = {};
-      allAssignmentRows().forEach(row => {
-        const client = String(row.client || "").trim();
-        const isInternalOrBench = ["Bench","Azumo"].includes(client) && isActiveCapacityRow(row);
-        if(!isExternalInProgress(row) && !isInternalOrBench) return;
-        const person = normalizeIdentity(displayName(row));
-        if(!person || !client) return;
-        if(!map[person]) map[person] = {displayName: displayName(row), clients: new Set()};
-        map[person].clients.add(client);
-      });
-      return map;
-    }
-
-    const expectedByPerson = expectedClientsByPerson();
-    const usersById = {};
-    (payload.users || []).forEach(u => { if(u.id) usersById[u.id] = u; });
-
-    const byPerson = {};
+    const clientMap = harvestHoursClientMap();
+    const hoursByUser = {};
+    const daysByUser = {};
+    const missingDescriptionByUser = {};
     (payload.entries || []).forEach(entry => {
-      const rawName = entry.user?.name || usersById[entry.user?.id]?.name || "";
-      const person = normalizeIdentity(rawName);
-      if(!person) return;
-      if(!byPerson[person]){
-        byPerson[person] = {displayName: rawName || "Unnamed user", byClient:{}, totalHours:0, totalDays:new Set(), missingDescription:false};
-      }
-      const bucket = byPerson[person];
+      const id = entry.user?.id;
       const hours = Number(entry.hours || 0);
-      const clientName = String(entry.client?.name || "").trim() || "No client / PTO / Other";
-      const projectName = String(entry.project?.name || "").trim() || "Unspecified";
-      if(!bucket.byClient[clientName]) bucket.byClient[clientName] = {hours:0, days:new Set(), missingDescription:false, byProject:{}};
-      const cb = bucket.byClient[clientName];
-      cb.hours += hours;
-      bucket.totalHours += hours;
-      if(hours > 0 && entry.spent_date){ cb.days.add(entry.spent_date); bucket.totalDays.add(entry.spent_date); }
-      if(hours > 0 && !String(entry.notes || "").trim()){ cb.missingDescription = true; bucket.missingDescription = true; }
-      if(!cb.byProject[projectName]) cb.byProject[projectName] = {hours:0, days:new Set()};
-      cb.byProject[projectName].hours += hours;
-      if(hours > 0 && entry.spent_date) cb.byProject[projectName].days.add(entry.spent_date);
-    });
-
-    Object.entries(expectedByPerson).forEach(([person, info]) => {
-      if(!byPerson[person]) byPerson[person] = {displayName: info.displayName, byClient:{}, totalHours:0, totalDays:new Set(), missingDescription:false};
-    });
-
-    const rows = [];
-    Object.entries(byPerson).forEach(([person, bucket]) => {
-      const expectedClients = expectedByPerson[person]?.clients || new Set();
-      const ratio = expected ? (bucket.totalHours / expected) : 0;
-      const personPct = Math.round(ratio * 100);
-      const personComplete = ratio >= threshold;
-      const seen = new Set();
-
-      expectedClients.forEach(clientName => {
-        seen.add(clientName);
-        const cb = bucket.byClient[clientName] || {hours:0, days:new Set(), missingDescription:false, byProject:{}};
-        rows.push({
-          name: bucket.displayName, person, client: clientName, isOther:false,
-          hours: Math.round(cb.hours * 10) / 10, daysFilled: cb.days.size,
-          missingDescription: Boolean(cb.missingDescription), hasHarvestData: cb.hours > 0 || cb.days.size > 0,
-          projects: Object.entries(cb.byProject).map(([n,p]) => ({name:n, hours: Math.round(p.hours*10)/10, days:p.days.size})),
-          personTotalHours: Math.round(bucket.totalHours * 10) / 10, personTotalDays: bucket.totalDays.size,
-          expected, pct: personPct, complete: personComplete
-        });
-      });
-
-      Object.entries(bucket.byClient).forEach(([clientName, cb]) => {
-        if(seen.has(clientName)) return;
-        rows.push({
-          name: bucket.displayName, person, client: clientName, isOther:true,
-          hours: Math.round(cb.hours * 10) / 10, daysFilled: cb.days.size,
-          missingDescription: Boolean(cb.missingDescription), hasHarvestData:true,
-          projects: Object.entries(cb.byProject).map(([n,p]) => ({name:n, hours: Math.round(p.hours*10)/10, days:p.days.size})),
-          personTotalHours: Math.round(bucket.totalHours * 10) / 10, personTotalDays: bucket.totalDays.size,
-          expected, pct: personPct, complete: personComplete
-        });
-      });
-
-      if(!expectedClients.size && !Object.keys(bucket.byClient).length){
-        rows.push({
-          name: bucket.displayName, person, client: "No client / PTO / Other", isOther:true,
-          hours:0, daysFilled:0, missingDescription:false, hasHarvestData:false, projects:[],
-          personTotalHours:0, personTotalDays:0, expected, pct:0, complete:false
-        });
+      if(!id) return;
+      hoursByUser[id] = (hoursByUser[id] || 0) + hours;
+      if(hours > 0 && entry.spent_date){
+        if(!daysByUser[id]) daysByUser[id] = new Set();
+        daysByUser[id].add(entry.spent_date);
+      }
+      if(hours > 0 && !String(entry.notes || "").trim()){
+        missingDescriptionByUser[id] = true;
       }
     });
-
-    harvestHoursReportData = rows
-      .filter(row => harvestHoursRowAllowedForCurrentUser(row))
-      .sort((a,b) => a.pct - b.pct || a.name.localeCompare(b.name) || a.client.localeCompare(b.client));
-
+    harvestHoursReportData = (payload.users || []).map(user => {
+      const name = user.name || [user.first_name, user.last_name].filter(Boolean).join(" ") || "Unnamed user";
+      const hours = Math.round(Number(hoursByUser[user.id] || 0) * 10) / 10;
+      const daysFilled = daysByUser[user.id]?.size || 0;
+      const missingDescription = Boolean(missingDescriptionByUser[user.id]);
+      const ratio = expected ? (hours / expected) : 0;
+      const pct = Math.round(ratio * 100);
+      return {name, hours, daysFilled, missingDescription, expected, pct, complete:ratio >= threshold, clients:clientMap[normalizeIdentity(name)] || []};
+    }).filter(row => harvestHoursRowAllowedForCurrentUser(row))
+      .sort((a,b) => a.pct - b.pct || a.name.localeCompare(b.name));
     renderHarvestHoursReport();
-    const peopleCount = new Set(harvestHoursReportData.map(row => row.person)).size;
-    setHarvestHoursStatus(`Report generated from Jira + Harvest. ${peopleCount} people reviewed. Target for selected range: ${expected}h (${rangeTarget.businessDays} business day${rangeTarget.businessDays === 1 ? "" : "s"} × ${Math.round(rangeTarget.dailyExpected * 10) / 10}h/day).`, "info");
+    setHarvestHoursStatus(`Report generated from Harvest. ${harvestHoursReportData.length} active users reviewed. Target for selected range: ${expected}h (${rangeTarget.businessDays} business day${rangeTarget.businessDays === 1 ? "" : "s"} × ${Math.round(rangeTarget.dailyExpected * 10) / 10}h/day).`, "info");
   }catch(error){
     setHarvestHoursStatus(error.message, "error");
   }finally{
