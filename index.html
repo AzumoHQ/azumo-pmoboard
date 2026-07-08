@@ -1241,7 +1241,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <div class="nav-menu" id="pmoNavMenu">
         <button class="nav-link" type="button" onclick="goTo('pmoActionCenter')">🔔 PMO <span class="nav-badge" id="actionNavBadge">0</span></button>
       </div>
-      <div class="pmo-subnav" id="pmoQuickLinks" aria-label="PMO quick views">
+      <div class="pmo-subnav" id="pmoQuickLinks" aria-label="PMO quick views" style="display:none">
         <button class="nav-link" onclick="goTo('pmoActionCenter')">QA <span class="nav-badge" id="actionNavDropdownBadge">0</span></button>
         <button class="nav-link" onclick="goTo('dueDates')">Due Dates</button>
         <button class="nav-link" onclick="goTo('pendingAssignments')">Pending Assignments <span class="nav-badge" id="pendingNavBadge">0</span></button>
@@ -1363,6 +1363,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     </div>
 
     <div class="pmo-ov-kpis" id="pmoOverviewKpis"></div>
+    <div id="pmoOverviewCharts" hidden></div>
     <div class="pmo-ov-details" id="pmoOverviewDetails" aria-live="polite" hidden></div>
   </div>
 <div id="overviewActivityFeed" hidden></div>
