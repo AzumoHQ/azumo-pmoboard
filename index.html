@@ -2319,7 +2319,7 @@ function renderOpsCharts(user) {
   var dueData = [
     {label:'Overdue', count:bk.overdue.length, color:'var(--danger)',  dest:'dueDates'},
     {label:'\u226430d', count:bk.soon.length,  color:'var(--warning)', dest:'dueDates'},
-    {label:'31\u201360d',count:bk.mid.length,  color:'var(--highlight-blue)', dest:'dueDates'},
+    {label:'31\u201360d',count:bk.mid.length,  color:'var(--highlight-blue)', dest:'dueDates', urgency:'mid'},
     {label:'>60d',    count:bk.far.length,  color:'var(--success)', dest:'dueDates'},
     {label:'Pending', count:bk.pending.length,color:'var(--fg-mute)',dest:'pendingAssignments'}
   ].filter(function(b){return b.count>0;});
@@ -2504,6 +2504,8 @@ function tabBadge(count){
 }
 /* PMO-LAYOUT: horizontal top module navigation */
 const SIDEBAR_STATE_KEY = 'pmo_sidebar_collapsed_v1';
+let dueDatesUrgencyFilter = null; // 'overdue'|'soon'|'mid'|'far'
+let dueDatesUrgencyFilter = null; // 'overdue'|'soon'|'mid'|'far'
 const PMO_ONLY_SECTIONS = new Set(['pmoActionCenter','dueDates','pendingAssignments']);
 let openModuleGroup = null;
 function canSeePmoGroup(){ return ['admin','pmo'].includes(effectiveUserRole()); }
@@ -5614,6 +5616,34 @@ function renderExpiring(){
     ? latest.expiring_60d
     : Object.values(latest.forecast || {}).flat();
   const seen = new Set();
+  if (typeof dueDatesUrgencyFilter !== 'undefined' && dueDatesUrgencyFilter) {
+    const _f = dueDatesUrgencyFilter; dueDatesUrgencyFilter = null;
+    const base = new Date(); base.setHours(0,0,0,0);
+    sourceRows = (sourceRows||[]).filter(e => {
+      if (!e || !e.due || isBenchRow(e)) return false;
+      const d = new Date(e.due); d.setHours(0,0,0,0);
+      const diff = Math.round((d-base)/86400000);
+      if (_f==='overdue') return diff < 0;
+      if (_f==='soon')    return diff >= 0 && diff <= 30;
+      if (_f==='mid')     return diff > 30 && diff <= 60;
+      if (_f==='far')     return diff > 60;
+      return true;
+    });
+  }
+  if (typeof dueDatesUrgencyFilter !== 'undefined' && dueDatesUrgencyFilter) {
+    const _f = dueDatesUrgencyFilter; dueDatesUrgencyFilter = null;
+    const base = new Date(); base.setHours(0,0,0,0);
+    sourceRows = (sourceRows||[]).filter(e => {
+      if (!e || !e.due || isBenchRow(e)) return false;
+      const d = new Date(e.due); d.setHours(0,0,0,0);
+      const diff = Math.round((d-base)/86400000);
+      if (_f==='overdue') return diff < 0;
+      if (_f==='soon')    return diff >= 0 && diff <= 30;
+      if (_f==='mid')     return diff > 30 && diff <= 60;
+      if (_f==='far')     return diff > 60;
+      return true;
+    });
+  }
   const exp = (sourceRows || [])
     .filter(e => e && e.due && !isBenchRow(e))
     .filter(e => {
