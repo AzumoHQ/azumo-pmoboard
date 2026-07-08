@@ -2284,9 +2284,93 @@ function renderDesignerOverview(){
   }
   renderOverviewHeadcountBars();
   renderOverviewDiscipline();
+  renderOpsCharts(PMO && PMO.user);
   renderActivityFeed(PMO && PMO.user);
 }
 
+
+
+function renderOpsCharts(user) {
+  var host = document.getElementById('overviewActivityFeed');
+  if (!host) return;
+  var ovRole = String((user && user.role) || (typeof effectiveUserRole === 'function' ? effectiveUserRole() : '') || '').trim().toLowerCase();
+  var isPmoOrExec = ['pmo','admin','executive'].indexOf(ovRole) !== -1;
+  if (isPmoOrExec) return;
+
+  var rows = (typeof scopedAssignmentRows === 'function') ? scopedAssignmentRows() : (typeof allAssignmentRows === 'function' ? allAssignmentRows() : []);
+  var external = rows.filter(function(r) {
+    return String(r.status||'').trim() === 'In Progress' && r.client && ['Bench','Azumo'].indexOf(String(r.client).trim()) === -1;
+  });
+
+  var today = new Date(); today.setHours(0,0,0,0);
+  var bk = {overdue:[],soon:[],mid:[],far:[],pending:[]};
+  external.forEach(function(r) {
+    if (!r.due) { bk.pending.push(r); return; }
+    var d = new Date(r.due); d.setHours(0,0,0,0);
+    var diff = Math.round((d-today)/86400000);
+    if (diff<0) bk.overdue.push(r);
+    else if (diff<=30) bk.soon.push(r);
+    else if (diff<=60) bk.mid.push(r);
+    else bk.far.push(r);
+  });
+  var dueData = [
+    {label:'Overdue', count:bk.overdue.length, color:'var(--danger)',  dest:'dueDates'},
+    {label:'\u226430d', count:bk.soon.length,  color:'var(--warning)', dest:'dueDates'},
+    {label:'31\u201360d',count:bk.mid.length,  color:'var(--highlight-blue)', dest:'dueDates'},
+    {label:'>60d',    count:bk.far.length,  color:'var(--success)', dest:'dueDates'},
+    {label:'Pending', count:bk.pending.length,color:'var(--fg-mute)',dest:'pendingAssignments'}
+  ].filter(function(b){return b.count>0;});
+  var totalDue = dueData.reduce(function(s,b){return s+b.count;},0);
+
+  var byClient = {};
+  external.forEach(function(r) {
+    var cl = String(r.client||'').trim(); if(!cl) return;
+    if(!byClient[cl]) byClient[cl] = new Set();
+    if(r.assignee) byClient[cl].add(r.assignee);
+  });
+  var clientData = Object.keys(byClient).map(function(cl){
+    return {client:cl, count:byClient[cl].size};
+  }).sort(function(a,b){return b.count-a.count;}).slice(0,8);
+  var maxC = clientData.length ? clientData[0].count : 1;
+  var BAR = 160;
+
+  function ee(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function tr(s,n){return s.length>n?s.slice(0,n-1)+'\u2026':s;}
+
+  var dueHtml = dueData.length===0
+    ? '<p style="color:var(--fg-mute);font-size:.82rem;margin:.5rem 0">No active external assignments.</p>'
+    : dueData.map(function(b){
+        var w=totalDue?Math.round((b.count/totalDue)*BAR):0;
+        return '<div class="pmo-ov-chart-row" role="button" tabindex="0" style="cursor:pointer"'
+          +' onclick="goTo(\''+b.dest+'\')">'
+          +'<span class="pmo-ov-chart-lbl">'+ee(b.label)+'</span>'
+          +'<span class="pmo-ov-chart-bar-wrap"><span class="pmo-ov-chart-bar" style="width:'+w+'px;background:'+b.color+'"></span></span>'
+          +'<span class="pmo-ov-chart-count">'+b.count+'</span></div>';
+      }).join('');
+
+  var clientHtml = clientData.length===0
+    ? '<p style="color:var(--fg-mute);font-size:.82rem;margin:.5rem 0">No active client assignments.</p>'
+    : clientData.map(function(b){
+        var w=Math.round((b.count/maxC)*BAR);
+        var ck=ee(b.client);
+        return '<div class="pmo-ov-chart-row" role="button" tabindex="0" style="cursor:pointer"'
+          +' onclick="opsFilters.client=\''+ck+'\';var s=document.getElementById(\'opsClientFilter\');if(s)s.value=\''+ck+'\';goTo(\'opsViews\')">'
+          +'<span class="pmo-ov-chart-lbl" title="'+ck+'">'+ee(tr(b.client,22))+'</span>'
+          +'<span class="pmo-ov-chart-bar-wrap"><span class="pmo-ov-chart-bar" style="width:'+w+'px;background:var(--highlight-blue)"></span></span>'
+          +'<span class="pmo-ov-chart-count">'+b.count+' people</span></div>';
+      }).join('');
+
+  var roleLabel = ovRole==='pm'?'My projects':ovRole==='csm'?'My accounts':'My assignments';
+  var chartsHtml = '<div class="pmo-ov-charts-grid" style="margin-top:20px">'
+    +'<div class="pmo-ov-chart-panel"><div class="pmo-ov-chart-title">Assignment due dates</div>'
+    +'<div class="pmo-ov-chart-sub" style="color:var(--fg-mute);font-size:.72rem;margin-bottom:.75rem">Click to view in Due Dates</div>'+dueHtml+'</div>'
+    +'<div class="pmo-ov-chart-panel"><div class="pmo-ov-chart-title">'+ee(roleLabel)+'</div>'
+    +'<div class="pmo-ov-chart-sub" style="color:var(--fg-mute);font-size:.72rem;margin-bottom:.75rem">Click → Operating Views</div>'+clientHtml+'</div>'
+    +'</div>';
+
+  host.innerHTML = chartsHtml + (host.innerHTML || '');
+  host.hidden = false;
+}
 
 function renderActivityFeed(user) {
   const host = document.getElementById('overviewActivityFeed');
