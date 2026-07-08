@@ -363,7 +363,7 @@
   }
 
   /* ---- KPI cards (data-driven) ---- */
-  function renderKpis(snapshot, prevSnapshot) {
+  function renderKpis(snapshot, prevSnapshot, user) {
     var host = el('pmoOverviewKpis');
     if (!host) return;
     var root = el('pmoOverview');
@@ -388,6 +388,15 @@
       { id: 'kpiHeadcountTotal', icon: ICON.people,   label: 'Headcount Total',    val: intStr(totalHeadcount),      delta: deltaBadge(totalHeadcount, pTotalHeadcount), sub: headcountSub }
     ];
 
+    var ovRole = String((user && user.role) || '').trim().toLowerCase();
+    var isPmoOrExec = ['pmo','admin','executive'].indexOf(ovRole) !== -1;
+    if (!isPmoOrExec) {
+      cards = cards.filter(function (c) {
+        return c.id !== 'kpiUtilBilling' && c.id !== 'kpiUtilAssignment';
+      });
+    }
+    host.classList.toggle('pmo-ov-kpis--centered', cards.length <= 3);
+
     host.innerHTML = cards.map(function (c) {
       var open = c.detail && c.detail === activeDetail;
       return '<article class="pmo-ov-kpi' + (c.detail ? ' has-popover' : '') + (open ? ' is-open' : '') + (c.popoverAlign === 'right' ? ' pmo-ov-kpi--popover-right' : '') + '">' +
@@ -403,6 +412,128 @@
       '</article>';
     }).join('');
     bindDetailActions();
+  }
+
+
+  /* ---- Ops charts for PM / CSM / TL ---- */
+  function renderOpsCharts(snapshot, user) {
+    var host = el('pmoOverviewCharts');
+    if (!host) return;
+    var ovRole = String((user && user.role) || '').trim().toLowerCase();
+    var isPmoOrExec = ['pmo','admin','executive'].indexOf(ovRole) !== -1;
+    if (isPmoOrExec) { host.hidden = true; host.innerHTML = ''; return; }
+    host.hidden = false;
+
+    var rows = (typeof global.scopedAssignmentRows === 'function')
+      ? global.scopedAssignmentRows()
+      : (global.allAssignmentRows ? global.allAssignmentRows() : []);
+
+    var external = rows.filter(function(r) {
+      return String(r.status || '').trim() === 'In Progress'
+        && r.client && ['Bench','Azumo'].indexOf(String(r.client).trim()) === -1;
+    });
+
+    // Chart 1 — due date buckets
+    var today = new Date(); today.setHours(0,0,0,0);
+    var bk = { overdue: [], soon: [], mid: [], far: [], pending: [] };
+    external.forEach(function(r) {
+      if (String(r.status || '') === 'Pending' || !r.due) { bk.pending.push(r); return; }
+      var d = new Date(r.due); d.setHours(0,0,0,0);
+      var diff = Math.round((d - today) / 86400000);
+      if (diff < 0)        bk.overdue.push(r);
+      else if (diff <= 30) bk.soon.push(r);
+      else if (diff <= 60) bk.mid.push(r);
+      else                 bk.far.push(r);
+    });
+    var dueData = [
+      { label: 'Overdue',  count: bk.overdue.length,  color: '#EF4444', dest: 'dueDates' },
+      { label: '≤30d', count: bk.soon.length,     color: '#F59E0B', dest: 'dueDates' },
+      { label: '31–60d',count: bk.mid.length,     color: '#0066FF', dest: 'dueDates' },
+      { label: '>60d',     count: bk.far.length,      color: '#10B981', dest: 'dueDates' },
+      { label: 'Pending',  count: bk.pending.length,  color: '#94A3B8', dest: 'pendingAssignments' }
+    ].filter(function(b) { return b.count > 0; });
+    var totalDue = dueData.reduce(function(s,b){ return s + b.count; }, 0);
+
+    // Chart 2 — assignees per client
+    var byClient = {};
+    external.forEach(function(r) {
+      var c = String(r.client || '').trim(); if (!c) return;
+      if (!byClient[c]) byClient[c] = new Set();
+      var n = r.assignee || r.name || ''; if (n) byClient[c].add(n);
+    });
+    var clientData = Object.keys(byClient).map(function(c) {
+      return { client: c, count: byClient[c].size };
+    }).sort(function(a,b){ return b.count - a.count; }).slice(0, 8);
+    var maxC = clientData.length ? clientData[0].count : 1;
+
+    var BAR = 160;
+    function e(s) {
+      return String(s||'')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
+    }
+    function truncate(s,n) { return s.length > n ? s.slice(0,n-1) + '…' : s; }
+
+    function barRow(label, count, total, color, onclick) {
+      var w = total ? Math.round((count / total) * BAR) : 0;
+      return '<div class="pmo-ov-chart-row" role="button" tabindex="0"'
+        + ' onclick="(' + onclick + ')();"'
+        + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){this.click();}"'
+        + ' style="cursor:pointer">'
+        + '<span class="pmo-ov-chart-lbl">' + e(label) + '</span>'
+        + '<span class="pmo-ov-chart-bar-wrap">'
+        +   '<span class="pmo-ov-chart-bar" style="width:' + w + 'px;background:' + color + '"></span>'
+        + '</span>'
+        + '<span class="pmo-ov-chart-count">' + count + '</span>'
+        + '</div>';
+    }
+
+    var dueHtml = dueData.length === 0
+      ? '<p style="color:var(--ov-text-3);font-size:.82rem;margin:.5rem 0">No active external assignments.</p>'
+      : dueData.map(function(b) {
+          return barRow(b.label, b.count, totalDue, b.color,
+            'function(){if(window.goTo){window.goTo("' + b.dest + '");}}');
+        }).join('');
+
+    var clientHtml = clientData.length === 0
+      ? '<p style="color:var(--ov-text-3);font-size:.82rem;margin:.5rem 0">No active client assignments.</p>'
+      : clientData.map(function(b) {
+          var ck = b.client.replace(/"/g, '\\&quot;');
+          return '<div class="pmo-ov-chart-row" role="button" tabindex="0"'
+            + ' onclick="(function(){'
+            + 'if(window.goTo&&window.opsFilters!==undefined){'
+            + 'window.opsFilters.client=\"' + ck + '\";"'
+            + 'var sel=document.getElementById(\"opsClientFilter\");'
+            + 'if(sel)sel.value=\"' + ck + '\";'
+            + 'window.goTo(\"opsViews\");'
+            + '}})()"'
+            + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){this.click();}"'
+            + ' style="cursor:pointer">'
+            + '<span class="pmo-ov-chart-lbl" title="' + e(b.client) + '">' + e(truncate(b.client,22)) + '</span>'
+            + '<span class="pmo-ov-chart-bar-wrap">'
+            +   '<span class="pmo-ov-chart-bar" style="width:' + Math.round((b.count/maxC)*BAR) + 'px;background:#0066FF"></span>'
+            + '</span>'
+            + '<span class="pmo-ov-chart-count">' + b.count + ' people</span>'
+            + '</div>';
+        }).join('');
+
+    var roleLabel = ovRole === 'pm' ? 'My projects' : ovRole === 'csm' ? 'My accounts' : 'My assignments';
+
+    host.innerHTML =
+      '<div class="pmo-ov-charts-grid">'
+      + '<div class="pmo-ov-chart-panel">'
+      +   '<div class="pmo-ov-chart-title">Assignment due dates</div>'
+      +   '<div class="pmo-ov-chart-sub">Click any row → Due Dates</div>'
+      +   dueHtml
+      + '</div>'
+      + '<div class="pmo-ov-chart-panel">'
+      +   '<div class="pmo-ov-chart-title">' + e(roleLabel) + '</div>'
+      +   '<div class="pmo-ov-chart-sub">Assignees per client · Click → Operating Views</div>'
+      +   clientHtml
+      + '</div>'
+      + '</div>';
   }
 
   /* ---- Public entry point ---- */
@@ -430,7 +561,8 @@
     }
     root.setAttribute('data-state', 'ready');
 
-    renderKpis(snapshot, prev);
+    renderKpis(snapshot, prev, user);
+    renderOpsCharts(snapshot, user);
     renderOverviewDetails(snapshot, root.getAttribute('data-detail') || '');
   }
 
