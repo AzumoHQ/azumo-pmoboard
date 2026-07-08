@@ -631,7 +631,7 @@
     root.setAttribute('data-state', 'ready');
 
     renderKpis(snapshot, prev, user);
-    renderOpsCharts(snapshot, user);
+    if(typeof window.renderOpsChartsMain === "function") { window.renderOpsChartsMain(user); } else { renderOpsCharts(snapshot, user); }
     renderOverviewDetails(snapshot, root.getAttribute('data-detail') || '');
   }
 

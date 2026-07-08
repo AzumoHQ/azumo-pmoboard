@@ -2258,7 +2258,7 @@ function renderDesignerOverview(){
       user: typeof effectiveSessionUser === 'function' ? effectiveSessionUser() : currentUser,
       lastRefresh: {at: PMO.last_refresh_at, label: lastUpdated || PMO.last_refresh}
     });
-    renderOpsCharts(typeof effectiveSessionUser === 'function' ? effectiveSessionUser() : currentUser);
+    renderOpsChartsMain(typeof effectiveSessionUser === 'function' ? effectiveSessionUser() : currentUser);
     renderActivityFeed(typeof effectiveSessionUser === 'function' ? effectiveSessionUser() : currentUser);
     return;
   }
@@ -2293,7 +2293,7 @@ function renderDesignerOverview(){
 
 
 
-function renderOpsCharts(user) {
+function renderOpsChartsMain(user) {
   var host = document.getElementById('pmoOverviewCharts');
   if (!host) return;
   var ovRole = String((user && user.role) || (typeof effectiveUserRole === 'function' ? effectiveUserRole() : '') || '').trim().toLowerCase();
