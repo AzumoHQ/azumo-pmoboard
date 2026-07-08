@@ -2288,14 +2288,13 @@ function renderDesignerOverview(){
   }
   renderOverviewHeadcountBars();
   renderOverviewDiscipline();
-  renderOpsCharts(PMO && PMO.user);
   renderActivityFeed(PMO && PMO.user);
 }
 
 
 
 function renderOpsCharts(user) {
-  var host = document.getElementById('pmoOverviewCharts') || document.getElementById('overviewActivityFeed');
+  var host = document.getElementById('pmoOverviewCharts');
   if (!host) return;
   var ovRole = String((user && user.role) || (typeof effectiveUserRole === 'function' ? effectiveUserRole() : '') || '').trim().toLowerCase();
   var isPmoOrExec = ['pmo','admin','executive'].indexOf(ovRole) !== -1;
