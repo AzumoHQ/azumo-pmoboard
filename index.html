@@ -5855,11 +5855,10 @@ function harvestHoursRowAllowedForCurrentUser(row = {}){
   if(!clientStr) return true;
   const clientKey = normalizeClientKey(clientStr);
   if(scopedKeys.has(clientKey)) return true;
-  const firstWord = normalizeClientKey(clientStr.trim().split(/\s+/)[0]);
   for(const sk of scopedKeys){
-    const skFirst = sk.split('-')[0];
-    if(firstWord === skFirst || clientKey.startsWith(sk+'-') || sk.startsWith(firstWord+'-')) return true;
+    if(clientKey.includes(sk) || sk.includes(clientKey)) return true;
   }
+  console.warn('[harvest scope] NO MATCH for client:', clientStr, '→', clientKey, '| scopedKeys:', [...scopedKeys]);
   return false;
 }
 function harvestHoursClientMap(){
