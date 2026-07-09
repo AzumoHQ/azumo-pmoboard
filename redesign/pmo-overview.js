@@ -391,9 +391,9 @@
     var ovRole = String((user && user.role) || '').trim().toLowerCase();
     var isPmoOrExec = ['pmo','admin','executive'].indexOf(ovRole) !== -1;
     if (!isPmoOrExec) {
-      cards = cards.filter(function (c) {
-        return c.id !== 'kpiUtilBilling' && c.id !== 'kpiUtilAssignment';
-      });
+      host.innerHTML = '';
+      host.hidden = true;
+      return;
     }
     host.classList.toggle('pmo-ov-kpis--centered', cards.length <= 3);
 
