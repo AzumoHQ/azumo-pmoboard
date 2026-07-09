@@ -5914,20 +5914,63 @@ function renderHarvestHoursReport(){
   document.getElementById("hhMetricTotal").textContent = harvestHoursReportData.length;
   document.getElementById("hhMetricComplete").textContent = harvestHoursReportData.filter(row => row.complete).length;
   document.getElementById("hhMetricIncomplete").textContent = harvestHoursReportData.filter(row => !row.complete).length;
-  const grouped = {};
-  harvestHoursReportData.forEach(row => {
-    const key = String(row.client || "").trim() || "No client";
-    if(!grouped[key]) grouped[key] = [];
-    grouped[key].push(row);
+
+  // Sort: incomplete first, then by % asc, then by name
+  const sorted = [...harvestHoursReportData].sort((a,b) => {
+    if(a.complete !== b.complete) return a.complete ? 1 : -1;
+    return (a.pct - b.pct) || a.name.localeCompare(b.name);
   });
-  tbody.innerHTML = Object.entries(grouped).sort(([a],[b]) => a.localeCompare(b)).map(([client, people]) => {
-    const rows = people.map(row => {
-      const color = row.complete ? "#10B981" : row.pct >= 50 ? "#F59E0B" : "#EF4444";
-      return `<tr><td style="font-weight:700">${esc(row.name)}</td><td style="color:var(--muted)">${esc(row.client || "—")}</td><td>${esc(row.hours)}h</td><td>${esc(row.daysFilled || 0)}</td><td>${harvestHoursDescriptionTag(row)}</td><td>${esc(row.pct)}%</td><td><div class="hh-progress"><div class="hh-progress-fill" style="width:${Math.min(row.pct,100)}%;background:${color}"></div></div></td><td>${harvestHoursStatusTag(row)}</td></tr>`;
-    }).join("");
-    return `<tr><td colspan="8" class="section-divider">${esc(client)}</td></tr>${rows}`;
+
+  // Client filter value
+  const clientFilter = document.getElementById("opsClientFilter")?.value || "";
+
+  tbody.innerHTML = sorted.map((row, idx) => {
+    const color = row.complete ? "var(--success)" : row.pct >= 50 ? "var(--warning)" : "var(--danger)";
+    const expandId = "hh-expand-" + idx;
+    const hasProjects = row.projects && row.projects.length > 0;
+
+    // Client filter
+    if(clientFilter && row.clients && !row.clients.some(cl => normalizeClientKey(cl) === normalizeClientKey(clientFilter))) return "";
+
+    const mainRow = `<tr onclick="toggleHarvestExpand('${expandId}')" style="cursor:${hasProjects?'pointer':'default'}">
+      <td style="font-weight:700">
+        ${hasProjects ? `<span id="${expandId}-icon" style="display:inline-block;width:16px;transition:transform .15s">▶</span> ` : '<span style="display:inline-block;width:16px"></span> '}
+        ${esc(row.name)}
+      </td>
+      <td style="color:var(--muted);font-size:.82rem">${esc(row.clients && row.clients.length ? row.clients.join(", ") : "—")}</td>
+      <td style="font-weight:700;color:${color}">${esc(row.hours)}h</td>
+      <td>${esc(row.daysFilled || 0)}</td>
+      <td>${harvestHoursDescriptionTag(row)}</td>
+      <td>${esc(row.pct)}%</td>
+      <td><div class="hh-progress"><div class="hh-progress-fill" style="width:${Math.min(row.pct,100)}%;background:${color}"></div></div></td>
+      <td>${harvestHoursStatusTag(row)}</td>
+    </tr>`;
+
+    const detailRows = hasProjects ? `<tr id="${expandId}" style="display:none">
+      <td colspan="8" style="padding:0 0 0 32px;background:var(--bg-2)">
+        <table style="width:100%;border-collapse:collapse">
+          ${row.projects.map(p => `<tr>
+            <td style="padding:6px 12px;font-size:.82rem;color:var(--fg-2);width:40%">${esc(p.client)}</td>
+            <td style="padding:6px 12px;font-size:.82rem;font-weight:700;color:var(--fg-1)">${esc(p.hours)}h</td>
+            <td style="padding:6px 12px;font-size:.82rem;color:var(--muted)">${esc(row.expected ? Math.round(p.hours/row.expected*100)+"%" : "")}</td>
+          </tr>`).join("")}
+        </table>
+      </td>
+    </tr>` : "";
+
+    return mainRow + detailRows;
   }).join("");
 }
+
+function toggleHarvestExpand(id){
+  const row = document.getElementById(id);
+  const icon = document.getElementById(id+"-icon");
+  if(!row) return;
+  const open = row.style.display !== "none";
+  row.style.display = open ? "none" : "table-row";
+  if(icon) icon.style.transform = open ? "" : "rotate(90deg)";
+}
+window.toggleHarvestExpand = toggleHarvestExpand;
 async function runHarvestHoursReport(){
   initHarvestHoursDefaults();
   const from = document.getElementById("hhDateFrom")?.value || "";
@@ -5948,6 +5991,8 @@ async function runHarvestHoursReport(){
     const hoursByUser = {};
     const daysByUser = {};
     const missingDescriptionByUser = {};
+    const clientsByUser = {};
+    const hoursByUserClient = {};
     (payload.entries || []).forEach(entry => {
       const id = entry.user?.id;
       const hours = Number(entry.hours || 0);
@@ -5960,6 +6005,13 @@ async function runHarvestHoursReport(){
       if(hours > 0 && !String(entry.notes || "").trim()){
         missingDescriptionByUser[id] = true;
       }
+      const clientName = entry.client?.name || '';
+      if(clientName && hours > 0){
+        if(!clientsByUser[id]) clientsByUser[id] = new Set();
+        clientsByUser[id].add(clientName);
+        const ck = id + '|' + clientName;
+        hoursByUserClient[ck] = (hoursByUserClient[ck] || 0) + hours;
+      }
     });
     harvestHoursReportData = (payload.users || []).map(user => {
       const name = user.name || [user.first_name, user.last_name].filter(Boolean).join(" ") || "Unnamed user";
@@ -5968,7 +6020,13 @@ async function runHarvestHoursReport(){
       const missingDescription = Boolean(missingDescriptionByUser[user.id]);
       const ratio = expected ? (hours / expected) : 0;
       const pct = Math.round(ratio * 100);
-      return {name, hours, daysFilled, missingDescription, expected, pct, complete:ratio >= threshold, clients:clientMap[normalizeIdentity(name)] || []};
+      const userClients = [...(clientsByUser[user.id] || new Set())].sort();
+      const primaryClient = userClients.length === 1 ? userClients[0] : (clientMap[normalizeIdentity(name)] || [])[0] || '';
+      const projects = userClients.map(cl => ({
+        client: cl,
+        hours: Math.round((hoursByUserClient[user.id + '|' + cl] || 0) * 10) / 10
+      }));
+      return {name, hours, daysFilled, missingDescription, expected, pct, complete:ratio >= threshold, client: primaryClient, clients: userClients, projects};
     }).filter(row => harvestHoursRowAllowedForCurrentUser(row))
       .sort((a,b) => a.pct - b.pct || a.name.localeCompare(b.name));
     renderHarvestHoursReport();
