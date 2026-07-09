@@ -2531,6 +2531,28 @@ function allModuleSections(){
   });
 }
 function uniqueModuleSections(){ return allModuleSections().filter(section => sectionAllowedForCurrentRole(section.id)); }
+const SECTION_ICON_MAP = {
+  'overview': 'ti-layout-dashboard',
+  'opsViews': 'ti-compass',
+  'bench': 'ti-armchair',
+  'azumo': 'ti-building',
+  'pendingAssignments': 'ti-hourglass',
+  'dueDates': 'ti-calendar',
+  'forecast': 'ti-chart-arrows',
+  'psaProjectStatus': 'ti-trending-up',
+  'accountCoverage': 'ti-clipboard-list',
+  'harvestHours': 'ti-stopwatch',
+  'harvestAccess': 'ti-folders',
+  'dashboard': 'ti-credit-card',
+  'history': 'ti-trending-up',
+  'newSearchesTriage': 'ti-search',
+  'pmoActionCenter': 'ti-alert-triangle',
+};
+function sectionIcon(id) {
+  var cls = SECTION_ICON_MAP[id];
+  return cls ? '<i class="ti ' + cls + '"></i>' : '';
+}
+
 function sidebarNavConfig(){
   const pendingCount = latest?.pending_list?.length || 0;
   const dueAlertCount = latest ? dueRowsForActionCenter().length : 0;
