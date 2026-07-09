@@ -1605,6 +1605,16 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <summary>Procedures & report links</summary>
       <div class="lineage-list" id="procedureLinks"></div>
     </details>
+
+    <div class="alert-detail-area" id="hhQASection" style="margin-top:1.25rem">
+      <div class="qa-section-head compact">
+        <div>
+          <h3 style="display:flex;align-items:center;gap:8px">Jira vs Harvest discrepancies <span id="hhQACount" class="badge badge-red" style="display:none"></span></h3>
+          <div>People logging Harvest hours against a client they are not assigned to in Jira.</div>
+        </div>
+      </div>
+      <div id="hhQABody"><div class="mc-sub" style="padding:.5rem 0">Run the Harvest Hours report to populate this check.</div></div>
+    </div>
   </div>
 </section>
 
@@ -1862,13 +1872,6 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
           </table>
         </div>
         <div id="hhCopyConfirm"></div>
-        <div id="hhQASection" style="margin-top:24px">
-          <div class="fc-table-head" style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-            <h3 style="margin:0">QA — Jira vs Harvest discrepancies</h3>
-            <span id="hhQACount" class="badge badge-red" style="display:none"></span>
-          </div>
-          <div id="hhQABody"></div>
-        </div>
       </div>
     </div>
   </div>
