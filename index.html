@@ -2316,93 +2316,66 @@ function renderOpsChartsMain(user) {
 
   var rows = (typeof scopedAssignmentRows === 'function') ? scopedAssignmentRows() : (typeof allAssignmentRows === 'function' ? allAssignmentRows() : []);
   var external = rows.filter(function(r) {
-    return String(r.status||'').trim() === 'In Progress'
-      && r.client && ['Bench','Azumo'].indexOf(String(r.client).trim()) === -1;
+    return String(r.status||'').trim() === 'In Progress' && r.client && ['Bench','Azumo'].indexOf(String(r.client).trim()) === -1;
   });
+  var myA = new Set(), myC = new Set();
+  external.forEach(function(r) { if(r.assignee) myA.add(r.assignee); if(r.client) myC.add(r.client); });
 
-  var myAssignees = new Set();
-  var myClients = new Set();
-  external.forEach(function(r) {
-    if (r.assignee) myAssignees.add(r.assignee);
-    if (r.client) myClients.add(r.client);
-  });
-
-  // Harvest week
-  var harvestPct = null, harvestHours = '', harvestColor = 'var(--fg-1)';
-  var hd = PMO && PMO.latest && PMO.latest.harvest;
-  if (hd && hd.date_from) {
-    var hhData = (typeof harvestHoursReportData !== 'undefined') ? harvestHoursReportData : [];
-    var totalH = 0, totalE = 0;
-    hhData.forEach(function(r) { totalH += (r.hours||0); totalE += (r.expected||0); });
-    if (totalE > 0) {
-      harvestPct = Math.round((totalH/totalE)*100);
-      harvestHours = totalH.toFixed(1)+'h / '+totalE.toFixed(1)+'h';
-      harvestColor = harvestPct>=80?'var(--success)':harvestPct>=50?'var(--warning)':'var(--danger)';
-    }
-  }
-
-  // Forecast scoped
   var allFcRows = Object.values((PMO&&PMO.latest&&PMO.latest.forecast)||{}).flat().filter(Boolean);
-  var forecastRows = (typeof scopedForecastRows==='function') ? scopedForecastRows(allFcRows) : allFcRows;
-  var today2 = new Date(); today2.setHours(0,0,0,0);
-  var fcG = {overdue:[],soon:[],mid:[],far:[]};
-  forecastRows.forEach(function(r) {
-    if (!r.due) return;
-    var d = new Date(r.due); d.setHours(0,0,0,0);
-    var diff = Math.round((d-today2)/86400000);
-    if (diff<0) fcG.overdue.push(r);
-    else if (diff<=30) fcG.soon.push(r);
-    else if (diff<=60) fcG.mid.push(r);
-    else fcG.far.push(r);
+  var fcRows = (typeof scopedForecastRows==='function') ? scopedForecastRows(allFcRows) : allFcRows;
+  var t2 = new Date(); t2.setHours(0,0,0,0);
+  var fcG = {o:0,s:0,m:0,f:0,tot:0};
+  fcRows.forEach(function(r) {
+    if(!r.due) return; var d=new Date(r.due); d.setHours(0,0,0,0);
+    var diff=Math.round((d-t2)/86400000); fcG.tot++;
+    if(diff<0) fcG.o++; else if(diff<=30) fcG.s++; else if(diff<=60) fcG.m++; else fcG.f++;
   });
 
+  var bench=(PMO&&PMO.latest&&PMO.latest.bench_list)||[];
   function ee(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function ini(n){var p=String(n||'').trim().split(' ');return (p[0]?p[0][0]:'')+(p[1]?p[1][0]:'');}
+  var AC=[['#E6E9FF','var(--highlight-blue)'],['#CFF3E4','#00915A'],['#FFE6CC','#B4690E'],['#F3CFFF','#7C3AED']];
+  var tot=fcG.tot||1;
 
-  function kpi(value, label, sub, onclick, color) {
-    var clickable = onclick ? ' onclick="'+onclick+'" style="cursor:pointer"' : '';
-    return '<div'+clickable+' class="pm-kpi-card">'
-      +'<div class="pm-kpi-val" style="color:'+(color||'var(--fg-1)')+'">'+value+'</div>'
-      +'<div class="pm-kpi-label">'+label+'</div>'
-      +(sub?'<div class="pm-kpi-sub">'+sub+'</div>':'')
-      +'</div>';
+  function fcr(label,count,color,dest,urg){
+    if(!count) return '';
+    var oc=urg?'dueDatesUrgencyFilter=\''+urg+'\';goTo(\''+dest+'\')':'goTo(\''+dest+'\')';
+    return '<div onclick="'+oc+'" class="pm-fc-row"><span class="pm-fc-dot" style="background:'+color+'"></span><span class="pm-fc-label">'+label+'</span><span class="pm-fc-count" style="color:'+color+'">'+count+'</span></div>';
   }
 
-  function fcRow(label, count, color, dest) {
-    if (!count) return '';
-    return '<div class="pm-fc-row" onclick="goTo(\''+dest+'\')">'
-      +'<span class="pm-fc-dot" style="background:'+color+'"></span>'
-      +'<span class="pm-fc-label">'+label+'</span>'
-      +'<span class="pm-fc-count" style="color:'+color+'">'+count+'</span>'
+  var bH=bench.slice(0,4).map(function(p,i){
+    var col=AC[i%AC.length],nm=ee(p.name||p.assignee||''),pos=ee(p.position||'');
+    var av=p.avail!=null?Math.round(p.avail):(p.assign!=null?100-Math.round(p.assign):null);
+    return '<div style="display:flex;align-items:center;gap:11px;padding:8px 6px">'
+      +'<span style="width:32px;height:32px;border-radius:50%;background:'+col[0]+';color:'+col[1]+';display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800">'+ee(ini(nm))+'</span>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:.84rem;font-weight:700;color:var(--fg-1)">'+nm+'</div>'+(pos?'<div style="font-size:.72rem;color:var(--fg-mute)">'+pos+'</div>':'')+(av!=null?'<div style="font-size:.7rem;color:var(--success);font-weight:700">'+av+'% avail</div>':'')+'</div>'
+      +'<button onclick="openAssignModal(\''+nm.replace(/'/g,"\\'")+'\','+(av!=null?av:100)+',\'\')" style="display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:9px;border:1px solid var(--border-default);background:var(--bg-1);color:var(--fg-1);font-size:.76rem;font-weight:700;font-family:var(--font-sans);cursor:pointer"><i class=\"ti ti-user-plus\"></i> Assign</button>'
       +'</div>';
-  }
+  }).join('')+(bench.length>4?'<div style="padding:6px;font-size:.72rem;color:var(--fg-mute)">+'+(bench.length-4)+' <a href="#" onclick="goTo(\'bench\');return false" style="color:var(--highlight-blue)">View all</a></div>':'');
 
-
-  var kpiHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">'
-    +kpi(myAssignees.size,'My assignees','Active · In Progress',"goTo(\'\1\')")
-    +kpi(myClients.size,'My clients','Active accounts',"goTo(\'\1\')")
-    +(harvestPct!==null?kpi(harvestPct+'%','Harvest (week)',harvestHours,"goTo(\'\1\')",harvestColor):'')
-    +'</div>';
-
-  var fcHtml = '<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1rem 1.2rem;margin-bottom:16px">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">'
-    +'<div style="font-family:var(--font-display);font-size:.9rem;font-weight:760;color:var(--fg-1)">Forecast</div>'
-    +'<button onclick="goTo(\'forecast\')" class="btn btn-ghost btn-sm" style="font-size:.72rem">View all <i class="ti ti-arrow-right"></i></button>'
+  host.innerHTML='<div style="font-family:var(--font-sans)">'
+    +'<div style="font-family:var(--font-display);font-size:1.05rem;font-weight:900;letter-spacing:-.02em;color:var(--fg-1);margin-bottom:14px">My work</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">'
+    +'<div onclick="goTo(\'opsViews\')" style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1.1rem 1.2rem;cursor:pointer"><span style="width:34px;height:34px;border-radius:9px;background:var(--bg-2);display:inline-flex;align-items:center;justify-content:center;color:var(--highlight-blue);font-size:18px;margin-bottom:.6rem"><i class=\"ti ti-users\"></i></span><div style="font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--fg-1);letter-spacing:-.04em;line-height:1">'+myA.size+'</div><div style="font-size:.8rem;font-weight:700;color:var(--fg-2);margin-top:5px">My assignees</div></div>'
+    +'<div onclick="goTo(\'opsViews\')" style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1.1rem 1.2rem;cursor:pointer"><span style="width:34px;height:34px;border-radius:9px;background:var(--bg-2);display:inline-flex;align-items:center;justify-content:center;color:var(--highlight-blue);font-size:18px;margin-bottom:.6rem"><i class=\"ti ti-building\"></i></span><div style="font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--fg-1);letter-spacing:-.04em;line-height:1">'+myC.size+'</div><div style="font-size:.8rem;font-weight:700;color:var(--fg-2);margin-top:5px">My clients</div></div>'
+    +'<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1.1rem 1.2rem;opacity:.5"><span style="width:34px;height:34px;border-radius:9px;background:var(--bg-2);display:inline-flex;align-items:center;justify-content:center;color:var(--fg-mute);font-size:18px;margin-bottom:.6rem"><i class=\"ti ti-clock-hour-4\"></i></span><div style="font-size:2rem;font-weight:900;color:var(--fg-mute);letter-spacing:-.04em;line-height:1">—</div><div style="font-size:.8rem;font-weight:700;color:var(--fg-2);margin-top:5px">Harvest (week)</div><div style="font-size:.7rem;color:var(--fg-mute)">Run report first</div></div>'
     +'</div>'
-    +(forecastRows.length===0
-      ? '<p style="color:var(--fg-mute);font-size:.82rem;margin:0">No upcoming assignments.</p>'
-      : fcRow('Overdue',fcG.overdue.length,'var(--danger)','dueDates')
-       +fcRow('≤30 days',fcG.soon.length,'var(--warning)','dueDates')
-       +fcRow('31–60 days',fcG.mid.length,'var(--highlight-blue)','forecast')
-       +fcRow('>60 days',fcG.far.length,'var(--success)','forecast'))
-    +'</div>';
-
-  var actHtml = '<div style="display:flex;gap:8px;flex-wrap:wrap">'
-    +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/AA/form/150" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="text-decoration:none"><i class="ti ti-plus"></i> New Assignment</a>'
-    +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/PSA/form/51" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="text-decoration:none"><i class="ti ti-clipboard-list"></i> Account Status</a>'
-    +'<button class="btn btn-ghost btn-sm" onclick="goTo(\'\1\')"><i class="ti ti-compass"></i> Operating Views</button>'
-    +'</div>';
-
-  host.innerHTML = kpiHtml + fcHtml + actHtml;
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">'
+    +'<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1.1rem 1.2rem"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem"><span style="font-family:var(--font-display);font-size:.92rem;font-weight:900;color:var(--fg-1)">Forecast</span><a href="#" onclick="goTo(\'forecast\');return false" style="font-size:.74rem;font-weight:700;color:var(--fg-3);display:inline-flex;align-items:center;gap:4px">View all <i class=\"ti ti-arrow-right\"></i></a></div>'
+    +(fcG.tot>0?'<div style="display:flex;height:8px;border-radius:999px;overflow:hidden;background:var(--bg-3);margin-bottom:1rem">'+(fcG.o?'<span style="width:'+(fcG.o/tot*100).toFixed(1)+'%;background:var(--danger)"></span>':'')+(fcG.s?'<span style="width:'+(fcG.s/tot*100).toFixed(1)+'%;background:var(--warning)"></span>':'')+(fcG.m?'<span style="width:'+(fcG.m/tot*100).toFixed(1)+'%;background:var(--highlight-blue)"></span>':'')+(fcG.f?'<span style="width:'+(fcG.f/tot*100).toFixed(1)+'%;background:var(--success)"></span>':'')+'</div>':'')
+    +fcr('Overdue',fcG.o,'var(--danger)','dueDates','overdue')
+    +fcr('≤30 days',fcG.s,'var(--warning)','dueDates','soon')
+    +fcr('31–60 days',fcG.m,'var(--highlight-blue)','forecast','')
+    +fcr('>60 days',fcG.f,'var(--success)','forecast','')
+    +(!fcG.tot?'<p style="color:var(--fg-mute);font-size:.82rem;margin:0">No upcoming assignments.</p>':'')
+    +'</div>'
+    +'<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1.1rem 1.2rem"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem"><span style="font-family:var(--font-display);font-size:.92rem;font-weight:900;color:var(--fg-1);display:inline-flex;align-items:center;gap:8px">On bench <span style="font-size:.7rem;font-weight:800;color:var(--warning);background:rgba(255,184,0,.12);padding:2px 8px;border-radius:999px">'+bench.length+'</span></span><a href="#" onclick="goTo(\'bench\');return false" style="font-size:.74rem;font-weight:700;color:var(--fg-3);display:inline-flex;align-items:center;gap:4px">View all <i class=\"ti ti-arrow-right\"></i></a></div>'+(bench.length?bH:'<p style="color:var(--fg-mute);font-size:.82rem;margin:.5rem 0">No bench.</p>')+'</div>'
+    +'</div>'
+    +'<div style="display:flex;gap:9px;flex-wrap:wrap">'
+    +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/AA/form/150" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:10px;background:var(--highlight-blue);color:#fff;font-size:.82rem;font-weight:700;text-decoration:none"><i class=\"ti ti-plus\"></i> New Assignment</a>'
+    +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/PSA/form/51" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:10px;background:var(--bg-1);border:1px solid var(--border-default);color:var(--fg-1);font-size:.82rem;font-weight:700;text-decoration:none"><i class=\"ti ti-clipboard-list\"></i> Account Status</a>'
+    +'<button onclick="goTo(\'opsViews\')" style="display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:10px;background:var(--bg-1);border:1px solid var(--border-default);color:var(--fg-1);font-size:.82rem;font-weight:700;font-family:var(--font-sans);cursor:pointer"><i class=\"ti ti-compass\"></i> Operating Views</button>'
+    +'</div></div>';
 }
 
 function renderActivityFeed(user) {
