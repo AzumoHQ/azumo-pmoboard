@@ -1189,6 +1189,18 @@ body:not(.light) .pmo-ov-popover,
 body:not(.light) .pmo-ov-popover::before{background:#10243F}
 body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 
+
+.pm-kpi-card{background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1rem 1.2rem;transition:background .12s}
+.pm-kpi-card:hover{background:var(--bg-2)}
+.pm-kpi-val{font-family:var(--font-display);font-size:1.9rem;font-weight:780;letter-spacing:-.04em;line-height:1}
+.pm-kpi-label{font-size:.78rem;font-weight:700;color:var(--fg-2);margin-top:4px}
+.pm-kpi-sub{font-size:.7rem;color:var(--fg-mute);margin-top:2px}
+.pm-fc-row{display:flex;align-items:center;gap:10px;padding:7px 4px;border-radius:8px;cursor:pointer;transition:background .12s}
+.pm-fc-row:hover{background:var(--bg-2)}
+.pm-fc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pm-fc-label{font-size:.82rem;font-weight:600;color:var(--fg-1);flex:1}
+.pm-fc-count{font-size:.82rem;font-weight:800}
+
 </style>
 </head>
 <body class="auth-locked light">
@@ -2347,24 +2359,23 @@ function renderOpsChartsMain(user) {
   function ee(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   function kpi(value, label, sub, onclick, color) {
-    return '<div '+(onclick?'onclick="'+onclick+'" style="cursor:pointer;background:var(--bg-1)"':'style="background:var(--bg-1)"')
-      +' style="border:1px solid var(--border-subtle);border-radius:14px;padding:1rem 1.2rem;transition:background .12s"'
-      +' onmouseover="if(this.onclick)this.style.background='var(--bg-2)'" onmouseout="this.style.background='var(--bg-1)'">'
-      +'<div style="font-family:var(--font-display);font-size:1.9rem;font-weight:780;color:'+(color||'var(--fg-1)')+';letter-spacing:-.04em;line-height:1">'+value+'</div>'
-      +'<div style="font-size:.78rem;font-weight:700;color:var(--fg-2);margin-top:4px">'+label+'</div>'
-      +(sub?'<div style="font-size:.7rem;color:var(--fg-mute);margin-top:2px">'+sub+'</div>':'')
+    var clickable = onclick ? ' onclick="'+onclick+'" style="cursor:pointer"' : '';
+    return '<div'+clickable+' class="pm-kpi-card">'
+      +'<div class="pm-kpi-val" style="color:'+(color||'var(--fg-1)')+'">'+value+'</div>'
+      +'<div class="pm-kpi-label">'+label+'</div>'
+      +(sub?'<div class="pm-kpi-sub">'+sub+'</div>':'')
       +'</div>';
   }
 
   function fcRow(label, count, color, dest) {
     if (!count) return '';
-    return '<div onclick="goTo(''+dest+'')" style="display:flex;align-items:center;gap:10px;padding:7px 4px;border-radius:8px;cursor:pointer" '
-      +'onmouseover="this.style.background='var(--bg-2)'" onmouseout="this.style.background=''">'
-      +'<span style="width:8px;height:8px;border-radius:50%;background:'+color+';flex-shrink:0"></span>'
-      +'<span style="font-size:.82rem;font-weight:600;color:var(--fg-1);flex:1">'+label+'</span>'
-      +'<span style="font-size:.82rem;font-weight:800;color:'+color+'">'+count+'</span>'
+    return '<div class="pm-fc-row" onclick="goTo(\''+dest+'\')">'
+      +'<span class="pm-fc-dot" style="background:'+color+'"></span>'
+      +'<span class="pm-fc-label">'+label+'</span>'
+      +'<span class="pm-fc-count" style="color:'+color+'">'+count+'</span>'
       +'</div>';
   }
+
 
   var kpiHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">'
     +kpi(myAssignees.size,'My assignees','Active · In Progress',"goTo('opsViews')")
