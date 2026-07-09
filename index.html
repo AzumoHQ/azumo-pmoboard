@@ -2378,9 +2378,9 @@ function renderOpsChartsMain(user) {
 
 
   var kpiHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">'
-    +kpi(myAssignees.size,'My assignees','Active · In Progress',"goTo('opsViews')")
-    +kpi(myClients.size,'My clients','Active accounts',"goTo('opsViews')")
-    +(harvestPct!==null?kpi(harvestPct+'%','Harvest (week)',harvestHours,"goTo('harvestHours')",harvestColor):'')
+    +kpi(myAssignees.size,'My assignees','Active · In Progress',"goTo(\'\1\')")
+    +kpi(myClients.size,'My clients','Active accounts',"goTo(\'\1\')")
+    +(harvestPct!==null?kpi(harvestPct+'%','Harvest (week)',harvestHours,"goTo(\'\1\')",harvestColor):'')
     +'</div>';
 
   var fcHtml = '<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1rem 1.2rem;margin-bottom:16px">'
@@ -2399,7 +2399,7 @@ function renderOpsChartsMain(user) {
   var actHtml = '<div style="display:flex;gap:8px;flex-wrap:wrap">'
     +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/AA/form/150" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="text-decoration:none"><i class="ti ti-plus"></i> New Assignment</a>'
     +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/PSA/form/51" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="text-decoration:none"><i class="ti ti-clipboard-list"></i> Account Status</a>'
-    +'<button class="btn btn-ghost btn-sm" onclick="goTo('opsViews')"><i class="ti ti-compass"></i> Operating Views</button>'
+    +'<button class="btn btn-ghost btn-sm" onclick="goTo(\'\1\')"><i class="ti ti-compass"></i> Operating Views</button>'
     +'</div>';
 
   host.innerHTML = kpiHtml + fcHtml + actHtml;
