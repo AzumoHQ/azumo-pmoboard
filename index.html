@@ -2297,6 +2297,7 @@ function renderOpsChartsMain(user) {
   var host = document.getElementById('pmoOverviewCharts');
   if (!host) return;
   host.innerHTML = '';
+  host.innerHTML = '';
   var ovRole = String((user && user.role) || (typeof effectiveUserRole === 'function' ? effectiveUserRole() : '') || '').trim().toLowerCase();
   var isPmoOrExec = ['pmo','admin','executive'].indexOf(ovRole) !== -1;
   if (isPmoOrExec) return;
