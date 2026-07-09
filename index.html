@@ -1846,7 +1846,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     <div class="audit-note" id="hhStatus" style="display:none"></div>
     <div id="hhResults" style="display:none">
       <div class="action-summary harvest-hours-summary">
-        <div class="action-card"><div class="action-label">Harvest users</div><div class="action-value" id="hhMetricTotal">—</div></div>
+        <div class="action-card"><div class="action-label">Assigned (Jira)</div><div class="action-value" id="hhMetricTotal">—</div></div>
         <div class="action-card ok"><div class="action-label">Complete</div><div class="action-value" id="hhMetricComplete">—</div></div>
         <div class="action-card warning"><div class="action-label">Incomplete</div><div class="action-value" id="hhMetricIncomplete">—</div></div>
       </div>
@@ -1862,6 +1862,13 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
           </table>
         </div>
         <div id="hhCopyConfirm"></div>
+        <div id="hhQASection" style="margin-top:24px">
+          <div class="fc-table-head" style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <h3 style="margin:0">QA — Jira vs Harvest discrepancies</h3>
+            <span id="hhQACount" class="badge badge-red" style="display:none"></span>
+          </div>
+          <div id="hhQABody"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1978,6 +1985,7 @@ let qaChecklistReviews = {};
 let qaChecklistReviewsLoaded = false;
 let qaChecklistReviewsPromise = null;
 let harvestHoursReportData = [];
+let harvestHoursQAData = [];
 let internalProjectsExpanded = true;
 
 document.getElementById('navDate').textContent =
@@ -5851,14 +5859,12 @@ function harvestHoursRowAllowedForCurrentUser(row = {}){
   }
   const scopedKeys = myScopedClientKeys();
   if(scopedKeys === null) return true;
-  const clientStr = String(row.client || "").trim();
-  if(!clientStr) return true;
-  const clientKey = normalizeClientKey(clientStr);
+  const clientKey = normalizeClientKey(String(row.client || ''));
+  if(!clientKey) return false;
   if(scopedKeys.has(clientKey)) return true;
   for(const sk of scopedKeys){
     if(clientKey.includes(sk) || sk.includes(clientKey)) return true;
   }
-  console.warn('[harvest scope] NO MATCH for client:', clientStr, '→', clientKey, '| scopedKeys:', [...scopedKeys]);
   return false;
 }
 function harvestHoursClientMap(){
@@ -5969,6 +5975,42 @@ function renderHarvestHoursReport(){
 
     return mainRow + detailRows;
   }).join("");
+  renderHarvestHoursQA();
+}
+
+function renderHarvestHoursQA(){
+  const body = document.getElementById("hhQABody");
+  const count = document.getElementById("hhQACount");
+  if(!body) return;
+  const data = harvestHoursQAData || [];
+  if(count){
+    if(data.length){ count.style.display = ""; count.textContent = String(data.length); }
+    else { count.style.display = "none"; }
+  }
+  if(!data.length){
+    body.innerHTML = '<div class="info-box" style="margin:0">No discrepancies found. Harvest hours match Jira assignments.</div>';
+    return;
+  }
+  const rowsHtml = data.map(d => {
+    const isCross = d.type === 'cross-client';
+    const label = isCross
+      ? `<span class="badge badge-red">Cross-client</span>`
+      : `<span class="badge badge-red">Not in Jira</span>`;
+    const jira = d.jiraClients && d.jiraClients.length ? esc(d.jiraClients.join(", ")) : '<span style="color:var(--muted)">—</span>';
+    const detail = isCross
+      ? `Logged in <strong>${esc(d.harvestClient)}</strong> (Harvest), assigned to ${jira} (Jira)`
+      : `Logged in <strong>${esc(d.harvestClient)}</strong> (Harvest), no Jira assignment`;
+    return `<tr>
+      <td style="font-weight:700">${esc(d.name)}</td>
+      <td>${label}</td>
+      <td style="font-size:.85rem">${detail}</td>
+      <td style="font-weight:700">${esc(d.hours)}h</td>
+    </tr>`;
+  }).join("");
+  body.innerHTML = `<div class="fc-table-wrap"><table>
+    <thead><tr><th>Name</th><th>Type</th><th>Detail</th><th>Hours</th></tr></thead>
+    <tbody>${rowsHtml}</tbody>
+  </table></div>`;
 }
 
 function toggleHarvestExpand(id){
@@ -5996,12 +6038,18 @@ async function runHarvestHoursReport(){
     const payload = await response.json().catch(() => ({}));
     if(response.status === 401){ showAuthModal("login"); throw new Error("Please sign in again."); }
     if(!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
-    const clientMap = harvestHoursClientMap();
+    const jiraClientsByPerson = harvestHoursClientMap(); // { normId: [clients] }
     const hoursByUser = {};
     const daysByUser = {};
     const missingDescriptionByUser = {};
     const clientsByUser = {};
     const hoursByUserClient = {};
+    const nameById = {};
+    const emailById = {};
+    (payload.users || []).forEach(u => {
+      const nm = u.name || [u.first_name, u.last_name].filter(Boolean).join(" ") || "";
+      if(u.id){ nameById[u.id] = nm; if(u.email) emailById[u.id] = String(u.email).trim().toLowerCase(); }
+    });
     (payload.entries || []).forEach(entry => {
       const id = entry.user?.id;
       const hours = Number(entry.hours || 0);
@@ -6022,27 +6070,98 @@ async function runHarvestHoursReport(){
         hoursByUserClient[ck] = (hoursByUserClient[ck] || 0) + hours;
       }
     });
-    harvestHoursReportData = (payload.users || []).map(user => {
-      const name = user.name || [user.first_name, user.last_name].filter(Boolean).join(" ") || "Unnamed user";
-      const hours = Math.round(Number(hoursByUser[user.id] || 0) * 10) / 10;
-      const daysFilled = daysByUser[user.id]?.size || 0;
-      const missingDescription = Boolean(missingDescriptionByUser[user.id]);
+
+    // Harvest data indexed by normalized identity (name), with email fallback
+    const harvestByNorm = {};
+    (payload.users || []).forEach(u => {
+      const nm = nameById[u.id] || "";
+      const norm = normalizeIdentity(nm);
+      if(!norm) return;
+      harvestByNorm[norm] = {
+        id: u.id,
+        name: nm,
+        email: emailById[u.id] || '',
+        hours: Math.round(Number(hoursByUser[u.id] || 0) * 10) / 10,
+        daysFilled: daysByUser[u.id]?.size || 0,
+        missingDescription: Boolean(missingDescriptionByUser[u.id]),
+        harvestClients: [...(clientsByUser[u.id] || new Set())].sort()
+      };
+    });
+
+    const buildProjects = (harv) => (harv?.harvestClients || []).map(cl => ({
+      client: cl,
+      hours: Math.round((hoursByUserClient[harv.id + '|' + cl] || 0) * 10) / 10
+    }));
+
+    const makeRow = (name, jiraClients, harv) => {
+      const hours = harv ? harv.hours : 0;
+      const daysFilled = harv ? harv.daysFilled : 0;
+      const missingDescription = harv ? harv.missingDescription : false;
       const ratio = expected ? (hours / expected) : 0;
       const pct = Math.round(ratio * 100);
-      const userClients = [...(clientsByUser[user.id] || new Set())].sort();
-      const primaryClient = userClients.length === 1 ? userClients[0] : (clientMap[normalizeIdentity(name)] || [])[0] || '';
-      const projects = userClients.map(cl => ({
-        client: cl,
-        hours: Math.round((hoursByUserClient[user.id + '|' + cl] || 0) * 10) / 10
-      }));
-      return {name, hours, daysFilled, missingDescription, expected, pct, complete:ratio >= threshold, client: primaryClient, clients: userClients, projects};
-    }).filter(row => harvestHoursRowAllowedForCurrentUser(row))
-      .filter(row => {
-        const role = (typeof effectiveUserRole === 'function' ? effectiveUserRole() : '').toLowerCase();
-        if(['pmo','admin','executive'].includes(role)) return true;
-        return row.clients && row.clients.length > 0;
-      })
+      return {
+        name, hours, daysFilled, missingDescription, expected, pct,
+        complete: ratio >= threshold,
+        client: (jiraClients && jiraClients[0]) || (harv?.harvestClients?.[0]) || '',
+        clients: (jiraClients && jiraClients.length) ? jiraClients : (harv?.harvestClients || []),
+        projects: buildProjects(harv)
+      };
+    };
+
+    // 1) Everyone assigned in Jira (source of truth for the roster)
+    const seenNorm = new Set();
+    const rosterRows = [];
+    Object.entries(jiraClientsByPerson).forEach(([norm, jiraClients]) => {
+      seenNorm.add(norm);
+      const harv = harvestByNorm[norm];
+      rosterRows.push(makeRow(harv?.name || norm, jiraClients, harv));
+    });
+
+    // 2) People with Harvest hours but NOT in Jira roster (added so PMO sees them; flagged in QA)
+    Object.entries(harvestByNorm).forEach(([norm, harv]) => {
+      if(seenNorm.has(norm)) return;
+      if(harv.hours <= 0 && (!harv.harvestClients || !harv.harvestClients.length)) return;
+      rosterRows.push(makeRow(harv.name, null, harv));
+    });
+
+    harvestHoursReportData = rosterRows
+      .filter(row => harvestHoursRowAllowedForCurrentUser(row))
       .sort((a,b) => a.pct - b.pct || a.name.localeCompare(b.name));
+
+    // ---- QA: Jira vs Harvest discrepancies (scope-aware) ----
+    harvestHoursQAData = [];
+    const normKeys = (arr) => new Set((arr || []).map(normalizeClientKey));
+    Object.entries(jiraClientsByPerson).forEach(([norm, jiraClients]) => {
+      const harv = harvestByNorm[norm];
+      if(!harv || !harv.harvestClients.length) return;
+      const jiraKeys = normKeys(jiraClients);
+      harv.harvestClients.forEach(hc => {
+        if(!jiraKeys.has(normalizeClientKey(hc))){
+          harvestHoursQAData.push({
+            name: harv.name, type: 'cross-client',
+            jiraClients: jiraClients.slice(),
+            harvestClient: hc,
+            hours: Math.round((hoursByUserClient[harv.id + '|' + hc] || 0) * 10) / 10
+          });
+        }
+      });
+    });
+    Object.entries(harvestByNorm).forEach(([norm, harv]) => {
+      if(jiraClientsByPerson[norm]) return;
+      if(!harv.harvestClients.length) return;
+      harv.harvestClients.forEach(hc => {
+        harvestHoursQAData.push({
+          name: harv.name, type: 'not-in-jira',
+          jiraClients: [],
+          harvestClient: hc,
+          hours: Math.round((hoursByUserClient[harv.id + '|' + hc] || 0) * 10) / 10
+        });
+      });
+    });
+    // Scope filter for QA rows
+    harvestHoursQAData = harvestHoursQAData.filter(d =>
+      harvestHoursRowAllowedForCurrentUser({name: d.name, client: d.harvestClient, clients: [d.harvestClient, ...(d.jiraClients||[])]})
+    ).sort((a,b) => a.name.localeCompare(b.name) || a.harvestClient.localeCompare(b.harvestClient));
     renderHarvestHoursReport();
     setHarvestHoursStatus(`Report generated from Harvest. ${harvestHoursReportData.length} active users reviewed. Target for selected range: ${expected}h (${rangeTarget.businessDays} business day${rangeTarget.businessDays === 1 ? "" : "s"} × ${Math.round(rangeTarget.dailyExpected * 10) / 10}h/day).`, "info");
   }catch(error){
