@@ -2321,6 +2321,19 @@ function renderOpsChartsMain(user) {
   var myA = new Set(), myC = new Set();
   external.forEach(function(r) { if(r.assignee) myA.add(r.assignee); if(r.client) myC.add(r.client); });
 
+  var harvestPct = null, harvestHours = '', harvestColor = 'var(--success)';
+  var hd = PMO && PMO.latest && PMO.latest.harvest;
+  if (hd && hd.date_from) {
+    var hhData = (typeof harvestHoursReportData !== 'undefined') ? harvestHoursReportData : [];
+    var totalH = 0, totalE = 0;
+    hhData.forEach(function(r) { totalH += (r.hours||0); totalE += (r.expected||0); });
+    if (totalE > 0) {
+      harvestPct = Math.round((totalH/totalE)*100);
+      harvestHours = totalH.toFixed(1)+'h / '+totalE.toFixed(1)+'h';
+      harvestColor = harvestPct>=80?'var(--success)':harvestPct>=50?'var(--warning)':'var(--danger)';
+    }
+  }
+
   var allFcRows = Object.values((PMO&&PMO.latest&&PMO.latest.forecast)||{}).flat().filter(Boolean);
   var fcRows = (typeof scopedForecastRows==='function') ? scopedForecastRows(allFcRows) : allFcRows;
   var t2 = new Date(); t2.setHours(0,0,0,0);
@@ -2332,6 +2345,8 @@ function renderOpsChartsMain(user) {
   });
 
   var bench=(PMO&&PMO.latest&&PMO.latest.bench_list)||[];
+  var needsAttn = fcG.s + fcG.o;
+
   function ee(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function ini(n){var p=String(n||'').trim().split(' ');return (p[0]?p[0][0]:'')+(p[1]?p[1][0]:'');}
   var AC=[['#E6E9FF','var(--highlight-blue)'],['#CFF3E4','#00915A'],['#FFE6CC','#B4690E'],['#F3CFFF','#7C3AED']];
@@ -2340,42 +2355,97 @@ function renderOpsChartsMain(user) {
   function fcr(label,count,color,dest,urg){
     if(!count) return '';
     var oc=urg?'dueDatesUrgencyFilter=\''+urg+'\';goTo(\''+dest+'\')':'goTo(\''+dest+'\')';
-    return '<div onclick="'+oc+'" class="pm-fc-row"><span class="pm-fc-dot" style="background:'+color+'"></span><span class="pm-fc-label">'+label+'</span><span class="pm-fc-count" style="color:'+color+'">'+count+'</span></div>';
+    return '<div onclick="'+oc+'" style="display:flex;align-items:center;gap:12px;padding:8px 4px;cursor:pointer;border-radius:8px" onmouseover="this.style.background=\'var(--bg-2)\'" onmouseout="this.style.background=\'\'"><span style="width:9px;height:9px;border-radius:999px;background:'+color+';flex-shrink:0"></span><span style="flex:1;font-size:14px;font-weight:600;color:var(--fg-1)">'+label+'</span><span style="font-size:14px;font-weight:800;color:'+color+'">'+count+'</span></div>';
   }
 
-  var bH=bench.slice(0,4).map(function(p,i){
-    var col=AC[i%AC.length],nm=ee(p.name||p.assignee||''),pos=ee(p.position||'');
-    var av=p.avail!=null?Math.round(p.avail):(p.assign!=null?100-Math.round(p.assign):null);
-    return '<div style="display:flex;align-items:center;gap:11px;padding:8px 6px">'
-      +'<span style="width:32px;height:32px;border-radius:50%;background:'+col[0]+';color:'+col[1]+';display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800">'+ee(ini(nm))+'</span>'
-      +'<div style="flex:1;min-width:0"><div style="font-size:.84rem;font-weight:700;color:var(--fg-1)">'+nm+'</div>'+(pos?'<div style="font-size:.72rem;color:var(--fg-mute)">'+pos+'</div>':'')+(av!=null?'<div style="font-size:.7rem;color:var(--success);font-weight:700">'+av+'% avail</div>':'')+'</div>'
-      +'<button onclick="openAssignModal(\''+nm.replace(/'/g,"\\'")+'\','+(av!=null?av:100)+',\'\')" style="display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:9px;border:1px solid var(--border-default);background:var(--bg-1);color:var(--fg-1);font-size:.76rem;font-weight:700;font-family:var(--font-sans);cursor:pointer"><i class=\"ti ti-user-plus\"></i> Assign</button>'
-      +'</div>';
-  }).join('')+(bench.length>4?'<div style="padding:6px;font-size:.72rem;color:var(--fg-mute)">+'+(bench.length-4)+' <a href="#" onclick="goTo(\'bench\');return false" style="color:var(--highlight-blue)">View all</a></div>':'');
+  var benchHtml = bench.length===0
+    ? '<p style="color:var(--fg-mute);font-size:.82rem;margin:.5rem 0">No bench.</p>'
+    : bench.slice(0,3).map(function(p,i){
+        var col=AC[i%AC.length],nm=ee(p.name||p.assignee||''),pos=ee(p.position||'');
+        var av=p.avail!=null?Math.round(p.avail):(p.assign!=null?100-Math.round(p.assign):null);
+        return '<div style="display:flex;align-items:center;gap:11px;padding:8px 4px">'
+          +'<span style="width:34px;height:34px;border-radius:50%;background:'+col[0]+';color:'+col[1]+';display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0">'+ee(ini(nm))+'</span>'
+          +'<div style="flex:1;min-width:0"><div style="font-size:.88rem;font-weight:700;color:var(--fg-1)">'+nm+'</div>'+(pos?'<div style="font-size:.75rem;color:var(--fg-mute)">'+pos+'</div>':'')+'</div>'
+          +'<button onclick="openAssignModal(\''+nm.replace(/'/g,"\\'")+'\','+(av!=null?av:100)+',\'\')" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:9px;border:1px solid var(--border-default);background:var(--bg-1);color:var(--fg-1);font-size:.78rem;font-weight:700;font-family:var(--font-sans);cursor:pointer"><i class=\"ti ti-user-plus\"></i> Assign</button>'
+          +'</div>';
+      }).join('')
+      +(bench.length>3?'<div style="padding:6px 4px 0;font-size:.75rem;color:var(--fg-mute)">+'+(bench.length-3)+' more &middot; <a href="#" onclick="goTo(\'bench\');return false" style="color:var(--highlight-blue)">View all</a></div>':'');
 
-  host.innerHTML='<div style="font-family:var(--font-sans)">'
-    +'<div style="font-family:var(--font-display);font-size:1.05rem;font-weight:900;letter-spacing:-.02em;color:var(--fg-1);margin-bottom:14px">Work</div>'
-    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">'
-    +'<div onclick="goTo(\'opsViews\')" style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1.1rem 1.2rem;cursor:pointer"><span style="width:34px;height:34px;border-radius:9px;background:var(--bg-2);display:inline-flex;align-items:center;justify-content:center;color:var(--highlight-blue);font-size:18px;margin-bottom:.6rem"><i class=\"ti ti-users\"></i></span><div style="font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--fg-1);letter-spacing:-.04em;line-height:1">'+myA.size+'</div><div style="font-size:.8rem;font-weight:700;color:var(--fg-2);margin-top:5px">Assignees</div></div>'
-    +'<div onclick="goTo(\'opsViews\')" style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1.1rem 1.2rem;cursor:pointer"><span style="width:34px;height:34px;border-radius:9px;background:var(--bg-2);display:inline-flex;align-items:center;justify-content:center;color:var(--highlight-blue);font-size:18px;margin-bottom:.6rem"><i class=\"ti ti-building\"></i></span><div style="font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--fg-1);letter-spacing:-.04em;line-height:1">'+myC.size+'</div><div style="font-size:.8rem;font-weight:700;color:var(--fg-2);margin-top:5px">Clients</div></div>'
-    +'<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1.1rem 1.2rem;opacity:.5"><span style="width:34px;height:34px;border-radius:9px;background:var(--bg-2);display:inline-flex;align-items:center;justify-content:center;color:var(--fg-mute);font-size:18px;margin-bottom:.6rem"><i class=\"ti ti-clock-hour-4\"></i></span><div style="font-size:2rem;font-weight:900;color:var(--fg-mute);letter-spacing:-.04em;line-height:1">—</div><div style="font-size:.8rem;font-weight:700;color:var(--fg-2);margin-top:5px">Harvest (week)</div><div style="font-size:.7rem;color:var(--fg-mute)">Run report first</div></div>'
+  host.innerHTML = '<div style="font-family:var(--font-sans);display:flex;flex-direction:column;gap:14px">'
+
+    // COMPACT HEADER + KPI CHIPS
+    +'<div style="display:flex;align-items:center;gap:20px;background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:16px;padding:20px 24px">'
+    +'<div>'
+    +'<div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--highlight-blue)">Operations Command Center</div>'
+    +'<div style="font-family:var(--font-display);font-weight:900;font-size:1.5rem;color:var(--fg-1);margin-top:4px;letter-spacing:-.02em">Work overview</div>'
     +'</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">'
-    +'<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1.1rem 1.2rem"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem"><span style="font-family:var(--font-display);font-size:.92rem;font-weight:900;color:var(--fg-1)">Forecast</span><a href="#" onclick="goTo(\'forecast\');return false" style="font-size:.74rem;font-weight:700;color:var(--fg-3);display:inline-flex;align-items:center;gap:4px">View all <i class=\"ti ti-arrow-right\"></i></a></div>'
-    +(fcG.tot>0?'<div style="display:flex;height:8px;border-radius:999px;overflow:hidden;background:var(--bg-3);margin-bottom:1rem">'+(fcG.o?'<span style="width:'+(fcG.o/tot*100).toFixed(1)+'%;background:var(--danger)"></span>':'')+(fcG.s?'<span style="width:'+(fcG.s/tot*100).toFixed(1)+'%;background:var(--warning)"></span>':'')+(fcG.m?'<span style="width:'+(fcG.m/tot*100).toFixed(1)+'%;background:var(--highlight-blue)"></span>':'')+(fcG.f?'<span style="width:'+(fcG.f/tot*100).toFixed(1)+'%;background:var(--success)"></span>':'')+'</div>':'')
+    +'<div style="margin-left:auto;display:flex;gap:10px">'
+    +'<div style="min-width:110px;background:var(--bg-2);border:1px solid var(--border-subtle);border-radius:12px;padding:10px 14px"><div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--fg-3)"><i class=\"ti ti-users\" style=\"color:var(--highlight-blue)\"></i>Assignees</div><div style="font-family:var(--font-display);font-weight:900;font-size:1.6rem;color:var(--fg-1);margin-top:2px">'+myA.size+'</div></div>'
+    +'<div style="min-width:110px;background:var(--bg-2);border:1px solid var(--border-subtle);border-radius:12px;padding:10px 14px"><div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--fg-3)"><i class=\"ti ti-building\" style=\"color:var(--sky-600,#0077B6)\"></i>Clients</div><div style="font-family:var(--font-display);font-weight:900;font-size:1.6rem;color:var(--fg-1);margin-top:2px">'+myC.size+'</div></div>'
+    +'<div style="min-width:110px;background:var(--bg-2);border:1px solid var(--border-subtle);border-radius:12px;padding:10px 14px" onclick="goTo(\'harvestHours\')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--fg-3)"><i class=\"ti ti-clock-hour-4\" style=\"color:'+harvestColor+'\"></i>Harvest</div><div style="font-family:var(--font-display);font-weight:900;font-size:1.6rem;color:'+(harvestPct!==null?harvestColor:'var(--fg-mute)')+';margin-top:2px">'+(harvestPct!==null?harvestPct+'%':'—')+'</div></div>'
+    +'</div>'
+    +'</div>'
+
+    // NEEDS ATTENTION
+    +(needsAttn>0
+      ?'<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:16px;padding:20px 24px">'
+       +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
+       +'<i class=\"ti ti-flag\" style=\"font-size:20px;color:var(--danger)\"></i>'
+       +'<span style="font-weight:800;font-size:15px;color:var(--fg-1)">Needs attention</span>'
+       +'<span style="font-size:12px;font-weight:800;color:#fff;background:var(--danger);padding:2px 8px;border-radius:999px">'+needsAttn+'</span>'
+       +'</div>'
+       +(fcG.o>0?'<div style="display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;background:#FFF1F3;border:1px solid rgba(255,51,85,.2);margin-bottom:10px">'
+         +'<i class=\"ti ti-calendar-x\" style=\"font-size:22px;color:var(--danger)\"></i>'
+         +'<div><div style="font-weight:700;font-size:14px;color:var(--fg-1)">'+fcG.o+' assignment'+(fcG.o>1?'s':'')+' overdue</div><div style="font-size:12px;color:var(--fg-3)">Requires immediate action</div></div>'
+         +'<a href="#" onclick="dueDatesUrgencyFilter=\'overdue\';goTo(\'dueDates\');return false" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:var(--danger);color:#fff;font-size:13px;font-weight:700">View <i class=\"ti ti-arrow-right\"></i></a>'
+         +'</div>':'')
+       +(fcG.s>0?'<div style="display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;background:#EDF4FA;border:1px solid var(--mist-100)">'
+         +'<i class=\"ti ti-calendar-event\" style=\"font-size:22px;color:var(--highlight-blue)\"></i>'
+         +'<div><div style="font-weight:700;font-size:14px;color:var(--fg-1)">'+fcG.s+' assignment'+(fcG.s>1?'s':'')+' ending in ≤30 days</div><div style="font-size:12px;color:var(--fg-3)">Confirm renewal or plan rotation</div></div>'
+         +'<a href="#" onclick="dueDatesUrgencyFilter=\'soon\';goTo(\'dueDates\');return false" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:#fff;border:1px solid var(--border-default);color:var(--fg-1);font-size:13px;font-weight:700">View due dates <i class=\"ti ti-arrow-right\"></i></a>'
+         +'</div>':'')
+       +'</div>'
+      :'')
+
+    // FORECAST + BENCH
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+
+    +'<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:16px;padding:20px 24px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+    +'<span style="display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:15px;color:var(--fg-1)"><i class=\"ti ti-calendar\" style=\"color:var(--fg-3)\"></i>Forecast</span>'
+    +'<a href="#" onclick="goTo(\'forecast\');return false" style="font-size:13px;font-weight:700;color:var(--fg-3);display:inline-flex;align-items:center;gap:4px">View all <i class=\"ti ti-arrow-right\"></i></a>'
+    +'</div>'
+    +(fcG.tot>0
+      ?'<div style="display:flex;height:9px;border-radius:999px;overflow:hidden;background:var(--bg-3);margin-bottom:12px">'
+       +(fcG.o?'<span style="width:'+(fcG.o/tot*100).toFixed(1)+'%;background:var(--danger)"></span>':'')
+       +(fcG.s?'<span style="width:'+(fcG.s/tot*100).toFixed(1)+'%;background:var(--warning)"></span>':'')
+       +(fcG.m?'<span style="width:'+(fcG.m/tot*100).toFixed(1)+'%;background:var(--highlight-blue)"></span>':'')
+       +(fcG.f?'<span style="width:'+(fcG.f/tot*100).toFixed(1)+'%;background:var(--success)"></span>':'')
+       +'</div>':''
+    )
     +fcr('Overdue',fcG.o,'var(--danger)','dueDates','overdue')
     +fcr('≤30 days',fcG.s,'var(--warning)','dueDates','soon')
     +fcr('31–60 days',fcG.m,'var(--highlight-blue)','forecast','')
     +fcr('>60 days',fcG.f,'var(--success)','forecast','')
-    +(!fcG.tot?'<p style="color:var(--fg-mute);font-size:.82rem;margin:0">No upcoming assignments.</p>':'')
+    +(!fcG.tot?'<p style="color:var(--fg-mute);font-size:.85rem;margin:0">No upcoming assignments.</p>':'')
     +'</div>'
-    +'<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1.1rem 1.2rem"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem"><span style="font-family:var(--font-display);font-size:.92rem;font-weight:900;color:var(--fg-1);display:inline-flex;align-items:center;gap:8px">On bench <span style="font-size:.7rem;font-weight:800;color:var(--warning);background:rgba(255,184,0,.12);padding:2px 8px;border-radius:999px">'+bench.length+'</span></span><a href="#" onclick="goTo(\'bench\');return false" style="font-size:.74rem;font-weight:700;color:var(--fg-3);display:inline-flex;align-items:center;gap:4px">View all <i class=\"ti ti-arrow-right\"></i></a></div>'+(bench.length?bH:'<p style="color:var(--fg-mute);font-size:.82rem;margin:.5rem 0">No bench.</p>')+'</div>'
+
+    +'<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:16px;padding:20px 24px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+    +'<span style="display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:15px;color:var(--fg-1)"><i class=\"ti ti-armchair\" style=\"color:var(--fg-3)\"></i>On bench <span style="font-size:12px;font-weight:800;color:var(--warning);background:rgba(255,184,0,.12);padding:2px 8px;border-radius:999px">'+bench.length+'</span></span>'
+    +'<a href="#" onclick="goTo(\'bench\');return false" style="font-size:13px;font-weight:700;color:var(--fg-3);display:inline-flex;align-items:center;gap:4px">View all <i class=\"ti ti-arrow-right\"></i></a>'
     +'</div>'
-    +'<div style="display:flex;gap:9px;flex-wrap:wrap">'
-    +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/AA/form/150" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:10px;background:var(--highlight-blue);color:#fff;font-size:.82rem;font-weight:700;text-decoration:none"><i class=\"ti ti-plus\"></i> New Assignment</a>'
-    +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/PSA/form/51" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:10px;background:var(--bg-1);border:1px solid var(--border-default);color:var(--fg-1);font-size:.82rem;font-weight:700;text-decoration:none"><i class=\"ti ti-clipboard-list\"></i> Account Status</a>'
-    +'<button onclick="goTo(\'opsViews\')" style="display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:10px;background:var(--bg-1);border:1px solid var(--border-default);color:var(--fg-1);font-size:.82rem;font-weight:700;font-family:var(--font-sans);cursor:pointer"><i class=\"ti ti-compass\"></i> Operating Views</button>'
-    +'</div></div>';
+    +benchHtml
+    +'</div>'
+    +'</div>'
+
+    // ACTIONS
+    +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
+    +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/AA/form/150" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:12px;background:var(--highlight-blue);color:#fff;font-size:14px;font-weight:700;text-decoration:none"><i class=\"ti ti-plus\"></i>New Assignment</a>'
+    +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/PSA/form/51" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:12px;background:var(--bg-1);border:1px solid var(--border-default);color:var(--fg-1);font-size:14px;font-weight:700;text-decoration:none"><i class=\"ti ti-clipboard-list\"></i>Account Status</a>'
+    +'<button onclick="goTo(\'opsViews\')" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:12px;background:var(--bg-1);border:1px solid var(--border-default);color:var(--fg-1);font-size:14px;font-weight:700;font-family:var(--font-sans);cursor:pointer"><i class=\"ti ti-compass\"></i>Operating Views</button>'
+    +'</div>'
+    +'</div>';
 }
 
 function renderActivityFeed(user) {
