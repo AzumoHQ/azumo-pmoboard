@@ -15,7 +15,8 @@ const {
   enrichParsedWithSnapshot,
   issuesFromJiraResponse,
   parseAccountCoverageIssues,
-  parseJiraIssues
+  parseJiraIssues,
+  buildActivityLog
 } = require('../lib/pmo-transform');
 
 function readJson(req) {
