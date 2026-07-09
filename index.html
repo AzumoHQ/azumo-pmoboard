@@ -2297,84 +2297,101 @@ function renderOpsChartsMain(user) {
   var host = document.getElementById('pmoOverviewCharts');
   if (!host) return;
   host.innerHTML = '';
-  host.innerHTML = '';
   var ovRole = String((user && user.role) || (typeof effectiveUserRole === 'function' ? effectiveUserRole() : '') || '').trim().toLowerCase();
   var isPmoOrExec = ['pmo','admin','executive'].indexOf(ovRole) !== -1;
-  if (isPmoOrExec) return;
+  if (isPmoOrExec) { host.hidden = true; return; }
+  host.hidden = false;
 
   var rows = (typeof scopedAssignmentRows === 'function') ? scopedAssignmentRows() : (typeof allAssignmentRows === 'function' ? allAssignmentRows() : []);
   var external = rows.filter(function(r) {
-    return String(r.status||'').trim() === 'In Progress' && r.client && ['Bench','Azumo'].indexOf(String(r.client).trim()) === -1;
+    return String(r.status||'').trim() === 'In Progress'
+      && r.client && ['Bench','Azumo'].indexOf(String(r.client).trim()) === -1;
   });
 
-  var today = new Date(); today.setHours(0,0,0,0);
-  var bk = {overdue:[],soon:[],mid:[],far:[],pending:[]};
+  var myAssignees = new Set();
+  var myClients = new Set();
   external.forEach(function(r) {
-    if (!r.due) { bk.pending.push(r); return; }
+    if (r.assignee) myAssignees.add(r.assignee);
+    if (r.client) myClients.add(r.client);
+  });
+
+  // Harvest week
+  var harvestPct = null, harvestHours = '', harvestColor = 'var(--fg-1)';
+  var hd = PMO && PMO.latest && PMO.latest.harvest;
+  if (hd && hd.date_from) {
+    var hhData = (typeof harvestHoursReportData !== 'undefined') ? harvestHoursReportData : [];
+    var totalH = 0, totalE = 0;
+    hhData.forEach(function(r) { totalH += (r.hours||0); totalE += (r.expected||0); });
+    if (totalE > 0) {
+      harvestPct = Math.round((totalH/totalE)*100);
+      harvestHours = totalH.toFixed(1)+'h / '+totalE.toFixed(1)+'h';
+      harvestColor = harvestPct>=80?'var(--success)':harvestPct>=50?'var(--warning)':'var(--danger)';
+    }
+  }
+
+  // Forecast scoped
+  var allFcRows = Object.values((PMO&&PMO.latest&&PMO.latest.forecast)||{}).flat().filter(Boolean);
+  var forecastRows = (typeof scopedForecastRows==='function') ? scopedForecastRows(allFcRows) : allFcRows;
+  var today2 = new Date(); today2.setHours(0,0,0,0);
+  var fcG = {overdue:[],soon:[],mid:[],far:[]};
+  forecastRows.forEach(function(r) {
+    if (!r.due) return;
     var d = new Date(r.due); d.setHours(0,0,0,0);
-    var diff = Math.round((d-today)/86400000);
-    if (diff<0) bk.overdue.push(r);
-    else if (diff<=30) bk.soon.push(r);
-    else if (diff<=60) bk.mid.push(r);
-    else bk.far.push(r);
+    var diff = Math.round((d-today2)/86400000);
+    if (diff<0) fcG.overdue.push(r);
+    else if (diff<=30) fcG.soon.push(r);
+    else if (diff<=60) fcG.mid.push(r);
+    else fcG.far.push(r);
   });
-  var dueData = [
-    {label:'Overdue', count:bk.overdue.length, color:'var(--danger)',  dest:'dueDates', urgency:'overdue'},
-    {label:'\u226430d', count:bk.soon.length,  color:'var(--warning)', dest:'dueDates', urgency:'soon'},
-    {label:'31\u201360d',count:bk.mid.length,  color:'var(--highlight-blue)', dest:'dueDates', urgency:'mid'},
-    {label:'>60d',    count:bk.far.length,  color:'var(--success)', dest:'dueDates', urgency:'far'},
-    {label:'Pending', count:bk.pending.length,color:'var(--fg-mute)',dest:'pendingAssignments'}
-  ].filter(function(b){return b.count>0;});
-  var totalDue = dueData.reduce(function(s,b){return s+b.count;},0);
 
-  var byClient = {};
-  external.forEach(function(r) {
-    var cl = String(r.client||'').trim(); if(!cl) return;
-    if(!byClient[cl]) byClient[cl] = new Set();
-    if(r.assignee) byClient[cl].add(r.assignee);
-  });
-  var clientData = Object.keys(byClient).map(function(cl){
-    return {client:cl, count:byClient[cl].size};
-  }).sort(function(a,b){return b.count-a.count;}).slice(0,8);
-  var maxC = clientData.length ? clientData[0].count : 1;
-  var BAR = 160;
+  function ee(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-  function ee(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-  function tr(s,n){return s.length>n?s.slice(0,n-1)+'\u2026':s;}
+  function kpi(value, label, sub, onclick, color) {
+    return '<div '+(onclick?'onclick="'+onclick+'" style="cursor:pointer;background:var(--bg-1)"':'style="background:var(--bg-1)"')
+      +' style="border:1px solid var(--border-subtle);border-radius:14px;padding:1rem 1.2rem;transition:background .12s"'
+      +' onmouseover="if(this.onclick)this.style.background='var(--bg-2)'" onmouseout="this.style.background='var(--bg-1)'">'
+      +'<div style="font-family:var(--font-display);font-size:1.9rem;font-weight:780;color:'+(color||'var(--fg-1)')+';letter-spacing:-.04em;line-height:1">'+value+'</div>'
+      +'<div style="font-size:.78rem;font-weight:700;color:var(--fg-2);margin-top:4px">'+label+'</div>'
+      +(sub?'<div style="font-size:.7rem;color:var(--fg-mute);margin-top:2px">'+sub+'</div>':'')
+      +'</div>';
+  }
 
-  var dueHtml = dueData.length===0
-    ? '<p style="color:var(--fg-mute);font-size:.82rem;margin:.5rem 0">No active external assignments.</p>'
-    : dueData.map(function(b){
-        var w=totalDue?Math.round((b.count/totalDue)*BAR):0;
-        return '<div class="pmo-ov-chart-row" role="button" tabindex="0" style="cursor:pointer"'
-          +' onclick="goTo(\''+b.dest+'\')">'
-          +'<span class="pmo-ov-chart-lbl">'+ee(b.label)+'</span>'
-          +'<span class="pmo-ov-chart-bar-wrap"><span class="pmo-ov-chart-bar" style="width:'+w+'px;background:'+b.color+'"></span></span>'
-          +'<span class="pmo-ov-chart-count">'+b.count+'</span></div>';
-      }).join('');
+  function fcRow(label, count, color, dest) {
+    if (!count) return '';
+    return '<div onclick="goTo(''+dest+'')" style="display:flex;align-items:center;gap:10px;padding:7px 4px;border-radius:8px;cursor:pointer" '
+      +'onmouseover="this.style.background='var(--bg-2)'" onmouseout="this.style.background=''">'
+      +'<span style="width:8px;height:8px;border-radius:50%;background:'+color+';flex-shrink:0"></span>'
+      +'<span style="font-size:.82rem;font-weight:600;color:var(--fg-1);flex:1">'+label+'</span>'
+      +'<span style="font-size:.82rem;font-weight:800;color:'+color+'">'+count+'</span>'
+      +'</div>';
+  }
 
-  var clientHtml = clientData.length===0
-    ? '<p style="color:var(--fg-mute);font-size:.82rem;margin:.5rem 0">No active client assignments.</p>'
-    : clientData.map(function(b){
-        var w=Math.round((b.count/maxC)*BAR);
-        var ck=ee(b.client);
-        return '<div class="pmo-ov-chart-row" role="button" tabindex="0" style="cursor:pointer"'
-          +' onclick="opsFilters.client=\''+ck+'\';var s=document.getElementById(\'opsClientFilter\');if(s)s.value=\''+ck+'\';goTo(\'opsViews\')">'
-          +'<span class="pmo-ov-chart-lbl" title="'+ck+'">'+ee(tr(b.client,22))+'</span>'
-          +'<span class="pmo-ov-chart-bar-wrap"><span class="pmo-ov-chart-bar" style="width:'+w+'px;background:var(--highlight-blue)"></span></span>'
-          +'<span class="pmo-ov-chart-count">'+b.count+' people</span></div>';
-      }).join('');
-
-  var roleLabel = ovRole==='pm'?'My projects':ovRole==='csm'?'My accounts':'My assignments';
-  var chartsHtml = '<div class="pmo-ov-charts-grid" style="margin-top:20px">'
-    +'<div class="pmo-ov-chart-panel"><div class="pmo-ov-chart-title">Assignment due dates</div>'
-    +'<div class="pmo-ov-chart-sub" style="color:var(--fg-mute);font-size:.72rem;margin-bottom:.75rem">Click to view in Due Dates</div>'+dueHtml+'</div>'
-    +'<div class="pmo-ov-chart-panel"><div class="pmo-ov-chart-title">'+ee(roleLabel)+'</div>'
-    +'<div class="pmo-ov-chart-sub" style="color:var(--fg-mute);font-size:.72rem;margin-bottom:.75rem">Click → Operating Views</div>'+clientHtml+'</div>'
+  var kpiHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">'
+    +kpi(myAssignees.size,'My assignees','Active · In Progress',"goTo('opsViews')")
+    +kpi(myClients.size,'My clients','Active accounts',"goTo('opsViews')")
+    +(harvestPct!==null?kpi(harvestPct+'%','Harvest (week)',harvestHours,"goTo('harvestHours')",harvestColor):'')
     +'</div>';
 
-  host.innerHTML = chartsHtml + (host.innerHTML || '');
-  host.hidden = false;
+  var fcHtml = '<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:14px;padding:1rem 1.2rem;margin-bottom:16px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">'
+    +'<div style="font-family:var(--font-display);font-size:.9rem;font-weight:760;color:var(--fg-1)">Forecast</div>'
+    +'<button onclick="goTo('forecast')" class="btn btn-ghost btn-sm" style="font-size:.72rem">View all <i class="ti ti-arrow-right"></i></button>'
+    +'</div>'
+    +(forecastRows.length===0
+      ? '<p style="color:var(--fg-mute);font-size:.82rem;margin:0">No upcoming assignments.</p>'
+      : fcRow('Overdue',fcG.overdue.length,'var(--danger)','dueDates')
+       +fcRow('≤30 days',fcG.soon.length,'var(--warning)','dueDates')
+       +fcRow('31–60 days',fcG.mid.length,'var(--highlight-blue)','forecast')
+       +fcRow('>60 days',fcG.far.length,'var(--success)','forecast'))
+    +'</div>';
+
+  var actHtml = '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/AA/form/150" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="text-decoration:none"><i class="ti ti-plus"></i> New Assignment</a>'
+    +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/PSA/form/51" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="text-decoration:none"><i class="ti ti-clipboard-list"></i> Account Status</a>'
+    +'<button class="btn btn-ghost btn-sm" onclick="goTo('opsViews')"><i class="ti ti-compass"></i> Operating Views</button>'
+    +'</div>';
+
+  host.innerHTML = kpiHtml + fcHtml + actHtml;
 }
 
 function renderActivityFeed(user) {
