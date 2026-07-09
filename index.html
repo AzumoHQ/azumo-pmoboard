@@ -6128,18 +6128,29 @@ async function runHarvestHoursReport(){
       .filter(row => harvestHoursRowAllowedForCurrentUser(row))
       .sort((a,b) => a.pct - b.pct || a.name.localeCompare(b.name));
 
+    // Client equivalence: same fuzzy rule as scope matching (Spinwheel ~ Spinwheel Solutions)
+    const NON_CLIENT_KEYS = new Set(['bench','azumo']);
+    const clientsMatch = (a, b) => {
+      const ka = normalizeClientKey(a), kb = normalizeClientKey(b);
+      if(!ka || !kb) return false;
+      return ka === kb || ka.includes(kb) || kb.includes(ka);
+    };
+    // Real client assignments only (exclude Bench / Azumo bench states)
+    const realJiraClients = (arr) => (arr || []).filter(cl => !NON_CLIENT_KEYS.has(normalizeClientKey(cl)));
+
     // ---- QA: Jira vs Harvest discrepancies (scope-aware) ----
     harvestHoursQAData = [];
     const normKeys = (arr) => new Set((arr || []).map(normalizeClientKey));
     Object.entries(jiraClientsByPerson).forEach(([norm, jiraClients]) => {
       const harv = harvestByNorm[norm];
       if(!harv || !harv.harvestClients.length) return;
-      const jiraKeys = normKeys(jiraClients);
+      const realClients = realJiraClients(jiraClients);
       harv.harvestClients.forEach(hc => {
-        if(!jiraKeys.has(normalizeClientKey(hc))){
+        const matches = realClients.some(jc => clientsMatch(jc, hc));
+        if(!matches){
           harvestHoursQAData.push({
             name: harv.name, type: 'cross-client',
-            jiraClients: jiraClients.slice(),
+            jiraClients: realClients.slice(),
             harvestClient: hc,
             hours: Math.round((hoursByUserClient[harv.id + '|' + hc] || 0) * 10) / 10
           });
