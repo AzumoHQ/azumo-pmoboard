@@ -3234,7 +3234,7 @@ async function manualSnapshot(){
     return;
   }
   const btns = [...document.querySelectorAll('[data-sync-action]')];
-  btns.forEach(btn => { btn.disabled = true; btn.dataset.originalText = btn.dataset.originalText || btn.textContent; btn.textContent = '<i class="ti ti-hourglass"></i> Syncing...'; });
+  btns.forEach(btn => { btn.disabled = true; btn.dataset.originalText = btn.dataset.originalText || btn.textContent; btn.innerHTML = '<i class="ti ti-hourglass"></i> Syncing...'; });
   try{
     const response = await fetch('/api/refresh', {
       method:'POST',
