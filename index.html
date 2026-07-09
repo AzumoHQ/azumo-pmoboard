@@ -5947,29 +5947,32 @@ function renderHarvestHoursReport(){
       <td>${harvestHoursStatusTag(row)}</td>
     </tr>`;
 
-    const detailRows = hasProjects ? `<tr id="${expandId}" class="hh-expand-row" style="display:none">
-      <td colspan="8" style="padding:0 0 0 32px;background:var(--bg-2)">
-        <table style="width:100%;border-collapse:collapse">
-          ${row.projects.map(p => `<tr>
-            <td style="padding:6px 12px;font-size:.82rem;color:var(--fg-2);width:40%">${esc(p.client)}</td>
-            <td style="padding:6px 12px;font-size:.82rem;font-weight:700;color:var(--fg-1)">${esc(p.hours)}h</td>
-            <td style="padding:6px 12px;font-size:.82rem;color:var(--muted)">${esc(row.expected ? Math.round(p.hours/row.expected*100)+"%" : "")}</td>
-          </tr>`).join("")}
-        </table>
-      </td>
-    </tr>` : "";
+    const detailRows = hasProjects ? row.projects.map(p => {
+      const pPct = row.expected ? Math.round(p.hours/row.expected*100) : 0;
+      return `<tr class="hh-expand-row hh-expand-${expandId}" style="background:var(--bg-2)">
+        <td style="padding:4px 8px 4px 36px;font-size:.82rem;color:var(--fg-3);font-style:italic">${esc(p.client)}</td>
+        <td style="font-size:.82rem;color:var(--fg-2)"></td>
+        <td style="font-size:.82rem;font-weight:700;color:var(--fg-1)">${esc(p.hours)}h</td>
+        <td></td>
+        <td></td>
+        <td style="font-size:.82rem;color:var(--fg-3)">${pPct}%</td>
+        <td></td>
+        <td></td>
+      </tr>`;
+    }).join("") : "";
 
     return mainRow + detailRows;
   }).join("");
 }
 
 function toggleHarvestExpand(id){
-  const row = document.getElementById(id);
+  const rows = document.querySelectorAll(".hh-expand-"+id);
   const icon = document.getElementById(id+"-icon");
-  if(!row) return;
-  const open = row.style.display !== "none";
-  row.style.display = open ? "none" : "table-row";
-  if(icon) icon.style.transform = open ? "" : "rotate(90deg)";
+  if(!rows.length) return;
+  const open = rows[0].style.display !== "none" && !rows[0].classList.contains("hh-expand-row");
+  const isHidden = getComputedStyle(rows[0]).display === "none";
+  rows.forEach(r => r.style.display = isHidden ? "table-row" : "none");
+  if(icon) icon.style.transform = isHidden ? "rotate(90deg)" : "";
 }
 window.toggleHarvestExpand = toggleHarvestExpand;
 async function runHarvestHoursReport(){
