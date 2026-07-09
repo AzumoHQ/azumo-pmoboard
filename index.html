@@ -6032,6 +6032,11 @@ async function runHarvestHoursReport(){
       }));
       return {name, hours, daysFilled, missingDescription, expected, pct, complete:ratio >= threshold, client: primaryClient, clients: userClients, projects};
     }).filter(row => harvestHoursRowAllowedForCurrentUser(row))
+      .filter(row => {
+        const role = (typeof effectiveUserRole === 'function' ? effectiveUserRole() : '').toLowerCase();
+        if(['pmo','admin','executive'].includes(role)) return true;
+        return row.clients && row.clients.length > 0;
+      })
       .sort((a,b) => a.pct - b.pct || a.name.localeCompare(b.name));
     renderHarvestHoursReport();
     setHarvestHoursStatus(`Report generated from Harvest. ${harvestHoursReportData.length} active users reviewed. Target for selected range: ${expected}h (${rangeTarget.businessDays} business day${rangeTarget.businessDays === 1 ? "" : "s"} × ${Math.round(rangeTarget.dailyExpected * 10) / 10}h/day).`, "info");
