@@ -5851,7 +5851,7 @@ function harvestHoursRowAllowedForCurrentUser(row = {}){
   const scopedKeys = myScopedClientKeys();
   if(scopedKeys === null) return true;
   const clientStr = String(row.client || "").trim();
-  return clientStr ? scopedKeys.has(normalizeClientKey(clientStr)) : false;
+  return !clientStr || scopedKeys.has(normalizeClientKey(clientStr));
 }
 function harvestHoursClientMap(){
   const map = {};
