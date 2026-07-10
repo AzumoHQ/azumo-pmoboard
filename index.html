@@ -2420,7 +2420,7 @@ function renderOpsChartsMain(user) {
       :'')
 
     // FORECAST + BENCH
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+    +'<div style="display:grid;grid-template-columns:1fr;gap:14px">'
 
     +'<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:16px;padding:20px 24px">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
@@ -2442,13 +2442,7 @@ function renderOpsChartsMain(user) {
     +(!fcG.tot?'<p style="color:var(--fg-mute);font-size:.85rem;margin:0">No upcoming assignments.</p>':'')
     +'</div>'
 
-    +'<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:16px;padding:20px 24px">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
-    +'<span style="display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:15px;color:var(--fg-1)"><i class=\"ti ti-armchair\" style=\"color:var(--fg-3)\"></i>On bench <span style="font-size:12px;font-weight:800;color:var(--warning);background:rgba(255,184,0,.12);padding:2px 8px;border-radius:999px">'+bench.length+'</span></span>'
-    +'<a href="#" onclick="goTo(\'bench\');return false" style="font-size:13px;font-weight:700;color:var(--fg-3);display:inline-flex;align-items:center;gap:4px">View all <i class=\"ti ti-arrow-right\"></i></a>'
-    +'</div>'
-    +benchHtml
-    +'</div>'
+    
     +'</div>'
 
     // ACTIONS
@@ -2598,7 +2592,7 @@ function sectionAllowedForCurrentRole(id){
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
   if(['executive','viewer','c-level','clevel','hr'].includes(role)) return true;
-  if(role === 'pm') return ['overview','opsViews','forecast','harvestHours','harvestAccess','psaProjectStatus'].includes(id);
+  if(role === 'pm') return ['overview','opsViews','bench','forecast','harvestHours','harvestAccess','psaProjectStatus'].includes(id);
   if(role === 'csm') return ['overview','opsViews','bench','accountCoverage','forecast','harvestHours','harvestAccess'].includes(id);
   if(role === 'tl') return ['overview','opsViews','accountCoverage','forecast'].includes(id);
   if(role === 'assignee') return ['overview','opsViews','forecast'].includes(id);
@@ -5923,7 +5917,10 @@ function harvestHoursClientMap(){
   try{
     allAssignmentRows().forEach(row => {
       const client = String(row.client || "").trim();
-      const isInternalOrBench = ["Bench","Azumo"].includes(client) && isActiveCapacityRow(row) && rowBillingClass(row) === "Billable";
+      const role = (typeof effectiveUserRole === 'function' ? effectiveUserRole() : '').toLowerCase();
+      const restrictedRoles = ['pm','csm','tl','assignee'];
+      const isCapacity = ["Bench","Azumo"].includes(client) && isActiveCapacityRow(row);
+      const isInternalOrBench = restrictedRoles.includes(role) ? (isCapacity && rowBillingClass(row) === "Billable") : isCapacity;
       if(!isExternalInProgress(row) && !isInternalOrBench) return;
       const person = normalizeIdentity(displayName(row));
       if(!person || !client) return;
