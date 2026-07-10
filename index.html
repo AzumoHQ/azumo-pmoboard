@@ -3738,6 +3738,54 @@ function harvestPayload(){ return latest?.harvest || {}; }
 function myEffectiveEmail(){
   return String(effectiveSessionUser()?.email || '').trim().toLowerCase();
 }
+function normalizeClientWords(value){
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+}
+function wordsContainSubsequence(bigWords, smallWords){
+  if(!smallWords.length || !bigWords.length) return false;
+  if(smallWords.length > bigWords.length) return false;
+  for(let i=0; i<=bigWords.length - smallWords.length; i++){
+    let match = true;
+    for(let j=0; j<smallWords.length; j++){
+      if(bigWords[i+j] !== smallWords[j]){ match = false; break; }
+    }
+    if(match) return true;
+  }
+  return false;
+}
+function clientNamesFuzzyMatch(a, b){
+  const wa = normalizeClientWords(a);
+  const wb = normalizeClientWords(b);
+  if(!wa.length || !wb.length) return false;
+  return wordsContainSubsequence(wa, wb) || wordsContainSubsequence(wb, wa);
+}
+function myScopedClientNames(){
+  const role = effectiveUserRole();
+  if(['admin','pmo','executive','c-level','clevel','viewer'].includes(role)) return [];
+  const email = myEffectiveEmail();
+  if(!email) return [];
+  const fieldByRole = {
+    pm: 'pm_assigned_email',
+    csm: 'csm_assigned_email',
+    tl: 'tl_assigned_email'
+  };
+  const field = fieldByRole[role];
+  if(!field) return [];
+  const names = [];
+  (latest?.account_coverage || []).forEach(row => {
+    if(String(row[field] || '').trim().toLowerCase() === email){
+      if(row.client) names.push(row.client);
+    }
+  });
+  return names;
+}
 function myScopedClientKeys(){
   const role = effectiveUserRole();
   if(['admin','pmo','executive','c-level','clevel','viewer'].includes(role)) return null;
@@ -5865,13 +5913,10 @@ function harvestHoursRowAllowedForCurrentUser(row = {}){
   const candidateClients = (row.clients && row.clients.length) ? row.clients : [row.client];
   const clientKeys = candidateClients.map(c => normalizeClientKey(String(c || ''))).filter(Boolean);
   if(!clientKeys.length) return false;
-  return clientKeys.some(clientKey => {
-    if(scopedKeys.has(clientKey)) return true;
-    for(const sk of scopedKeys){
-      if(clientKey.includes(sk) || sk.includes(clientKey)) return true;
-    }
-    return false;
-  });
+  if(clientKeys.some(clientKey => scopedKeys.has(clientKey))) return true;
+  const scopedNames = myScopedClientNames();
+  if(!scopedNames.length) return false;
+  return candidateClients.some(c => scopedNames.some(sn => clientNamesFuzzyMatch(c, sn)));
 }
 function harvestHoursClientMap(){
   const map = {};
