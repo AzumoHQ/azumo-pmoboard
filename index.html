@@ -5862,13 +5862,16 @@ function harvestHoursRowAllowedForCurrentUser(row = {}){
   }
   const scopedKeys = myScopedClientKeys();
   if(scopedKeys === null) return true;
-  const clientKey = normalizeClientKey(String(row.client || ''));
-  if(!clientKey) return false;
-  if(scopedKeys.has(clientKey)) return true;
-  for(const sk of scopedKeys){
-    if(clientKey.includes(sk) || sk.includes(clientKey)) return true;
-  }
-  return false;
+  const candidateClients = (row.clients && row.clients.length) ? row.clients : [row.client];
+  const clientKeys = candidateClients.map(c => normalizeClientKey(String(c || ''))).filter(Boolean);
+  if(!clientKeys.length) return false;
+  return clientKeys.some(clientKey => {
+    if(scopedKeys.has(clientKey)) return true;
+    for(const sk of scopedKeys){
+      if(clientKey.includes(sk) || sk.includes(clientKey)) return true;
+    }
+    return false;
+  });
 }
 function harvestHoursClientMap(){
   const map = {};
