@@ -5923,7 +5923,7 @@ function harvestHoursClientMap(){
   try{
     allAssignmentRows().forEach(row => {
       const client = String(row.client || "").trim();
-      const isInternalOrBench = ["Bench","Azumo"].includes(client) && isActiveCapacityRow(row);
+      const isInternalOrBench = ["Bench","Azumo"].includes(client) && isActiveCapacityRow(row) && rowBillingClass(row) === "Billable";
       if(!isExternalInProgress(row) && !isInternalOrBench) return;
       const person = normalizeIdentity(displayName(row));
       if(!person || !client) return;
@@ -6012,8 +6012,9 @@ function renderHarvestHoursReport(){
 
     const detailRows = hasProjects ? row.projects.map(p => {
       const pPct = row.expected ? Math.round(p.hours/row.expected*100) : 0;
+      const projectLabel = p.client ? (esc(p.project) + ' <span style="color:var(--fg-mute)">(' + esc(p.client) + ')</span>') : esc(p.project);
       return `<tr class="hh-expand-row hh-expand-${expandId}" data-hidden="true" style="background:var(--bg-2)">
-        <td style="padding:4px 8px 4px 36px;font-size:.82rem;color:var(--fg-3);font-style:italic">${esc(p.client)}</td>
+        <td style="padding:4px 8px 4px 36px;font-size:.82rem;color:var(--fg-3);font-style:italic">${projectLabel}</td>
         <td style="font-size:.82rem;color:var(--fg-2)"></td>
         <td style="font-size:.82rem;font-weight:700;color:var(--fg-1)">${esc(p.hours)}h</td>
         <td></td>
@@ -6095,6 +6096,8 @@ async function runHarvestHoursReport(){
     const missingDescriptionByUser = {};
     const clientsByUser = {};
     const hoursByUserClient = {};
+    const projectsByUser = {};
+    const hoursByUserProject = {};
     const nameById = {};
     const emailById = {};
     (payload.users || []).forEach(u => {
@@ -6114,11 +6117,18 @@ async function runHarvestHoursReport(){
         missingDescriptionByUser[id] = true;
       }
       const clientName = entry.client?.name || '';
+      const projectName = entry.project?.name || 'No project';
       if(clientName && hours > 0){
         if(!clientsByUser[id]) clientsByUser[id] = new Set();
         clientsByUser[id].add(clientName);
         const ck = id + '|' + clientName;
         hoursByUserClient[ck] = (hoursByUserClient[ck] || 0) + hours;
+      }
+      if(hours > 0){
+        if(!projectsByUser[id]) projectsByUser[id] = new Map();
+        projectsByUser[id].set(projectName, clientName);
+        const pk = id + '|' + projectName;
+        hoursByUserProject[pk] = (hoursByUserProject[pk] || 0) + hours;
       }
     });
 
@@ -6135,14 +6145,19 @@ async function runHarvestHoursReport(){
         hours: Math.round(Number(hoursByUser[u.id] || 0) * 10) / 10,
         daysFilled: daysByUser[u.id]?.size || 0,
         missingDescription: Boolean(missingDescriptionByUser[u.id]),
-        harvestClients: [...(clientsByUser[u.id] || new Set())].sort()
+        harvestClients: [...(clientsByUser[u.id] || new Set())].sort(),
+        harvestProjects: projectsByUser[u.id] || new Map()
       };
     });
 
-    const buildProjects = (harv) => (harv?.harvestClients || []).map(cl => ({
-      client: cl,
-      hours: Math.round((hoursByUserClient[harv.id + '|' + cl] || 0) * 10) / 10
-    }));
+    const buildProjects = (harv) => {
+      const projMap = harv?.harvestProjects || new Map();
+      return [...projMap.keys()].sort().map(pName => ({
+        project: pName,
+        client: projMap.get(pName) || '',
+        hours: Math.round((hoursByUserProject[harv.id + '|' + pName] || 0) * 10) / 10
+      }));
+    };
 
     const makeRow = (name, jiraClients, harv) => {
       const hours = harv ? harv.hours : 0;
