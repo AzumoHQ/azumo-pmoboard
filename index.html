@@ -5940,14 +5940,18 @@ function harvestHoursClientMap(){
       const role = (typeof effectiveUserRole === 'function' ? effectiveUserRole() : '').toLowerCase();
       const restrictedRoles = ['pm','csm','tl','assignee'];
       const isCapacity = ["Bench","Azumo"].includes(client) && isActiveCapacityRow(row);
-      const isInternalOrBench = restrictedRoles.includes(role) ? (isCapacity && rowBillingClass(row) === "Billable") : isCapacity;
+      // billing_type = whether the PERSON is billable (Jira custom field).
+      // rowBillingClass()/billing_class = whether THIS assignment bills (Bench never does).
+      // For hours control we want billable people, even while they sit on Bench.
+      const isBillablePerson = String(row.billing_type || '').trim().toLowerCase() === 'billable';
+      const isInternalOrBench = restrictedRoles.includes(role) ? (isCapacity && isBillablePerson) : isCapacity;
       if(!isExternalInProgress(row) && !isInternalOrBench) return;
       const person = normalizeIdentity(displayName(row));
       if(!person || !client) return;
       if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false};
       map[person].clients.add(client);
-      const bc = String(rowBillingClass(row) || '').trim();
-      if(bc) map[person].billingClasses.add(bc);
+      const bt = String(row.billing_type || '').trim();
+      if(bt) map[person].billingClasses.add(bt);
       const pm = String(row.projectManager || row.pm || '').trim();
       if(pm) map[person].pms.add(pm);
       if(String(row.freelance || '').trim().toLowerCase() === 'yes') map[person].freelance = true;
