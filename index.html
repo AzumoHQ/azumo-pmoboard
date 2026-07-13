@@ -6359,7 +6359,12 @@ async function runHarvestHoursReport(){
     populateHarvestHoursFilterOptions();
     harvestHoursApplyCoverageDefaults();
     renderHarvestHoursReport();
-    setHarvestHoursStatus(`Report generated from Harvest. <a href="#" onclick="event.preventDefault();goTo('opsViews');setOpsView('assignees')" style="color:inherit;text-decoration:underline;cursor:pointer">${harvestHoursReportData.length} active users reviewed</a>. Target for selected range: ${expected}h (${rangeTarget.businessDays} business day${rangeTarget.businessDays === 1 ? "" : "s"} × ${Math.round(rangeTarget.dailyExpected * 10) / 10}h/day).`, "info");
+    // Set status with clickable user count (uses innerHTML directly to allow the link)
+    const hhStatusEl = document.getElementById("hhStatus");
+    if(hhStatusEl){
+      hhStatusEl.style.display = "block";
+      hhStatusEl.innerHTML = `<div class="info-box" style="margin:0">Report generated from Harvest. <a href="#" onclick="event.preventDefault();goTo('opsViews');setOpsView('assignees')" style="color:inherit;text-decoration:underline;cursor:pointer">${harvestHoursReportData.length} active users reviewed</a>. Target for selected range: ${expected}h (${rangeTarget.businessDays} business day${rangeTarget.businessDays === 1 ? "" : "s"} × ${Math.round(rangeTarget.dailyExpected * 10) / 10}h/day).</div>`;
+    }
   }catch(error){
     setHarvestHoursStatus(error.message, "error");
   }finally{
