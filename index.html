@@ -1852,12 +1852,6 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <div class="filter-field"><label for="hhDateTo">To</label><input id="hhDateTo" type="date"/></div>
       <div class="filter-field"><label for="hhExpectedHours">Weekly expected hours</label><input id="hhExpectedHours" type="number" min="1" max="80" value="40"/></div>
       <div class="filter-field"><label for="hhThreshold">Complete threshold %</label><input id="hhThreshold" type="number" min="1" max="100" value="90"/></div>
-      <div class="filter-field">
-        <label for="hhShowAllToggle">&nbsp;</label>
-        <label style="display:flex;align-items:center;gap:6px;height:40px;font-size:.82rem">
-          <input id="hhShowAllToggle" type="checkbox" onchange="setHarvestHoursShowAll(this.checked)"/> Ver todos los empleados
-        </label>
-      </div>
       <button class="btn btn-primary" id="hhRunButton" type="button" onclick="runHarvestHoursReport()">Generate report</button>
     </div>
     <div class="harvest-hours-controls hh-filter-row" id="hhFilterRow" style="display:none">
@@ -5958,7 +5952,7 @@ function harvestHoursClientMap(){
       map[person].clients.add(client);
       const bt = String(row.billing_type || '').trim();
       if(bt) map[person].billingClasses.add(bt);
-      const pm = String(row.projectManager || row.pm || '').trim();
+      const pm = String(row.project_manager || '').trim();
       if(pm) map[person].pms.add(pm);
       if(String(row.freelance || '').trim().toLowerCase() === 'yes') map[person].freelance = true;
     });
@@ -6022,9 +6016,10 @@ function harvestHoursRowMatchesFilters(row, f){
   if(f.pm && !(row.pms || []).includes(f.pm)) return false;
   const anyType = f.billable || f.nonBillable || f.freelancer;
   if(!anyType) return true;
-  // Derive billing type from Harvest clients: external = Billable, Bench/Azumo only = Non-Billable
+  // Use Jira clients for billing classification (reliable even when no Harvest hours logged)
   const NON_CLIENT = new Set(['bench','azumo','']);
-  const hasExternal = (row.clients || []).some(c => !NON_CLIENT.has(normalizeClientKey(c)));
+  const clientsForBilling = (row.jiraClients && row.jiraClients.length) ? row.jiraClients : (row.clients || []);
+  const hasExternal = clientsForBilling.some(c => !NON_CLIENT.has(normalizeClientKey(c)));
   const isFreelancer = Boolean(row.freelance);
   if(f.billable && hasExternal && !isFreelancer) return true;
   if(f.nonBillable && !hasExternal && !isFreelancer) return true;
@@ -6274,7 +6269,8 @@ async function runHarvestHoursReport(){
       const missingDescription = harv ? harv.missingDescription : false;
       const ratio = expected ? (hours / expected) : 0;
       const pct = Math.round(ratio * 100);
-      const jiraClients = jiraInfo?.clients || null;
+      const jiraClients = Array.isArray(jiraInfo) ? jiraInfo : (jiraInfo?.clients || []);
+      const jiraPms = Array.isArray(jiraInfo) ? [] : (jiraInfo?.pms || []);
       return {
         name, hours, daysFilled, missingDescription, expected, pct,
         complete: ratio >= threshold,
@@ -6294,13 +6290,14 @@ async function runHarvestHoursReport(){
       seenNorm.add(norm);
       // Primary match: normalized name. Fallback: email (handles "Paulo Omena" vs "Paulo Omena dos Santos")
       const jiraClients = Array.isArray(jiraInfo) ? jiraInfo : (jiraInfo?.clients || []);
+      const jiraPms = Array.isArray(jiraInfo) ? [] : (jiraInfo?.pms || []);
       const jiraEmail = jiraInfo?.email || '';
       let harv = harvestByNorm[norm];
       if(!harv && jiraEmail) {
         harv = harvestByEmail[jiraEmail.toLowerCase()];
         if(harv) seenNorm.add(normalizeIdentity(harv.name)); // prevent duplicate in section 2
       }
-      rosterRows.push(makeRow(harv?.name || norm, jiraClients, harv));
+      rosterRows.push(makeRow(harv?.name || norm, jiraInfo, harv));
     });
 
     // 2) People with Harvest hours but NOT in Jira roster (added so PMO sees them; flagged in QA)
