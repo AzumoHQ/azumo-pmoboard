@@ -6022,10 +6022,13 @@ function harvestHoursRowMatchesFilters(row, f){
   if(f.pm && !(row.pms || []).includes(f.pm)) return false;
   const anyType = f.billable || f.nonBillable || f.freelancer;
   if(!anyType) return true;
-  const bc = row.billingClasses || [];
-  if(f.billable && bc.includes("Billable")) return true;
-  if(f.nonBillable && bc.some(c => c && c !== "Billable")) return true;
-  if(f.freelancer && row.freelance) return true;
+  // Derive billing type from Harvest clients: external = Billable, Bench/Azumo only = Non-Billable
+  const NON_CLIENT = new Set(['bench','azumo','']);
+  const hasExternal = (row.clients || []).some(c => !NON_CLIENT.has(normalizeClientKey(c)));
+  const isFreelancer = Boolean(row.freelance);
+  if(f.billable && hasExternal && !isFreelancer) return true;
+  if(f.nonBillable && !hasExternal && !isFreelancer) return true;
+  if(f.freelancer && isFreelancer) return true;
   return false;
 }
 function populateHarvestHoursFilterOptions(){
