@@ -1852,6 +1852,12 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <div class="filter-field"><label for="hhDateTo">To</label><input id="hhDateTo" type="date"/></div>
       <div class="filter-field"><label for="hhExpectedHours">Weekly expected hours</label><input id="hhExpectedHours" type="number" min="1" max="80" value="40"/></div>
       <div class="filter-field"><label for="hhThreshold">Complete threshold %</label><input id="hhThreshold" type="number" min="1" max="100" value="90"/></div>
+      <div class="filter-field">
+        <label for="hhShowAllToggle">&nbsp;</label>
+        <label style="display:flex;align-items:center;gap:6px;height:40px;font-size:.82rem">
+          <input id="hhShowAllToggle" type="checkbox" onchange="setHarvestHoursShowAll(this.checked)"/> Ver todos los empleados
+        </label>
+      </div>
       <button class="btn btn-primary" id="hhRunButton" type="button" onclick="runHarvestHoursReport()">Generate report</button>
     </div>
     <div class="harvest-hours-controls hh-filter-row" id="hhFilterRow" style="display:none">
@@ -6142,6 +6148,37 @@ function toggleHarvestExpand(id){
   if(icon) icon.style.transform = isHidden ? "rotate(90deg)" : "";
 }
 window.toggleHarvestExpand = toggleHarvestExpand;
+let hhShowAll = false;
+let hhFiltersInitialized = false;
+
+function harvestHoursApplyCoverageDefaults(){
+  if(hhShowAll || hhFiltersInitialized) return;
+  hhFiltersInitialized = true;
+  if(isHarvestScopedToSelf()) return;
+  const names = myScopedClientNames();
+  const clientSelect = document.getElementById('hhClientFilter');
+  if(clientSelect && names.length === 1){
+    clientSelect.value = names[0];
+  }
+  const billableSelect = document.getElementById('hhTypeBillable');
+  if(billableSelect) billableSelect.value = 'Billable';
+}
+
+function setHarvestHoursShowAll(checked){
+  hhShowAll = checked;
+  const clientSelect = document.getElementById('hhClientFilter');
+  const billableSelect = document.getElementById('hhTypeBillable');
+  if(checked){
+    if(clientSelect) clientSelect.value = '';
+    if(billableSelect) billableSelect.value = '';
+  } else {
+    hhFiltersInitialized = false;
+    harvestHoursApplyCoverageDefaults();
+  }
+  renderHarvestHoursReport();
+}
+window.setHarvestHoursShowAll = setHarvestHoursShowAll;
+
 async function runHarvestHoursReport(){
   initHarvestHoursDefaults();
   const from = document.getElementById("hhDateFrom")?.value || "";
@@ -6210,6 +6247,7 @@ async function runHarvestHoursReport(){
         id: u.id,
         name: nm,
         email: emailById[u.id] || '',
+        isActive: u.is_active !== false,
         hours: Math.round(Number(hoursByUser[u.id] || 0) * 10) / 10,
         daysFilled: daysByUser[u.id]?.size || 0,
         missingDescription: Boolean(missingDescriptionByUser[u.id]),
@@ -6258,12 +6296,11 @@ async function runHarvestHoursReport(){
     // 2) People with Harvest hours but NOT in Jira roster (added so PMO sees them; flagged in QA)
     Object.entries(harvestByNorm).forEach(([norm, harv]) => {
       if(seenNorm.has(norm)) return;
-      if(harv.hours <= 0 && (!harv.harvestClients || !harv.harvestClients.length)) return;
+      if(harv.isActive === false) return; // solo empleados activos en Harvest
       rosterRows.push(makeRow(harv.name, null, harv));
     });
 
     harvestHoursReportData = rosterRows
-      .filter(row => harvestHoursRowAllowedForCurrentUser(row))
       .sort((a,b) => a.pct - b.pct || a.name.localeCompare(b.name));
 
     // Client equivalence: same fuzzy rule as scope matching (Spinwheel ~ Spinwheel Solutions)
@@ -6308,10 +6345,10 @@ async function runHarvestHoursReport(){
       });
     });
     // Scope filter for QA rows
-    harvestHoursQAData = harvestHoursQAData.filter(d =>
-      harvestHoursRowAllowedForCurrentUser({name: d.name, client: d.harvestClient, clients: [d.harvestClient, ...(d.jiraClients||[])]})
-    ).sort((a,b) => a.name.localeCompare(b.name) || a.harvestClient.localeCompare(b.harvestClient));
+    harvestHoursQAData = harvestHoursQAData
+      .sort((a,b) => a.name.localeCompare(b.name) || a.harvestClient.localeCompare(b.harvestClient));
     populateHarvestHoursFilterOptions();
+    harvestHoursApplyCoverageDefaults();
     renderHarvestHoursReport();
     setHarvestHoursStatus(`Report generated from Harvest. ${harvestHoursReportData.length} active users reviewed. Target for selected range: ${expected}h (${rangeTarget.businessDays} business day${rangeTarget.businessDays === 1 ? "" : "s"} × ${Math.round(rangeTarget.dailyExpected * 10) / 10}h/day).`, "info");
   }catch(error){
