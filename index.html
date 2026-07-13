@@ -5946,6 +5946,8 @@ function harvestHoursClientMap(){
       const isBillablePerson = String(row.billing_type || '').trim().toLowerCase() === 'billable';
       const isInternalOrBench = restrictedRoles.includes(role) ? (isCapacity && isBillablePerson) : isCapacity;
       if(!isExternalInProgress(row) && !isInternalOrBench) return;
+      const rawName = String(row.name || row.assignee || '').trim();
+      if(!rawName) return; // skip unassigned/new-hire rows (no real name yet)
       const person = normalizeIdentity(displayName(row));
       if(!person || !client) return;
       if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false};
@@ -6304,6 +6306,7 @@ async function runHarvestHoursReport(){
     Object.entries(harvestByNorm).forEach(([norm, harv]) => {
       if(seenNorm.has(norm)) return;
       if(harv.isActive === false) return; // solo empleados activos en Harvest
+      if(!harv.name || /^unassigned\s*\(/i.test(harv.name)) return; // skip new-hire placeholder rows
       rosterRows.push(makeRow(harv.name, null, harv));
     });
 
