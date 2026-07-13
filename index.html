@@ -6289,8 +6289,15 @@ async function runHarvestHoursReport(){
     const rosterRows = [];
     Object.entries(jiraClientsByPerson).forEach(([norm, jiraInfo]) => {
       seenNorm.add(norm);
-      const harv = harvestByNorm[norm];
-      rosterRows.push(makeRow(harv?.name || norm, jiraInfo, harv));
+      // Primary match: normalized name. Fallback: email (handles "Paulo Omena" vs "Paulo Omena dos Santos")
+      const jiraClients = Array.isArray(jiraInfo) ? jiraInfo : (jiraInfo?.clients || []);
+      const jiraEmail = jiraInfo?.email || '';
+      let harv = harvestByNorm[norm];
+      if(!harv && jiraEmail) {
+        harv = harvestByEmail[jiraEmail.toLowerCase()];
+        if(harv) seenNorm.add(normalizeIdentity(harv.name)); // prevent duplicate in section 2
+      }
+      rosterRows.push(makeRow(harv?.name || norm, jiraClients, harv));
     });
 
     // 2) People with Harvest hours but NOT in Jira roster (added so PMO sees them; flagged in QA)
