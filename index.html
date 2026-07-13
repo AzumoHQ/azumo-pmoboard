@@ -557,6 +557,7 @@ section{margin-bottom:1.65rem!important}
 .internal-projects-table td:nth-child(2){font-weight:850;color:var(--txt)}
 .internal-projects-table .muted-value{color:var(--muted)}
 .internal-client-row td{background:rgba(0,102,255,.08)!important;border-top:0;font-weight:850}.internal-client-main{display:flex;align-items:center;gap:8px}.internal-toggle{background:rgba(0,102,255,.12);border:1px solid rgba(0,102,255,.3);color:var(--blue-lt);border-radius:9px;padding:5px 9px;font-size:.72rem;font-weight:950;cursor:pointer}.internal-toggle:hover{background:rgba(0,102,255,.18)}.internal-sow-row td:first-child{padding-left:2.2rem}.internal-assignment-chip{display:inline-flex;align-items:center;justify-content:center;min-height:24px;border-radius:999px;padding:0 10px;font-size:.72rem;font-weight:900;line-height:1;background:rgba(0,102,255,.14);color:#93C5FD}.internal-assignment-chip.full{background:rgba(16,185,129,.14);color:#6EE7B7}.internal-assignment-chip.partial{background:rgba(249,115,22,.14);color:#FDBA74}
+.hh-filter-row{border-bottom:1px solid var(--brd)}.hh-check-field{grid-column:span 2}.hh-checks{display:flex;gap:14px;flex-wrap:wrap;align-items:center;height:40px}.hh-check{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:800;color:var(--txt);cursor:pointer;white-space:nowrap}.hh-check input{cursor:pointer;accent-color:#E8501A}
 .harvest-hours-module{padding-bottom:1rem}.harvest-hours-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end;padding:1rem 1.2rem;border-bottom:1px solid var(--brd)}.harvest-hours-controls .btn{height:40px;justify-content:center}.harvest-hours-summary{padding:1rem 1.2rem;margin-bottom:0}.harvest-hours-subhead{border-top:1px solid var(--brd)}.harvest-hours-table-wrap{max-height:440px}.hh-progress{height:7px;background:rgba(107,143,191,.18);border-radius:999px;overflow:hidden;min-width:90px}.hh-progress-fill{height:100%;border-radius:999px}.info-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(16,185,129,.12);color:#6EE7B7;border:1px solid rgba(16,185,129,.32);font-size:.8rem}.err-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.35);font-size:.8rem}
 
 /* PMO-LAYOUT: nav work-in-progress badge */
@@ -1852,6 +1853,25 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <div class="filter-field"><label for="hhExpectedHours">Weekly expected hours</label><input id="hhExpectedHours" type="number" min="1" max="80" value="40"/></div>
       <div class="filter-field"><label for="hhThreshold">Complete threshold %</label><input id="hhThreshold" type="number" min="1" max="100" value="90"/></div>
       <button class="btn btn-primary" id="hhRunButton" type="button" onclick="runHarvestHoursReport()">Generate report</button>
+    </div>
+    <div class="harvest-hours-controls hh-filter-row" id="hhFilterRow" style="display:none">
+      <div class="filter-field">
+        <label for="hhClientFilter">Client</label>
+        <select id="hhClientFilter" onchange="renderHarvestHoursReport()"></select>
+      </div>
+      <div class="filter-field">
+        <label for="hhPmFilter">Project Manager</label>
+        <select id="hhPmFilter" onchange="renderHarvestHoursReport()"></select>
+      </div>
+      <div class="filter-field hh-check-field">
+        <label>Type</label>
+        <div class="hh-checks">
+          <label class="hh-check"><input type="checkbox" id="hhTypeBillable" onchange="renderHarvestHoursReport()"/> Billable</label>
+          <label class="hh-check"><input type="checkbox" id="hhTypeNonBillable" onchange="renderHarvestHoursReport()"/> Non-Billable</label>
+          <label class="hh-check"><input type="checkbox" id="hhTypeFreelancer" onchange="renderHarvestHoursReport()"/> Freelancer</label>
+        </div>
+      </div>
+      <button class="btn btn-ghost" type="button" onclick="clearHarvestHoursFilters()">Clear filters</button>
     </div>
     <div class="audit-note" id="hhStatus" style="display:none"></div>
     <div id="hhResults" style="display:none">
@@ -5920,17 +5940,31 @@ function harvestHoursClientMap(){
       const role = (typeof effectiveUserRole === 'function' ? effectiveUserRole() : '').toLowerCase();
       const restrictedRoles = ['pm','csm','tl','assignee'];
       const isCapacity = ["Bench","Azumo"].includes(client) && isActiveCapacityRow(row);
-      const isInternalOrBench = restrictedRoles.includes(role) ? (isCapacity && rowBillingClass(row) === "Billable") : isCapacity;
+      // billing_type = whether the PERSON is billable (Jira custom field).
+      // rowBillingClass()/billing_class = whether THIS assignment bills (Bench never does).
+      // For hours control we want billable people, even while they sit on Bench.
+      const isBillablePerson = String(row.billing_type || '').trim().toLowerCase() === 'billable';
+      const isInternalOrBench = restrictedRoles.includes(role) ? (isCapacity && isBillablePerson) : isCapacity;
       if(!isExternalInProgress(row) && !isInternalOrBench) return;
       const person = normalizeIdentity(displayName(row));
       if(!person || !client) return;
-      if(!map[person]) map[person] = new Set();
-      map[person].add(client);
+      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false};
+      map[person].clients.add(client);
+      const bt = String(row.billing_type || '').trim();
+      if(bt) map[person].billingClasses.add(bt);
+      const pm = String(row.projectManager || row.pm || '').trim();
+      if(pm) map[person].pms.add(pm);
+      if(String(row.freelance || '').trim().toLowerCase() === 'yes') map[person].freelance = true;
     });
   }catch(error){
     console.info("Harvest hours Jira client map unavailable:", error.message);
   }
-  return Object.fromEntries(Object.entries(map).map(([key, value]) => [key, [...value].sort()]));
+  return Object.fromEntries(Object.entries(map).map(([key, value]) => [key, {
+    clients: [...value.clients].sort(),
+    billingClasses: [...value.billingClasses].sort(),
+    pms: [...value.pms].sort(),
+    freelance: value.freelance
+  }]));
 }
 function harvestHoursBillingHubNames(incomplete, noDescriptionRows=[]){
   const grouped = new Map();
@@ -5968,31 +6002,68 @@ function harvestHoursDescriptionTag(row){
     ? `<span class="badge badge-red">Empty</span>`
     : `<span class="badge badge-green">OK</span>`;
 }
+function harvestHoursFilterState(){
+  return {
+    client: document.getElementById("hhClientFilter")?.value || "",
+    pm: document.getElementById("hhPmFilter")?.value || "",
+    billable: Boolean(document.getElementById("hhTypeBillable")?.checked),
+    nonBillable: Boolean(document.getElementById("hhTypeNonBillable")?.checked),
+    freelancer: Boolean(document.getElementById("hhTypeFreelancer")?.checked)
+  };
+}
+function harvestHoursRowMatchesFilters(row, f){
+  if(f.client && !(row.clients || []).some(cl => normalizeClientKey(cl) === normalizeClientKey(f.client))) return false;
+  if(f.pm && !(row.pms || []).includes(f.pm)) return false;
+  const anyType = f.billable || f.nonBillable || f.freelancer;
+  if(!anyType) return true;
+  const bc = row.billingClasses || [];
+  if(f.billable && bc.includes("Billable")) return true;
+  if(f.nonBillable && bc.some(c => c && c !== "Billable")) return true;
+  if(f.freelancer && row.freelance) return true;
+  return false;
+}
+function populateHarvestHoursFilterOptions(){
+  const clientSel = document.getElementById("hhClientFilter");
+  const pmSel = document.getElementById("hhPmFilter");
+  if(!clientSel || !pmSel) return;
+  const prevClient = clientSel.value, prevPm = pmSel.value;
+  const clients = [...new Set(harvestHoursReportData.flatMap(r => r.clients || []))].filter(Boolean).sort((a,b) => a.localeCompare(b));
+  const pms = [...new Set(harvestHoursReportData.flatMap(r => r.pms || []))].filter(Boolean).sort((a,b) => a.localeCompare(b));
+  clientSel.innerHTML = '<option value="">All clients</option>' + clients.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  pmSel.innerHTML = '<option value="">All PMs</option>' + pms.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  if(clients.includes(prevClient)) clientSel.value = prevClient;
+  if(pms.includes(prevPm)) pmSel.value = prevPm;
+  const row = document.getElementById("hhFilterRow");
+  if(row) row.style.display = "grid";
+}
+function clearHarvestHoursFilters(){
+  ["hhClientFilter","hhPmFilter"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
+  ["hhTypeBillable","hhTypeNonBillable","hhTypeFreelancer"].forEach(id => { const el = document.getElementById(id); if(el) el.checked = false; });
+  renderHarvestHoursReport();
+}
 function renderHarvestHoursReport(){
   const results = document.getElementById("hhResults");
   const tbody = document.getElementById("hhReportBody");
   if(!results || !tbody) return;
   results.style.display = "block";
-  document.getElementById("hhMetricTotal").textContent = harvestHoursReportData.length;
-  document.getElementById("hhMetricComplete").textContent = harvestHoursReportData.filter(row => row.complete).length;
-  document.getElementById("hhMetricIncomplete").textContent = harvestHoursReportData.filter(row => !row.complete).length;
+
+  const f = harvestHoursFilterState();
+  const visible = harvestHoursReportData.filter(row => harvestHoursRowMatchesFilters(row, f));
+
+  document.getElementById("hhMetricTotal").textContent = visible.length;
+  document.getElementById("hhMetricComplete").textContent = visible.filter(row => row.complete).length;
+  document.getElementById("hhMetricIncomplete").textContent = visible.filter(row => !row.complete).length;
 
   // Sort: incomplete first, then by % asc, then by name
-  const sorted = [...harvestHoursReportData].sort((a,b) => {
+  const sorted = [...visible].sort((a,b) => {
     if(a.complete !== b.complete) return a.complete ? 1 : -1;
     return (a.pct - b.pct) || a.name.localeCompare(b.name);
   });
-
-  // Client filter value
-  const clientFilter = document.getElementById("opsClientFilter")?.value || "";
 
   tbody.innerHTML = sorted.map((row, idx) => {
     const color = row.complete ? "var(--success)" : row.pct >= 50 ? "var(--warning)" : "var(--danger)";
     const expandId = "hh-expand-" + idx;
     const hasProjects = row.projects && row.projects.length > 0;
-
-    // Client filter
-    if(clientFilter && row.clients && !row.clients.some(cl => normalizeClientKey(cl) === normalizeClientKey(clientFilter))) return "";
 
     const mainRow = `<tr onclick="toggleHarvestExpand('${expandId}')" style="cursor:${hasProjects?'pointer':'default'}">
       <td style="font-weight:700">
@@ -6156,17 +6227,21 @@ async function runHarvestHoursReport(){
       }));
     };
 
-    const makeRow = (name, jiraClients, harv) => {
+    const makeRow = (name, jiraInfo, harv) => {
       const hours = harv ? harv.hours : 0;
       const daysFilled = harv ? harv.daysFilled : 0;
       const missingDescription = harv ? harv.missingDescription : false;
       const ratio = expected ? (hours / expected) : 0;
       const pct = Math.round(ratio * 100);
+      const jiraClients = jiraInfo?.clients || null;
       return {
         name, hours, daysFilled, missingDescription, expected, pct,
         complete: ratio >= threshold,
         client: (jiraClients && jiraClients[0]) || (harv?.harvestClients?.[0]) || '',
         clients: (jiraClients && jiraClients.length) ? jiraClients : (harv?.harvestClients || []),
+        billingClasses: jiraInfo?.billingClasses || [],
+        pms: jiraInfo?.pms || [],
+        freelance: Boolean(jiraInfo?.freelance),
         projects: buildProjects(harv)
       };
     };
@@ -6174,10 +6249,10 @@ async function runHarvestHoursReport(){
     // 1) Everyone assigned in Jira (source of truth for the roster)
     const seenNorm = new Set();
     const rosterRows = [];
-    Object.entries(jiraClientsByPerson).forEach(([norm, jiraClients]) => {
+    Object.entries(jiraClientsByPerson).forEach(([norm, jiraInfo]) => {
       seenNorm.add(norm);
       const harv = harvestByNorm[norm];
-      rosterRows.push(makeRow(harv?.name || norm, jiraClients, harv));
+      rosterRows.push(makeRow(harv?.name || norm, jiraInfo, harv));
     });
 
     // 2) People with Harvest hours but NOT in Jira roster (added so PMO sees them; flagged in QA)
@@ -6204,10 +6279,10 @@ async function runHarvestHoursReport(){
     // ---- QA: Jira vs Harvest discrepancies (scope-aware) ----
     harvestHoursQAData = [];
     const normKeys = (arr) => new Set((arr || []).map(normalizeClientKey));
-    Object.entries(jiraClientsByPerson).forEach(([norm, jiraClients]) => {
+    Object.entries(jiraClientsByPerson).forEach(([norm, jiraInfo]) => {
       const harv = harvestByNorm[norm];
       if(!harv || !harv.harvestClients.length) return;
-      const realClients = realJiraClients(jiraClients);
+      const realClients = realJiraClients(jiraInfo?.clients || []);
       harv.harvestClients.forEach(hc => {
         const matches = realClients.some(jc => clientsMatch(jc, hc));
         if(!matches){
@@ -6236,6 +6311,7 @@ async function runHarvestHoursReport(){
     harvestHoursQAData = harvestHoursQAData.filter(d =>
       harvestHoursRowAllowedForCurrentUser({name: d.name, client: d.harvestClient, clients: [d.harvestClient, ...(d.jiraClients||[])]})
     ).sort((a,b) => a.name.localeCompare(b.name) || a.harvestClient.localeCompare(b.harvestClient));
+    populateHarvestHoursFilterOptions();
     renderHarvestHoursReport();
     setHarvestHoursStatus(`Report generated from Harvest. ${harvestHoursReportData.length} active users reviewed. Target for selected range: ${expected}h (${rangeTarget.businessDays} business day${rangeTarget.businessDays === 1 ? "" : "s"} × ${Math.round(rangeTarget.dailyExpected * 10) / 10}h/day).`, "info");
   }catch(error){
@@ -6270,6 +6346,8 @@ async function copyHarvestHoursSlack(){
     prompt("Copy these names and paste them in #billing-hub:", text);
   }
 }
+window.renderHarvestHoursReport = renderHarvestHoursReport;
+window.clearHarvestHoursFilters = clearHarvestHoursFilters;
 window.runHarvestHoursReport = runHarvestHoursReport;
 window.exportHarvestHoursCSV = exportHarvestHoursCSV;
 window.copyHarvestHoursSlack = copyHarvestHoursSlack;
