@@ -5951,7 +5951,7 @@ function harvestHoursClientMap(){
       if(!person || !client) return;
       if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false};
       map[person].clients.add(client);
-      const bt = String(row.billing_type || '').trim();
+      const bt = rowBillingClass(row); // reads epic_billing (customfield_12711) correctly
       if(bt) map[person].billingClasses.add(bt);
       const pm = String(row.project_manager || '').trim();
       if(pm) map[person].pms.add(pm);
@@ -6017,13 +6017,13 @@ function harvestHoursRowMatchesFilters(row, f){
   if(f.pm && !(row.pms || []).includes(f.pm)) return false;
   const anyType = f.billable || f.nonBillable || f.freelancer;
   if(!anyType) return true;
-  // Use Jira clients for billing classification (reliable even when no Harvest hours logged)
-  const NON_CLIENT = new Set(['bench','azumo','']);
-  const clientsForBilling = (row.jiraClients && row.jiraClients.length) ? row.jiraClients : (row.clients || []);
-  const hasExternal = clientsForBilling.some(c => !NON_CLIENT.has(normalizeClientKey(c)));
+  // Use epic billing class from Jira snapshot (customfield_12711) — most reliable source
   const isFreelancer = Boolean(row.freelance);
-  if(f.billable && hasExternal && !isFreelancer) return true;
-  if(f.nonBillable && !hasExternal && !isFreelancer) return true;
+  const bc = (row.billingClasses || []);
+  const isBillable = !isFreelancer && (bc.includes('Billable') || bc.length === 0);
+  const isNonBillable = !isFreelancer && bc.includes('Non-Billable') && !bc.includes('Billable');
+  if(f.billable && isBillable) return true;
+  if(f.nonBillable && isNonBillable) return true;
   if(f.freelancer && isFreelancer) return true;
   return false;
 }
