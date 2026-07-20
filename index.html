@@ -6024,7 +6024,7 @@ function harvestHoursRowMatchesFilters(row, f){
   // Use epic billing class from Jira snapshot (customfield_12711) — most reliable source
   const isFreelancer = Boolean(row.freelance);
   const bc = (row.billingClasses || []);
-  const isBillable = !isFreelancer && (bc.includes('Billable') || bc.length === 0);
+  const isBillable = !isFreelancer && bc.includes('Billable');
   const isNonBillable = !isFreelancer && bc.includes('Non-Billable') && !bc.includes('Billable');
   if(f.billable && isBillable) return true;
   if(f.nonBillable && isNonBillable) return true;
