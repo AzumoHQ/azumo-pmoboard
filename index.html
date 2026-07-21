@@ -5953,8 +5953,8 @@ function harvestHoursClientMap(){
       map[person].clients.add(client);
       const bt = rowBillingClass(row); // reads epic_billing (customfield_12711) correctly
       if(bt) map[person].billingClasses.add(bt);
-      // If any assignment is NOT Non-Billable, person is not exclusively non-billable
-      if(bt !== 'Non-Billable') map[person].hasNonBillableOnly = false;
+      if(isBillablePerson) map[person].billingClasses.add('Billable');
+      if(bt !== 'Non-Billable' || isBillablePerson) map[person].hasNonBillableOnly = false;
       const pm = String(row.project_manager || '').trim();
       if(pm) map[person].pms.add(pm);
       if(String(row.freelance || '').trim().toLowerCase() === 'yes') map[person].freelance = true;
