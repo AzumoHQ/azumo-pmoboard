@@ -1855,6 +1855,10 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     </div>
     <div class="harvest-hours-controls hh-filter-row" id="hhFilterRow" style="display:none">
       <div class="filter-field">
+        <label for="hhAssigneeSearch">Assignee</label>
+        <input type="text" id="hhAssigneeSearch" placeholder="Search by name…" oninput="renderHarvestHoursReport()"/>
+      </div>
+      <div class="filter-field">
         <label for="hhClientFilter">Client</label>
         <select id="hhClientFilter" onchange="renderHarvestHoursReport()"></select>
       </div>
@@ -1866,7 +1870,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         <label>Type</label>
         <div class="hh-checks">
           <label class="hh-check"><input type="checkbox" id="hhTypeBillable" onchange="renderHarvestHoursReport()"/> Billable</label>
-          
+          <label class="hh-check"><input type="checkbox" id="hhTypeNonBillable" onchange="renderHarvestHoursReport()"/> Non-Billable</label>
           <label class="hh-check"><input type="checkbox" id="hhTypeFreelancer" onchange="renderHarvestHoursReport()"/> Freelancer</label>
         </div>
       </div>
@@ -6009,6 +6013,7 @@ function harvestHoursDescriptionTag(row){
 }
 function harvestHoursFilterState(){
   return {
+    search: (document.getElementById("hhAssigneeSearch")?.value || "").trim().toLowerCase(),
     client: document.getElementById("hhClientFilter")?.value || "",
     pm: document.getElementById("hhPmFilter")?.value || "",
     billable: Boolean(document.getElementById("hhTypeBillable")?.checked),
@@ -6017,6 +6022,7 @@ function harvestHoursFilterState(){
   };
 }
 function harvestHoursRowMatchesFilters(row, f){
+  if(f.search && !String(row.name || "").toLowerCase().includes(f.search)) return false;
   if(f.client && !(row.clients || []).some(cl => normalizeClientKey(cl) === normalizeClientKey(f.client))) return false;
   if(f.pm && !(row.pms || []).includes(f.pm)) return false;
   const anyType = f.billable || f.nonBillable || f.freelancer;
@@ -6046,6 +6052,8 @@ function populateHarvestHoursFilterOptions(){
   if(row) row.style.display = "grid";
 }
 function clearHarvestHoursFilters(){
+  const searchEl = document.getElementById("hhAssigneeSearch");
+  if(searchEl) searchEl.value = "";
   ["hhClientFilter","hhPmFilter"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
   ["hhTypeBillable","hhTypeNonBillable","hhTypeFreelancer"].forEach(id => { const el = document.getElementById(id); if(el) el.checked = false; });
   renderHarvestHoursReport();
