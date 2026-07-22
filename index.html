@@ -5966,9 +5966,7 @@ function harvestHoursClientMap(){
   }catch(error){
     console.info("Harvest hours Jira client map unavailable:", error.message);
   }
-  // Exclude people whose ONLY assignments are Non-Billable (ops/admin staff)
-  const filtered = Object.fromEntries(Object.entries(map).filter(([,v]) => !v.hasNonBillableOnly));
-  return Object.fromEntries(Object.entries(filtered).map(([key, value]) => [key, {
+  return Object.fromEntries(Object.entries(map).map(([key, value]) => [key, {
     clients: [...value.clients].sort(),
     billingClasses: [...value.billingClasses].sort(),
     pms: [...value.pms].sort(),
