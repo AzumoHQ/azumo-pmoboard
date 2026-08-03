@@ -5982,6 +5982,8 @@ function harvestHoursClientMap(){
   }
   try{
     (latest?.non_billable_epic_assignments || []).forEach(row => {
+      const status = String(row.status || '').trim().toLowerCase();
+      if(status === 'inactive') return;
       const person = normalizeIdentity(displayName(row));
       if(!person) return;
       if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', personNonBillable:false};
