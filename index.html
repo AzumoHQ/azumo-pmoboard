@@ -5957,7 +5957,7 @@ function harvestHoursClientMap(){
       // rowBillingClass()/billing_class = whether THIS assignment bills (Bench never does).
       // For hours control we want billable people, even while they sit on Bench.
       const isBillablePerson = String(row.billing_type || '').trim().toLowerCase() === 'billable';
-      const isNonBillablePerson = String(row.billing_type || '').trim().toLowerCase() === 'non-billable';
+      const isNonBillablePerson = !isBillablePerson;
       const isInternalOrBench = restrictedRoles.includes(role) ? (isCapacity && isBillablePerson) : isCapacity;
       if(!isExternalInProgress(row) && !isInternalOrBench) return;
       const rawName = String(row.name || row.assignee || '').trim();
