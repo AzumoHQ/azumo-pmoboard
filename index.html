@@ -5980,6 +5980,18 @@ function harvestHoursClientMap(){
   }catch(error){
     console.info("Harvest hours Jira client map unavailable:", error.message);
   }
+  try{
+    (latest?.non_billable_epic_assignments || []).forEach(row => {
+      const person = normalizeIdentity(displayName(row));
+      if(!person) return;
+      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', personNonBillable:false};
+      map[person].personNonBillable = true;
+      const rowEmail = String(row.email || '').trim();
+      if(rowEmail && !map[person].email) map[person].email = rowEmail;
+    });
+  }catch(error){
+    console.info("Harvest hours non-billable map unavailable:", error.message);
+  }
   return Object.fromEntries(Object.entries(map).map(([key, value]) => [key, {
     clients: [...value.clients].sort(),
     billingClasses: [...value.billingClasses].sort(),
