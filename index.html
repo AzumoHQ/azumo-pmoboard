@@ -3655,9 +3655,9 @@ function renderNewSearchesTriageReport(){
       `<div class="util-card"><div class="util-card-label">Last import</div><div class="util-card-value" style="font-size:1rem;line-height:1.25">${esc(lastImport)}</div><div class="util-card-sub">${reportSourceLabel(report, 'New Searches Triage')}</div></div>`
     ].join('');
   }
-  thead.innerHTML = '<tr><th>New Search</th><th>Client</th><th>Priority</th><th>Status</th><th>Created</th><th>Age</th><th>Candidates</th></tr>';
+  thead.innerHTML = '<tr><th>New Search</th><th>Client</th><th>Priority</th><th>Status</th><th>Created</th><th>Age</th><th>Candidates</th><th>Rate (h)</th><th>Start Date</th></tr>';
   if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="7" style="color:var(--muted);padding:1rem">${esc(report.warning || 'New Searches Triage data is not available yet.')}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="color:var(--muted);padding:1rem">${esc(report.warning || 'New Searches Triage data is not available yet.')}</td></tr>`;
     return;
   }
   tbody.innerHTML = rows.map(row => {
@@ -3672,6 +3672,8 @@ function renderNewSearchesTriageReport(){
       <td class="muted-value">${esc(cleanDisplayValue(row.created_display || fmtDate(row.created_at)))}</td>
       <td style="font-weight:900">${esc(cleanDisplayValue(row.days_display || Math.round(Number(row.days_since_created || 0))))}</td>
       <td><span class="candidate-count">${Number(row.candidate_count || 0)}</span>${candidatePreview ? `<div class="candidate-list">${candidatePreview}</div>` : ''}</td>
+      <td class="muted-value">${row.rate_hourly != null && row.rate_hourly !== '' ? `$${esc(String(row.rate_hourly_display || row.rate_hourly))}` : '—'}</td>
+      <td class="muted-value">${esc(cleanDisplayValue(row.potential_start_date_display || row.potential_start_date))}</td>
     </tr>`;
   }).join('');
 }
