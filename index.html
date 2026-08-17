@@ -1855,6 +1855,10 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     </div>
     <div class="harvest-hours-controls hh-filter-row" id="hhFilterRow" style="display:none">
       <div class="filter-field">
+        <label for="hhAssigneeSearch">Assignee</label>
+        <input type="text" id="hhAssigneeSearch" placeholder="Search by name…" oninput="renderHarvestHoursReport()"/>
+      </div>
+      <div class="filter-field">
         <label for="hhClientFilter">Client</label>
         <select id="hhClientFilter" onchange="renderHarvestHoursReport()"></select>
       </div>
@@ -1866,7 +1870,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         <label>Type</label>
         <div class="hh-checks">
           <label class="hh-check"><input type="checkbox" id="hhTypeBillable" onchange="renderHarvestHoursReport()"/> Billable</label>
-          
+          <label class="hh-check"><input type="checkbox" id="hhTypeNonBillable" onchange="renderHarvestHoursReport()"/> Non-Billable</label>
           <label class="hh-check"><input type="checkbox" id="hhTypeFreelancer" onchange="renderHarvestHoursReport()"/> Freelancer</label>
         </div>
       </div>
@@ -1886,7 +1890,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         </div>
         <div class="fc-table-wrap harvest-hours-table-wrap">
           <table>
-            <thead><tr><th>Name</th><th>Client</th><th>Hours</th><th>Days filled</th><th>Description</th><th>%</th><th>Progress</th><th>Status</th></tr></thead>
+            <thead><tr><th>Name</th><th>Client</th><th>Hours</th><th>Days filled</th><th>Description</th><th>Jira %</th><th>Actual %</th><th>Progress</th><th>Status</th></tr></thead>
             <tbody id="hhReportBody"></tbody>
           </table>
         </div>
@@ -5949,26 +5953,29 @@ function harvestHoursClientMap(){
       if(!rawName) return; // skip unassigned/new-hire rows (no real name yet)
       const person = normalizeIdentity(displayName(row));
       if(!person || !client) return;
-      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true};
+      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', assignmentPct:0};
       map[person].clients.add(client);
       const bt = rowBillingClass(row); // reads epic_billing (customfield_12711) correctly
       if(bt) map[person].billingClasses.add(bt);
-      // If any assignment is NOT Non-Billable, person is not exclusively non-billable
-      if(bt !== 'Non-Billable') map[person].hasNonBillableOnly = false;
+      if(isBillablePerson) map[person].billingClasses.add('Billable');
+      map[person].assignmentPct += Number(rowAssignmentPct(row) || 0);
+      if(bt !== 'Non-Billable' || isBillablePerson) map[person].hasNonBillableOnly = false;
       const pm = String(row.project_manager || '').trim();
       if(pm) map[person].pms.add(pm);
       if(String(row.freelance || '').trim().toLowerCase() === 'yes') map[person].freelance = true;
+      const rowEmail = String(row.email || '').trim().toLowerCase();
+      if(rowEmail && !map[person].email) map[person].email = rowEmail; // needed for Harvest fallback match (name mismatches, e.g. legal vs display name)
     });
   }catch(error){
     console.info("Harvest hours Jira client map unavailable:", error.message);
   }
-  // Exclude people whose ONLY assignments are Non-Billable (ops/admin staff)
-  const filtered = Object.fromEntries(Object.entries(map).filter(([,v]) => !v.hasNonBillableOnly));
-  return Object.fromEntries(Object.entries(filtered).map(([key, value]) => [key, {
+  return Object.fromEntries(Object.entries(map).map(([key, value]) => [key, {
     clients: [...value.clients].sort(),
     billingClasses: [...value.billingClasses].sort(),
     pms: [...value.pms].sort(),
-    freelance: value.freelance
+    freelance: value.freelance,
+    email: value.email,
+    assignmentPct: Math.min(100, Math.round((value.assignmentPct || 0) * 100) / 100)
   }]));
 }
 function harvestHoursBillingHubNames(incomplete, noDescriptionRows=[]){
@@ -6009,6 +6016,7 @@ function harvestHoursDescriptionTag(row){
 }
 function harvestHoursFilterState(){
   return {
+    search: (document.getElementById("hhAssigneeSearch")?.value || "").trim().toLowerCase(),
     client: document.getElementById("hhClientFilter")?.value || "",
     pm: document.getElementById("hhPmFilter")?.value || "",
     billable: Boolean(document.getElementById("hhTypeBillable")?.checked),
@@ -6017,6 +6025,7 @@ function harvestHoursFilterState(){
   };
 }
 function harvestHoursRowMatchesFilters(row, f){
+  if(f.search && !String(row.name || "").toLowerCase().includes(f.search)) return false;
   if(f.client && !(row.clients || []).some(cl => normalizeClientKey(cl) === normalizeClientKey(f.client))) return false;
   if(f.pm && !(row.pms || []).includes(f.pm)) return false;
   const anyType = f.billable || f.nonBillable || f.freelancer;
@@ -6024,7 +6033,7 @@ function harvestHoursRowMatchesFilters(row, f){
   // Use epic billing class from Jira snapshot (customfield_12711) — most reliable source
   const isFreelancer = Boolean(row.freelance);
   const bc = (row.billingClasses || []);
-  const isBillable = !isFreelancer && (bc.includes('Billable') || bc.length === 0);
+  const isBillable = !isFreelancer && bc.includes('Billable');
   const isNonBillable = !isFreelancer && bc.includes('Non-Billable') && !bc.includes('Billable');
   if(f.billable && isBillable) return true;
   if(f.nonBillable && isNonBillable) return true;
@@ -6046,6 +6055,8 @@ function populateHarvestHoursFilterOptions(){
   if(row) row.style.display = "grid";
 }
 function clearHarvestHoursFilters(){
+  const searchEl = document.getElementById("hhAssigneeSearch");
+  if(searchEl) searchEl.value = "";
   ["hhClientFilter","hhPmFilter"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
   ["hhTypeBillable","hhTypeNonBillable","hhTypeFreelancer"].forEach(id => { const el = document.getElementById(id); if(el) el.checked = false; });
   renderHarvestHoursReport();
@@ -6073,21 +6084,27 @@ function renderHarvestHoursReport(){
     const color = row.complete ? "var(--success)" : row.pct >= 50 ? "var(--warning)" : "var(--danger)";
     const expandId = "hh-expand-" + idx;
     const hasProjects = row.projects && row.projects.length > 0;
+    const hasEntries = row.entries && row.entries.length > 0;
+    const hasDetail = hasProjects || hasEntries;
+    const jiraPctLabel = (row.jiraPct === null || row.jiraPct === undefined) ? "—" : (esc(row.jiraPct) + "%");
+    const jiraGapWarning = (row.jiraPct !== null && row.jiraPct !== undefined && row.jiraPct > 0 && row.pct < row.jiraPct - 15);
 
-    const mainRow = `<tr onclick="toggleHarvestExpand('${expandId}')" style="cursor:${hasProjects?'pointer':'default'}">
+    const mainRow = `<tr onclick="toggleHarvestExpand('${expandId}')" style="cursor:${hasDetail?'pointer':'default'}">
       <td style="font-weight:700">
-        ${hasProjects ? `<span id="${expandId}-icon" style="display:inline-block;width:16px;transition:transform .15s">▶</span> ` : '<span style="display:inline-block;width:16px"></span> '}
+        ${hasDetail ? `<span id="${expandId}-icon" style="display:inline-block;width:16px;transition:transform .15s">▶</span> ` : '<span style="display:inline-block;width:16px"></span> '}
         ${esc(row.name)}
       </td>
       <td style="color:var(--muted);font-size:.82rem">${esc(row.clients && row.clients.length ? row.clients.join(", ") : "—")}</td>
       <td style="font-weight:700;color:${color}">${esc(row.hours)}h</td>
       <td>${esc(row.daysFilled || 0)}</td>
       <td>${harvestHoursDescriptionTag(row)}</td>
+      <td style="color:${jiraGapWarning ? 'var(--danger)' : 'var(--muted)'}">${jiraPctLabel}</td>
       <td>${esc(row.pct)}%</td>
       <td><div class="hh-progress"><div class="hh-progress-fill" style="width:${Math.min(row.pct,100)}%;background:${color}"></div></div></td>
+      <td>${harvestHoursStatusTag(row)}</td>
     </tr>`;
 
-    const detailRows = hasProjects ? row.projects.map(p => {
+    const projectDetailRows = hasProjects ? row.projects.map(p => {
       const pPct = row.expected ? Math.round(p.hours/row.expected*100) : 0;
       const projectLabel = p.client ? (esc(p.project) + ' <span style="color:var(--fg-mute)">(' + esc(p.client) + ')</span>') : esc(p.project);
       return `<tr class="hh-expand-row hh-expand-${expandId}" data-hidden="true" style="background:var(--bg-2)">
@@ -6096,13 +6113,26 @@ function renderHarvestHoursReport(){
         <td style="font-size:.82rem;font-weight:700;color:var(--fg-1)">${esc(p.hours)}h</td>
         <td></td>
         <td></td>
+        <td></td>
         <td style="font-size:.82rem;color:var(--fg-3)">${pPct}%</td>
         <td></td>
         <td></td>
       </tr>`;
     }).join("") : "";
 
-    return mainRow + detailRows;
+    const descriptionRows = hasEntries ? `<tr class="hh-expand-row hh-expand-${expandId}" data-hidden="true" style="background:var(--bg-2)">
+      <td colspan="9" style="padding:6px 8px 10px 36px">
+        <div style="font-size:.72rem;color:var(--fg-3);font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin:4px 0 4px">Harvest entries</div>
+        ${row.entries.map(e => `<div style="display:flex;gap:12px;padding:4px 0;border-top:1px solid var(--brd);font-size:.8rem;align-items:baseline">
+          <span style="min-width:88px;color:var(--fg-2)">${esc(e.date || "—")}</span>
+          <span style="min-width:46px;font-weight:700;color:var(--fg-1)">${esc(e.hours)}h</span>
+          <span style="min-width:150px;color:var(--fg-2)">${esc(e.client || "—")}</span>
+          <span style="flex:1;${e.notes ? "" : "font-style:italic;color:var(--danger)"}">${esc(e.notes || "No description")}</span>
+        </div>`).join("")}
+      </td>
+    </tr>` : "";
+
+    return mainRow + projectDetailRows + descriptionRows;
   }).join("");
   renderHarvestHoursQA();
 }
@@ -6202,6 +6232,7 @@ async function runHarvestHoursReport(){
     const hoursByUser = {};
     const daysByUser = {};
     const missingDescriptionByUser = {};
+    const entriesByUser = {};
     const clientsByUser = {};
     const hoursByUserClient = {};
     const projectsByUser = {};
@@ -6226,6 +6257,10 @@ async function runHarvestHoursReport(){
       }
       const clientName = entry.client?.name || '';
       const projectName = entry.project?.name || 'No project';
+      if(hours > 0){
+        if(!entriesByUser[id]) entriesByUser[id] = [];
+        entriesByUser[id].push({date: entry.spent_date || '', hours, client: clientName, project: projectName, notes: String(entry.notes || '').trim()});
+      }
       if(clientName && hours > 0){
         if(!clientsByUser[id]) clientsByUser[id] = new Set();
         clientsByUser[id].add(clientName);
@@ -6255,8 +6290,15 @@ async function runHarvestHoursReport(){
         daysFilled: daysByUser[u.id]?.size || 0,
         missingDescription: Boolean(missingDescriptionByUser[u.id]),
         harvestClients: [...(clientsByUser[u.id] || new Set())].sort(),
-        harvestProjects: projectsByUser[u.id] || new Map()
+        harvestProjects: projectsByUser[u.id] || new Map(),
+        harvestEntries: (entriesByUser[u.id] || []).slice().sort((a,b) => String(a.date).localeCompare(String(b.date)))
       };
+    });
+
+    // Fallback index by email, for cases where Jira display name != Harvest full name
+    const harvestByEmail = {};
+    Object.values(harvestByNorm).forEach(h => {
+      if(h.email) harvestByEmail[h.email.toLowerCase()] = h;
     });
 
     const buildProjects = (harv) => {
@@ -6276,15 +6318,17 @@ async function runHarvestHoursReport(){
       const pct = Math.round(ratio * 100);
       const jiraClients = Array.isArray(jiraInfo) ? jiraInfo : (jiraInfo?.clients || []);
       const jiraPms = Array.isArray(jiraInfo) ? [] : (jiraInfo?.pms || []);
+      const jiraPct = Array.isArray(jiraInfo) ? null : (Number.isFinite(jiraInfo?.assignmentPct) ? jiraInfo.assignmentPct : null);
       return {
-        name, hours, daysFilled, missingDescription, expected, pct,
+        name, hours, daysFilled, missingDescription, expected, pct, jiraPct,
         complete: ratio >= threshold,
         client: (jiraClients && jiraClients[0]) || (harv?.harvestClients?.[0]) || '',
         clients: (jiraClients && jiraClients.length) ? jiraClients : (harv?.harvestClients || []),
         billingClasses: jiraInfo?.billingClasses || [],
         pms: jiraInfo?.pms || [],
         freelance: Boolean(jiraInfo?.freelance),
-        projects: buildProjects(harv)
+        projects: buildProjects(harv),
+        entries: (harv?.harvestEntries || [])
       };
     };
 
@@ -6382,7 +6426,7 @@ function hhCsvCell(value){
 function exportHarvestHoursCSV(){
   const from = document.getElementById("hhDateFrom")?.value || "";
   const to = document.getElementById("hhDateTo")?.value || "";
-  const rows = [["Name","Client","Hours loaded","Days filled","Description","Percent complete","Status"]].concat(harvestHoursReportData.map(row => [row.name,row.client || "",row.hours,row.daysFilled || 0,row.missingDescription ? "Empty" : "OK",`${row.pct}%`,row.complete ? "Complete" : row.pct >= 50 ? "Partial" : "Incomplete"]));
+  const rows = [["Name","Client","Hours loaded","Days filled","Description","Jira %","Percent complete","Status"]].concat(harvestHoursReportData.map(row => [row.name,row.client || "",row.hours,row.daysFilled || 0,row.missingDescription ? "Empty" : "OK",(row.jiraPct === null || row.jiraPct === undefined) ? "—" : `${row.jiraPct}%`,`${row.pct}%`,row.complete ? "Complete" : row.pct >= 50 ? "Partial" : "Incomplete"]));
   const csv = rows.map(row => row.map(hhCsvCell).join(",")).join("\n");
   const link = document.createElement("a");
   link.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8;"}));
