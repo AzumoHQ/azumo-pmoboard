@@ -1422,6 +1422,27 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
           <span class="badge badge-blue">Native PMO view</span>
         </div>
       </div>
+      <div class="harvest-hours-controls hh-filter-row" id="nsFilterRow">
+        <div class="filter-field">
+          <label for="nsPriorityFilter">Priority</label>
+          <select id="nsPriorityFilter" onchange="renderNewSearchesTriageReport()">
+            <option value="">All priorities</option>
+            <option value="Highest">Highest</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="nsClientFilter">Client</label>
+          <select id="nsClientFilter" onchange="renderNewSearchesTriageReport()"></select>
+        </div>
+        <div class="filter-field">
+          <label for="nsStatusFilter">Status</label>
+          <select id="nsStatusFilter" onchange="renderNewSearchesTriageReport()"></select>
+        </div>
+        <button class="btn btn-ghost" type="button" onclick="clearNewSearchesFilters()">Clear filters</button>
+      </div>
       <div class="fc-table-wrap">
         <table>
           <thead id="newSearchesThead">
@@ -3314,6 +3335,7 @@ const METRIC_CFG = [
   {key:'utilization_assignment', label:'Utilization Rate (Assignment)', unit:'%',  color:'#10B981', higherBetter:true,  target:'headcount'},
   {key:'utilization_billing',    label:'Utilization Rate (Billing)',    unit:'%',  color:'#10B981', higherBetter:true,  target:'billable'},
   {key:'bench',                  label:'Bench',                         unit:'',   color:'#EF4444', higherBetter:false, src:'Jira', target:'bench', hover:'bench'},
+  {key:'bench_rate',             label:'Bench (FTE)',                   unit:'',   color:'#EF4444', higherBetter:false, src:'Jira', target:'bench'},
   {key:'pending_assignments',    label:'Pending Assignments',           unit:'',   color:'#F59E0B', higherBetter:false, src:'Jira'},
   {key:'unassigned_capacity',    label:'Unassigned Capacity',           unit:'%',  color:'#F97316', higherBetter:false},
 ];
@@ -3337,12 +3359,21 @@ function freelancerMetricRows(snapshot = latest){
     .sort((a,b)=>a.assignee.localeCompare(b.assignee));
 }
 
+function benchRateValue(snapshot = latest){
+  const rows = Array.isArray(snapshot?.bench_list) ? snapshot.bench_list : [];
+  const sum = rows.reduce((acc, row) => {
+    const pct = Number(row.assign ?? row.avail ?? 0);
+    return acc + (pct / 100);
+  }, 0);
+  return Math.round(sum * 100) / 100;
+}
 function metricValue(snapshot, key){
   const metrics = snapshot?.metrics || {};
   if(key === 'headcount_total'){
     return overviewPeopleCount(snapshot);
   }
   if(key === 'freelancers') return freelancerMetricRows(snapshot).length;
+  if(key === 'bench_rate') return benchRateValue(snapshot);
   return metrics[key];
 }
 
@@ -3636,21 +3667,50 @@ function renderNewSearchesTriageReport(){
   const lastImport = report.last_import_at
     ? new Date(report.last_import_at).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})
     : '—';
+
+  const nsClientSel = document.getElementById('nsClientFilter');
+  const nsStatusSel = document.getElementById('nsStatusFilter');
+  if(nsClientSel){
+    const prevClient = nsClientSel.value;
+    const clients = [...new Set(rows.map(r => cleanDisplayValue(r.client)).filter(v => v !== '—'))].sort();
+    nsClientSel.innerHTML = '<option value="">All clients</option>' + clients.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    if(clients.includes(prevClient)) nsClientSel.value = prevClient;
+  }
+  if(nsStatusSel){
+    const prevStatus = nsStatusSel.value;
+    const statuses = [...new Set(rows.map(r => cleanDisplayValue(r.status)).filter(v => v !== '—'))].sort();
+    nsStatusSel.innerHTML = '<option value="">All statuses</option>' + statuses.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+    if(statuses.includes(prevStatus)) nsStatusSel.value = prevStatus;
+  }
+
+  const nsPriority = (document.getElementById('nsPriorityFilter')?.value || '').toLowerCase();
+  const nsClient = (document.getElementById('nsClientFilter')?.value || '');
+  const nsStatus = (document.getElementById('nsStatusFilter')?.value || '');
+  const filteredRows = rows.filter(row => {
+    if(nsPriority && !String(row.priority || '').toLowerCase().includes(nsPriority)) return false;
+    if(nsClient && cleanDisplayValue(row.client) !== nsClient) return false;
+    if(nsStatus && cleanDisplayValue(row.status) !== nsStatus) return false;
+    return true;
+  });
+
   if(cards){
+    const highPriCount = filteredRows.filter(r => /highest|high/i.test(r.priority || '')).length;
+    const staleCount = filteredRows.filter(r => Number(r.days_since_created || 0) >= 30).length;
+    const noCandCount = filteredRows.filter(r => Number(r.candidate_count || 0) <= 0).length;
     cards.innerHTML = [
-      `<div class="util-card"><div class="util-card-label">Open searches</div><div class="util-card-value">${rows.length || report.row_count || 0}</div><div class="util-card-sub">Live export</div></div>`,
-      `<div class="util-card"><div class="util-card-label">High priority</div><div class="util-card-value">${report.high_priority_count || 0}</div><div class="util-card-sub">High / Highest</div></div>`,
-      `<div class="util-card"><div class="util-card-label">30+ days open</div><div class="util-card-value">${report.stale_count || 0}</div><div class="util-card-sub">Aging queue</div></div>`,
-      `<div class="util-card"><div class="util-card-label">No candidates</div><div class="util-card-value">${report.without_candidates_count || 0}</div><div class="util-card-sub">Needs sourcing follow-up</div></div>`,
+      `<div class="util-card"><div class="util-card-label">Open searches</div><div class="util-card-value">${filteredRows.length}</div><div class="util-card-sub">${filteredRows.length !== rows.length ? `${rows.length} total` : 'Live export'}</div></div>`,
+      `<div class="util-card"><div class="util-card-label">High priority</div><div class="util-card-value">${highPriCount}</div><div class="util-card-sub">High / Highest</div></div>`,
+      `<div class="util-card"><div class="util-card-label">30+ days open</div><div class="util-card-value">${staleCount}</div><div class="util-card-sub">Aging queue</div></div>`,
+      `<div class="util-card"><div class="util-card-label">No candidates</div><div class="util-card-value">${noCandCount}</div><div class="util-card-sub">Needs sourcing follow-up</div></div>`,
       `<div class="util-card"><div class="util-card-label">Last import</div><div class="util-card-value" style="font-size:1rem;line-height:1.25">${esc(lastImport)}</div><div class="util-card-sub">${reportSourceLabel(report, 'New Searches Triage')}</div></div>`
     ].join('');
   }
-  thead.innerHTML = '<tr><th>New Search</th><th>Client</th><th>Priority</th><th>Status</th><th>Created</th><th>Age</th><th>Candidates</th></tr>';
-  if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="7" style="color:var(--muted);padding:1rem">${esc(report.warning || 'New Searches Triage data is not available yet.')}</td></tr>`;
+  thead.innerHTML = '<tr><th>New Search</th><th>Client</th><th>Priority</th><th>Status</th><th>Created</th><th>Age</th><th>Candidates</th><th>Rate (h)</th><th>Start Date</th></tr>';
+  if(!filteredRows.length){
+    tbody.innerHTML = `<tr><td colspan="9" style="color:var(--muted);padding:1rem">${esc(filteredRows.length !== rows.length ? 'No results match the selected filters.' : report.warning || 'New Searches Triage data is not available yet.')}</td></tr>`;
     return;
   }
-  tbody.innerHTML = rows.map(row => {
+  tbody.innerHTML = filteredRows.map(row => {
     const key = cleanDisplayValue(row.key);
     const keyLink = key !== '—' ? `<a class="new-search-key" href="${jiraIssueUrl(key)}" target="_blank" rel="noopener noreferrer">${esc(key)}</a>` : `<span class="new-search-key">—</span>`;
     const candidatePreview = (row.candidates || []).map(candidate => esc(candidate)).join('<br>');
@@ -3662,10 +3722,21 @@ function renderNewSearchesTriageReport(){
       <td class="muted-value">${esc(cleanDisplayValue(row.created_display || fmtDate(row.created_at)))}</td>
       <td style="font-weight:900">${esc(cleanDisplayValue(row.days_display || Math.round(Number(row.days_since_created || 0))))}</td>
       <td><span class="candidate-count">${Number(row.candidate_count || 0)}</span>${candidatePreview ? `<div class="candidate-list">${candidatePreview}</div>` : ''}</td>
+      <td class="muted-value">${row.rate_hourly != null && row.rate_hourly !== '' ? `$${esc(String(row.rate_hourly_display || row.rate_hourly))}` : '—'}</td>
+      <td class="muted-value">${esc(cleanDisplayValue(row.potential_start_date_display || row.potential_start_date))}</td>
     </tr>`;
   }).join('');
 }
 
+function clearNewSearchesFilters(){
+  const p = document.getElementById('nsPriorityFilter');
+  const c = document.getElementById('nsClientFilter');
+  const s = document.getElementById('nsStatusFilter');
+  if(p) p.value = '';
+  if(c) c.value = '';
+  if(s) s.value = '';
+  renderNewSearchesTriageReport();
+}
 function cleanDisplayValue(value){
   const text = String(value ?? '').trim();
   return text && !/^\(none\)$/i.test(text) ? text : '—';
@@ -5947,13 +6018,15 @@ function harvestHoursClientMap(){
       // rowBillingClass()/billing_class = whether THIS assignment bills (Bench never does).
       // For hours control we want billable people, even while they sit on Bench.
       const isBillablePerson = String(row.billing_type || '').trim().toLowerCase() === 'billable';
+      const isNonBillablePerson = !isBillablePerson;
       const isInternalOrBench = restrictedRoles.includes(role) ? (isCapacity && isBillablePerson) : isCapacity;
       if(!isExternalInProgress(row) && !isInternalOrBench) return;
       const rawName = String(row.name || row.assignee || '').trim();
       if(!rawName) return; // skip unassigned/new-hire rows (no real name yet)
       const person = normalizeIdentity(displayName(row));
       if(!person || !client) return;
-      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', assignmentPct:0};
+      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', assignmentPct:0, personNonBillable:false};
+      if(isNonBillablePerson) map[person].personNonBillable = true;
       map[person].clients.add(client);
       const bt = rowBillingClass(row); // reads epic_billing (customfield_12711) correctly
       if(bt) map[person].billingClasses.add(bt);
@@ -5969,13 +6042,28 @@ function harvestHoursClientMap(){
   }catch(error){
     console.info("Harvest hours Jira client map unavailable:", error.message);
   }
+  try{
+    (latest?.non_billable_epic_assignments || []).forEach(row => {
+      const status = String(row.status || '').trim().toLowerCase();
+      if(status === 'inactive') return;
+      const person = normalizeIdentity(displayName(row));
+      if(!person) return;
+      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', assignmentPct:0, personNonBillable:false};
+      map[person].personNonBillable = true;
+      const rowEmail = String(row.email || '').trim();
+      if(rowEmail && !map[person].email) map[person].email = rowEmail;
+    });
+  }catch(error){
+    console.info("Harvest hours non-billable map unavailable:", error.message);
+  }
   return Object.fromEntries(Object.entries(map).map(([key, value]) => [key, {
     clients: [...value.clients].sort(),
     billingClasses: [...value.billingClasses].sort(),
     pms: [...value.pms].sort(),
     freelance: value.freelance,
-    email: value.email,
-    assignmentPct: Math.min(100, Math.round((value.assignmentPct || 0) * 100) / 100)
+    email: value.email || '',
+    assignmentPct: Math.min(100, Math.round((value.assignmentPct || 0) * 100) / 100),
+    personNonBillable: Boolean(value.personNonBillable)
   }]));
 }
 function harvestHoursBillingHubNames(incomplete, noDescriptionRows=[]){
@@ -6034,7 +6122,7 @@ function harvestHoursRowMatchesFilters(row, f){
   const isFreelancer = Boolean(row.freelance);
   const bc = (row.billingClasses || []);
   const isBillable = !isFreelancer && bc.includes('Billable');
-  const isNonBillable = !isFreelancer && bc.includes('Non-Billable') && !bc.includes('Billable');
+  const isNonBillable = !isFreelancer && Boolean(row.personNonBillable);
   if(f.billable && isBillable) return true;
   if(f.nonBillable && isNonBillable) return true;
   if(f.freelancer && isFreelancer) return true;
@@ -6325,6 +6413,7 @@ async function runHarvestHoursReport(){
         client: (jiraClients && jiraClients[0]) || (harv?.harvestClients?.[0]) || '',
         clients: (jiraClients && jiraClients.length) ? jiraClients : (harv?.harvestClients || []),
         billingClasses: jiraInfo?.billingClasses || [],
+        personNonBillable: Boolean(jiraInfo?.personNonBillable),
         pms: jiraInfo?.pms || [],
         freelance: Boolean(jiraInfo?.freelance),
         projects: buildProjects(harv),
