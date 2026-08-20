@@ -6121,7 +6121,8 @@ function harvestHoursMentionedClient(notes, ownClient, candidateClients){
   for(const name of names){
     const looksLikeAcronym = name.length >= 2 && name === name.toUpperCase() && /[A-Z]/.test(name);
     if(name.length < 4 && !looksLikeAcronym) continue; // nombres cortos en minuscula dan falsos positivos; siglas (NGL) se permiten
-    if(normalizeClientKey(name) === ownKey) continue;
+    const nameKey = normalizeClientKey(name);
+    if(ownKey && (nameKey === ownKey || ownKey.includes(nameKey) || nameKey.includes(ownKey))) continue;
     const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const re = new RegExp('\\b' + escaped + '\\b', 'i');
     if(re.test(text)) return name;
@@ -6139,9 +6140,9 @@ function harvestHoursSummarizeIssues(groups){
 }
 function harvestHoursIssueTooltip(missingCount, mentionedClients){
   const parts = [];
-  if(missingCount) parts.push(`${missingCount} entrada${missingCount === 1 ? '' : 's'} de Harvest sin descripcion`);
+  if(missingCount) parts.push(`${missingCount} Harvest ${missingCount === 1 ? 'entry' : 'entries'} missing a description`);
   if(mentionedClients && mentionedClients.length){
-    parts.push(`Menciona ${mentionedClients.length === 1 ? 'otro cliente' : 'otros clientes'} en la descripcion: ${mentionedClients.join(', ')}`);
+    parts.push(`Mentions ${mentionedClients.length === 1 ? 'another client' : 'other clients'} in the description: ${mentionedClients.join(', ')}`);
   }
   return parts.join(' · ');
 }
@@ -6155,7 +6156,7 @@ function harvestHoursGaugeHTML(pct){
   const clamped = Math.max(0, Math.min(100, Number(pct) || 0));
   const color = harvestHoursGaugeColor(clamped);
   return `<div style="display:flex;align-items:center;justify-content:center;gap:6px">
-    <span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,var(--card) 55%,transparent 56%),conic-gradient(${color} ${clamped}%,var(--brd) 0);flex:none" title="${clamped}% de las horas esperadas"></span>
+    <span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,var(--card) 55%,transparent 56%),conic-gradient(${color} ${clamped}%,var(--brd) 0);flex:none" title="${clamped}% of expected hours"></span>
     <span style="font-size:.8rem;font-weight:700;color:${color}">${clamped}%</span>
   </div>`;
 }
@@ -6163,6 +6164,13 @@ function harvestHoursInfoIcon(missingCount, mentionedClients){
   if(!missingCount && !(mentionedClients && mentionedClients.length)) return '';
   const tooltip = harvestHoursIssueTooltip(missingCount, mentionedClients);
   return `<span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--danger);color:var(--card);font-size:10px;font-weight:700;font-style:italic;cursor:help;flex:none;margin-left:6px" title="${esc(tooltip)}">i</span>`;
+}
+function harvestHoursHighlightMention(notes, mentionedClient){
+  const safeNotes = esc(notes);
+  if(!mentionedClient) return safeNotes;
+  const escaped = mentionedClient.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('\\b(' + escaped + ')\\b', 'ig');
+  return safeNotes.replace(re, '<span style="color:var(--warning);font-weight:700">$1</span>');
 }
 function harvestHoursFlagIcon(hasIssue, tooltip){
   if(!hasIssue) return '';
@@ -6295,14 +6303,14 @@ function renderHarvestHoursReport(){
 
         const entryRows = hasEntries ? pg.entries.map(e => {
           const noteHtml = e.missingDescription
-            ? `<span style="font-style:italic">Sin descripcion</span>`
-            : esc(e.notes);
+            ? `<span style="font-style:italic">No description</span>`
+            : harvestHoursHighlightMention(e.notes, e.mentionedClient);
           return `<tr class="hh-expand-row hh-g-${personId} hh-g-${clientId} hh-g-${projectId}" data-hidden="true" style="background:var(--bg-2);${e.missingDescription ? 'color:var(--danger)' : ''}">
             <td colspan="6" style="padding:4px 8px 4px 78px;font-size:.8rem">
               <div style="display:flex;gap:12px;align-items:baseline">
                 <span style="min-width:64px;color:${e.missingDescription ? 'inherit' : 'var(--fg-2)'}">${esc(e.date || "—")}</span>
                 <span style="min-width:44px;font-weight:700;color:${e.missingDescription ? 'inherit' : 'var(--fg-1)'}">${esc(e.hours)}h</span>
-                <span style="flex:1">${noteHtml}${e.mentionedClient ? ` <span style="color:var(--warning);font-weight:600">(menciona ${esc(e.mentionedClient)})</span>` : ''}</span>
+                <span style="flex:1">${noteHtml}</span>
               </div>
             </td>
           </tr>`;
