@@ -1554,6 +1554,14 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 	          <option value="Non-Billable">Non-Billable</option>
 	        </select>
 	      </div>
+	      <div class="filter-field">
+	        <label for="opsPersonBillingFilter">Billing type (person)</label>
+	        <select id="opsPersonBillingFilter" onchange="setOpsFilter('personBillingType', this.value)">
+	          <option value="">All</option>
+	          <option value="Billable">Billable</option>
+	          <option value="Non-Billable">Non-Billable</option>
+	        </select>
+	      </div>
 	      <div class="filter-field ops-clients-only ops-hidden" id="opsClientSortField">
 	        <label for="opsClientSortFilter">Client sort</label>
 	        <select id="opsClientSortFilter" onchange="setOpsClientSort(this.value)">
@@ -2000,7 +2008,7 @@ let lastUpdated = '';
 let serviceHealth = null;
 let forecastFilters = {client:'', position:'', month:'', assignee:''};
 let opsView = 'assignees';
-let opsFilters = {search:'', client:'', position:'', projectManager:'', freelance:'', billingClass:''};
+let opsFilters = {search:'', client:'', position:'', projectManager:'', freelance:'', billingClass:'', personBillingType:''};
 let opsClientMode = 'overview';
 let opsClientSort = 'assigneesDesc';
 let harvestUsersOpen = false;
@@ -6655,6 +6663,12 @@ function rowBillingClass(row){
   if(billing === null) return '';
   return billing === 0 ? 'Non-Billable' : 'Billable';
 }
+// billing_type = whether the PERSON is billable (Jira custom field), independent of
+// rowBillingClass() which is per-assignment. Used for the Headcount Total audit filter
+// so a person counts once, consistently, regardless of which assignment row is inspected.
+function rowPersonBillingType(row){
+  return String(row.billing_type || '').trim().toLowerCase() === 'billable' ? 'Billable' : 'Non-Billable';
+}
 function jiraIssueUrl(key){
   const safeKey = String(key || '').trim();
   if(!safeKey) return '';
@@ -6735,7 +6749,8 @@ function opsRowMatches(row){
     && (!opsFilters.position || (row.position || '') === opsFilters.position)
     && (!opsFilters.projectManager || (row.project_manager || '') === opsFilters.projectManager)
     && (!opsFilters.freelance || (isFreelance(row) ? 'Yes' : 'No') === opsFilters.freelance)
-    && (!opsFilters.billingClass || rowBillingClass(row) === opsFilters.billingClass);
+    && (!opsFilters.billingClass || rowBillingClass(row) === opsFilters.billingClass)
+    && (!opsFilters.personBillingType || rowPersonBillingType(row) === opsFilters.personBillingType);
 }
 function filteredOpsRows(){
   return scopedAssignmentRows(allAssignmentRows()).filter(opsRowMatches);
@@ -6766,6 +6781,7 @@ function renderOpsFilterControls(){
   const projectManagerSelect = document.getElementById('opsProjectManagerFilter');
   const freelanceSelect = document.getElementById('opsFreelanceFilter');
   const billableSelect = document.getElementById('opsBillableFilter');
+  const personBillingSelect = document.getElementById('opsPersonBillingFilter');
   const clientSortSelect = document.getElementById('opsClientSortFilter');
   document.querySelectorAll('.ops-clients-only').forEach(el => el.classList.toggle('ops-hidden', opsView !== 'clients'));
   if(search && search.value !== opsFilters.search) search.value = opsFilters.search;
@@ -6786,6 +6802,7 @@ function renderOpsFilterControls(){
   }
   if(freelanceSelect) freelanceSelect.value = opsFilters.freelance;
   if(billableSelect) billableSelect.value = opsFilters.billingClass;
+  if(personBillingSelect) personBillingSelect.value = opsFilters.personBillingType;
   if(clientSortSelect) clientSortSelect.value = opsClientSort;
 }
 function summaryCard(label, value, sub=''){
@@ -6834,7 +6851,8 @@ function assigneeGroups(rows){
       clients: uniqueNonEmpty(assignments.map(row => row.client)),
       positions: uniqueNonEmpty(assignments.map(row => row.position)),
       availability: personAvailabilityFromAssignments(assignments),
-      nextDue: dueDates[0] || ''
+      nextDue: dueDates[0] || '',
+      billingType: rowPersonBillingType(assignments[0] || {})
     };
   });
 }
@@ -6845,7 +6863,7 @@ function assignmentChip(row){
   return `<span class="assignment-chip" title="${esc(row.summary || row.sow || row.key || label)}">${esc(label)}${internal}: ${fmtRawPct(pct)}</span>`;
 }
 function renderAssignmentDetails(group){
-  return `<tr><td colspan="6" style="padding:0;background:var(--surf)">
+  return `<tr><td colspan="7" style="padding:0;background:var(--surf)">
     <div style="padding:12px 16px 16px">
       <table class="nested-table"><thead><tr><th>Assignment</th><th>Project Manager</th><th>%</th><th>Due Date</th><th>SOW / Summary</th><th>Link</th></tr></thead><tbody>
       ${group.assignments.map(row => {
@@ -6871,20 +6889,21 @@ function renderOpsAssignees(rows){
     if(a.availability === null && b.availability !== null) return 1;
     return a.name.localeCompare(b.name);
   });
-  document.getElementById('opsThead').innerHTML = '<tr><th>Assignee</th><th>Position</th><th>Assignments</th><th>Available</th><th>Next Due</th><th>SOWs</th></tr>';
+  document.getElementById('opsThead').innerHTML = '<tr><th>Assignee</th><th>Position</th><th>Billing type</th><th>Assignments</th><th>Available</th><th>Next Due</th><th>SOWs</th></tr>';
   document.getElementById('opsTbody').innerHTML = groups.map(group => {
     const expanded = expandedAssignees.has(group.id);
     const avail = group.availability;
     const main = `<tr>
       <td style="font-weight:800;white-space:nowrap"><button class="ops-expand" onclick='toggleAssigneeGroup(${jsArg(group.id)})'>${expanded ? '−' : '+'}</button>${esc(group.name)}</td>
       <td>${esc(group.positions.join(', ') || '—')}</td>
+      <td><span class="chip ${group.billingType === 'Billable' ? 'badge-green' : 'badge-yellow'}">${esc(group.billingType)}</span></td>
       <td>${group.assignments.map(assignmentChip).join('')}</td>
       <td><span class="${avail===null?'':availCls(avail)}">${fmtRawPct(avail)}</span></td>
       <td style="white-space:nowrap">${fmtDate(group.nextDue)}</td>
       <td><button class="inline-filter" onclick='toggleAssigneeGroup(${jsArg(group.id)})'>${expanded ? 'Hide' : 'Show'} ${group.assignments.length} SOW${group.assignments.length === 1 ? '' : 's'}</button></td>
     </tr>`;
     return main + (expanded ? renderAssignmentDetails(group) : '');
-  }).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No assignees match the selected filters</td></tr>';
+  }).join('') || '<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--muted)">No assignees match the selected filters</td></tr>';
 }
 function accountCoverageMap(){
   const map = new Map();
@@ -7314,6 +7333,7 @@ function renderOpsViews(){
 	    opsFilters.projectManager ? `PM: ${opsFilters.projectManager}` : '',
 	    opsFilters.freelance ? `Freelancer: ${opsFilters.freelance}` : '',
 	    opsFilters.billingClass ? `Billing: ${opsFilters.billingClass}` : '',
+	    opsFilters.personBillingType ? `Billing type (person): ${opsFilters.personBillingType}` : '',
 	    opsView === 'clients' ? `Sort: ${opsClientSort.replace('assignees','Assignees ').replace('Desc','↓').replace('Asc','↑').replace('due','Due').replace('client','Client')}` : '',
 	  ].filter(Boolean);
 	  document.getElementById('opsViewsTag').textContent = `${label} view`;
@@ -7342,7 +7362,7 @@ function setOpsFilter(field, value){
   renderOpsViews();
 }
 function resetOpsFilters(){
-  opsFilters = {search:'', client:'', position:'', projectManager:'', freelance:'', billingClass:''};
+  opsFilters = {search:'', client:'', position:'', projectManager:'', freelance:'', billingClass:'', personBillingType:''};
   opsClientSort = 'assigneesDesc';
   expandedAssignees = new Set();
   expandedProjectManagers = new Set();
@@ -7368,6 +7388,15 @@ function toggleProjectManagerGroup(id){
 }
 window.setOpsView = setOpsView;
 window.setOpsFilter = setOpsFilter;
+// Entry point para la tarjeta Headcount Total (redesign/pmo-overview.js): salta a
+// Operating Views > Assignees con el filtro de billing por persona limpio, para que
+// PMO alterne Billable/Non-Billable y cuente las filas contra el 97/18 de la tarjeta.
+function goToHeadcountAudit(){
+  goTo('opsViews');
+  setOpsView('assignees');
+  setOpsFilter('personBillingType', '');
+}
+window.goToHeadcountAudit = goToHeadcountAudit;
 window.resetOpsFilters = resetOpsFilters;
 window.toggleAssigneeGroup = toggleAssigneeGroup;
 window.toggleProjectManagerGroup = toggleProjectManagerGroup;
