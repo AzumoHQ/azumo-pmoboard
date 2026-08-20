@@ -346,7 +346,7 @@ main>section.tab-section-active{animation:tabFade .18s ease-out}
 .forecast-filters{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin:0 0 1rem}
 .filter-field{display:flex;flex-direction:column;gap:5px;min-width:220px}
 .filter-field label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
-.filter-field select,.filter-field input{background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.65rem .8rem;font:inherit;outline:none}
+.filter-field select,.filter-field input{background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.65rem .8rem;font:inherit;outline:none;max-width:100%;text-overflow:ellipsis}
 .filter-field select:focus,.filter-field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,102,255,.15)}
 .forecast-filter-summary{font-size:.78rem;color:var(--muted);margin-left:auto;padding:.65rem 0}
 .inline-filter{background:none;border:none;color:var(--blue-lt);font:inherit;font-weight:700;cursor:pointer;padding:0;text-align:left}
@@ -558,7 +558,7 @@ section{margin-bottom:1.65rem!important}
 .internal-projects-table .muted-value{color:var(--muted)}
 .internal-client-row td{background:rgba(0,102,255,.08)!important;border-top:0;font-weight:850}.internal-client-main{display:flex;align-items:center;gap:8px}.internal-toggle{background:rgba(0,102,255,.12);border:1px solid rgba(0,102,255,.3);color:var(--blue-lt);border-radius:9px;padding:5px 9px;font-size:.72rem;font-weight:950;cursor:pointer}.internal-toggle:hover{background:rgba(0,102,255,.18)}.internal-sow-row td:first-child{padding-left:2.2rem}.internal-assignment-chip{display:inline-flex;align-items:center;justify-content:center;min-height:24px;border-radius:999px;padding:0 10px;font-size:.72rem;font-weight:900;line-height:1;background:rgba(0,102,255,.14);color:#93C5FD}.internal-assignment-chip.full{background:rgba(16,185,129,.14);color:#6EE7B7}.internal-assignment-chip.partial{background:rgba(249,115,22,.14);color:#FDBA74}
 .hh-filter-row{border-bottom:1px solid var(--brd)}.hh-check-field{grid-column:span 2}.hh-checks{display:flex;gap:14px;flex-wrap:wrap;align-items:center;height:40px}.hh-check{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:800;color:var(--txt);cursor:pointer;white-space:nowrap}.hh-check input{cursor:pointer;accent-color:#E8501A}
-.harvest-hours-module{padding-bottom:1rem}.harvest-hours-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end;padding:1rem 1.2rem;border-bottom:1px solid var(--brd)}.harvest-hours-controls .btn{height:40px;justify-content:center}.harvest-hours-summary{padding:1rem 1.2rem;margin-bottom:0}.harvest-hours-subhead{border-top:1px solid var(--brd)}.harvest-hours-table-wrap{max-height:440px}.hh-progress{height:7px;background:rgba(107,143,191,.18);border-radius:999px;overflow:hidden;min-width:90px}.hh-progress-fill{height:100%;border-radius:999px}.info-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(16,185,129,.12);color:#6EE7B7;border:1px solid rgba(16,185,129,.32);font-size:.8rem}.err-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.35);font-size:.8rem}
+.harvest-hours-module{padding-bottom:1rem}.harvest-hours-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;align-items:end;padding:1rem 1.2rem;border-bottom:1px solid var(--brd)}.harvest-hours-controls .btn{height:40px;justify-content:center}.harvest-hours-summary{padding:1rem 1.2rem;margin-bottom:0}.harvest-hours-subhead{border-top:1px solid var(--brd)}.harvest-hours-table-wrap{max-height:440px}.hh-progress{height:7px;background:rgba(107,143,191,.18);border-radius:999px;overflow:hidden;min-width:90px}.hh-progress-fill{height:100%;border-radius:999px}.info-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(16,185,129,.12);color:#6EE7B7;border:1px solid rgba(16,185,129,.32);font-size:.8rem}.err-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.35);font-size:.8rem}
 
 /* PMO-LAYOUT: nav work-in-progress badge */
 @media(max-width:980px){.nav-wip-pill a{display:none}.nav-wip-pill{padding:2px 7px;font-size:.58rem}.nav-title-row{gap:6px}}
@@ -1919,7 +1919,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         </div>
         <div class="fc-table-wrap harvest-hours-table-wrap">
           <table>
-            <thead><tr><th>Name</th><th>Client</th><th>Hours</th><th>Days filled</th><th>Jira %</th><th style="text-align:center">Real %</th></tr></thead>
+            <thead><tr><th>Name</th><th>Client</th><th>Hours</th><th>Days filled</th><th>Jira %</th><th style="text-align:center">%</th></tr></thead>
             <tbody id="hhReportBody"></tbody>
           </table>
         </div>
@@ -6163,7 +6163,7 @@ function harvestHoursGaugeHTML(pct){
 function harvestHoursInfoIcon(missingCount, mentionedClients){
   if(!missingCount && !(mentionedClients && mentionedClients.length)) return '';
   const tooltip = harvestHoursIssueTooltip(missingCount, mentionedClients);
-  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--danger);color:var(--card);font-size:10px;font-weight:700;font-style:italic;cursor:help;flex:none;margin-left:6px" title="${esc(tooltip)}">i</span>`;
+  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;flex:none;margin-left:6px;cursor:help" title="${esc(tooltip)}"><svg viewBox="0 0 26 26" width="15" height="15" xmlns="http://www.w3.org/2000/svg"><path d="M13 25C19.6274 25 25 19.6274 25 13C25 6.37258 19.6274 1 13 1C6.37258 1 1 6.37258 1 13C1 19.6274 6.37258 25 13 25Z" stroke="var(--danger)" stroke-width="2"/><path d="M13 9.00003C13.718 9.00003 14.3 8.41801 14.3 7.70004C14.3 6.98207 13.718 6.40002 13 6.40002C12.282 6.40002 11.7 6.98207 11.7 7.70004C11.7 8.41801 12.282 9.00003 13 9.00003Z" fill="var(--danger)"/><path d="M13 19.7C12.2 19.7 11.6 19.1 11.6 18.4V11.6C11.6 10.9 12.2 10.3 12.9 10.3H13C13.7 10.3 14.3 10.9 14.3 11.6V18.4C14.3 19.1 13.8 19.7 13 19.7Z" fill="var(--danger)"/></svg></span>`;
 }
 function harvestHoursHighlightMention(notes, mentionedClient){
   const safeNotes = esc(notes);
