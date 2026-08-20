@@ -558,7 +558,7 @@ section{margin-bottom:1.65rem!important}
 .internal-projects-table .muted-value{color:var(--muted)}
 .internal-client-row td{background:rgba(0,102,255,.08)!important;border-top:0;font-weight:850}.internal-client-main{display:flex;align-items:center;gap:8px}.internal-toggle{background:rgba(0,102,255,.12);border:1px solid rgba(0,102,255,.3);color:var(--blue-lt);border-radius:9px;padding:5px 9px;font-size:.72rem;font-weight:950;cursor:pointer}.internal-toggle:hover{background:rgba(0,102,255,.18)}.internal-sow-row td:first-child{padding-left:2.2rem}.internal-assignment-chip{display:inline-flex;align-items:center;justify-content:center;min-height:24px;border-radius:999px;padding:0 10px;font-size:.72rem;font-weight:900;line-height:1;background:rgba(0,102,255,.14);color:#93C5FD}.internal-assignment-chip.full{background:rgba(16,185,129,.14);color:#6EE7B7}.internal-assignment-chip.partial{background:rgba(249,115,22,.14);color:#FDBA74}
 .hh-filter-row{border-bottom:1px solid var(--brd)}.hh-check-field{grid-column:span 2}.hh-checks{display:flex;gap:14px;flex-wrap:wrap;align-items:center;height:40px}.hh-check{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:800;color:var(--txt);cursor:pointer;white-space:nowrap}.hh-check input{cursor:pointer;accent-color:#E8501A}
-.harvest-hours-module{padding-bottom:1rem}.harvest-hours-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;align-items:end;padding:1rem 1.2rem;border-bottom:1px solid var(--brd)}.harvest-hours-controls .btn{height:40px;justify-content:center}.harvest-hours-summary{padding:1rem 1.2rem;margin-bottom:0}.harvest-hours-subhead{border-top:1px solid var(--brd)}.harvest-hours-table-wrap{max-height:440px}.hh-progress{height:7px;background:rgba(107,143,191,.18);border-radius:999px;overflow:hidden;min-width:90px}.hh-progress-fill{height:100%;border-radius:999px}.info-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(16,185,129,.12);color:#6EE7B7;border:1px solid rgba(16,185,129,.32);font-size:.8rem}.hh-issue-trigger{position:relative;cursor:help}.hh-issue-trigger .hh-issue-preview{display:none;position:absolute;top:22px;left:0;z-index:60;background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:8px 10px;min-width:230px;box-shadow:0 10px 28px rgba(0,0,0,.35);font-size:.76rem;white-space:normal;text-align:left}.hh-issue-trigger:hover .hh-issue-preview{display:block}.hh-issue-preview-title{font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:.64rem;color:var(--muted);margin-bottom:6px}.hh-issue-preview-row{display:flex;gap:10px;padding:4px 0;border-top:1px solid var(--brd);color:var(--txt)}.hh-issue-preview-row:first-of-type{border-top:none}.hh-issue-preview-row span:first-child{min-width:64px;color:var(--muted)}.hh-issue-preview-row span:nth-child(2){min-width:36px;font-weight:700}.err-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.35);font-size:.8rem}
+.harvest-hours-module{padding-bottom:1rem}.harvest-hours-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;align-items:end;padding:1rem 1.2rem;border-bottom:1px solid var(--brd)}.harvest-hours-controls .btn{height:40px;justify-content:center}.harvest-hours-summary{padding:1rem 1.2rem;margin-bottom:0}.harvest-hours-subhead{border-top:1px solid var(--brd)}.harvest-hours-table-wrap{max-height:440px}.hh-progress{height:7px;background:rgba(107,143,191,.18);border-radius:999px;overflow:hidden;min-width:90px}.hh-progress-fill{height:100%;border-radius:999px}.info-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(16,185,129,.12);color:#6EE7B7;border:1px solid rgba(16,185,129,.32);font-size:.8rem}.err-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.35);font-size:.8rem}
 
 /* PMO-LAYOUT: nav work-in-progress badge */
 @media(max-width:980px){.nav-wip-pill a{display:none}.nav-wip-pill{padding:2px 7px;font-size:.58rem}.nav-title-row{gap:6px}}
@@ -6033,13 +6033,14 @@ function harvestHoursClientMap(){
       if(!rawName) return; // skip unassigned/new-hire rows (no real name yet)
       const person = normalizeIdentity(displayName(row));
       if(!person || !client) return;
-      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', assignmentPct:0, personNonBillable:false};
+      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', assignmentPct:0, personNonBillable:false, clientPct:new Map()};
       if(isNonBillablePerson) map[person].personNonBillable = true;
       map[person].clients.add(client);
       const bt = rowBillingClass(row); // reads epic_billing (customfield_12711) correctly
       if(bt) map[person].billingClasses.add(bt);
       if(isBillablePerson) map[person].billingClasses.add('Billable');
       map[person].assignmentPct += Number(rowAssignmentPct(row) || 0);
+      map[person].clientPct.set(client, (map[person].clientPct.get(client) || 0) + Number(rowAssignmentPct(row) || 0));
       if(bt !== 'Non-Billable' || isBillablePerson) map[person].hasNonBillableOnly = false;
       const pm = String(row.project_manager || '').trim();
       if(pm) map[person].pms.add(pm);
@@ -6056,7 +6057,7 @@ function harvestHoursClientMap(){
       if(status === 'inactive') return;
       const person = normalizeIdentity(displayName(row));
       if(!person) return;
-      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', assignmentPct:0, personNonBillable:false};
+      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', assignmentPct:0, personNonBillable:false, clientPct:new Map()};
       map[person].personNonBillable = true;
       const rowEmail = String(row.email || '').trim();
       if(rowEmail && !map[person].email) map[person].email = rowEmail;
@@ -6071,6 +6072,7 @@ function harvestHoursClientMap(){
     freelance: value.freelance,
     email: value.email || '',
     assignmentPct: Math.min(100, Math.round((value.assignmentPct || 0) * 100) / 100),
+    clientPct: Object.fromEntries([...value.clientPct.entries()].map(([c, p]) => [c, Math.min(100, Math.round(p * 100) / 100)])),
     personNonBillable: Boolean(value.personNonBillable)
   }]));
 }
@@ -6111,7 +6113,13 @@ function harvestHoursDescriptionTag(row){
     : `<span class="badge badge-green">OK</span>`;
 }
 function harvestHoursActiveClientNames(){
-  return (latest?.active_clients || []).map(c => String(c || '').trim()).filter(Boolean);
+  // Azumo y Bench no son clientes externos reales -- son la empresa interna
+  // y el estado de disponibilidad. Mencionarlos en una nota (ej. "reunion con
+  // el equipo de Azumo") es normal y nunca debe marcarse como sospechoso.
+  const nonClientNames = new Set(['azumo', 'bench']);
+  return (latest?.active_clients || [])
+    .map(c => String(c || '').trim())
+    .filter(c => c && !nonClientNames.has(c.toLowerCase()));
 }
 // Palabras muy comunes en notas de Harvest: nunca deben disparar un match de
 // cliente aunque se parezcan a un nombre (evita ruido con el criterio permisivo).
@@ -6265,32 +6273,10 @@ function harvestHoursGaugeHTML(pct){
     <span style="font-size:.8rem;font-weight:700;color:${color}">${clamped}%</span>
   </div>`;
 }
-function harvestHoursInfoIcon(missingCount, mentionedClients, source){
+function harvestHoursInfoIcon(missingCount, mentionedClients){
   if(!missingCount && !(mentionedClients && mentionedClients.length)) return '';
-  const preview = harvestHoursIssuePreviewHTML(source);
-  return `<span class="hh-issue-trigger" style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;flex:none;margin-left:6px" title="Needs review"><svg viewBox="0 0 26 26" width="15" height="15" xmlns="http://www.w3.org/2000/svg"><path d="M13 25C19.6274 25 25 19.6274 25 13C25 6.37258 19.6274 1 13 1C6.37258 1 1 6.37258 1 13C1 19.6274 6.37258 25 13 25Z" fill="none" stroke="var(--danger)" stroke-width="2"/><path d="M13 9.00003C13.718 9.00003 14.3 8.41801 14.3 7.70004C14.3 6.98207 13.718 6.40002 13 6.40002C12.282 6.40002 11.7 6.98207 11.7 7.70004C11.7 8.41801 12.282 9.00003 13 9.00003Z" fill="var(--danger)"/><path d="M13 19.7C12.2 19.7 11.6 19.1 11.6 18.4V11.6C11.6 10.9 12.2 10.3 12.9 10.3H13C13.7 10.3 14.3 10.9 14.3 11.6V18.4C14.3 19.1 13.8 19.7 13 19.7Z" fill="var(--danger)"/></svg>${preview}</span>`;
-}
-function harvestHoursFlattenEntries(source){
-  if(!Array.isArray(source) || !source.length) return [];
-  if(source[0] && source[0].projects) return source.flatMap(cg => harvestHoursFlattenEntries(cg.projects));
-  if(source[0] && source[0].entries) return source.flatMap(pg => pg.entries || []);
-  return source;
-}
-function harvestHoursIssueDetailRows(source){
-  const rows = [];
-  harvestHoursFlattenEntries(source).forEach(e => {
-    if(e.missingDescription) rows.push({date: e.date, hours: e.hours, label: 'Missing description'});
-    if(e.mentionedClient) rows.push({date: e.date, hours: e.hours, label: e.mentionedKey ? `References ${e.mentionedKey} (${e.mentionedClient})` : `Mentions ${e.mentionedClient}`});
-  });
-  return rows.sort((a,b) => String(a.date).localeCompare(String(b.date)));
-}
-function harvestHoursIssuePreviewHTML(source){
-  const rows = harvestHoursIssueDetailRows(source);
-  if(!rows.length) return '';
-  return `<div class="hh-issue-preview">
-    <div class="hh-issue-preview-title">Needs review</div>
-    ${rows.map(r => `<div class="hh-issue-preview-row"><span>${esc(r.date || "\u2014")}</span><span>${esc(r.hours)}h</span><span>${esc(r.label)}</span></div>`).join('')}
-  </div>`;
+  const tooltip = harvestHoursIssueTooltip(missingCount, mentionedClients);
+  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;flex:none;margin-left:6px;cursor:help" title="${esc(tooltip)}"><svg viewBox="0 0 26 26" width="15" height="15" xmlns="http://www.w3.org/2000/svg"><path d="M13 25C19.6274 25 25 19.6274 25 13C25 6.37258 19.6274 1 13 1C6.37258 1 1 6.37258 1 13C1 19.6274 6.37258 25 13 25Z" fill="none" stroke="var(--danger)" stroke-width="2"/><path d="M13 9.00003C13.718 9.00003 14.3 8.41801 14.3 7.70004C14.3 6.98207 13.718 6.40002 13 6.40002C12.282 6.40002 11.7 6.98207 11.7 7.70004C11.7 8.41801 12.282 9.00003 13 9.00003Z" fill="var(--danger)"/><path d="M13 19.7C12.2 19.7 11.6 19.1 11.6 18.4V11.6C11.6 10.9 12.2 10.3 12.9 10.3H13C13.7 10.3 14.3 10.9 14.3 11.6V18.4C14.3 19.1 13.8 19.7 13 19.7Z" fill="var(--danger)"/></svg></span>`;
 }
 function harvestHoursHighlightMention(notes, mentionedClient){
   const safeNotes = esc(notes);
@@ -6299,10 +6285,9 @@ function harvestHoursHighlightMention(notes, mentionedClient){
   const re = new RegExp('\\b(' + escaped + ')\\b', 'ig');
   return safeNotes.replace(re, '<span style="color:var(--warning);font-weight:700">$1</span>');
 }
-function harvestHoursFlagIcon(hasIssue, tooltip, source){
+function harvestHoursFlagIcon(hasIssue, tooltip){
   if(!hasIssue) return '';
-  const preview = harvestHoursIssuePreviewHTML(source);
-  return `<span class="hh-issue-trigger" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--warning);color:var(--card);font-size:9px;font-weight:700;flex:none;margin-left:5px" title="Needs review">!${preview}</span>`;
+  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--warning);color:var(--card);font-size:9px;font-weight:700;cursor:help;flex:none;margin-left:5px" title="${esc(tooltip)}">!</span>`;
 }
 function harvestHoursFilterState(){
   return {
@@ -6378,7 +6363,7 @@ function renderHarvestHoursReport(){
     const hasGroups = row.groups && row.groups.length > 0;
     const jiraPctLabel = (row.jiraPct === null || row.jiraPct === undefined) ? "—" : (esc(row.jiraPct) + "%");
     const jiraGapWarning = (row.jiraPct !== null && row.jiraPct !== undefined && row.jiraPct > 0 && row.pct < row.jiraPct - 15);
-    const infoIcon = harvestHoursInfoIcon(row.missingCount, row.mentionedClients, row.groups);
+    const infoIcon = harvestHoursInfoIcon(row.missingCount, row.mentionedClients);
 
     const mainRow = `<tr onclick="toggleHarvestExpand('${personId}')" style="cursor:${hasGroups?'pointer':'default'}">
       <td style="font-weight:700">
@@ -6397,9 +6382,10 @@ function renderHarvestHoursReport(){
       const hasProjects = cg.projects && cg.projects.length > 0;
       const clientMissing = cg.projects.reduce((n,pg) => n + pg.entries.filter(e => e.missingDescription).length, 0);
       const clientMentions = [...new Set(cg.projects.flatMap(pg => pg.entries.map(e => e.mentionedClient).filter(Boolean)))];
-      const clientFlag = harvestHoursFlagIcon(cg.hasIssue, harvestHoursIssueTooltip(clientMissing, clientMentions), cg.projects);
+      const clientFlag = harvestHoursFlagIcon(cg.hasIssue, harvestHoursIssueTooltip(clientMissing, clientMentions));
       const clientLabel = cg.client === 'Azumo' ? 'Azumo <span style="color:var(--fg-mute)">(internal)</span>' : esc(cg.client);
 
+      const clientJiraPctLabel = (cg.jiraPct === null || cg.jiraPct === undefined) ? "—" : (esc(cg.jiraPct) + "%");
       const clientRow = `<tr class="hh-expand-row hh-g-${personId}" data-hidden="true" onclick="event.stopPropagation();toggleHarvestExpand('${clientId}')" style="background:var(--bg-2);cursor:${hasProjects?'pointer':'default'}">
         <td style="padding:6px 8px 6px 32px;font-size:.85rem;color:var(--fg-2)">
           ${hasProjects ? `<span id="hh-icon-${clientId}" style="display:inline-block;width:14px;transition:transform .15s">▶</span> ` : '<span style="display:inline-block;width:14px"></span> '}
@@ -6408,7 +6394,7 @@ function renderHarvestHoursReport(){
         <td></td>
         <td style="font-size:.85rem;font-weight:700;color:var(--fg-1)">${esc(cg.hours)}h</td>
         <td></td>
-        <td></td>
+        <td style="font-size:.8rem;color:var(--fg-3)">${clientJiraPctLabel}</td>
         <td style="text-align:center;font-size:.8rem;color:var(--fg-3)">${cg.pct}%</td>
       </tr>`;
 
@@ -6417,7 +6403,7 @@ function renderHarvestHoursReport(){
         const hasEntries = pg.entries && pg.entries.length > 0;
         const projectMissing = pg.entries.filter(e => e.missingDescription).length;
         const projectMentions = [...new Set(pg.entries.map(e => e.mentionedClient).filter(Boolean))];
-        const projectFlag = harvestHoursFlagIcon(pg.hasIssue, harvestHoursIssueTooltip(projectMissing, projectMentions), pg.entries);
+        const projectFlag = harvestHoursFlagIcon(pg.hasIssue, harvestHoursIssueTooltip(projectMissing, projectMentions));
 
         const projectRow = `<tr class="hh-expand-row hh-g-${personId} hh-g-${clientId}" data-hidden="true" onclick="event.stopPropagation();toggleHarvestExpand('${projectId}')" style="background:var(--bg-2);cursor:${hasEntries?'pointer':'default'}">
           <td style="padding:5px 8px 5px 54px;font-size:.82rem;color:var(--fg-3);font-style:italic">
@@ -6624,7 +6610,7 @@ async function runHarvestHoursReport(){
     // Prefijo de ticket -> cliente dominante, aprendido de TODAS las entradas del reporte
     const prefixClientMap = harvestHoursBuildPrefixClientMap(Object.values(entriesByUser).flat());
 
-    const buildClientGroups = (harv) => {
+    const buildClientGroups = (harv, clientPctMap = {}) => {
       const activeClientNames = harvestHoursActiveClientNames();
       const entries = harv?.harvestEntries || [];
       const byClient = new Map();
@@ -6649,21 +6635,27 @@ async function runHarvestHoursReport(){
         if(entry.missingDescription || entry.mentionedClient) pg.hasIssue = true;
         pg.entries.push(entry);
       });
-      return [...byClient.values()].map(cg => ({
-        client: cg.client,
-        hours: Math.round(cg.hours * 10) / 10,
-        pct: expected ? Math.round(cg.hours / expected * 100) : 0,
-        hasIssue: cg.hasIssue,
-        projects: [...cg.projects.values()]
-          .map(pg => ({
-            project: pg.project,
-            hours: Math.round(pg.hours * 10) / 10,
-            pct: expected ? Math.round(pg.hours / expected * 100) : 0,
-            hasIssue: pg.hasIssue,
-            entries: pg.entries.slice().sort((a,b) => String(a.date).localeCompare(String(b.date)))
-          }))
-          .sort((a,b) => a.project.localeCompare(b.project))
-      })).sort((a,b) => a.client.localeCompare(b.client));
+      return [...byClient.values()].map(cg => {
+        const jiraPctForClient = Number.isFinite(clientPctMap[cg.client]) ? clientPctMap[cg.client] : null;
+        const clientTarget = (jiraPctForClient !== null && expected) ? (expected * jiraPctForClient / 100) : null;
+        const clientPct = clientTarget ? Math.round(cg.hours / clientTarget * 100) : (expected ? Math.round(cg.hours / expected * 100) : 0);
+        return {
+          client: cg.client,
+          hours: Math.round(cg.hours * 10) / 10,
+          jiraPct: jiraPctForClient,
+          pct: clientPct,
+          hasIssue: cg.hasIssue,
+          projects: [...cg.projects.values()]
+            .map(pg => ({
+              project: pg.project,
+              hours: Math.round(pg.hours * 10) / 10,
+              pct: clientTarget ? Math.round(pg.hours / clientTarget * 100) : (expected ? Math.round(pg.hours / expected * 100) : 0),
+              hasIssue: pg.hasIssue,
+              entries: pg.entries.slice().sort((a,b) => String(a.date).localeCompare(String(b.date)))
+            }))
+            .sort((a,b) => a.project.localeCompare(b.project))
+        };
+      }).sort((a,b) => a.client.localeCompare(b.client));
     };
 
     const makeRow = (name, jiraInfo, harv) => {
@@ -6675,7 +6667,7 @@ async function runHarvestHoursReport(){
       const jiraClients = Array.isArray(jiraInfo) ? jiraInfo : (jiraInfo?.clients || []);
       const jiraPms = Array.isArray(jiraInfo) ? [] : (jiraInfo?.pms || []);
       const jiraPct = Array.isArray(jiraInfo) ? null : (Number.isFinite(jiraInfo?.assignmentPct) ? jiraInfo.assignmentPct : null);
-      const groups = buildClientGroups(harv);
+      const groups = buildClientGroups(harv, jiraInfo?.clientPct || {});
       const issues = harvestHoursSummarizeIssues(groups);
       return {
         name, hours, daysFilled, missingDescription, expected, pct, jiraPct,
