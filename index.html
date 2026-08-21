@@ -1246,7 +1246,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   <div class="nav-inner">
     <div class="nav-brand">
       <a href="#" onclick="goTo('overview');return false;" style="text-decoration:none;display:flex"><div class="nav-logo"><img class="nav-wordmark" src="assets/azumo-logo.png" alt="Azumo"/></div></a>
-      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span>V1</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
+      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span>V2</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
     </div>
     <div class="nav-links">
       <button class="nav-link" id="overviewNavLink" onclick="goTo('overview')">Overview</button>
@@ -1645,6 +1645,27 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       </div>
       <div id="hhQABody"><div class="mc-sub" style="padding:.5rem 0">Run the Harvest Hours report to populate this check.</div></div>
     </div>
+  </div>
+</section>
+
+<!-- ── HELP / CHANGELOG ───────────────────────── -->
+<section id="helpChangelog">
+  <div class="sec-head">
+    <div class="sec-icon"><i class="ti ti-help-circle"></i></div>
+    <h2>Help</h2>
+    <div class="sec-tag">v2.0 · What's new</div>
+  </div>
+  <div class="mc" style="padding:1.2rem 1.4rem">
+    <h3 style="margin-bottom:.4rem">Harvest Hours Control — recent changes</h3>
+    <div class="mc-sub" style="margin-bottom:1rem">Latest updates to the hours audit module.</div>
+    <ul style="margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.55rem;font-size:.86rem;color:var(--txt)">
+      <li><strong>Nested breakdown.</strong> Expand any person to see client → project → individual Harvest entry, each level foldable on its own.</li>
+      <li><strong>Jira % per client.</strong> The weekly target is now prorated by each client's own Jira assignment %, instead of using the full weekly hours as the target for every client.</li>
+      <li><strong>Cross-client detection.</strong> Flags entries whose notes reference a Jira ticket that belongs to a different client than the one hours were logged under.</li>
+      <li><strong>Needs review only.</strong> New toggle to filter the list down to just the people with something flagged.</li>
+      <li><strong>Billable filter simplified.</strong> "Billable" now includes freelancers; Non-Billable stays separate.</li>
+      <li><strong>Cleaner columns.</strong> Removed redundant Description/Status/Progress columns; hours now show green/red directly.</li>
+    </ul>
   </div>
 </section>
 
@@ -2645,6 +2666,7 @@ const PMO_ONLY_SECTIONS = new Set(['pmoActionCenter','dueDates','pendingAssignme
 let openModuleGroup = null;
 function canSeePmoGroup(){ return ['admin','pmo'].includes(effectiveUserRole()); }
 function sectionAllowedForCurrentRole(id){
+  if(id === 'helpChangelog') return true;
   const role = effectiveUserRole();
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
@@ -2680,6 +2702,7 @@ const SECTION_ICON_MAP = {
   'history': 'ti-trending-up',
   'newSearchesTriage': 'ti-search',
   'pmoActionCenter': 'ti-alert-triangle',
+  'helpChangelog': 'ti-help-circle',
 };
 function sectionIcon(id) {
   var cls = SECTION_ICON_MAP[id];
@@ -2727,7 +2750,8 @@ function sidebarNavConfig(){
       {id:'history', icon:'<i class="ti ti-trending-up"></i>', label:'Trends'},
       {id:'newSearchesTriage', icon:'<i class="ti ti-search"></i>', label:'New Searches'}
     ]},
-    {id:'pmoActionCenter', icon:'<i class="ti ti-alert-triangle"></i>', label:'PMO QA', count: qaCount}
+    {id:'pmoActionCenter', icon:'<i class="ti ti-alert-triangle"></i>', label:'PMO QA', count: qaCount},
+    {id:'helpChangelog', icon:'<i class="ti ti-help-circle"></i>', label:'Help'}
   ];
   return entries;
 }
@@ -6176,15 +6200,29 @@ function harvestHoursBuildPrefixClientMap(allEntries){
   });
   return dominant;
 }
-function harvestHoursMentionedTicketClient(notes, ownClient, prefixClientMap){
+function harvestHoursClientInitials(name){
+  const words = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if(words.length < 2) return null;
+  const initials = words.map(w => w[0]).join('').toUpperCase();
+  return initials.length >= 2 ? initials : null;
+}
+function harvestHoursMentionedTicketClient(notes, ownClient, prefixClientMap, candidateClients){
   const ownKey = normalizeClientKey(ownClient || '');
+  const names = candidateClients || harvestHoursActiveClientNames();
   for(const key of harvestHoursExtractTicketKeys(notes)){
     const prefix = key.split('-')[0];
-    const dominant = prefixClientMap[prefix];
-    if(!dominant) continue;
-    const dominantKey = normalizeClientKey(dominant);
-    if(ownKey && (dominantKey === ownKey || ownKey.includes(dominantKey) || dominantKey.includes(ownKey))) continue;
-    return {client: dominant, key};
+    // 1) Preferir lo aprendido del volumen real de datos del reporte, si hay suficiente
+    let matchedClient = prefixClientMap[prefix] || null;
+    // 2) Sin datos suficientes, comparar contra las iniciales oficiales del nombre del cliente
+    //    (ej. "Veteran Recovery Coalition" -> "VRC"). Solo aplica a prefijos de ticket,
+    //    nunca a palabras sueltas de texto libre.
+    if(!matchedClient){
+      matchedClient = names.find(name => harvestHoursClientInitials(name) === prefix) || null;
+    }
+    if(!matchedClient) continue;
+    const matchedKey = normalizeClientKey(matchedClient);
+    if(ownKey && (matchedKey === ownKey || ownKey.includes(matchedKey) || matchedKey.includes(ownKey))) continue;
+    return {client: matchedClient, key};
   }
   return null;
 }
@@ -6569,7 +6607,7 @@ async function runHarvestHoursReport(){
         let mentionedClient = missingDescription ? null : harvestHoursMentionedClient(e.notes, e.client, activeClientNames);
         let mentionedKey = null;
         if(!missingDescription && !mentionedClient){
-          const ticketMatch = harvestHoursMentionedTicketClient(e.notes, e.client, prefixClientMap);
+          const ticketMatch = harvestHoursMentionedTicketClient(e.notes, e.client, prefixClientMap, activeClientNames);
           if(ticketMatch){ mentionedClient = ticketMatch.client; mentionedKey = ticketMatch.key; }
         }
         const entry = {date: e.date, hours: e.hours, notes: e.notes, missingDescription, mentionedClient, mentionedKey};
