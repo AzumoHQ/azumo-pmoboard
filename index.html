@@ -1900,7 +1900,12 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         <div class="hh-checks">
           <label class="hh-check"><input type="checkbox" id="hhTypeBillable" onchange="renderHarvestHoursReport()"/> Billable</label>
           <label class="hh-check"><input type="checkbox" id="hhTypeNonBillable" onchange="renderHarvestHoursReport()"/> Non-Billable</label>
-          <label class="hh-check"><input type="checkbox" id="hhTypeFreelancer" onchange="renderHarvestHoursReport()"/> Freelancer</label>
+        </div>
+      </div>
+      <div class="filter-field hh-check-field">
+        <label>Review</label>
+        <div class="hh-checks">
+          <label class="hh-check"><input type="checkbox" id="hhNeedsReviewOnly" onchange="renderHarvestHoursReport()"/> Needs review only</label>
         </div>
       </div>
       <button class="btn btn-ghost" type="button" onclick="clearHarvestHoursFilters()">Clear filters</button>
@@ -6123,80 +6128,21 @@ function harvestHoursActiveClientNames(){
 }
 // Palabras muy comunes en notas de Harvest: nunca deben disparar un match de
 // cliente aunque se parezcan a un nombre (evita ruido con el criterio permisivo).
-const HH_STOPWORDS = new Set(['testing','test','daily','sprint','review','meeting','session','support','general','other','follow','followup','sync','planning','discovery','reporting','bugs','call','standup','retro','demo','training','internal','weekly','monthly','tickets','ticket','project','client','team','work','working']);
-
-function harvestHoursClientVariants(name){
-  const variants = new Set();
-  const clean = String(name || '').trim();
-  if(!clean) return variants;
-  variants.add(clean);
-  const words = clean.split(/\s+/).filter(Boolean);
-  // Nombre parcial: cada palabra significativa por separado ("Elevate" de "Elevate DDS")
-  words.forEach(w => { if(w.length >= 4 || w === w.toUpperCase()) variants.add(w); });
-  // Iniciales: "Veteran Recovery Coalition" -> "VRC"
-  if(words.length >= 2){
-    const initials = words.map(w => w[0]).join('').toUpperCase();
-    if(initials.length >= 2) variants.add(initials);
-  }
-  return variants;
-}
-function harvestHoursEditDistance(a, b){
-  if(a === b) return 0;
-  if(!a.length || !b.length) return Math.max(a.length, b.length);
-  let prev = Array.from({length: b.length + 1}, (_, i) => i);
-  for(let i = 1; i <= a.length; i++){
-    const curr = [i];
-    for(let j = 1; j <= b.length; j++){
-      curr[j] = Math.min(prev[j] + 1, curr[j-1] + 1, prev[j-1] + (a[i-1] === b[j-1] ? 0 : 1));
-    }
-    prev = curr;
-  }
-  return prev[b.length];
-}
-function harvestHoursTokenMatchesVariant(token, variant){
-  const t = token.toLowerCase();
-  const v = variant.toLowerCase();
-  if(t === v) return true;
-  // Typos leves: tolerancia proporcional al largo de la palabra
-  const tolerance = v.length >= 7 ? 2 : (v.length >= 5 ? 1 : 0);
-  if(tolerance === 0) return false;
-  if(Math.abs(t.length - v.length) > tolerance) return false;
-  return harvestHoursEditDistance(t, v) <= tolerance;
-}
 function harvestHoursMentionedClient(notes, ownClient, candidateClients){
   const text = String(notes || '').trim();
   if(!text) return null;
   const ownKey = normalizeClientKey(ownClient || '');
   const names = candidateClients || harvestHoursActiveClientNames();
-  // Variantes del cliente propio: tampoco deben marcarse (ni por sigla ni por typo)
-  const ownVariantKeys = new Set([...harvestHoursClientVariants(ownClient)].map(normalizeClientKey));
-  // Tokens de la nota, sin URLs (los tickets los maneja harvestHoursMentionedTicketClient)
-  const tokens = text.replace(/https?:\/\/\S+/g, ' ').split(/[^A-Za-z0-9]+/).filter(Boolean);
-
   for(const name of names){
+    // No es una sigla derivada: algunos clientes tienen un nombre real corto
+    // (ej. "NGL"), y ese nombre completo y exacto se permite igual.
+    const looksLikeAcronym = name.length >= 2 && name === name.toUpperCase() && /[A-Z]/.test(name);
+    if(name.length < 4 && !looksLikeAcronym) continue;
     const nameKey = normalizeClientKey(name);
     if(ownKey && (nameKey === ownKey || ownKey.includes(nameKey) || nameKey.includes(ownKey))) continue;
-    for(const variant of harvestHoursClientVariants(name)){
-      const variantKey = normalizeClientKey(variant);
-      if(!variantKey || ownVariantKeys.has(variantKey)) continue;
-      const isAcronym = variant === variant.toUpperCase() && /[A-Z]/.test(variant);
-      if(variant.length < 4 && !isAcronym) continue;
-      // Nombre multi-palabra: buscar la frase completa en el texto
-      if(variant.includes(' ')){
-        const escaped = variant.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        if(new RegExp('\\b' + escaped + '\\b', 'i').test(text)) return name;
-        continue;
-      }
-      // Palabra suelta: comparar contra cada token, con tolerancia a typos
-      for(const token of tokens){
-        if(HH_STOPWORDS.has(token.toLowerCase())) continue;
-        if(isAcronym){
-          if(token.toUpperCase() === variant.toUpperCase()) return name; // siglas: match exacto, sin typos
-        }else if(harvestHoursTokenMatchesVariant(token, variant)){
-          return name;
-        }
-      }
-    }
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp('\\b' + escaped + '\\b', 'i');
+    if(re.test(text)) return name;
   }
   return null;
 }
@@ -6296,23 +6242,27 @@ function harvestHoursFilterState(){
     pm: document.getElementById("hhPmFilter")?.value || "",
     billable: Boolean(document.getElementById("hhTypeBillable")?.checked),
     nonBillable: Boolean(document.getElementById("hhTypeNonBillable")?.checked),
-    freelancer: Boolean(document.getElementById("hhTypeFreelancer")?.checked)
+    needsReviewOnly: Boolean(document.getElementById("hhNeedsReviewOnly")?.checked)
   };
 }
 function harvestHoursRowMatchesFilters(row, f){
   if(f.search && !String(row.name || "").toLowerCase().includes(f.search)) return false;
   if(f.client && !(row.clients || []).some(cl => normalizeClientKey(cl) === normalizeClientKey(f.client))) return false;
   if(f.pm && !(row.pms || []).includes(f.pm)) return false;
-  const anyType = f.billable || f.nonBillable || f.freelancer;
+  if(f.needsReviewOnly){
+    const hasIssue = Boolean(row.missingCount) || Boolean(row.mentionedClients && row.mentionedClients.length);
+    if(!hasIssue) return false;
+  }
+  const anyType = f.billable || f.nonBillable;
   if(!anyType) return true;
   // Use epic billing class from Jira snapshot (customfield_12711) — most reliable source
   const isFreelancer = Boolean(row.freelance);
   const bc = (row.billingClasses || []);
-  const isBillable = !isFreelancer && bc.includes('Billable');
+  // "Billable" agrupa empleados facturables y freelancers (a ambos se les factura al cliente).
+  const isBillable = isFreelancer || bc.includes('Billable');
   const isNonBillable = !isFreelancer && Boolean(row.personNonBillable);
   if(f.billable && isBillable) return true;
   if(f.nonBillable && isNonBillable) return true;
-  if(f.freelancer && isFreelancer) return true;
   return false;
 }
 function populateHarvestHoursFilterOptions(){
@@ -6335,7 +6285,7 @@ function clearHarvestHoursFilters(){
   const searchEl = document.getElementById("hhAssigneeSearch");
   if(searchEl) searchEl.value = "";
   ["hhClientFilter","hhPmFilter"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
-  ["hhTypeBillable","hhTypeNonBillable","hhTypeFreelancer"].forEach(id => { const el = document.getElementById(id); if(el) el.checked = false; });
+  ["hhTypeBillable","hhTypeNonBillable","hhNeedsReviewOnly"].forEach(id => { const el = document.getElementById(id); if(el) el.checked = false; });
   renderHarvestHoursReport();
 }
 function renderHarvestHoursReport(){
