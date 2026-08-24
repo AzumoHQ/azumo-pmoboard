@@ -2931,10 +2931,29 @@ function userIdentityTokens(user){
 function effectiveUserTokens(){
   return userIdentityTokens(effectiveSessionUser());
 }
+function identityNameWords(value){
+  return String(value || '').split(' ').filter(Boolean);
+}
 function identityMatchesTokens(value, tokens = effectiveUserTokens()){
   const normalized = normalizeIdentity(value);
   if(!normalized || !tokens.size) return false;
-  return tokens.has(normalized);
+  if(tokens.has(normalized)) return true;
+  // Defensive fallback: full names sometimes differ between Jira's display
+  // name and the users table (e.g. a second surname present on one side and
+  // not the other -- "Camila Navarro" vs "Camila Navarro Perez"). Match when
+  // every word of the shorter name appears in the longer name, word-by-word
+  // (not a raw substring check, to avoid false positives like "Ana Garcia"
+  // matching inside "Mariana Garcia"). Only applies to multi-word names --
+  // single-word tokens (first/last name alone) keep the exact match above.
+  const valueWords = identityNameWords(normalized);
+  if(valueWords.length < 2) return false;
+  for(const token of tokens){
+    const tokenWords = identityNameWords(token);
+    if(tokenWords.length < 2) continue;
+    const [shorter, longer] = valueWords.length <= tokenWords.length ? [valueWords, tokenWords] : [tokenWords, valueWords];
+    if(shorter.every(w => longer.includes(w))) return true;
+  }
+  return false;
 }
 function effectivePersonMatch(row){
   const tokens = effectiveUserTokens();
