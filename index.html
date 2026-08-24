@@ -2807,7 +2807,7 @@ function renderModuleTabButtons(activeId){
       const active = moduleEntryHasActive(entry, activeId);
       const open = openModuleGroup === entry.id;
       const children = renderModuleNestedItems(entry.children, activeId);
-      return `<details class="module-menu ${open ? 'open' : ''}"><summary title="${esc(entry.label)}" class="sidebar-item ${active ? 'active' : ''}" onclick="event.preventDefault();event.stopPropagation();toggleModuleGroup('${entry.id}')"><span class="sidebar-icon">${sectionIcon(entry.id)||esc(entry.icon||"")}</span><span class="sidebar-label">${esc(entry.label)}</span>${tabBadge(entry.count || 0)}<span class="module-caret">⌄</span></summary><div class="module-menu-panel">${children}</div></details>`;
+      return `<details class="module-menu ${open ? 'open' : ''}" ${open ? 'open' : ''}><summary title="${esc(entry.label)}" class="sidebar-item ${active ? 'active' : ''}" onclick="event.preventDefault();event.stopPropagation();toggleModuleGroup('${entry.id}')"><span class="sidebar-icon">${sectionIcon(entry.id)||esc(entry.icon||"")}</span><span class="sidebar-label">${esc(entry.label)}</span>${tabBadge(entry.count || 0)}<span class="module-caret">⌄</span></summary><div class="module-menu-panel">${children}</div></details>`;
     }
     return renderModuleLeaf(entry, activeId);
   }).join('');
