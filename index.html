@@ -2726,8 +2726,8 @@ function sectionIcon(id) {
 }
 
 function sidebarNavConfig(){
-  const pendingCount = latest?.pending_list?.length || 0;
-  const dueAlertCount = latest ? dueRowsForActionCenter().length : 0;
+  const pendingCount = scopedByOwnership(latest?.pending_list || []).length;
+  const dueAlertCount = latest ? scopedByOwnership(dueRowsForActionCenter()).length : 0;
   // Overdue alert banner
   const overdueRows = dueRowsForActionCenter().filter(r => r.severity === 'critical');
   const overdueAlertEl = document.getElementById('overdueAlert');
@@ -5883,7 +5883,7 @@ function renderBench(){
 }
 
 function renderPending(){
-  const pend = latest.pending_list || [];
+  const pend = scopedByOwnership(latest.pending_list || []);
   const badge = document.getElementById('pendingBadge');
   if(badge) badge.textContent = pend.length;
   const tag = document.getElementById('pendingTag');
@@ -5939,7 +5939,7 @@ function renderExpiring(){
       return true;
     });
   }
-  const exp = (sourceRows || [])
+  const exp = scopedByOwnership(sourceRows || [])
     .filter(e => e && e.due && !isBenchRow(e))
     .filter(e => {
       const d = daysUntil(e.due);
@@ -6983,6 +6983,32 @@ function scopedAssignmentRows(rows = allAssignmentRows()){
     if(visibleAssignments.has(assignmentKey)) return true;
     return isInternalCapacityRow(row) && visiblePeople.has(personId(row));
   });
+}
+function clientToProjectManagerMap(){
+  const map = new Map();
+  allAssignmentRows().forEach(row => {
+    const key = normalizeClientKey(row.client || '');
+    const pm = String(row.project_manager || '').trim();
+    if(key && pm && !map.has(key)) map.set(key, pm);
+  });
+  return map;
+}
+function scopedByOwnership(rows = []){
+  const role = effectiveUserRole();
+  if(executiveLikeRole(role)) return rows.slice();
+  if(role === 'assignee') return rows.filter(effectivePersonMatch);
+  if(role === 'csm' || role === 'tl'){
+    const allowedClients = effectiveOwnedClientKeys();
+    return rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+  }
+  if(role === 'pm'){
+    const pmMap = clientToProjectManagerMap();
+    return rows.filter(row => {
+      const pm = row.project_manager || pmMap.get(normalizeClientKey(row.client || '')) || '';
+      return identityMatchesTokens(pm);
+    });
+  }
+  return rows.slice();
 }
 function scopedForecastRows(rows = []){
   const role = effectiveUserRole();
