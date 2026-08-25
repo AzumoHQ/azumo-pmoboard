@@ -385,7 +385,7 @@
       { id: 'kpiActiveClients',  icon: ICON.clients,  label: 'Active clients',     val: intStr(clients),              delta: deltaBadge(clients, pClients), detail: 'clients', detailCount: intStr(clientRows.length), popoverAlign: 'right' },
       { id: 'kpiUtilBilling',    icon: ICON.util,     label: 'Utilization Rate (Billing)', val: pct(m.utilization_billing), delta: deltaBadge(m.utilization_billing, pm && pm.utilization_billing, { suffix: 'pp' }) },
       { id: 'kpiUtilAssignment', icon: ICON.util,     label: 'Utilization Rate (Assignment)', val: pct(m.utilization_assignment), delta: deltaBadge(m.utilization_assignment, pm && pm.utilization_assignment, { suffix: 'pp' }) },
-      { id: 'kpiHeadcountTotal', icon: ICON.people,   label: 'Headcount Total',    val: intStr(totalHeadcount),      delta: deltaBadge(totalHeadcount, pTotalHeadcount), sub: headcountSub }
+      { id: 'kpiHeadcountTotal', icon: ICON.people,   label: 'Headcount Total',    val: intStr(totalHeadcount),      delta: deltaBadge(totalHeadcount, pTotalHeadcount), sub: headcountSub, onClick: 'window.goToHeadcountAudit && window.goToHeadcountAudit()' }
     ];
 
     var ovRole = String((user && user.role) || '').trim().toLowerCase();
@@ -399,7 +399,8 @@
 
     host.innerHTML = cards.map(function (c) {
       var open = c.detail && c.detail === activeDetail;
-      return '<article class="pmo-ov-kpi' + (c.detail ? ' has-popover' : '') + (open ? ' is-open' : '') + (c.popoverAlign === 'right' ? ' pmo-ov-kpi--popover-right' : '') + '">' +
+      return '<article class="pmo-ov-kpi' + (c.detail ? ' has-popover' : '') + (open ? ' is-open' : '') + (c.popoverAlign === 'right' ? ' pmo-ov-kpi--popover-right' : '') + '"' +
+          (c.onClick ? ' onclick="' + c.onClick + '" style="cursor:pointer" role="button" tabindex="0"' : '') + '>' +
         '<div class="pmo-ov-kpi-top">' +
           '<span class="pmo-ov-kpi-icon"><span class="msi">' + c.icon + '</span></span>' +
           c.delta +

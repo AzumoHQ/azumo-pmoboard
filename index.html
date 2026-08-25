@@ -346,7 +346,7 @@ main>section.tab-section-active{animation:tabFade .18s ease-out}
 .forecast-filters{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin:0 0 1rem}
 .filter-field{display:flex;flex-direction:column;gap:5px;min-width:220px}
 .filter-field label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
-.filter-field select,.filter-field input{background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.65rem .8rem;font:inherit;outline:none}
+.filter-field select,.filter-field input{background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.65rem .8rem;font:inherit;outline:none;max-width:100%;text-overflow:ellipsis}
 .filter-field select:focus,.filter-field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,102,255,.15)}
 .forecast-filter-summary{font-size:.78rem;color:var(--muted);margin-left:auto;padding:.65rem 0}
 .inline-filter{background:none;border:none;color:var(--blue-lt);font:inherit;font-weight:700;cursor:pointer;padding:0;text-align:left}
@@ -490,7 +490,22 @@ body.sidebar-collapsed{--pmo-sidebar-width:0px}
 .sidebar-icon{width:auto;display:inline-flex;justify-content:center;align-items:center;flex:0 0 auto;font-size:.95rem}
 .sidebar-label{overflow:hidden;text-overflow:ellipsis;transition:opacity .15s ease}
 .side-index .tab-badge{margin-left:2px;min-width:18px;height:18px;flex:0 0 auto}
-.module-menu{position:relative;display:inline-flex;flex:0 0 auto}
+.module-menu{
+  position:relative;
+  display:inline-block;
+  flex:0 0 auto;
+}
+.module-menu[open]{z-index:300}
+.module-menu-panel{
+  position:absolute!important;
+  display:none!important;
+  top:calc(100% + 8px);
+  left:0;
+}
+.module-menu.open .module-menu-panel,
+.module-menu[open] .module-menu-panel{
+  display:flex!important;
+}
 .module-menu-panel{position:absolute;top:calc(100% + 8px);left:0;min-width:190px;display:none;flex-direction:column;gap:6px;padding:8px;border:1px solid var(--brd);border-radius:14px;background:rgba(6,12,26,.98);box-shadow:0 18px 44px rgba(0,0,0,.35);z-index:260}
 .module-menu.open .module-menu-panel,.module-menu[open] .module-menu-panel{display:flex}
 .module-menu-panel .sidebar-item{width:100%!important;justify-content:flex-start!important;border-radius:11px!important;text-align:left!important}.module-submenu{display:flex;flex-direction:column;gap:5px}.module-submenu summary.sidebar-item{background:rgba(107,143,191,.10);font-weight:950}.module-submenu-panel{display:none;flex-direction:column;gap:5px;padding-left:10px;border-left:1px solid rgba(107,143,191,.22);margin:2px 0 4px 8px}.module-submenu[open] .module-submenu-panel{display:flex}.module-submenu-panel .sidebar-item{font-size:.74rem!important;min-height:32px!important}
@@ -558,7 +573,7 @@ section{margin-bottom:1.65rem!important}
 .internal-projects-table .muted-value{color:var(--muted)}
 .internal-client-row td{background:rgba(0,102,255,.08)!important;border-top:0;font-weight:850}.internal-client-main{display:flex;align-items:center;gap:8px}.internal-toggle{background:rgba(0,102,255,.12);border:1px solid rgba(0,102,255,.3);color:var(--blue-lt);border-radius:9px;padding:5px 9px;font-size:.72rem;font-weight:950;cursor:pointer}.internal-toggle:hover{background:rgba(0,102,255,.18)}.internal-sow-row td:first-child{padding-left:2.2rem}.internal-assignment-chip{display:inline-flex;align-items:center;justify-content:center;min-height:24px;border-radius:999px;padding:0 10px;font-size:.72rem;font-weight:900;line-height:1;background:rgba(0,102,255,.14);color:#93C5FD}.internal-assignment-chip.full{background:rgba(16,185,129,.14);color:#6EE7B7}.internal-assignment-chip.partial{background:rgba(249,115,22,.14);color:#FDBA74}
 .hh-filter-row{border-bottom:1px solid var(--brd)}.hh-check-field{grid-column:span 2}.hh-checks{display:flex;gap:14px;flex-wrap:wrap;align-items:center;height:40px}.hh-check{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:800;color:var(--txt);cursor:pointer;white-space:nowrap}.hh-check input{cursor:pointer;accent-color:#E8501A}
-.harvest-hours-module{padding-bottom:1rem}.harvest-hours-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end;padding:1rem 1.2rem;border-bottom:1px solid var(--brd)}.harvest-hours-controls .btn{height:40px;justify-content:center}.harvest-hours-summary{padding:1rem 1.2rem;margin-bottom:0}.harvest-hours-subhead{border-top:1px solid var(--brd)}.harvest-hours-table-wrap{max-height:440px}.hh-progress{height:7px;background:rgba(107,143,191,.18);border-radius:999px;overflow:hidden;min-width:90px}.hh-progress-fill{height:100%;border-radius:999px}.info-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(16,185,129,.12);color:#6EE7B7;border:1px solid rgba(16,185,129,.32);font-size:.8rem}.err-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.35);font-size:.8rem}
+.harvest-hours-module{padding-bottom:1rem}.harvest-hours-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;align-items:end;padding:1rem 1.2rem;border-bottom:1px solid var(--brd)}.harvest-hours-controls .btn{height:40px;justify-content:center}.harvest-hours-summary{padding:1rem 1.2rem;margin-bottom:0}.harvest-hours-subhead{border-top:1px solid var(--brd)}.harvest-hours-table-wrap{max-height:440px}.hh-progress{height:7px;background:rgba(107,143,191,.18);border-radius:999px;overflow:hidden;min-width:90px}.hh-progress-fill{height:100%;border-radius:999px}.info-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(16,185,129,.12);color:#6EE7B7;border:1px solid rgba(16,185,129,.32);font-size:.8rem}.err-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.35);font-size:.8rem}
 
 /* PMO-LAYOUT: nav work-in-progress badge */
 @media(max-width:980px){.nav-wip-pill a{display:none}.nav-wip-pill{padding:2px 7px;font-size:.58rem}.nav-title-row{gap:6px}}
@@ -1173,6 +1188,7 @@ body:not(.light) .pmo-ov{
   --ov-border-strong:rgba(255,255,255,.2);
   --ov-chip-bg:rgba(0,180,216,.14);
   --ov-chip-fg:#90E0EF;
+  --ov-accent-text:#90E0EF;
 }
 body:not(.light) :is(#newSearchesTriage,#dashboard,#opsViews,#pmoActionCenter,#harvestAccess,#accountCoverage,#dueDates,#pendingAssignments,#bench,#azumo,#harvestHours,#history,#forecast){
   --card:#10243F;
@@ -1246,7 +1262,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   <div class="nav-inner">
     <div class="nav-brand">
       <a href="#" onclick="goTo('overview');return false;" style="text-decoration:none;display:flex"><div class="nav-logo"><img class="nav-wordmark" src="assets/azumo-logo.png" alt="Azumo"/></div></a>
-      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span>V1</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
+      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span>V2</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
     </div>
     <div class="nav-links">
       <button class="nav-link" id="overviewNavLink" onclick="goTo('overview')">Overview</button>
@@ -1549,6 +1565,14 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 	      <div class="filter-field">
 	        <label for="opsBillableFilter">Billing</label>
 	        <select id="opsBillableFilter" onchange="setOpsFilter('billingClass', this.value)">
+	          <option value="">All</option>
+	          <option value="Billable">Billable</option>
+	          <option value="Non-Billable">Non-Billable</option>
+	        </select>
+	      </div>
+	      <div class="filter-field">
+	        <label for="opsPersonBillingFilter">Billing type (person)</label>
+	        <select id="opsPersonBillingFilter" onchange="setOpsFilter('personBillingType', this.value)">
 	          <option value="">All</option>
 	          <option value="Billable">Billable</option>
 	          <option value="Non-Billable">Non-Billable</option>
@@ -1892,7 +1916,12 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         <div class="hh-checks">
           <label class="hh-check"><input type="checkbox" id="hhTypeBillable" onchange="renderHarvestHoursReport()"/> Billable</label>
           <label class="hh-check"><input type="checkbox" id="hhTypeNonBillable" onchange="renderHarvestHoursReport()"/> Non-Billable</label>
-          <label class="hh-check"><input type="checkbox" id="hhTypeFreelancer" onchange="renderHarvestHoursReport()"/> Freelancer</label>
+        </div>
+      </div>
+      <div class="filter-field hh-check-field">
+        <label>Review</label>
+        <div class="hh-checks">
+          <label class="hh-check"><input type="checkbox" id="hhNeedsReviewOnly" onchange="renderHarvestHoursReport()"/> Needs review only</label>
         </div>
       </div>
       <button class="btn btn-ghost" type="button" onclick="clearHarvestHoursFilters()">Clear filters</button>
@@ -1911,7 +1940,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         </div>
         <div class="fc-table-wrap harvest-hours-table-wrap">
           <table>
-            <thead><tr><th>Name</th><th>Client</th><th>Hours</th><th>Days filled</th><th>Description</th><th>%</th><th>Progress</th><th>Status</th></tr></thead>
+            <thead><tr><th>Name</th><th>Client</th><th>Hours</th><th>Days filled</th><th>Jira %</th><th style="text-align:center">%</th></tr></thead>
             <tbody id="hhReportBody"></tbody>
           </table>
         </div>
@@ -1976,6 +2005,27 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 
 </section>
 
+  <!-- ── HELP / CHANGELOG ───────────────────────── -->
+  <section id="helpChangelog">
+    <div class="sec-head">
+      <div class="sec-icon"><i class="ti ti-help-circle"></i></div>
+      <h2>Help</h2>
+      <div class="sec-tag">v2.0 · What's new</div>
+    </div>
+    <div class="mc" style="padding:1.2rem 1.4rem">
+      <h3 style="margin-bottom:.4rem">Harvest Hours Control — recent changes</h3>
+      <div class="mc-sub" style="margin-bottom:1rem">Latest updates to the hours audit module.</div>
+      <ul style="margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.55rem;font-size:.86rem;color:var(--txt)">
+        <li><strong>Nested breakdown.</strong> Expand any person to see client → project → individual Harvest entry, each level foldable on its own.</li>
+        <li><strong>Jira % per client.</strong> The weekly target is now prorated by each client's own Jira assignment %, instead of using the full weekly hours as the target for every client.</li>
+        <li><strong>Cross-client detection.</strong> Flags entries whose notes reference a Jira ticket that belongs to a different client than the one hours were logged under.</li>
+        <li><strong>Needs review only.</strong> New toggle to filter the list down to just the people with something flagged.</li>
+        <li><strong>Billable filter simplified.</strong> "Billable" now includes freelancers; Non-Billable stays separate.</li>
+        <li><strong>Cleaner columns.</strong> Removed redundant Description/Status/Progress columns; hours now show green/red directly.</li>
+      </ul>
+    </div>
+  </section>
+
 </main>
 <footer>
   <img src="assets/azumo-logo.png" alt="Azumo" height="16" style="opacity:.7"/>
@@ -2000,7 +2050,7 @@ let lastUpdated = '';
 let serviceHealth = null;
 let forecastFilters = {client:'', position:'', month:'', assignee:''};
 let opsView = 'assignees';
-let opsFilters = {search:'', client:'', position:'', projectManager:'', freelance:'', billingClass:''};
+let opsFilters = {search:'', client:'', position:'', projectManager:'', freelance:'', billingClass:'', personBillingType:''};
 let opsClientMode = 'overview';
 let opsClientSort = 'assigneesDesc';
 let harvestUsersOpen = false;
@@ -2632,6 +2682,7 @@ const PMO_ONLY_SECTIONS = new Set(['pmoActionCenter','dueDates','pendingAssignme
 let openModuleGroup = null;
 function canSeePmoGroup(){ return ['admin','pmo'].includes(effectiveUserRole()); }
 function sectionAllowedForCurrentRole(id){
+  if(id === 'helpChangelog') return true;
   const role = effectiveUserRole();
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
@@ -2667,6 +2718,7 @@ const SECTION_ICON_MAP = {
   'history': 'ti-trending-up',
   'newSearchesTriage': 'ti-search',
   'pmoActionCenter': 'ti-alert-triangle',
+  'helpChangelog': 'ti-help-circle',
 };
 function sectionIcon(id) {
   var cls = SECTION_ICON_MAP[id];
@@ -2714,7 +2766,8 @@ function sidebarNavConfig(){
       {id:'history', icon:'<i class="ti ti-trending-up"></i>', label:'Trends'},
       {id:'newSearchesTriage', icon:'<i class="ti ti-search"></i>', label:'New Searches'}
     ]},
-    {id:'pmoActionCenter', icon:'<i class="ti ti-alert-triangle"></i>', label:'PMO QA', count: qaCount}
+    {id:'pmoActionCenter', icon:'<i class="ti ti-alert-triangle"></i>', label:'PMO QA', count: qaCount},
+    {id:'helpChangelog', icon:'<i class="ti ti-help-circle"></i>', label:'Help'}
   ];
   return entries;
 }
@@ -2769,7 +2822,7 @@ function renderModuleTabButtons(activeId){
       const active = moduleEntryHasActive(entry, activeId);
       const open = openModuleGroup === entry.id;
       const children = renderModuleNestedItems(entry.children, activeId);
-      return `<details class="module-menu ${open ? 'open' : ''}"><summary title="${esc(entry.label)}" class="sidebar-item ${active ? 'active' : ''}"><span class="sidebar-icon">${sectionIcon(entry.id)||esc(entry.icon||"")}</span><span class="sidebar-label">${esc(entry.label)}</span>${tabBadge(entry.count || 0)}<span class="module-caret">⌄</span></summary><div class="module-menu-panel">${children}</div></details>`;
+      return `<details class="module-menu ${open ? 'open' : ''}" ${open ? 'open' : ''}><summary title="${esc(entry.label)}" class="sidebar-item ${active ? 'active' : ''}" onclick="event.preventDefault();event.stopPropagation();toggleModuleGroup('${entry.id}')"><span class="sidebar-icon">${sectionIcon(entry.id)||esc(entry.icon||"")}</span><span class="sidebar-label">${esc(entry.label)}</span>${tabBadge(entry.count || 0)}<span class="module-caret">⌄</span></summary><div class="module-menu-panel">${children}</div></details>`;
     }
     return renderModuleLeaf(entry, activeId);
   }).join('');
@@ -6044,18 +6097,20 @@ function harvestHoursClientMap(){
       if(!rawName) return; // skip unassigned/new-hire rows (no real name yet)
       const person = normalizeIdentity(displayName(row));
       if(!person || !client) return;
-      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', personNonBillable:false};
-      const rowEmail = String(row.email || '').trim();
-      if(rowEmail && !map[person].email) map[person].email = rowEmail;
+      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', assignmentPct:0, personNonBillable:false, clientPct:new Map()};
       if(isNonBillablePerson) map[person].personNonBillable = true;
       map[person].clients.add(client);
       const bt = rowBillingClass(row); // reads epic_billing (customfield_12711) correctly
       if(bt) map[person].billingClasses.add(bt);
       if(isBillablePerson) map[person].billingClasses.add('Billable');
+      map[person].assignmentPct += Number(rowAssignmentPct(row) || 0);
+      map[person].clientPct.set(client, (map[person].clientPct.get(client) || 0) + Number(rowAssignmentPct(row) || 0));
       if(bt !== 'Non-Billable' || isBillablePerson) map[person].hasNonBillableOnly = false;
       const pm = String(row.project_manager || '').trim();
       if(pm) map[person].pms.add(pm);
       if(String(row.freelance || '').trim().toLowerCase() === 'yes') map[person].freelance = true;
+      const rowEmail = String(row.email || '').trim().toLowerCase();
+      if(rowEmail && !map[person].email) map[person].email = rowEmail; // needed for Harvest fallback match (name mismatches, e.g. legal vs display name)
     });
   }catch(error){
     console.info("Harvest hours Jira client map unavailable:", error.message);
@@ -6066,7 +6121,7 @@ function harvestHoursClientMap(){
       if(status === 'inactive') return;
       const person = normalizeIdentity(displayName(row));
       if(!person) return;
-      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', personNonBillable:false};
+      if(!map[person]) map[person] = {clients:new Set(), billingClasses:new Set(), pms:new Set(), freelance:false, hasNonBillableOnly:true, email:'', assignmentPct:0, personNonBillable:false, clientPct:new Map()};
       map[person].personNonBillable = true;
       const rowEmail = String(row.email || '').trim();
       if(rowEmail && !map[person].email) map[person].email = rowEmail;
@@ -6080,6 +6135,8 @@ function harvestHoursClientMap(){
     pms: [...value.pms].sort(),
     freelance: value.freelance,
     email: value.email || '',
+    assignmentPct: Math.min(100, Math.round((value.assignmentPct || 0) * 100) / 100),
+    clientPct: Object.fromEntries([...value.clientPct.entries()].map(([c, p]) => [c, Math.min(100, Math.round(p * 100) / 100)])),
     personNonBillable: Boolean(value.personNonBillable)
   }]));
 }
@@ -6119,6 +6176,150 @@ function harvestHoursDescriptionTag(row){
     ? `<span class="badge badge-red">Empty</span>`
     : `<span class="badge badge-green">OK</span>`;
 }
+function harvestHoursLookupClientPct(clientPctMap, clientName){
+  if(Number.isFinite(clientPctMap[clientName])) return clientPctMap[clientName];
+  const key = normalizeClientKey(clientName);
+  if(!key) return null;
+  for(const mapClient of Object.keys(clientPctMap)){
+    const mapKey = normalizeClientKey(mapClient);
+    if(mapKey && (mapKey === key || mapKey.includes(key) || key.includes(mapKey))){
+      return clientPctMap[mapClient];
+    }
+  }
+  return null;
+}
+function harvestHoursActiveClientNames(){
+  // Azumo y Bench no son clientes externos reales -- son la empresa interna
+  // y el estado de disponibilidad. Mencionarlos en una nota (ej. "reunion con
+  // el equipo de Azumo") es normal y nunca debe marcarse como sospechoso.
+  const nonClientNames = new Set(['azumo', 'bench']);
+  return (latest?.active_clients || [])
+    .map(c => String(c || '').trim())
+    .filter(c => c && !nonClientNames.has(c.toLowerCase()));
+}
+// Palabras muy comunes en notas de Harvest: nunca deben disparar un match de
+// cliente aunque se parezcan a un nombre (evita ruido con el criterio permisivo).
+function harvestHoursMentionedClient(notes, ownClient, candidateClients){
+  const text = String(notes || '').trim();
+  if(!text) return null;
+  const ownKey = normalizeClientKey(ownClient || '');
+  const names = candidateClients || harvestHoursActiveClientNames();
+  for(const name of names){
+    // No es una sigla derivada: algunos clientes tienen un nombre real corto
+    // (ej. "NGL"), y ese nombre completo y exacto se permite igual.
+    const looksLikeAcronym = name.length >= 2 && name === name.toUpperCase() && /[A-Z]/.test(name);
+    if(name.length < 4 && !looksLikeAcronym) continue;
+    const nameKey = normalizeClientKey(name);
+    if(ownKey && (nameKey === ownKey || ownKey.includes(nameKey) || nameKey.includes(ownKey))) continue;
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp('\\b' + escaped + '\\b', 'i');
+    if(re.test(text)) return name;
+  }
+  return null;
+}
+function harvestHoursExtractTicketKeys(notes){
+  const text = String(notes || '');
+  const matches = text.match(/\b[A-Z]{2,10}-\d+\b/g) || [];
+  return [...new Set(matches)];
+}
+function harvestHoursBuildPrefixClientMap(allEntries){
+  const counts = {};
+  allEntries.forEach(e => {
+    const client = String(e.client || '').trim();
+    if(!client) return;
+    // Una entrada cuenta como 1 solo voto por prefijo, aunque mencione varios
+    // tickets del mismo prefijo (si no, una nota con 3 links pesa 3x mas que
+    // una con 1, distorsionando cual cliente "es dueno" del prefijo).
+    const prefixesInEntry = new Set(harvestHoursExtractTicketKeys(e.notes).map(key => key.split('-')[0]));
+    prefixesInEntry.forEach(prefix => {
+      if(!counts[prefix]) counts[prefix] = {};
+      counts[prefix][client] = (counts[prefix][client] || 0) + 1;
+    });
+  });
+  const dominant = {};
+  Object.entries(counts).forEach(([prefix, byClient]) => {
+    const ranked = Object.entries(byClient).sort((a,b) => b[1] - a[1]);
+    if(!ranked.length) return;
+    const [topClient, topCount] = ranked[0];
+    const runnerUp = ranked[1] ? ranked[1][1] : 0;
+    // Exigir al menos 2 apariciones y que no sea ambiguo (empate) antes de confiar
+    if(topCount >= 2 && topCount > runnerUp) dominant[prefix] = topClient;
+  });
+  return dominant;
+}
+function harvestHoursClientInitials(name){
+  const words = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if(words.length < 2) return null;
+  const initials = words.map(w => w[0]).join('').toUpperCase();
+  return initials.length >= 2 ? initials : null;
+}
+function harvestHoursMentionedTicketClient(notes, ownClient, prefixClientMap, candidateClients){
+  const ownKey = normalizeClientKey(ownClient || '');
+  const names = candidateClients || harvestHoursActiveClientNames();
+  for(const key of harvestHoursExtractTicketKeys(notes)){
+    const prefix = key.split('-')[0];
+    // 1) Preferir lo aprendido del volumen real de datos del reporte, si hay suficiente
+    let matchedClient = prefixClientMap[prefix] || null;
+    // 2) Sin datos suficientes, comparar contra las iniciales oficiales del nombre del cliente
+    //    (ej. "Veteran Recovery Coalition" -> "VRC"). Solo aplica a prefijos de ticket,
+    //    nunca a palabras sueltas de texto libre.
+    if(!matchedClient){
+      matchedClient = names.find(name => harvestHoursClientInitials(name) === prefix) || null;
+    }
+    if(!matchedClient) continue;
+    const matchedKey = normalizeClientKey(matchedClient);
+    if(ownKey && (matchedKey === ownKey || ownKey.includes(matchedKey) || matchedKey.includes(ownKey))) continue;
+    return {client: matchedClient, key};
+  }
+  return null;
+}
+function harvestHoursSummarizeIssues(groups){
+  let missingCount = 0;
+  const mentioned = new Set();
+  (groups || []).forEach(cg => (cg.projects || []).forEach(pg => (pg.entries || []).forEach(e => {
+    if(e.missingDescription) missingCount++;
+    if(e.mentionedClient) mentioned.add(e.mentionedClient);
+  })));
+  return {missingCount, mentionedClients: [...mentioned]};
+}
+function harvestHoursIssueTooltip(missingCount, mentionedClients){
+  const parts = [];
+  if(missingCount) parts.push(`${missingCount} Harvest ${missingCount === 1 ? 'entry' : 'entries'} missing a description`);
+  if(mentionedClients && mentionedClients.length){
+    parts.push(`Mentions ${mentionedClients.length === 1 ? 'another client' : 'other clients'} in the description: ${mentionedClients.join(', ')}`);
+  }
+  return parts.join(' · ');
+}
+function harvestHoursGaugeColor(pct){
+  const n = Number(pct) || 0;
+  if(n >= 90) return 'var(--success)';
+  if(n >= 50) return 'var(--warning)';
+  return 'var(--danger)';
+}
+function harvestHoursGaugeHTML(pct){
+  const clamped = Math.max(0, Math.min(100, Number(pct) || 0));
+  const color = harvestHoursGaugeColor(clamped);
+  return `<div style="display:flex;align-items:center;justify-content:center;gap:6px">
+    <span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,var(--card) 55%,transparent 56%),conic-gradient(${color} ${clamped}%,var(--brd) 0);flex:none" title="${clamped}% of expected hours"></span>
+    <span style="font-size:.8rem;font-weight:700;color:${color}">${clamped}%</span>
+  </div>`;
+}
+function harvestHoursInfoIcon(missingCount, mentionedClients){
+  if(!missingCount && !(mentionedClients && mentionedClients.length)) return '';
+  const tooltip = harvestHoursIssueTooltip(missingCount, mentionedClients);
+  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;flex:none;margin-left:6px;cursor:help" title="${esc(tooltip)}"><svg viewBox="0 0 26 26" width="15" height="15" xmlns="http://www.w3.org/2000/svg"><path d="M13 25C19.6274 25 25 19.6274 25 13C25 6.37258 19.6274 1 13 1C6.37258 1 1 6.37258 1 13C1 19.6274 6.37258 25 13 25Z" fill="none" stroke="var(--danger)" stroke-width="2"/><path d="M13 9.00003C13.718 9.00003 14.3 8.41801 14.3 7.70004C14.3 6.98207 13.718 6.40002 13 6.40002C12.282 6.40002 11.7 6.98207 11.7 7.70004C11.7 8.41801 12.282 9.00003 13 9.00003Z" fill="var(--danger)"/><path d="M13 19.7C12.2 19.7 11.6 19.1 11.6 18.4V11.6C11.6 10.9 12.2 10.3 12.9 10.3H13C13.7 10.3 14.3 10.9 14.3 11.6V18.4C14.3 19.1 13.8 19.7 13 19.7Z" fill="var(--danger)"/></svg></span>`;
+}
+function harvestHoursHighlightMention(notes, mentionedClient){
+  const safeNotes = esc(notes);
+  if(!mentionedClient) return safeNotes;
+  const escaped = mentionedClient.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('\\b(' + escaped + ')\\b', 'ig');
+  return safeNotes.replace(re, '<span style="color:var(--warning);font-weight:700">$1</span>');
+}
+function harvestHoursFlagIcon(hasIssue, tooltip){
+  if(!hasIssue) return '';
+  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--warning);color:var(--card);font-size:9px;font-weight:700;cursor:help;flex:none;margin-left:5px" title="${esc(tooltip)}">!</span>`;
+}
 function harvestHoursFilterState(){
   return {
     search: (document.getElementById("hhAssigneeSearch")?.value || "").trim().toLowerCase(),
@@ -6126,23 +6327,27 @@ function harvestHoursFilterState(){
     pm: document.getElementById("hhPmFilter")?.value || "",
     billable: Boolean(document.getElementById("hhTypeBillable")?.checked),
     nonBillable: Boolean(document.getElementById("hhTypeNonBillable")?.checked),
-    freelancer: Boolean(document.getElementById("hhTypeFreelancer")?.checked)
+    needsReviewOnly: Boolean(document.getElementById("hhNeedsReviewOnly")?.checked)
   };
 }
 function harvestHoursRowMatchesFilters(row, f){
   if(f.search && !String(row.name || "").toLowerCase().includes(f.search)) return false;
   if(f.client && !(row.clients || []).some(cl => normalizeClientKey(cl) === normalizeClientKey(f.client))) return false;
   if(f.pm && !(row.pms || []).includes(f.pm)) return false;
-  const anyType = f.billable || f.nonBillable || f.freelancer;
+  if(f.needsReviewOnly){
+    const hasIssue = Boolean(row.missingCount) || Boolean(row.mentionedClients && row.mentionedClients.length);
+    if(!hasIssue) return false;
+  }
+  const anyType = f.billable || f.nonBillable;
   if(!anyType) return true;
   // Use epic billing class from Jira snapshot (customfield_12711) — most reliable source
   const isFreelancer = Boolean(row.freelance);
   const bc = (row.billingClasses || []);
-  const isBillable = !isFreelancer && bc.includes('Billable');
+  // "Billable" agrupa empleados facturables y freelancers (a ambos se les factura al cliente).
+  const isBillable = isFreelancer || bc.includes('Billable');
   const isNonBillable = !isFreelancer && Boolean(row.personNonBillable);
   if(f.billable && isBillable) return true;
   if(f.nonBillable && isNonBillable) return true;
-  if(f.freelancer && isFreelancer) return true;
   return false;
 }
 function populateHarvestHoursFilterOptions(){
@@ -6158,12 +6363,14 @@ function populateHarvestHoursFilterOptions(){
   if(pms.includes(prevPm)) pmSel.value = prevPm;
   const row = document.getElementById("hhFilterRow");
   if(row) row.style.display = "grid";
+  const nonBillableField = document.getElementById("hhTypeNonBillable")?.closest("label.hh-check");
+  if(nonBillableField) nonBillableField.style.display = executiveLikeRole() ? "" : "none";
 }
 function clearHarvestHoursFilters(){
   const searchEl = document.getElementById("hhAssigneeSearch");
   if(searchEl) searchEl.value = "";
   ["hhClientFilter","hhPmFilter"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
-  ["hhTypeBillable","hhTypeNonBillable","hhTypeFreelancer"].forEach(id => { const el = document.getElementById(id); if(el) el.checked = false; });
+  ["hhTypeBillable","hhTypeNonBillable","hhNeedsReviewOnly"].forEach(id => { const el = document.getElementById(id); if(el) el.checked = false; });
   renderHarvestHoursReport();
 }
 function renderHarvestHoursReport(){
@@ -6187,38 +6394,86 @@ function renderHarvestHoursReport(){
 
   tbody.innerHTML = sorted.map((row, idx) => {
     const color = row.complete ? "var(--success)" : row.pct >= 50 ? "var(--warning)" : "var(--danger)";
-    const expandId = "hh-expand-" + idx;
-    const hasProjects = row.projects && row.projects.length > 0;
+    const personId = "p" + idx;
+    const hasGroups = row.groups && row.groups.length > 0;
+    const jiraPctLabel = (row.jiraPct === null || row.jiraPct === undefined) ? "—" : (esc(row.jiraPct) + "%");
+    const jiraGapWarning = (row.jiraPct !== null && row.jiraPct !== undefined && row.jiraPct > 0 && row.pct < row.jiraPct - 15);
+    const infoIcon = harvestHoursInfoIcon(row.missingCount, row.mentionedClients);
 
-    const mainRow = `<tr onclick="toggleHarvestExpand('${expandId}')" style="cursor:${hasProjects?'pointer':'default'}">
+    const mainRow = `<tr onclick="toggleHarvestExpand('${personId}')" style="cursor:${hasGroups?'pointer':'default'}">
       <td style="font-weight:700">
-        ${hasProjects ? `<span id="${expandId}-icon" style="display:inline-block;width:16px;transition:transform .15s">▶</span> ` : '<span style="display:inline-block;width:16px"></span> '}
-        ${esc(row.name)}
+        ${hasGroups ? `<span id="hh-icon-${personId}" style="display:inline-block;width:16px;transition:transform .15s">▶</span> ` : '<span style="display:inline-block;width:16px"></span> '}
+        ${esc(row.name)}${infoIcon}
       </td>
       <td style="color:var(--muted);font-size:.82rem">${esc(row.clients && row.clients.length ? row.clients.join(", ") : "—")}</td>
       <td style="font-weight:700;color:${color}">${esc(row.hours)}h</td>
       <td>${esc(row.daysFilled || 0)}</td>
-      <td>${harvestHoursDescriptionTag(row)}</td>
-      <td>${esc(row.pct)}%</td>
-      <td><div class="hh-progress"><div class="hh-progress-fill" style="width:${Math.min(row.pct,100)}%;background:${color}"></div></div></td>
+      <td style="color:${jiraGapWarning ? 'var(--danger)' : 'var(--muted)'}">${jiraPctLabel}</td>
+      <td>${harvestHoursGaugeHTML(row.pct)}</td>
     </tr>`;
 
-    const detailRows = hasProjects ? row.projects.map(p => {
-      const pPct = row.expected ? Math.round(p.hours/row.expected*100) : 0;
-      const projectLabel = p.client ? (esc(p.project) + ' <span style="color:var(--fg-mute)">(' + esc(p.client) + ')</span>') : esc(p.project);
-      return `<tr class="hh-expand-row hh-expand-${expandId}" data-hidden="true" style="background:var(--bg-2)">
-        <td style="padding:4px 8px 4px 36px;font-size:.82rem;color:var(--fg-3);font-style:italic">${projectLabel}</td>
-        <td style="font-size:.82rem;color:var(--fg-2)"></td>
-        <td style="font-size:.82rem;font-weight:700;color:var(--fg-1)">${esc(p.hours)}h</td>
+    const clientRows = hasGroups ? row.groups.map((cg, ci) => {
+      const clientId = personId + "-c" + ci;
+      const hasProjects = cg.projects && cg.projects.length > 0;
+      const clientMissing = cg.projects.reduce((n,pg) => n + pg.entries.filter(e => e.missingDescription).length, 0);
+      const clientMentions = [...new Set(cg.projects.flatMap(pg => pg.entries.map(e => e.mentionedClient).filter(Boolean)))];
+      const clientFlag = harvestHoursFlagIcon(cg.hasIssue, harvestHoursIssueTooltip(clientMissing, clientMentions));
+      const clientLabel = cg.client === 'Azumo' ? 'Azumo <span style="color:var(--fg-mute)">(internal)</span>' : esc(cg.client);
+
+      const clientJiraPctLabel = (cg.jiraPct === null || cg.jiraPct === undefined) ? "—" : (esc(cg.jiraPct) + "%");
+      const clientRow = `<tr class="hh-expand-row hh-g-${personId}" data-hidden="true" onclick="event.stopPropagation();toggleHarvestExpand('${clientId}')" style="background:var(--bg-2);cursor:${hasProjects?'pointer':'default'}">
+        <td style="padding:6px 8px 6px 32px;font-size:.85rem;color:var(--fg-2)">
+          ${hasProjects ? `<span id="hh-icon-${clientId}" style="display:inline-block;width:14px;transition:transform .15s">▶</span> ` : '<span style="display:inline-block;width:14px"></span> '}
+          ${clientLabel}${clientFlag}
+        </td>
         <td></td>
+        <td style="font-size:.85rem;font-weight:700;color:var(--fg-1)">${esc(cg.hours)}h</td>
         <td></td>
-        <td style="font-size:.82rem;color:var(--fg-3)">${pPct}%</td>
-        <td></td>
-        <td></td>
+        <td style="font-size:.8rem;color:var(--fg-3)">${clientJiraPctLabel}</td>
+        <td style="text-align:center;font-size:.8rem;color:var(--fg-3)">${cg.pct}%</td>
       </tr>`;
+
+      const projectRows = hasProjects ? cg.projects.map((pg, pi) => {
+        const projectId = clientId + "-p" + pi;
+        const hasEntries = pg.entries && pg.entries.length > 0;
+        const projectMissing = pg.entries.filter(e => e.missingDescription).length;
+        const projectMentions = [...new Set(pg.entries.map(e => e.mentionedClient).filter(Boolean))];
+        const projectFlag = harvestHoursFlagIcon(pg.hasIssue, harvestHoursIssueTooltip(projectMissing, projectMentions));
+
+        const projectRow = `<tr class="hh-expand-row hh-g-${personId} hh-g-${clientId}" data-hidden="true" onclick="event.stopPropagation();toggleHarvestExpand('${projectId}')" style="background:var(--bg-2);cursor:${hasEntries?'pointer':'default'}">
+          <td style="padding:5px 8px 5px 54px;font-size:.82rem;color:var(--fg-3);font-style:italic">
+            ${hasEntries ? `<span id="hh-icon-${projectId}" style="display:inline-block;width:13px;transition:transform .15s">▶</span> ` : '<span style="display:inline-block;width:13px"></span> '}
+            ${esc(pg.project)}${projectFlag}
+          </td>
+          <td></td>
+          <td style="font-size:.82rem;color:var(--fg-2)">${esc(pg.hours)}h</td>
+          <td></td>
+          <td></td>
+          <td style="text-align:center;font-size:.78rem;color:var(--fg-3)">${pg.pct}%</td>
+        </tr>`;
+
+        const entryRows = hasEntries ? pg.entries.map(e => {
+          const noteHtml = e.missingDescription
+            ? `<span style="font-style:italic">No description</span>`
+            : harvestHoursHighlightMention(e.notes, e.mentionedKey || e.mentionedClient);
+          return `<tr class="hh-expand-row hh-g-${personId} hh-g-${clientId} hh-g-${projectId}" data-hidden="true" style="background:var(--bg-2);${e.missingDescription ? 'color:var(--danger)' : ''}">
+            <td colspan="6" style="padding:4px 8px 4px 78px;font-size:.8rem">
+              <div style="display:flex;gap:12px;align-items:baseline">
+                <span style="min-width:64px;color:${e.missingDescription ? 'inherit' : 'var(--fg-2)'}">${esc(e.date || "—")}</span>
+                <span style="min-width:44px;font-weight:700;color:${e.missingDescription ? 'inherit' : 'var(--fg-1)'}">${esc(e.hours)}h</span>
+                <span style="flex:1">${noteHtml}</span>
+              </div>
+            </td>
+          </tr>`;
+        }).join("") : "";
+
+        return projectRow + entryRows;
+      }).join("") : "";
+
+      return clientRow + projectRows;
     }).join("") : "";
 
-    return mainRow + detailRows;
+    return mainRow + clientRows;
   }).join("");
   renderHarvestHoursQA();
 }
@@ -6259,8 +6514,8 @@ function renderHarvestHoursQA(){
 }
 
 function toggleHarvestExpand(id){
-  const rows = document.querySelectorAll(".hh-expand-"+id);
-  const icon = document.getElementById(id+"-icon");
+  const rows = document.querySelectorAll(".hh-g-"+id);
+  const icon = document.getElementById("hh-icon-"+id);
   if(!rows.length) return;
   const isHidden = rows[0].getAttribute("data-hidden") !== "false";
   rows.forEach(r => r.setAttribute("data-hidden", isHidden ? "false" : "true"));
@@ -6318,6 +6573,7 @@ async function runHarvestHoursReport(){
     const hoursByUser = {};
     const daysByUser = {};
     const missingDescriptionByUser = {};
+    const entriesByUser = {};
     const clientsByUser = {};
     const hoursByUserClient = {};
     const projectsByUser = {};
@@ -6342,6 +6598,10 @@ async function runHarvestHoursReport(){
       }
       const clientName = entry.client?.name || '';
       const projectName = entry.project?.name || 'No project';
+      if(hours > 0){
+        if(!entriesByUser[id]) entriesByUser[id] = [];
+        entriesByUser[id].push({date: entry.spent_date || '', hours, client: clientName, project: projectName, notes: String(entry.notes || '').trim()});
+      }
       if(clientName && hours > 0){
         if(!clientsByUser[id]) clientsByUser[id] = new Set();
         clientsByUser[id].add(clientName);
@@ -6371,23 +6631,66 @@ async function runHarvestHoursReport(){
         daysFilled: daysByUser[u.id]?.size || 0,
         missingDescription: Boolean(missingDescriptionByUser[u.id]),
         harvestClients: [...(clientsByUser[u.id] || new Set())].sort(),
-        harvestProjects: projectsByUser[u.id] || new Map()
+        harvestProjects: projectsByUser[u.id] || new Map(),
+        harvestEntries: (entriesByUser[u.id] || []).slice().sort((a,b) => String(a.date).localeCompare(String(b.date)))
       };
     });
 
-    // Harvest data indexed by email (lowercased) - fallback cuando los nombres no matchean
+    // Fallback index by email, for cases where Jira display name != Harvest full name
     const harvestByEmail = {};
-    Object.values(harvestByNorm).forEach(harv => {
-      if(harv.email) harvestByEmail[harv.email.toLowerCase()] = harv;
+    Object.values(harvestByNorm).forEach(h => {
+      if(h.email) harvestByEmail[h.email.toLowerCase()] = h;
     });
 
-    const buildProjects = (harv) => {
-      const projMap = harv?.harvestProjects || new Map();
-      return [...projMap.keys()].sort().map(pName => ({
-        project: pName,
-        client: projMap.get(pName) || '',
-        hours: Math.round((hoursByUserProject[harv.id + '|' + pName] || 0) * 10) / 10
-      }));
+    // Prefijo de ticket -> cliente dominante, aprendido de TODAS las entradas del reporte
+    const prefixClientMap = harvestHoursBuildPrefixClientMap(Object.values(entriesByUser).flat());
+
+    const buildClientGroups = (harv, clientPctMap = {}) => {
+      const activeClientNames = harvestHoursActiveClientNames();
+      const entries = harv?.harvestEntries || [];
+      const byClient = new Map();
+      entries.forEach(e => {
+        const missingDescription = !String(e.notes || '').trim();
+        let mentionedClient = missingDescription ? null : harvestHoursMentionedClient(e.notes, e.client, activeClientNames);
+        let mentionedKey = null;
+        if(!missingDescription && !mentionedClient){
+          const ticketMatch = harvestHoursMentionedTicketClient(e.notes, e.client, prefixClientMap, activeClientNames);
+          if(ticketMatch){ mentionedClient = ticketMatch.client; mentionedKey = ticketMatch.key; }
+        }
+        const entry = {date: e.date, hours: e.hours, notes: e.notes, missingDescription, mentionedClient, mentionedKey};
+        const clientKey = e.client || 'No client';
+        if(!byClient.has(clientKey)) byClient.set(clientKey, {client: clientKey, hours: 0, hasIssue: false, projects: new Map()});
+        const cg = byClient.get(clientKey);
+        cg.hours += e.hours;
+        if(entry.missingDescription || entry.mentionedClient) cg.hasIssue = true;
+        const projectKey = e.project || 'No project';
+        if(!cg.projects.has(projectKey)) cg.projects.set(projectKey, {project: projectKey, hours: 0, hasIssue: false, entries: []});
+        const pg = cg.projects.get(projectKey);
+        pg.hours += e.hours;
+        if(entry.missingDescription || entry.mentionedClient) pg.hasIssue = true;
+        pg.entries.push(entry);
+      });
+      return [...byClient.values()].map(cg => {
+        const jiraPctForClient = harvestHoursLookupClientPct(clientPctMap, cg.client);
+        const clientTarget = (jiraPctForClient !== null && expected) ? (expected * jiraPctForClient / 100) : null;
+        const clientPct = clientTarget ? Math.round(cg.hours / clientTarget * 100) : (expected ? Math.round(cg.hours / expected * 100) : 0);
+        return {
+          client: cg.client,
+          hours: Math.round(cg.hours * 10) / 10,
+          jiraPct: jiraPctForClient,
+          pct: clientPct,
+          hasIssue: cg.hasIssue,
+          projects: [...cg.projects.values()]
+            .map(pg => ({
+              project: pg.project,
+              hours: Math.round(pg.hours * 10) / 10,
+              pct: clientTarget ? Math.round(pg.hours / clientTarget * 100) : (expected ? Math.round(pg.hours / expected * 100) : 0),
+              hasIssue: pg.hasIssue,
+              entries: pg.entries.slice().sort((a,b) => String(a.date).localeCompare(String(b.date)))
+            }))
+            .sort((a,b) => a.project.localeCompare(b.project))
+        };
+      }).sort((a,b) => a.client.localeCompare(b.client));
     };
 
     const makeRow = (name, jiraInfo, harv) => {
@@ -6398,8 +6701,11 @@ async function runHarvestHoursReport(){
       const pct = Math.round(ratio * 100);
       const jiraClients = Array.isArray(jiraInfo) ? jiraInfo : (jiraInfo?.clients || []);
       const jiraPms = Array.isArray(jiraInfo) ? [] : (jiraInfo?.pms || []);
+      const jiraPct = Array.isArray(jiraInfo) ? null : (Number.isFinite(jiraInfo?.assignmentPct) ? jiraInfo.assignmentPct : null);
+      const groups = buildClientGroups(harv, jiraInfo?.clientPct || {});
+      const issues = harvestHoursSummarizeIssues(groups);
       return {
-        name, hours, daysFilled, missingDescription, expected, pct,
+        name, hours, daysFilled, missingDescription, expected, pct, jiraPct,
         complete: ratio >= threshold,
         client: (jiraClients && jiraClients[0]) || (harv?.harvestClients?.[0]) || '',
         clients: (jiraClients && jiraClients.length) ? jiraClients : (harv?.harvestClients || []),
@@ -6407,7 +6713,9 @@ async function runHarvestHoursReport(){
         personNonBillable: Boolean(jiraInfo?.personNonBillable),
         pms: jiraInfo?.pms || [],
         freelance: Boolean(jiraInfo?.freelance),
-        projects: buildProjects(harv)
+        groups,
+        missingCount: issues.missingCount,
+        mentionedClients: issues.mentionedClients
       };
     };
 
@@ -6436,7 +6744,9 @@ async function runHarvestHoursReport(){
       rosterRows.push(makeRow(harv.name, null, harv));
     });
 
+    const hhCanSeeNonBillable = executiveLikeRole();
     harvestHoursReportData = rosterRows
+      .filter(row => hhCanSeeNonBillable || !(row.personNonBillable && !row.freelance))
       .sort((a,b) => a.pct - b.pct || a.name.localeCompare(b.name));
 
     // Client equivalence: same fuzzy rule as scope matching (Spinwheel ~ Spinwheel Solutions)
@@ -6505,7 +6815,7 @@ function hhCsvCell(value){
 function exportHarvestHoursCSV(){
   const from = document.getElementById("hhDateFrom")?.value || "";
   const to = document.getElementById("hhDateTo")?.value || "";
-  const rows = [["Name","Client","Hours loaded","Days filled","Description","Percent complete","Status"]].concat(harvestHoursReportData.map(row => [row.name,row.client || "",row.hours,row.daysFilled || 0,row.missingDescription ? "Empty" : "OK",`${row.pct}%`,row.complete ? "Complete" : row.pct >= 50 ? "Partial" : "Incomplete"]));
+  const rows = [["Name","Client","Hours loaded","Days filled","Description","Jira %","Percent complete","Status"]].concat(harvestHoursReportData.map(row => [row.name,row.client || "",row.hours,row.daysFilled || 0,row.missingDescription ? "Empty" : "OK",(row.jiraPct === null || row.jiraPct === undefined) ? "—" : `${row.jiraPct}%`,`${row.pct}%`,row.complete ? "Complete" : row.pct >= 50 ? "Partial" : "Incomplete"]));
   const csv = rows.map(row => row.map(hhCsvCell).join(",")).join("\n");
   const link = document.createElement("a");
   link.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8;"}));
@@ -6645,6 +6955,12 @@ function rowBillingClass(row){
   if(billing === null) return '';
   return billing === 0 ? 'Non-Billable' : 'Billable';
 }
+// billing_type = whether the PERSON is billable (Jira custom field), independent of
+// rowBillingClass() which is per-assignment. Used for the Headcount Total audit filter
+// so a person counts once, consistently, regardless of which assignment row is inspected.
+function rowPersonBillingType(row){
+  return String(row.billing_type || '').trim().toLowerCase() === 'billable' ? 'Billable' : 'Non-Billable';
+}
 function jiraIssueUrl(key){
   const safeKey = String(key || '').trim();
   if(!safeKey) return '';
@@ -6725,7 +7041,8 @@ function opsRowMatches(row){
     && (!opsFilters.position || (row.position || '') === opsFilters.position)
     && (!opsFilters.projectManager || (row.project_manager || '') === opsFilters.projectManager)
     && (!opsFilters.freelance || (isFreelance(row) ? 'Yes' : 'No') === opsFilters.freelance)
-    && (!opsFilters.billingClass || rowBillingClass(row) === opsFilters.billingClass);
+    && (!opsFilters.billingClass || rowBillingClass(row) === opsFilters.billingClass)
+    && (!opsFilters.personBillingType || rowPersonBillingType(row) === opsFilters.personBillingType);
 }
 function filteredOpsRows(){
   return scopedAssignmentRows(allAssignmentRows()).filter(opsRowMatches);
@@ -6756,6 +7073,7 @@ function renderOpsFilterControls(){
   const projectManagerSelect = document.getElementById('opsProjectManagerFilter');
   const freelanceSelect = document.getElementById('opsFreelanceFilter');
   const billableSelect = document.getElementById('opsBillableFilter');
+  const personBillingSelect = document.getElementById('opsPersonBillingFilter');
   const clientSortSelect = document.getElementById('opsClientSortFilter');
   document.querySelectorAll('.ops-clients-only').forEach(el => el.classList.toggle('ops-hidden', opsView !== 'clients'));
   if(search && search.value !== opsFilters.search) search.value = opsFilters.search;
@@ -6776,6 +7094,7 @@ function renderOpsFilterControls(){
   }
   if(freelanceSelect) freelanceSelect.value = opsFilters.freelance;
   if(billableSelect) billableSelect.value = opsFilters.billingClass;
+  if(personBillingSelect) personBillingSelect.value = opsFilters.personBillingType;
   if(clientSortSelect) clientSortSelect.value = opsClientSort;
 }
 function summaryCard(label, value, sub=''){
@@ -6824,7 +7143,8 @@ function assigneeGroups(rows){
       clients: uniqueNonEmpty(assignments.map(row => row.client)),
       positions: uniqueNonEmpty(assignments.map(row => row.position)),
       availability: personAvailabilityFromAssignments(assignments),
-      nextDue: dueDates[0] || ''
+      nextDue: dueDates[0] || '',
+      billingType: rowPersonBillingType(assignments[0] || {})
     };
   });
 }
@@ -6835,7 +7155,7 @@ function assignmentChip(row){
   return `<span class="assignment-chip" title="${esc(row.summary || row.sow || row.key || label)}">${esc(label)}${internal}: ${fmtRawPct(pct)}</span>`;
 }
 function renderAssignmentDetails(group){
-  return `<tr><td colspan="6" style="padding:0;background:var(--surf)">
+  return `<tr><td colspan="7" style="padding:0;background:var(--surf)">
     <div style="padding:12px 16px 16px">
       <table class="nested-table"><thead><tr><th>Assignment</th><th>Project Manager</th><th>%</th><th>Due Date</th><th>SOW / Summary</th><th>Link</th></tr></thead><tbody>
       ${group.assignments.map(row => {
@@ -6861,20 +7181,21 @@ function renderOpsAssignees(rows){
     if(a.availability === null && b.availability !== null) return 1;
     return a.name.localeCompare(b.name);
   });
-  document.getElementById('opsThead').innerHTML = '<tr><th>Assignee</th><th>Position</th><th>Assignments</th><th>Available</th><th>Next Due</th><th>SOWs</th></tr>';
+  document.getElementById('opsThead').innerHTML = '<tr><th>Assignee</th><th>Position</th><th>Billing type</th><th>Assignments</th><th>Available</th><th>Next Due</th><th>SOWs</th></tr>';
   document.getElementById('opsTbody').innerHTML = groups.map(group => {
     const expanded = expandedAssignees.has(group.id);
     const avail = group.availability;
     const main = `<tr>
       <td style="font-weight:800;white-space:nowrap"><button class="ops-expand" onclick='toggleAssigneeGroup(${jsArg(group.id)})'>${expanded ? '−' : '+'}</button>${esc(group.name)}</td>
       <td>${esc(group.positions.join(', ') || '—')}</td>
+      <td><span class="chip ${group.billingType === 'Billable' ? 'badge-green' : 'badge-yellow'}">${esc(group.billingType)}</span></td>
       <td>${group.assignments.map(assignmentChip).join('')}</td>
       <td><span class="${avail===null?'':availCls(avail)}">${fmtRawPct(avail)}</span></td>
       <td style="white-space:nowrap">${fmtDate(group.nextDue)}</td>
       <td><button class="inline-filter" onclick='toggleAssigneeGroup(${jsArg(group.id)})'>${expanded ? 'Hide' : 'Show'} ${group.assignments.length} SOW${group.assignments.length === 1 ? '' : 's'}</button></td>
     </tr>`;
     return main + (expanded ? renderAssignmentDetails(group) : '');
-  }).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No assignees match the selected filters</td></tr>';
+  }).join('') || '<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--muted)">No assignees match the selected filters</td></tr>';
 }
 function accountCoverageMap(){
   const map = new Map();
@@ -7304,6 +7625,7 @@ function renderOpsViews(){
 	    opsFilters.projectManager ? `PM: ${opsFilters.projectManager}` : '',
 	    opsFilters.freelance ? `Freelancer: ${opsFilters.freelance}` : '',
 	    opsFilters.billingClass ? `Billing: ${opsFilters.billingClass}` : '',
+	    opsFilters.personBillingType ? `Billing type (person): ${opsFilters.personBillingType}` : '',
 	    opsView === 'clients' ? `Sort: ${opsClientSort.replace('assignees','Assignees ').replace('Desc','↓').replace('Asc','↑').replace('due','Due').replace('client','Client')}` : '',
 	  ].filter(Boolean);
 	  document.getElementById('opsViewsTag').textContent = `${label} view`;
@@ -7332,7 +7654,7 @@ function setOpsFilter(field, value){
   renderOpsViews();
 }
 function resetOpsFilters(){
-  opsFilters = {search:'', client:'', position:'', projectManager:'', freelance:'', billingClass:''};
+  opsFilters = {search:'', client:'', position:'', projectManager:'', freelance:'', billingClass:'', personBillingType:''};
   opsClientSort = 'assigneesDesc';
   expandedAssignees = new Set();
   expandedProjectManagers = new Set();
@@ -7358,6 +7680,15 @@ function toggleProjectManagerGroup(id){
 }
 window.setOpsView = setOpsView;
 window.setOpsFilter = setOpsFilter;
+// Entry point para la tarjeta Headcount Total (redesign/pmo-overview.js): salta a
+// Operating Views > Assignees con el filtro de billing por persona limpio, para que
+// PMO alterne Billable/Non-Billable y cuente las filas contra el 97/18 de la tarjeta.
+function goToHeadcountAudit(){
+  goTo('opsViews');
+  setOpsView('assignees');
+  setOpsFilter('personBillingType', '');
+}
+window.goToHeadcountAudit = goToHeadcountAudit;
 window.resetOpsFilters = resetOpsFilters;
 window.toggleAssigneeGroup = toggleAssigneeGroup;
 window.toggleProjectManagerGroup = toggleProjectManagerGroup;
