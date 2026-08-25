@@ -172,6 +172,7 @@ body.light .bench-table-wrap tbody tr:nth-child(even) td{background:rgba(0,102,2
 .badge-yellow{background:rgba(249,115,22,.16);color:#FDBA74}
 .badge-blue{background:rgba(0,102,255,.15);color:#60A5FA}
 .badge-green{background:rgba(16,185,129,.15);color:#34D399}
+.badge-wip{background:rgba(249,115,22,.16);color:#FDBA74;border:1px dashed rgba(249,115,22,.55);font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;margin-left:10px}
 table{width:100%;border-collapse:collapse;font-size:.82rem}
 th{padding:10px 16px;text-align:left;color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:rgba(255,255,255,.02);white-space:nowrap}
 td{padding:12px 16px;border-top:1px solid var(--brd);vertical-align:middle}
@@ -1384,6 +1385,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <div class="pmo-ov-hero-copy">
         <div class="pmo-ov-eyebrow">Azumo · Operations Command Center</div>
         <h1 id="pmoGreeting">Welcome back</h1>
+        <span class="badge badge-wip" title="Seccion en reestructuracion.">Work in progress</span>
         <div class="pmo-ov-hero-meta">
           <span>Synced from Jira &amp; Harvest</span>
           <span class="dot"></span>
@@ -1485,6 +1487,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   <div class="sec-head">
     <div class="sec-icon"><i class="ti ti-chart-bar"></i></div>
     <h2>Billing — <span id="currentSnapshotLabel" style="color:var(--blue-lt)"></span></h2>
+    <span class="badge badge-wip" title="Seccion en reestructuracion: los reportes de EazyBI se van a reagrupar bajo la pestana Jira.">Work in progress</span>
     <div class="sec-tag" id="lastRefreshTag">Last refresh: —</div>
   </div>
   <div class="metrics-grid" id="metricsGrid"></div>
@@ -1955,6 +1958,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   <div class="sec-head">
     <div class="sec-icon"><i class="ti ti-trending-up"></i></div>
     <h2>Trends</h2>
+    <span class="badge badge-wip" title="Seccion en reestructuracion: vista mensual de Jira/EazyBI. Las metricas semanales de Harvest van a vivir en Metrics.">Work in progress</span>
     <div class="sec-tag" id="historySnapshotsTag">—</div>
   </div>
   <div class="history-grid" id="historyGrid"></div>
@@ -2010,19 +2014,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-help-circle"></i></div>
       <h2>Help</h2>
-      <div class="sec-tag">v2.0 · What's new</div>
-    </div>
-    <div class="mc" style="padding:1.2rem 1.4rem">
-      <h3 style="margin-bottom:.4rem">Harvest Hours Control — recent changes</h3>
-      <div class="mc-sub" style="margin-bottom:1rem">Latest updates to the hours audit module.</div>
-      <ul style="margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.55rem;font-size:.86rem;color:var(--txt)">
-        <li><strong>Nested breakdown.</strong> Expand any person to see client → project → individual Harvest entry, each level foldable on its own.</li>
-        <li><strong>Jira % per client.</strong> The weekly target is now prorated by each client's own Jira assignment %, instead of using the full weekly hours as the target for every client.</li>
-        <li><strong>Cross-client detection.</strong> Flags entries whose notes reference a Jira ticket that belongs to a different client than the one hours were logged under.</li>
-        <li><strong>Needs review only.</strong> New toggle to filter the list down to just the people with something flagged.</li>
-        <li><strong>Billable filter simplified.</strong> "Billable" now includes freelancers; Non-Billable stays separate.</li>
-        <li><strong>Cleaner columns.</strong> Removed redundant Description/Status/Progress columns; hours now show green/red directly.</li>
-      </ul>
+      <span class="badge badge-wip">Work in progress</span>
     </div>
   </section>
 
