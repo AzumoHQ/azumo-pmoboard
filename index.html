@@ -2729,7 +2729,7 @@ function sidebarNavConfig(){
   const pendingCount = scopedByOwnership(latest?.pending_list || []).length;
   const dueAlertCount = latest ? scopedByOwnership(dueRowsForActionCenter()).length : 0;
   // Overdue alert banner
-  const overdueRows = dueRowsForActionCenter().filter(r => r.severity === 'critical');
+  const overdueRows = scopedByOwnership(dueRowsForActionCenter()).filter(r => r.severity === 'critical');
   const overdueAlertEl = document.getElementById('overdueAlert');
   const overdueAlertCount = document.getElementById('overdueAlertCount');
   if (overdueAlertEl) {
@@ -5907,7 +5907,7 @@ function renderPending(){
 }
 
 function renderExpiring(){
-  const sourceRows = (latest.expiring_60d && latest.expiring_60d.length)
+  let sourceRows = (latest.expiring_60d && latest.expiring_60d.length)
     ? latest.expiring_60d
     : Object.values(latest.forecast || {}).flat();
   const seen = new Set();
