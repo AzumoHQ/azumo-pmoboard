@@ -6336,8 +6336,9 @@ function populateHarvestHoursFilterOptions(){
   const pmSel = document.getElementById("hhPmFilter");
   if(!clientSel || !pmSel) return;
   const prevClient = clientSel.value, prevPm = pmSel.value;
-  const clients = [...new Set(harvestHoursReportData.flatMap(r => r.clients || []))].filter(Boolean).sort((a,b) => a.localeCompare(b));
-  const pms = [...new Set(harvestHoursReportData.flatMap(r => r.pms || []))].filter(Boolean).sort((a,b) => a.localeCompare(b));
+  const _scoped = scopedHarvestHoursRows();
+  const clients = [...new Set(_scoped.flatMap(r => r.clients || []))].filter(Boolean).sort((a,b) => a.localeCompare(b));
+  const pms = [...new Set(_scoped.flatMap(r => r.pms || []))].filter(Boolean).sort((a,b) => a.localeCompare(b));
   clientSel.innerHTML = '<option value="">All clients</option>' + clients.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
   pmSel.innerHTML = '<option value="">All PMs</option>' + pms.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
   if(clients.includes(prevClient)) clientSel.value = prevClient;
@@ -6354,6 +6355,23 @@ function clearHarvestHoursFilters(){
   ["hhTypeBillable","hhTypeNonBillable","hhNeedsReviewOnly"].forEach(id => { const el = document.getElementById(id); if(el) el.checked = false; });
   renderHarvestHoursReport();
 }
+function hhOwnedClientKeys(role = effectiveUserRole()){
+  const field = role === 'pm' ? 'pm_assigned' : role === 'csm' ? 'csm_assigned' : role === 'tl' ? 'tl_assigned' : '';
+  const keys = new Set();
+  if(!field || !latest) return keys;
+  (latest.account_coverage || []).forEach(row => {
+    if(identityMatchesTokens(row[field])) keys.add(normalizeClientKey(row.client || ''));
+  });
+  return keys;
+}
+function scopedHarvestHoursRows(rows = harvestHoursReportData){
+  const role = effectiveUserRole();
+  if(executiveLikeRole(role)) return rows.slice();
+  if(role === 'assignee') return rows.filter(row => identityMatchesTokens(normalizeIdentity(row.name || '')));
+  const ownedClients = hhOwnedClientKeys(role);
+  if(!ownedClients.size) return rows.slice();
+  return rows.filter(row => (row.clients || []).some(cl => ownedClients.has(normalizeClientKey(cl))));
+}
 function renderHarvestHoursReport(){
   const results = document.getElementById("hhResults");
   const tbody = document.getElementById("hhReportBody");
@@ -6361,7 +6379,7 @@ function renderHarvestHoursReport(){
   results.style.display = "block";
 
   const f = harvestHoursFilterState();
-  const visible = harvestHoursReportData.filter(row => harvestHoursRowMatchesFilters(row, f));
+  const visible = scopedHarvestHoursRows().filter(row => harvestHoursRowMatchesFilters(row, f));
 
   document.getElementById("hhMetricTotal").textContent = visible.length;
   document.getElementById("hhMetricComplete").textContent = visible.filter(row => row.complete).length;
