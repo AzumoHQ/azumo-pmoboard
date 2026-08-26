@@ -58,6 +58,23 @@ function lastCompletedWeekRange(reference = new Date()) {
   return { from: toIso(lastMonday), to: toIso(lastSunday) };
 }
 
+// The glossary scopes Committed Harvest Hours to "the Billable Team", which
+// is the roster the COO sheet lists -- not everyone who logs hours in Harvest.
+// Jira assignment rows carry billing_type per person, so the roster is built
+// from there. Falls back to null (count everyone, and warn) when the rows are
+// missing or carry no emails, which is safer than silently zeroing the week.
+function billableRosterFromAssignments(assignmentRows = []) {
+  const roster = new Set();
+  for (const row of assignmentRows) {
+    const email = String(row?.email || '').trim().toLowerCase();
+    if (!email) continue;
+    const billingType = String(row?.billing_type || '').trim().toLowerCase();
+    if (billingType && billingType !== 'billable') continue;
+    roster.add(email);
+  }
+  return roster.size ? roster : null;
+}
+
 async function isAuthorized(req) {
   const token = process.env.PMO_REFRESH_TOKEN;
   if (token && (req.headers['x-pmo-token'] === token || req.headers.authorization === `Bearer ${token}`)) {
@@ -201,7 +218,9 @@ async function runRefresh(body = {}) {
       const weekRange = (body.harvestWeekFrom && body.harvestWeekTo)
         ? { from: body.harvestWeekFrom, to: body.harvestWeekTo }
         : lastCompletedWeekRange();
-      parsed.harvest_metrics = await fetchWeeklyHarvestMetrics(weekRange);
+      parsed.harvest_metrics = await fetchWeeklyHarvestMetrics(weekRange, {
+        roster: billableRosterFromAssignments(parsed.assignment_rows || [])
+      });
     } catch (error) {
       console.warn('Harvest weekly metrics refresh skipped:', error.message);
       warnings.push(`Harvest weekly metrics refresh skipped: ${error.message}`);
