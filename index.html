@@ -6957,17 +6957,16 @@ function renderHarvestWeeklyByPerson() {
     const ipDetail = p.internal_projects_detail || {};
     const bDetail  = p.bench_detail || {};
 
-    const ipItems = Object.entries(ipDetail).length
-      ? Object.entries(ipDetail).map(([proj, hrs]) =>
-          `<li><span class="hw-dl-proj" title="${esc(proj)}">${esc(proj)}</span><span class="hw-dl-hrs">${Number(hrs).toFixed(2)}h</span></li>`
-        ).join('')
-      : '<li><span class="hw-drill-empty">No internal project entries</span></li>';
-
-    const bItems = Object.entries(bDetail).length
-      ? Object.entries(bDetail).map(([proj, hrs]) =>
-          `<li><span class="hw-dl-proj" title="${esc(proj)}">${esc(proj)}</span><span class="hw-dl-hrs">${Number(hrs).toFixed(2)}h</span></li>`
-        ).join('')
-      : '<li><span class="hw-drill-empty">No bench entries</span></li>';
+    const allDetail = {};
+    for (const [proj, hrs] of Object.entries(ipDetail)) allDetail[proj] = (allDetail[proj] || 0) + hrs;
+    for (const [proj, hrs] of Object.entries(bDetail))  allDetail[proj] = (allDetail[proj] || 0) + hrs;
+    const drillItems = Object.entries(allDetail).length
+      ? Object.entries(allDetail)
+          .sort((a, b) => b[1] - a[1])
+          .map(([proj, hrs]) =>
+            `<li><span class="hw-dl-proj" title="${esc(proj)}">${esc(proj)}</span><span class="hw-dl-hrs">${Number(hrs).toFixed(2)}h</span></li>`
+          ).join('')
+      : '<li><span class="hw-drill-empty">No non-billable entries</span></li>';
 
     const dataRow = `<tr class="hw-data-row" onclick="hwToggleDrill('${drillId}', this)">
       <td>${esc(p.user_name)}${p.is_contractor ? ' <span style="font-size:.68rem;color:var(--muted)">(contractor)</span>' : ''}</td>
@@ -6981,14 +6980,7 @@ function renderHarvestWeeklyByPerson() {
     const drillRow = `<tr class="hw-drill-row" id="${drillId}" style="display:none">
       <td colspan="${HW_COLS.length}">
         <div class="hw-drill-inner">
-          <div class="hw-drill-col">
-            <h4>Internal Projects</h4>
-            <ul class="hw-drill-list">${ipItems}</ul>
-          </div>
-          <div class="hw-drill-col">
-            <h4>Bench (residual)</h4>
-            <ul class="hw-drill-list">${bItems}</ul>
-          </div>
+          <ul class="hw-drill-list">${drillItems}</ul>
         </div>
       </td>
     </tr>`;
