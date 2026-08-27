@@ -576,6 +576,7 @@ section{margin-bottom:1.65rem!important}
 .hh-filter-row{border-bottom:1px solid var(--brd)}.hh-check-field{grid-column:span 2}.hh-checks{display:flex;gap:14px;flex-wrap:wrap;align-items:center;height:40px}.hh-check{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:800;color:var(--txt);cursor:pointer;white-space:nowrap}.hh-check input{cursor:pointer;accent-color:#E8501A}
 .harvest-hours-module{padding-bottom:1rem}.harvest-hours-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;align-items:end;padding:1rem 1.2rem;border-bottom:1px solid var(--brd)}.harvest-hours-controls .btn{height:40px;justify-content:center}.harvest-hours-summary{padding:1rem 1.2rem;margin-bottom:0}.harvest-hours-subhead{border-top:1px solid var(--brd)}.harvest-hours-table-wrap{max-height:440px}.hh-progress{height:7px;background:rgba(107,143,191,.18);border-radius:999px;overflow:hidden;min-width:90px}.hh-progress-fill{height:100%;border-radius:999px}.info-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(16,185,129,.12);color:#6EE7B7;border:1px solid rgba(16,185,129,.32);font-size:.8rem}.err-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.35);font-size:.8rem}
 .hw-table-wrap{overflow-x:auto;max-height:540px}.hw-table-wrap table{min-width:700px}.hw-table-wrap th{position:sticky;top:0;z-index:4;background:var(--surf)}.hw-table-wrap td{padding-top:12px;padding-bottom:12px}.hw-table-wrap tbody tr.hw-data-row{cursor:pointer}.hw-table-wrap tbody tr.hw-data-row:hover td{background:rgba(0,102,255,.04)}.hw-table-wrap tbody tr.hw-data-row.is-open td{background:rgba(0,102,255,.06)}.hw-sort-btn{background:none;border:none;color:inherit;font:inherit;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:0;white-space:nowrap}.hw-sort-btn .hw-caret{color:var(--muted);font-size:.65rem}.hw-sort-btn.active .hw-caret{color:var(--blue-lt)}.hw-filter-row{display:flex;align-items:center;gap:10px;padding:.75rem 1.2rem;border-bottom:1px solid var(--brd)}.hw-filter-row input{flex:1;max-width:280px;background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:8px;padding:6px 10px;font:inherit;font-size:.82rem;outline:none}.hw-filter-row input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,102,255,.12)}.hw-meta{font-size:.72rem;color:var(--muted)}.hw-drill-row td{padding:0!important;border-top:none!important}.hw-drill-inner{display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:.75rem 1.2rem 1rem;border-top:1px solid rgba(107,143,191,.18);background:rgba(0,0,0,.06)}.hw-drill-col h4{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 .4rem}.hw-drill-list{list-style:none;margin:0;padding:0;font-size:.78rem;line-height:1.7}.hw-drill-list li{display:flex;justify-content:space-between;gap:.5rem;border-bottom:1px solid rgba(107,143,191,.1);padding-bottom:2px}.hw-drill-list li:last-child{border-bottom:none}.hw-drill-list .hw-dl-proj{color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hw-drill-list .hw-dl-hrs{color:var(--muted);white-space:nowrap;font-weight:800}.hw-drill-empty{font-size:.76rem;color:var(--muted);font-style:italic}.hw-empty-state{padding:2rem 1.2rem;text-align:center;color:var(--muted);font-size:.85rem}
+.hw-health-strip{border-bottom:1px solid var(--brd);padding:.65rem 1.2rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:flex-start;font-size:.78rem}.hw-health-ok{color:var(--green);font-weight:800;font-size:.75rem;line-height:2}.hw-health-group{flex-shrink:0}.hw-health-group>summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:950}.hw-health-group>summary::-webkit-details-marker{display:none}.hw-health-error>summary{background:rgba(239,68,68,.16);color:#FCA5A5}.hw-health-warning>summary{background:rgba(249,115,22,.16);color:#FDBA74}.hw-health-group[open]>summary{border-radius:8px 8px 0 0}.hw-health-list{margin:.3rem 0 0;padding:.4rem .65rem;list-style:none;border-radius:0 8px 8px 8px;display:flex;flex-direction:column;gap:.3rem;max-width:580px}.hw-health-error .hw-health-list{background:rgba(239,68,68,.1)}.hw-health-warning .hw-health-list{background:rgba(249,115,22,.1)}.hw-health-list li{font-size:.72rem;line-height:1.45}.hw-health-error .hw-health-list li{color:#FCA5A5}.hw-health-warning .hw-health-list li{color:#FDBA74}.hw-hltype{font-size:.63rem;font-weight:950;text-transform:uppercase;letter-spacing:.06em;opacity:.75;margin-right:4px}
 
 /* PMO-LAYOUT: nav work-in-progress badge */
 @media(max-width:980px){.nav-wip-pill a{display:none}.nav-wip-pill{padding:2px 7px;font-size:.58rem}.nav-title-row{gap:6px}}
@@ -6977,7 +6978,7 @@ function renderHarvestWeeklyByPerson() {
     return dataRow + drillRow;
   }).join('');
 
-  body.innerHTML = `
+  body.innerHTML = hwBuildHealthStrip(metrics.health_checks || []) + `
     <div class="hw-filter-row">
       <input id="hwSearch" type="text" placeholder="Filter by name…" value="${esc(q)}" oninput="renderHarvestWeeklyByPerson()"/>
       <span class="hw-meta">${sorted.length} of ${people.length} people</span>
@@ -6988,6 +6989,25 @@ function renderHarvestWeeklyByPerson() {
         <tbody>${rows}</tbody>
       </table>
     </div>`;
+}
+
+function hwBuildHealthStrip(checks) {
+  if (!checks || !checks.length) {
+    return '<div class="hw-health-strip"><span class="hw-health-ok">✓ No data issues found</span></div>';
+  }
+  const errors   = checks.filter(c => c.severity === 'error');
+  const warnings = checks.filter(c => c.severity === 'warning');
+  const group = (items, cls, label) => {
+    if (!items.length) return '';
+    const lis = items.map(c =>
+      `<li><span class="hw-hltype">${esc(c.type.replace(/_/g,' '))}</span>${esc(c.message)}</li>`
+    ).join('');
+    return `<details class="hw-health-group ${cls}">
+      <summary>${items.length} ${label}${items.length > 1 ? 's' : ''}</summary>
+      <ul class="hw-health-list">${lis}</ul>
+    </details>`;
+  };
+  return `<div class="hw-health-strip">${group(errors,'hw-health-error','error')}${group(warnings,'hw-health-warning','warning')}</div>`;
 }
 
 function hwSort(col) {
