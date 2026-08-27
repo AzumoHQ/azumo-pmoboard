@@ -1955,6 +1955,17 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   </div>
 </section>
 
+<!-- ── TRENDS ──────────────────────────────── -->
+<section id="history">
+  <div class="sec-head">
+    <div class="sec-icon"><i class="ti ti-trending-up"></i></div>
+    <h2>Trends</h2>
+    <span class="badge badge-wip" title="Seccion en reestructuracion: vista mensual de Jira/EazyBI. Las metricas semanales de Harvest van a vivir en Metrics.">Work in progress</span>
+    <div class="sec-tag" id="historySnapshotsTag">—</div>
+  </div>
+  <div class="history-grid" id="historyGrid"></div>
+</section>
+
 <!-- ── HARVEST WEEKLY BY PERSON ───────────── -->
 <section id="harvestWeekly">
   <div class="sec-head compact-head">
@@ -1970,17 +1981,6 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <div class="hw-empty-state">No data yet — run a board refresh to populate this view.</div>
     </div>
   </div>
-</section>
-
-<!-- ── TRENDS ──────────────────────────────── -->
-<section id="history">
-  <div class="sec-head">
-    <div class="sec-icon"><i class="ti ti-trending-up"></i></div>
-    <h2>Trends</h2>
-    <span class="badge badge-wip" title="Seccion en reestructuracion: vista mensual de Jira/EazyBI. Las metricas semanales de Harvest van a vivir en Metrics.">Work in progress</span>
-    <div class="sec-tag" id="historySnapshotsTag">—</div>
-  </div>
-  <div class="history-grid" id="historyGrid"></div>
 </section>
 
 <!-- ── FORECAST ────────────────────────────── -->
@@ -2772,13 +2772,13 @@ function sidebarNavConfig(){
     ]},
     {id:'harvestGroup', icon:'', label:'Harvest', children:[
       {id:'harvestHours', icon:'<i class="ti ti-stopwatch"></i>', label:'Control'},
-      {id:'harvestAccess', icon:'<i class="ti ti-folders"></i>', label:'Assignments'},
-      {id:'harvestWeekly', icon:'<i class="ti ti-users"></i>', label:'By Person'}
+      {id:'harvestAccess', icon:'<i class="ti ti-folders"></i>', label:'Assignments'}
     ]},
     {id:'reportsGroup', icon:'', label:'Reports', children:[
       {id:'dashboard', icon:'<i class="ti ti-credit-card"></i>', label:'Billing'},
       {id:'history', icon:'<i class="ti ti-trending-up"></i>', label:'Trends'},
-      {id:'newSearchesTriage', icon:'<i class="ti ti-search"></i>', label:'New Searches'}
+      {id:'newSearchesTriage', icon:'<i class="ti ti-search"></i>', label:'New Searches'},
+      {id:'harvestWeekly', icon:'<i class="ti ti-users"></i>', label:'By Person'}
     ]},
     {id:'pmoActionCenter', icon:'<i class="ti ti-alert-triangle"></i>', label:'PMO QA', count: qaCount},
     {id:'helpChangelog', icon:'<i class="ti ti-help-circle"></i>', label:'Help'}
@@ -2789,7 +2789,7 @@ function currentModuleTabId(sections){
   const stored = localStorage.getItem(MODULE_TAB_KEY);
   if(sections.some(section => section.id === 'overview')) return 'overview';
   if(stored && sections.some(section => section.id === stored)) return stored;
-  const preferred = ['overview','opsViews','bench','azumo','pendingAssignments','dueDates','forecast','accountCoverage','harvestHours','harvestAccess','harvestWeekly','dashboard','history','newSearchesTriage','pmoActionCenter'];
+  const preferred = ['overview','opsViews','bench','azumo','pendingAssignments','dueDates','forecast','accountCoverage','harvestHours','harvestAccess','dashboard','history','newSearchesTriage','harvestWeekly','pmoActionCenter'];
   return preferred.find(id => sections.some(section => section.id === id)) || sections[0]?.id;
 }
 function moduleLeafItems(entry){
@@ -6875,8 +6875,8 @@ window.copyHarvestHoursSlack = copyHarvestHoursSlack;
 // ════════════════════════════════════════════════════
 // HARVEST WEEKLY BY PERSON
 // ════════════════════════════════════════════════════
-let hwSortCol = 'non_billable_hours';
-let hwSortDir = -1; // -1 = desc
+let hwSortCol = 'user_name';
+let hwSortDir = 1; // 1 = asc (A→Z)
 const HW_COLS = [
   {key:'user_name',          label:'Name',               num:false},
   {key:'client_logged_hours',label:'Client Logged',      num:true},
