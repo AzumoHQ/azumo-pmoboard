@@ -219,7 +219,11 @@ async function runRefresh(body = {}) {
         ? { from: body.harvestWeekFrom, to: body.harvestWeekTo }
         : lastCompletedWeekRange();
       parsed.harvest_metrics = await fetchWeeklyHarvestMetrics(weekRange, {
-        roster: billableRosterFromAssignments(parsed.assignment_rows || [])
+        roster: billableRosterFromAssignments([
+          ...(parsed.active || []),
+          ...(parsed.bench || []),
+          ...(parsed.pending || []),
+        ])
       });
     } catch (error) {
       console.warn('Harvest weekly metrics refresh skipped:', error.message);
