@@ -3949,7 +3949,7 @@ function clientNamesFuzzyMatch(a, b){
 }
 function myScopedClientNames(){
   const role = effectiveUserRole();
-  if(['admin','pmo','executive','c-level','clevel','viewer'].includes(role)) return [];
+  if(['admin','pmo','executive','c-level','clevel','viewer','pm'].includes(role)) return [];
   const email = myEffectiveEmail();
   if(!email) return [];
   const fieldByRole = {
@@ -3969,7 +3969,7 @@ function myScopedClientNames(){
 }
 function myScopedClientKeys(){
   const role = effectiveUserRole();
-  if(['admin','pmo','executive','c-level','clevel','viewer'].includes(role)) return null;
+  if(['admin','pmo','executive','c-level','clevel','viewer','pm'].includes(role)) return null;
   const email = myEffectiveEmail();
   if(!email) return new Set();
   const fieldByRole = {
