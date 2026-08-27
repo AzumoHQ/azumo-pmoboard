@@ -1913,10 +1913,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         <label for="hhClientFilter">Client</label>
         <select id="hhClientFilter" onchange="renderHarvestHoursReport()"></select>
       </div>
-      <div class="filter-field">
-        <label for="hhPmFilter">Project Manager</label>
-        <select id="hhPmFilter" onchange="renderHarvestHoursReport()"></select>
-      </div>
+
       <div class="filter-field hh-check-field">
         <label>Type</label>
         <div class="hh-checks">
@@ -6345,7 +6342,6 @@ function harvestHoursFilterState(){
   return {
     search: (document.getElementById("hhAssigneeSearch")?.value || "").trim().toLowerCase(),
     client: document.getElementById("hhClientFilter")?.value || "",
-    pm: document.getElementById("hhPmFilter")?.value || "",
     billable: Boolean(document.getElementById("hhTypeBillable")?.checked),
     nonBillable: Boolean(document.getElementById("hhTypeNonBillable")?.checked),
     needsReviewOnly: Boolean(document.getElementById("hhNeedsReviewOnly")?.checked)
@@ -6354,7 +6350,6 @@ function harvestHoursFilterState(){
 function harvestHoursRowMatchesFilters(row, f){
   if(f.search && !String(row.name || "").toLowerCase().includes(f.search)) return false;
   if(f.client && !(row.clients || []).some(cl => normalizeClientKey(cl) === normalizeClientKey(f.client))) return false;
-  if(f.pm && !(row.pms || []).includes(f.pm)) return false;
   if(f.needsReviewOnly){
     const hasIssue = Boolean(row.missingCount) || Boolean(row.mentionedClients && row.mentionedClients.length);
     if(!hasIssue) return false;
@@ -6373,16 +6368,12 @@ function harvestHoursRowMatchesFilters(row, f){
 }
 function populateHarvestHoursFilterOptions(){
   const clientSel = document.getElementById("hhClientFilter");
-  const pmSel = document.getElementById("hhPmFilter");
-  if(!clientSel || !pmSel) return;
-  const prevClient = clientSel.value, prevPm = pmSel.value;
+  if(!clientSel) return;
+  const prevClient = clientSel.value;
   const _scoped = scopedHarvestHoursRows();
   const clients = [...new Set(_scoped.flatMap(r => r.clients || []))].filter(Boolean).sort((a,b) => a.localeCompare(b));
-  const pms = [...new Set(_scoped.flatMap(r => r.pms || []))].filter(Boolean).sort((a,b) => a.localeCompare(b));
   clientSel.innerHTML = '<option value="">All clients</option>' + clients.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
-  pmSel.innerHTML = '<option value="">All PMs</option>' + pms.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
   if(clients.includes(prevClient)) clientSel.value = prevClient;
-  if(pms.includes(prevPm)) pmSel.value = prevPm;
   const row = document.getElementById("hhFilterRow");
   if(row) row.style.display = "grid";
   const nonBillableField = document.getElementById("hhTypeNonBillable")?.closest("label.hh-check");
@@ -6391,7 +6382,7 @@ function populateHarvestHoursFilterOptions(){
 function clearHarvestHoursFilters(){
   const searchEl = document.getElementById("hhAssigneeSearch");
   if(searchEl) searchEl.value = "";
-  ["hhClientFilter","hhPmFilter"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
+  ["hhClientFilter"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
   ["hhTypeBillable","hhTypeNonBillable","hhNeedsReviewOnly"].forEach(id => { const el = document.getElementById(id); if(el) el.checked = false; });
   renderHarvestHoursReport();
 }
