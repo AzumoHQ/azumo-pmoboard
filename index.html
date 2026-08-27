@@ -6918,8 +6918,13 @@ function renderHarvestWeeklyByPerson() {
 
   const rangeTag = document.getElementById('hwRangeTag');
   if (rangeTag && metrics.range) {
-    rangeTag.textContent = metrics.range.from + ' → ' + metrics.range.to
-      + (metrics.population && metrics.population.roster_applied ? ' · ' + metrics.population.people_counted + ' people' : '');
+    const rFrom = new Date(metrics.range.from + 'T00:00:00');
+    const rTo   = new Date(metrics.range.to   + 'T00:00:00');
+    const isPartial = Math.round((rTo - rFrom) / 86400000) < 6;
+    const populationSuffix = metrics.population && metrics.population.roster_applied
+      ? ' · ' + metrics.population.people_counted + ' people' : '';
+    const partialSuffix = isPartial ? ' (in progress · week not closed)' : '';
+    rangeTag.textContent = metrics.range.from + ' → ' + metrics.range.to + populationSuffix + partialSuffix;
   }
 
   // Prefill picker with currently-loaded week
@@ -7057,15 +7062,16 @@ async function loadHarvestWeek() {
   const to   = toInput   ? toInput.value   : '';
   if (!from || !to) { alert('Pick both dates.'); return; }
 
-  // Validate Monday → Sunday (6-day span)
+  // Validate: from must be a Monday; to must be within the same week (from → from+6)
   const fromDate = new Date(from + 'T00:00:00');
   const toDate   = new Date(to   + 'T00:00:00');
   if (fromDate.getDay() !== 1) {
     alert('Pick a Monday–Sunday week (from date must be a Monday).');
     return;
   }
-  if (Math.round((toDate - fromDate) / 86400000) !== 6) {
-    alert('Pick a Monday–Sunday week (to date must be 6 days after from).');
+  const diffDays = Math.round((toDate - fromDate) / 86400000);
+  if (diffDays < 0 || diffDays > 6) {
+    alert('To date must be within the same week (Monday through Sunday).');
     return;
   }
 
