@@ -6406,7 +6406,7 @@ function hhOwnedClientKeys(role = effectiveUserRole()){
 }
 function scopedHarvestHoursRows(rows = harvestHoursReportData){
   const role = effectiveUserRole();
-  if(executiveLikeRole(role)) return rows.slice();
+  if(executiveLikeRole(role) || role === 'pm') return rows.slice();
   if(role === 'assignee') return rows.filter(row => identityMatchesTokens(normalizeIdentity(row.name || '')));
   const ownedClients = hhOwnedClientKeys(role);
   if(!ownedClients.size) return rows.slice();
