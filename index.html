@@ -6539,8 +6539,8 @@ function renderHarvestHoursReport(){
             const subtotalRow = dayEntries.length > 1 ? `<tr class="${clsSuffix}" data-hidden="true" style="background:var(--bg-2)">
               <td colspan="6" style="padding:2px 8px 6px 78px">
                 <div class="hh-day-subtotal">
-                  <span>${esc(date)}</span>
-                  <span class="hh-day-subtotal-hrs">${dayTotal % 1 === 0 ? dayTotal : dayTotal.toFixed(1)}h total</span>
+                  <span>Total</span>
+                  <span class="hh-day-subtotal-hrs">${dayTotal % 1 === 0 ? dayTotal : dayTotal.toFixed(1)}h</span>
                 </div>
               </td>
             </tr>` : '';
