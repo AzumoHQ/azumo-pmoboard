@@ -3068,7 +3068,7 @@ function effectivePersonMatch(row){
 }
 function effectiveOwnedClientKeys(){
   const role = effectiveUserRole();
-  const field = role === 'csm' ? 'csm_assigned' : role === 'tl' ? 'tl_assigned' : '';
+  const field = role === 'pm' ? 'pm_assigned' : role === 'csm' ? 'csm_assigned' : role === 'tl' ? 'tl_assigned' : '';
   const allowed = new Set();
   if(!field || !latest) return allowed;
   (latest.account_coverage || []).forEach(row => {
@@ -7601,11 +7601,13 @@ function scopedAssignmentRows(rows = allAssignmentRows()){
   if(role === 'assignee') return rows.filter(effectivePersonMatch);
 
   let primaryRows = [];
-  if(role === 'pm'){
-    primaryRows = rows.filter(row => identityMatchesTokens(row.project_manager || ''));
-  }else if(role === 'csm' || role === 'tl'){
+  if(role === 'pm' || role === 'csm' || role === 'tl'){
     const allowedClients = effectiveOwnedClientKeys();
-    primaryRows = rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+    if(allowedClients.size){
+      primaryRows = rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+    } else if(role === 'pm'){
+      primaryRows = rows.filter(row => identityMatchesTokens(row.project_manager || ''));
+    }
   }else{
     return rows.slice();
   }
@@ -7631,16 +7633,17 @@ function scopedByOwnership(rows = []){
   const role = effectiveUserRole();
   if(executiveLikeRole(role)) return rows.slice();
   if(role === 'assignee') return rows.filter(effectivePersonMatch);
-  if(role === 'csm' || role === 'tl'){
+  if(role === 'pm' || role === 'csm' || role === 'tl'){
     const allowedClients = effectiveOwnedClientKeys();
-    return rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
-  }
-  if(role === 'pm'){
-    const pmMap = clientToProjectManagerMap();
-    return rows.filter(row => {
-      const pm = row.project_manager || pmMap.get(normalizeClientKey(row.client || '')) || '';
-      return identityMatchesTokens(pm);
-    });
+    if(allowedClients.size) return rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+    if(role === 'pm'){
+      const pmMap = clientToProjectManagerMap();
+      return rows.filter(row => {
+        const pm = row.project_manager || pmMap.get(normalizeClientKey(row.client || '')) || '';
+        return identityMatchesTokens(pm);
+      });
+    }
+    return [];
   }
   return rows.slice();
 }
@@ -7648,22 +7651,20 @@ function scopedForecastRows(rows = []){
   const role = effectiveUserRole();
   if(executiveLikeRole(role)) return rows.slice();
   if(role === 'assignee') return rows.filter(effectivePersonMatch);
-  if(role === 'pm') return rows.filter(row => identityMatchesTokens(row.project_manager || ''));
-  if(role === 'csm' || role === 'tl'){
+  if(role === 'pm' || role === 'csm' || role === 'tl'){
     const allowedClients = effectiveOwnedClientKeys();
-    return rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+    if(allowedClients.size) return rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+    if(role === 'pm') return rows.filter(row => identityMatchesTokens(row.project_manager || ''));
+    return [];
   }
   return rows.slice();
 }
 function scopedAccountCoverageRowsSource(rows = latest?.account_coverage || []){
   const role = effectiveUserRole();
-  if(executiveLikeRole(role) || role === 'pm') return rows.slice();
-  if(role === 'csm'){
-    return rows.filter(row => identityMatchesTokens(row.csm_assigned || ''));
-  }
-  if(role === 'tl'){
-    return rows.filter(row => identityMatchesTokens(row.tl_assigned || ''));
-  }
+  if(executiveLikeRole(role)) return rows.slice();
+  if(role === 'pm') return rows.filter(row => identityMatchesTokens(row.pm_assigned || ''));
+  if(role === 'csm') return rows.filter(row => identityMatchesTokens(row.csm_assigned || ''));
+  if(role === 'tl') return rows.filter(row => identityMatchesTokens(row.tl_assigned || ''));
   if(role === 'assignee') return [];
   return rows.slice();
 }
