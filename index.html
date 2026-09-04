@@ -7623,12 +7623,12 @@ function sowLink(row, label){
 }
 function allAssignmentRows(){
   const direct = (latest.assignment_rows || []).filter(Boolean);
-  if(direct.length) return direct;
-  return [
+  const rows = direct.length ? direct : [
     ...Object.values(latest.forecast || {}).flat(),
     ...(latest.bench_list || []),
     ...(latest.pending_list || [])
   ].filter(Boolean);
+  return filterActiveOnly(rows);
 }
 function scopedAssignmentRows(rows = allAssignmentRows()){
   const role = effectiveUserRole();
@@ -7901,22 +7901,46 @@ function coverageForClient(client){
     source: latest.account_coverage_source || 'Jira PSA Epic Account Coverage'
   };
 }
-function knownActiveRoster(){
+function harvestActiveRoster(){
   const names = new Set();
-  const addRow = row => { const n = normalizeIdentity(row.assignee||row.name||''); if(n) names.add(n); };
-  allAssignmentRows().forEach(addRow);
+  const emails = new Set();
+  (latest?.harvest?.users || []).forEach(u => {
+    const n = normalizeIdentity(u.name || '');
+    const e = String(u.email || '').toLowerCase().trim();
+    if(n) names.add(n);
+    if(e) emails.add(e);
+  });
+  return { names, emails };
+}
+function filterActiveOnly(rows){
+  const { names, emails } = harvestActiveRoster();
+  if(!names.size && !emails.size) return rows;
+  return rows.filter(row => {
+    const name  = normalizeIdentity(row.assignee || row.name || '');
+    const email = String(row.email || '').toLowerCase().trim();
+    if(!name && !email) return true;
+    if(email && emails.has(email)) return true;
+    if(name  && names.has(name))   return true;
+    return false;
+  });
+}
+function knownActiveRoster(){
+  const { names } = harvestActiveRoster();
+  if(names.size) return names;
+  const fallback = new Set();
+  const addRow = row => { const n = normalizeIdentity(row.assignee||row.name||''); if(n) fallback.add(n); };
+  (latest?.assignment_rows||[]).forEach(addRow);
   (latest?.bench_list||[]).forEach(addRow);
   (latest?.pending_list||[]).forEach(addRow);
-  return names;
+  return fallback;
 }
 function coverageBadge(value){
   if(!value) return '<span class="badge badge-red">Missing</span>';
   const roster = knownActiveRoster();
-  const inactive = roster.size > 0 && !roster.has(normalizeIdentity(value));
-  const warn = inactive
-    ? ' <span class="badge badge-red" title="Not found in current Jira data — may be inactive" style="font-size:.62rem;vertical-align:middle">Inactive?</span>'
-    : '';
-  return esc(value) + warn;
+  if(roster.size > 0 && !roster.has(normalizeIdentity(value))){
+    return `<span class="badge badge-red" title="${esc(value)} — not in Harvest active users">Missing</span>`;
+  }
+  return esc(value);
 }
 function jiraSearchUrl(jql){
   return `https://azumohq.atlassian.net/issues/?jql=${encodeURIComponent(jql)}`;
