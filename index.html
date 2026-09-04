@@ -7901,8 +7901,22 @@ function coverageForClient(client){
     source: latest.account_coverage_source || 'Jira PSA Epic Account Coverage'
   };
 }
+function knownActiveRoster(){
+  const names = new Set();
+  const addRow = row => { const n = normalizeIdentity(row.assignee||row.name||''); if(n) names.add(n); };
+  allAssignmentRows().forEach(addRow);
+  (latest?.bench_list||[]).forEach(addRow);
+  (latest?.pending_list||[]).forEach(addRow);
+  return names;
+}
 function coverageBadge(value){
-  return value ? esc(value) : '<span class="badge badge-red">Missing</span>';
+  if(!value) return '<span class="badge badge-red">Missing</span>';
+  const roster = knownActiveRoster();
+  const inactive = roster.size > 0 && !roster.has(normalizeIdentity(value));
+  const warn = inactive
+    ? ' <span class="badge badge-red" title="Not found in current Jira data — may be inactive" style="font-size:.62rem;vertical-align:middle">Inactive?</span>'
+    : '';
+  return esc(value) + warn;
 }
 function jiraSearchUrl(jql){
   return `https://azumohq.atlassian.net/issues/?jql=${encodeURIComponent(jql)}`;
@@ -8094,13 +8108,18 @@ function renderAccountCoverageModule(){
     if(btn) btn.classList.toggle('active', accountCoverageFilter === filter);
   });
 
+  const roster = knownActiveRoster();
+  const inactiveRows = roster.size ? (latest.account_coverage||[]).filter(row =>
+    [row.pm_assigned, row.csm_assigned, row.tl_assigned].some(v => v && !roster.has(normalizeIdentity(v)))
+  ) : [];
+
   const cards = document.getElementById('accountCoverageSummaryCards');
   if(cards){
     cards.innerHTML = [
       `<div class="action-card"><div class="action-label">Clients tracked</div><div class="action-value">${total}</div><div class="action-copy">Active Jira clients + PSA coverage records</div></div>`,
       `<div class="action-card ${missingRowsAll.length ? 'warning' : 'ok'}"><div class="action-label">Missing coverage</div><div class="action-value">${missingRowsAll.length}</div><div class="action-copy">Need PM, CSM, or TL assigned</div></div>`,
-      `<div class="action-card ok"><div class="action-label">Complete</div><div class="action-value">${completeRowsAll.length}</div><div class="action-copy">PM + CSM + TL populated</div></div>`,
-      `<div class="action-card"><div class="action-label">Visible rows</div><div class="action-value">${rows.length}</div><div class="action-copy">${search ? 'Filtered by search' : 'Current filter'}</div></div>`
+      `<div class="action-card ${inactiveRows.length ? 'critical' : 'ok'}"><div class="action-label">Inactive assignees</div><div class="action-value">${inactiveRows.length}</div><div class="action-copy">PM/CSM/TL not found in current Jira data</div></div>`,
+      `<div class="action-card ok"><div class="action-label">Complete</div><div class="action-value">${completeRowsAll.length}</div><div class="action-copy">PM + CSM + TL populated</div></div>`
     ].join('');
   }
 
