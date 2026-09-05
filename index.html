@@ -7788,7 +7788,8 @@ function renderOpsFilterControls(){
     positionSelect.value = opsFilters.position;
   }
   if(projectManagerSelect){
-    const projectManagers = [...projectManagerCounts.keys()].sort((a,b)=>a.localeCompare(b));
+    const projectManagers = [...projectManagerCounts.keys()].filter(pm => pm && activePmName(pm)).sort((a,b)=>a.localeCompare(b));
+    if(opsFilters.projectManager && !projectManagers.includes(opsFilters.projectManager)) opsFilters.projectManager = '';
     projectManagerSelect.innerHTML = optionHTML('', `All PMs (${rows.length})`) + projectManagers.map(pm => optionHTML(pm, `${pm} (${projectManagerCounts.get(pm)})`)).join('');
     projectManagerSelect.value = opsFilters.projectManager;
   }
