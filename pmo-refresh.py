@@ -1573,6 +1573,90 @@ def zero_historical_percentages(data: dict) -> dict:
     return data
 
 
+def build_activity_log(prev_snap: dict, new_snap: dict, refresh_at: str) -> list:
+    """Diff two consecutive snapshots and return a list of change events for the timeline."""
+    prev_rows = {r['key']: r for r in (prev_snap or {}).get('assignment_rows', []) if r.get('key')}
+    new_rows  = {r['key']: r for r in new_snap.get('assignment_rows', []) if r.get('key')}
+
+    ACTIVE = {'In Progress', 'In progress'}
+    events = []
+
+    def assignee_label(row):
+        name = row.get('assignee') or '?'
+        client = row.get('client') or '?'
+        pos = row.get('position') or ''
+        return f"{name} · {client}" + (f" ({pos})" if pos else '')
+
+    for key, row in new_rows.items():
+        if key not in prev_rows:
+            status = str(row.get('status', '')).strip()
+            etype = 'new_assignment' if status in ACTIVE else 'status_change'
+            events.append({
+                'ts': refresh_at, 'type': etype, 'key': key,
+                'label': f"{row.get('assignee','?')} → {row.get('client','?')}" + (f" ({row.get('position','')})" if row.get('position') else ''),
+                'assignee': row.get('assignee', ''), 'client': row.get('client', ''),
+                'project_manager': row.get('project_manager', ''),
+            })
+        else:
+            prev = prev_rows[key]
+            base = assignee_label(row)
+
+            old_status = str(prev.get('status', '')).strip()
+            new_status = str(row.get('status', '')).strip()
+            if old_status != new_status and new_status in ACTIVE and old_status not in ACTIVE:
+                events.append({
+                    'ts': refresh_at, 'type': 'status_change', 'key': key,
+                    'label': f"{base}: {old_status} → {new_status}",
+                    'assignee': row.get('assignee', ''), 'client': row.get('client', ''),
+                    'project_manager': row.get('project_manager', ''),
+                })
+
+            try:
+                old_pct = float(prev.get('assignment_pct') or prev.get('pct') or 0)
+                new_pct = float(row.get('assignment_pct') or row.get('pct') or 0)
+                if abs(new_pct - old_pct) >= 10:
+                    events.append({
+                        'ts': refresh_at, 'type': 'pct_change', 'key': key,
+                        'label': f"{base}: {int(old_pct)}% → {int(new_pct)}%",
+                        'assignee': row.get('assignee', ''), 'client': row.get('client', ''),
+                        'project_manager': row.get('project_manager', ''),
+                    })
+            except (TypeError, ValueError):
+                pass
+
+            old_due = str(prev.get('due') or prev.get('epic_due') or '').strip()
+            new_due = str(row.get('due') or row.get('epic_due') or '').strip()
+            if old_due and new_due and old_due != new_due:
+                events.append({
+                    'ts': refresh_at, 'type': 'due_change', 'key': key,
+                    'label': f"{base}: {old_due} → {new_due}",
+                    'assignee': row.get('assignee', ''), 'client': row.get('client', ''),
+                    'project_manager': row.get('project_manager', ''),
+                })
+
+            old_pm = str(prev.get('project_manager') or '').strip()
+            new_pm = str(row.get('project_manager') or '').strip()
+            if old_pm and new_pm and old_pm != new_pm:
+                events.append({
+                    'ts': refresh_at, 'type': 'pm_change', 'key': key,
+                    'label': f"{base}: PM {old_pm} → {new_pm}",
+                    'assignee': row.get('assignee', ''), 'client': row.get('client', ''),
+                    'project_manager': new_pm,
+                })
+
+    for key, prev in prev_rows.items():
+        if key not in new_rows and str(prev.get('status', '')).strip() in ACTIVE:
+            events.append({
+                'ts': refresh_at, 'type': 'assignment_done', 'key': key,
+                'label': f"{assignee_label(prev)} finished",
+                'assignee': prev.get('assignee', ''), 'client': prev.get('client', ''),
+                'project_manager': prev.get('project_manager', ''),
+            })
+
+    events.sort(key=lambda e: e.get('ts', ''), reverse=True)
+    return events
+
+
 def update_data_file(snapshot: dict, reset_history: bool = False) -> dict:
     data = load_or_create_data()
     if reset_history:
@@ -1582,6 +1666,15 @@ def update_data_file(snapshot: dict, reset_history: bool = False) -> dict:
     data['last_refresh'] = date.today().isoformat()
     data['last_refresh_at'] = datetime.now().isoformat(timespec='seconds')
     data.setdefault('history_start_date', date.today().isoformat())
+
+    # Find the most recent snapshot with a different date (used for diffing)
+    prev_snap = next(
+        (s for s in reversed(data.get('snapshots', [])) if s.get('date') != snapshot['date']),
+        None
+    )
+    snapshot['activity_log'] = build_activity_log(prev_snap, snapshot, data['last_refresh_at'])
+    if snapshot['activity_log']:
+        print(f"  → {len(snapshot['activity_log'])} activity log events generated")
 
     # Replace today's snapshot if it already exists, else append
     existing = next((i for i, s in enumerate(data['snapshots'])

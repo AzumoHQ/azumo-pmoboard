@@ -2618,9 +2618,9 @@ function renderAssignmentTimeline() {
   if (!filtered.length) { host.hidden = true; return; }
   host.hidden = false;
 
-  const TYPE_ICON  = { new_assignment:'⊕', assignment_done:'✓', pct_change:'~', due_change:'◷', psa_report:'↑' };
-  const TYPE_COLOR = { new_assignment:'#6EE7B7', assignment_done:'var(--muted)', pct_change:'#FCD34D', due_change:'#FB923C', psa_report:'var(--blue-lt)' };
-  const TYPE_LABEL = { new_assignment:'New', assignment_done:'Done', pct_change:'Alloc', due_change:'Due', psa_report:'Report' };
+  const TYPE_ICON  = { new_assignment:'⊕', assignment_done:'✓', pct_change:'~', due_change:'◷', psa_report:'↑', pm_change:'→', status_change:'▶' };
+  const TYPE_COLOR = { new_assignment:'#6EE7B7', assignment_done:'var(--muted)', pct_change:'#FCD34D', due_change:'#FB923C', psa_report:'var(--blue-lt)', pm_change:'#C4B5FD', status_change:'#93C5FD' };
+  const TYPE_LABEL = { new_assignment:'New', assignment_done:'Done', pct_change:'Alloc', due_change:'Due', psa_report:'Report', pm_change:'PM', status_change:'Active' };
 
   function dayKey(iso) { return new Date(iso).toLocaleDateString('en-CA'); }
   function dayLabel(iso) {
