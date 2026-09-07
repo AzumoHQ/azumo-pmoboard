@@ -1262,7 +1262,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   <div class="nav-inner">
     <div class="nav-brand">
       <a href="#" onclick="goTo('overview');return false;" style="text-decoration:none;display:flex"><div class="nav-logo"><img class="nav-wordmark" src="assets/azumo-logo.png" alt="Azumo"/></div></a>
-      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span>V2</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
+      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span>V2.1</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
     </div>
     <div class="nav-links">
       <button class="nav-link" id="overviewNavLink" onclick="goTo('overview')">Overview</button>
@@ -2010,19 +2010,30 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-help-circle"></i></div>
       <h2>Help</h2>
-      <div class="sec-tag">v2.0 · What's new</div>
+      <div class="sec-tag">v2.1 · What's new</div>
     </div>
     <div class="mc" style="padding:1.2rem 1.4rem">
-      <h3 style="margin-bottom:.4rem">Harvest Hours Control — recent changes</h3>
-      <div class="mc-sub" style="margin-bottom:1rem">Latest updates to the hours audit module.</div>
+      <h3 style="margin-bottom:.4rem">v2.1 — Aug 24, 2026</h3>
+      <div class="mc-sub" style="margin-bottom:1rem">Role-scoped views, nav menu fixes, bench count alignment.</div>
       <ul style="margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.55rem;font-size:.86rem;color:var(--txt)">
-        <li><strong>Nested breakdown.</strong> Expand any person to see client → project → individual Harvest entry, each level foldable on its own.</li>
-        <li><strong>Jira % per client.</strong> The weekly target is now prorated by each client's own Jira assignment %, instead of using the full weekly hours as the target for every client.</li>
-        <li><strong>Cross-client detection.</strong> Flags entries whose notes reference a Jira ticket that belongs to a different client than the one hours were logged under.</li>
-        <li><strong>Needs review only.</strong> New toggle to filter the list down to just the people with something flagged.</li>
-        <li><strong>Billable filter simplified.</strong> "Billable" now includes freelancers; Non-Billable stays separate.</li>
-        <li><strong>Cleaner columns.</strong> Removed redundant Description/Status/Progress columns; hours now show green/red directly.</li>
+        <li><strong>Role-scoped views.</strong> Harvest Hours Control, Pending Assignments and Due Dates now filter by your role (PM/CSM/TL/Assignee), matching how Forecast already worked.</li>
+        <li><strong>Bench count fix.</strong> The Bench (FTE) metric now counts people consistently between the Overview card and the detailed bench list.</li>
+        <li><strong>Nav menu fixes.</strong> Module dropdowns no longer stay open on top of each other, and closing them by clicking outside the menu works again.</li>
+        <li><strong>Dark mode polish.</strong> Fixed low-contrast KPI icons in dark mode.</li>
       </ul>
+
+      <div style="margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--brd)">
+        <h3 style="margin-bottom:.4rem">v2.0 — Aug 20, 2026 · Harvest Hours Control</h3>
+        <div class="mc-sub" style="margin-bottom:1rem">Latest updates to the hours audit module.</div>
+        <ul style="margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.55rem;font-size:.86rem;color:var(--txt)">
+          <li><strong>Nested breakdown.</strong> Expand any person to see client → project → individual Harvest entry, each level foldable on its own.</li>
+          <li><strong>Jira % per client.</strong> The weekly target is now prorated by each client's own Jira assignment %, instead of using the full weekly hours as the target for every client.</li>
+          <li><strong>Cross-client detection.</strong> Flags entries whose notes reference a Jira ticket that belongs to a different client than the one hours were logged under.</li>
+          <li><strong>Needs review only.</strong> New toggle to filter the list down to just the people with something flagged.</li>
+          <li><strong>Billable filter simplified.</strong> "Billable" now includes freelancers; Non-Billable stays separate.</li>
+          <li><strong>Cleaner columns.</strong> Removed redundant Description/Status/Progress columns; hours now show green/red directly.</li>
+        </ul>
+      </div>
     </div>
   </section>
 
