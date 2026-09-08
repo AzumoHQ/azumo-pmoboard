@@ -7131,6 +7131,7 @@ function renderHarvestWeeklyReport() {
       <span class="hw-meta">${people.length} people · ${wDays} working day${wDays !== 1 ? 's' : ''}</span>
       <button class="btn btn-ghost btn-sm" onclick="hwExportReportTSV()" title="Copy as TSV">↓ TSV</button>
       <button class="btn btn-ghost btn-sm" id="hwCopySheetBtn" onclick="hwCopyForSheet()" title="Name · Total h · Client h · PTO h · Non-billable h — para pegar en la sheet">↓ Sheet</button>
+      <button class="btn btn-ghost btn-sm" id="hwCopyBenchInternalBtn" onclick="hwCopyBenchInternal()" title="Bench + Internal Projects — Assignee · Hours · Project">↓ Bench/Internal</button>
     </div>
     <div class="hwr-table-wrap">
       <table>
@@ -7297,6 +7298,64 @@ async function hwCopyForSheet() {
   }
 }
 window.hwCopyForSheet = hwCopyForSheet;
+
+async function hwCopyBenchInternal() {
+  const metrics = latest && latest.harvest_metrics;
+  const people  = metrics && Array.isArray(metrics.by_person) ? metrics.by_person : null;
+  if (!people) return;
+  const fmt = h => Number(h || 0).toFixed(2);
+  const TAB = '\t', NL = '\n';
+
+  function expandRows(list, hoursKey, detailKey) {
+    const rows = [];
+    let total = 0;
+    list.forEach(p => {
+      const detail = p[detailKey] || {};
+      const entries = Object.entries(detail).sort((a, b) => b[1] - a[1]);
+      if (entries.length) {
+        entries.forEach(([proj, hrs]) => {
+          rows.push([p.user_name, fmt(hrs), proj].join(TAB));
+          total += Number(hrs || 0);
+        });
+      } else {
+        const hrs = Number(p[hoursKey] || 0);
+        rows.push([p.user_name, fmt(hrs), ''].join(TAB));
+        total += hrs;
+      }
+    });
+    rows.push(['Total', fmt(total), ''].join(TAB));
+    return rows;
+  }
+
+  const benchers  = people.filter(p => Number(p.bench_hours || 0) > 0)
+                          .sort((a, b) => a.user_name.localeCompare(b.user_name));
+  const internals = people.filter(p => Number(p.internal_projects_hours || 0) > 0)
+                          .sort((a, b) => a.user_name.localeCompare(b.user_name));
+
+  const lines = [
+    'BENCH' + TAB + TAB,
+    ['Assignee', 'Hours', 'Project'].join(TAB),
+    ...expandRows(benchers, 'bench_hours', 'bench_detail'),
+    TAB + TAB,
+    TAB + TAB,
+    'INTERNAL PROJECTS' + TAB + TAB,
+    TAB + TAB,
+    ['Assignee', 'Hours', 'Project'].join(TAB),
+    ...expandRows(internals, 'internal_projects_hours', 'internal_projects_detail'),
+  ];
+  const tsv = lines.join(NL);
+  try {
+    await navigator.clipboard.writeText(tsv);
+    const btn = document.getElementById('hwCopyBenchInternalBtn');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(() => { btn.textContent = orig; }, 2000); }
+  } catch {
+    const blob = new Blob([tsv], { type: 'text/tab-separated-values' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'bench-internal.tsv'; a.click();
+    URL.revokeObjectURL(url);
+  }
+}
+window.hwCopyBenchInternal = hwCopyBenchInternal;
 
 let hwActiveTab = 'report';
 
