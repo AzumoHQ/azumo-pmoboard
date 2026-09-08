@@ -7062,6 +7062,40 @@ function hwBillingPctByPerson() {
   return map;
 }
 
+let hwBillingDeltaVisible = false;
+
+function hwSnapshotForDate(dateStr) {
+  const target = new Date(dateStr + 'T12:00:00');
+  const snaps = (PMO && PMO.snapshots) ? PMO.snapshots : [];
+  let best = null, bestDiff = Infinity;
+  for (const s of snaps) {
+    if (!s.date || !(s.assignment_rows && s.assignment_rows.length)) continue;
+    const d = new Date(s.date + 'T12:00:00');
+    const diff = Math.abs(d - target);
+    if (diff < bestDiff) { bestDiff = diff; best = s; }
+  }
+  return bestDiff <= 4 * 86400000 ? best : null; // max 4 days away
+}
+
+function hwBillingMapFromSnapshot(snap) {
+  const map = {};
+  for (const row of (snap && snap.assignment_rows || [])) {
+    if (rowBillingClass(row) !== 'Billable') continue;
+    const name = normalizeIdentity(row.assignee || row.name || '');
+    if (!name) continue;
+    const pct = rowAssignmentPct(row);
+    if (pct == null) continue;
+    map[name] = Math.min(100, (map[name] || 0) + pct);
+  }
+  return map;
+}
+
+function hwToggleBillingDelta() {
+  hwBillingDeltaVisible = !hwBillingDeltaVisible;
+  renderHarvestWeeklyReport();
+}
+window.hwToggleBillingDelta = hwToggleBillingDelta;
+
 function renderHarvestWeeklyReport() {
   const body = document.getElementById('hwBody');
   if (!body) return;
@@ -7099,6 +7133,15 @@ function renderHarvestWeeklyReport() {
   const wDays = metrics.range ? hwWorkingDays(metrics.range.from, metrics.range.to) : 5;
   const billingByPerson = hwBillingPctByPerson();
 
+  // Optional Mon/Sun billing delta columns
+  let monMap = {}, sunMap = {}, monSnapDate = null, sunSnapDate = null;
+  if (hwBillingDeltaVisible && metrics.range) {
+    const monSnap = hwSnapshotForDate(metrics.range.from);
+    const sunSnap = hwSnapshotForDate(metrics.range.to);
+    if (monSnap) { monMap = hwBillingMapFromSnapshot(monSnap); monSnapDate = monSnap.date; }
+    if (sunSnap) { sunMap = hwBillingMapFromSnapshot(sunSnap); sunSnapDate = sunSnap.date; }
+  }
+
   const fmtH = h => h == null || h === 0 ? '<span style="color:var(--muted)">—</span>' : Number(h).toFixed(2) + 'h';
   const fmtPct = v => v == null ? '<span style="color:var(--muted)">—</span>' : Number(v).toFixed(1) + '%';
 
@@ -7111,9 +7154,20 @@ function renderHarvestWeeklyReport() {
     const diffStr = diffH == null
       ? '<span style="color:var(--muted)">—</span>'
       : `<span class="${diffH >= 0 ? 'hwr-diff-pos' : 'hwr-diff-neg'}">${diffH >= 0 ? '+' : ''}${diffH.toFixed(2)}h</span>`;
+
+    let deltaCols = '';
+    if (hwBillingDeltaVisible) {
+      const monPct = monMap[nameKey] != null ? monMap[nameKey] : null;
+      const sunPct = sunMap[nameKey] != null ? sunMap[nameKey] : null;
+      const changed = monPct != null && sunPct != null && Math.abs(sunPct - monPct) >= 0.5;
+      const sunStyle = changed ? (sunPct > monPct ? 'color:#6EE7B7;font-weight:700' : 'color:#F87171;font-weight:700') : '';
+      deltaCols = `<td style="text-align:right;opacity:.8">${fmtPct(monPct)}</td><td style="text-align:right;${sunStyle}">${fmtPct(sunPct)}</td>`;
+    }
+
     return `<tr>
       <td>${esc(p.user_name)}${p.is_contractor ? ' <span style="font-size:.68rem;color:var(--muted)">(c)</span>' : ''}</td>
       <td style="text-align:right">${fmtPct(jiraPct)}</td>
+      ${deltaCols}
       <td style="text-align:right">${fmtH(p.committed_harvest_hours)}</td>
       <td style="text-align:right">${fmtH(p.client_logged_hours)}</td>
       <td style="text-align:right">${fmtH(p.total_off_hours)}</td>
@@ -7124,6 +7178,10 @@ function renderHarvestWeeklyReport() {
     </tr>`;
   }).join('');
 
+  const deltaHeaders = hwBillingDeltaVisible ? `
+          <th style="text-align:right;opacity:.8" title="Jira billing % — snapshot más cercano al ${monSnapDate || metrics.range.from}">Mon&nbsp;%</th>
+          <th style="text-align:right" title="Jira billing % — snapshot más cercano al ${sunSnapDate || metrics.range.to}">Sun&nbsp;%</th>` : '';
+
   hwRenderHealthBadges(metrics.health_checks || []);
 
   body.innerHTML = `
@@ -7132,12 +7190,14 @@ function renderHarvestWeeklyReport() {
       <button class="btn btn-ghost btn-sm" onclick="hwExportReportTSV()" title="Copy as TSV">↓ TSV</button>
       <button class="btn btn-ghost btn-sm" id="hwCopySheetBtn" onclick="hwCopyForSheet()" title="Name · Total h · Client h · PTO h · Non-billable h — para pegar en la sheet">↓ Sheet</button>
       <button class="btn btn-ghost btn-sm" id="hwCopyBenchInternalBtn" onclick="hwCopyBenchInternal()" title="Bench + Internal Projects — Assignee · Hours · Project">↓ Bench/Internal</button>
+      <button class="btn btn-ghost btn-sm${hwBillingDeltaVisible ? ' btn-active' : ''}" id="hwBillingDeltaBtn" onclick="hwToggleBillingDelta()" title="Mostrar Billing % de Jira del lunes y domingo de la semana trackeada">± Mon/Sun</button>
     </div>
     <div class="hwr-table-wrap">
       <table>
         <thead><tr>
           <th>Name</th>
           <th style="text-align:right">Billing&nbsp;% (Jira)</th>
+          ${deltaHeaders}
           <th style="text-align:right">Total&nbsp;h</th>
           <th style="text-align:right">Client&nbsp;h</th>
           <th style="text-align:right">PTO&nbsp;h</th>
@@ -7306,23 +7366,26 @@ async function hwCopyBenchInternal() {
   const fmt = h => Number(h || 0).toFixed(2);
   const TAB = '\t', NL = '\n';
 
-  function expandRows(list, hoursKey, detailKey) {
+  // Use the per-person hoursKey as authoritative total (avoids rounding drift
+  // from summing individually-rounded detail values).
+  function expandRows(list, hoursKey, detailKey, moduleTotal) {
     const rows = [];
-    let total = 0;
+    let personTotal = 0;
     list.forEach(p => {
       const detail = p[detailKey] || {};
       const entries = Object.entries(detail).sort((a, b) => b[1] - a[1]);
+      const personHours = Number(p[hoursKey] || 0);
+      personTotal += personHours;
       if (entries.length) {
         entries.forEach(([proj, hrs]) => {
           rows.push([p.user_name, fmt(hrs), proj].join(TAB));
-          total += Number(hrs || 0);
         });
       } else {
-        const hrs = Number(p[hoursKey] || 0);
-        rows.push([p.user_name, fmt(hrs), ''].join(TAB));
-        total += hrs;
+        rows.push([p.user_name, fmt(personHours), ''].join(TAB));
       }
     });
+    // Use module-level total when available (ground truth); fall back to per-person sum.
+    const total = moduleTotal != null ? moduleTotal : personTotal;
     rows.push(['Total', fmt(total), ''].join(TAB));
     return rows;
   }
@@ -7335,13 +7398,13 @@ async function hwCopyBenchInternal() {
   const lines = [
     'BENCH' + TAB + TAB,
     ['Assignee', 'Hours', 'Project'].join(TAB),
-    ...expandRows(benchers, 'bench_hours', 'bench_detail'),
+    ...expandRows(benchers, 'bench_hours', 'bench_detail', metrics.internal_bench_hours),
     TAB + TAB,
     TAB + TAB,
     'INTERNAL PROJECTS' + TAB + TAB,
     TAB + TAB,
     ['Assignee', 'Hours', 'Project'].join(TAB),
-    ...expandRows(internals, 'internal_projects_hours', 'internal_projects_detail'),
+    ...expandRows(internals, 'internal_projects_hours', 'internal_projects_detail', metrics.internal_projects_logged_hours),
   ];
   const tsv = lines.join(NL);
   try {
