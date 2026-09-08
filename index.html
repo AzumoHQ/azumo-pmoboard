@@ -7366,17 +7366,20 @@ async function hwCopyBenchInternal() {
   const fmt = h => Number(h || 0).toFixed(2);
   const TAB = '\t', NL = '\n';
 
-  // Use the per-person hoursKey as authoritative total (avoids rounding drift
-  // from summing individually-rounded detail values).
   function expandRows(list, hoursKey, detailKey, moduleTotal) {
     const rows = [];
     let personTotal = 0;
     list.forEach(p => {
-      const detail = p[detailKey] || {};
-      const entries = Object.entries(detail).sort((a, b) => b[1] - a[1]);
       const personHours = Number(p[hoursKey] || 0);
       personTotal += personHours;
-      if (entries.length) {
+      const detail = p[detailKey] || {};
+      const entries = Object.entries(detail).sort((a, b) => b[1] - a[1]);
+      const detailSum = entries.reduce((s, [, v]) => s + Number(v || 0), 0);
+      // If detail sum differs from per-person total by more than 5%+0.1h,
+      // the detail is stale (from a previous week's snapshot). In that case,
+      // show the authoritative per-person total without project breakdown.
+      const stale = entries.length > 0 && Math.abs(detailSum - personHours) > Math.max(personHours * 0.05, 0.1);
+      if (!stale && entries.length) {
         entries.forEach(([proj, hrs]) => {
           rows.push([p.user_name, fmt(hrs), proj].join(TAB));
         });
@@ -7384,7 +7387,7 @@ async function hwCopyBenchInternal() {
         rows.push([p.user_name, fmt(personHours), ''].join(TAB));
       }
     });
-    // Use module-level total when available (ground truth); fall back to per-person sum.
+    // Module-level total is ground truth; fall back to sum of per-person totals.
     const total = moduleTotal != null ? moduleTotal : personTotal;
     rows.push(['Total', fmt(total), ''].join(TAB));
     return rows;
