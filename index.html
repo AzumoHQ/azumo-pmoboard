@@ -7130,6 +7130,7 @@ function renderHarvestWeeklyReport() {
     <div class="hw-filter-row">
       <span class="hw-meta">${people.length} people · ${wDays} working day${wDays !== 1 ? 's' : ''}</span>
       <button class="btn btn-ghost btn-sm" onclick="hwExportReportTSV()" title="Copy as TSV">↓ TSV</button>
+      <button class="btn btn-ghost btn-sm" id="hwCopySheetBtn" onclick="hwCopyForSheet()" title="Name · Total h · Client h · PTO h · Non-billable h — para pegar en la sheet">↓ Sheet</button>
     </div>
     <div class="hwr-table-wrap">
       <table>
@@ -7266,6 +7267,36 @@ function hwExportReportTSV() {
     URL.revokeObjectURL(url);
   });
 }
+
+async function hwCopyForSheet() {
+  const metrics = latest && latest.harvest_metrics;
+  const people = metrics && Array.isArray(metrics.by_person) ? metrics.by_person : null;
+  if (!people || !people.length) return;
+  const fmt = v => v != null ? Number(v).toFixed(2) : '0.00';
+  // Columnas: Name | Total h (D) | Client h (E) | PTO h (I) | Non-billable h (J)
+  // F, G, H son fórmulas en la sheet — no se incluyen para no pisar nada
+  const header = ['Name', 'Total h', 'Client h', 'PTO h', 'Non-billable h'].join('\t');
+  const lines = people.map(p => [
+    p.user_name,
+    fmt(p.committed_harvest_hours),
+    fmt(p.client_logged_hours),
+    fmt(p.total_off_hours),
+    fmt(p.non_billable_hours)
+  ].join('\t'));
+  const tsv = [header, ...lines].join('\n');
+  try {
+    await navigator.clipboard.writeText(tsv);
+    const btn = document.getElementById('hwCopySheetBtn');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(() => { btn.textContent = orig; }, 2000); }
+  } catch {
+    const blob = new Blob([tsv], { type: 'text/tab-separated-values' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'harvest-sheet.tsv'; a.click();
+    URL.revokeObjectURL(url);
+  }
+}
+window.hwCopyForSheet = hwCopyForSheet;
 
 let hwActiveTab = 'report';
 
