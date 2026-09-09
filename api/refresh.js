@@ -235,7 +235,7 @@ async function runRefresh(body = {}) {
   }
 
   const snapshot = buildSnapshot(parsed, overrides);
-  snapshot.activity_log = buildActivityLog(parsed.assignment_rows||[], previousSnapshot, parsed.psaProjects||[]);
+  snapshot.activity_log = buildActivityLog(parsed.assignment_rows||[], previousSnapshot, parsed.psaProjects||[], undefined, parsed.harvest_metrics);
   preservePreviousMetricFallbacks(snapshot, previousMetrics, explicitOverrideKeys, authoritativeMetricKeys);
   const refreshedAt = new Date().toISOString();
   const data = await saveSnapshot(snapshot, {

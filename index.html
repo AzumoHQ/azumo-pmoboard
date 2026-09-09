@@ -1199,7 +1199,7 @@ body:not(.light) .pmo-ov{
   --ov-chip-fg:#90E0EF;
   --ov-accent-text:#90E0EF;
 }
-body:not(.light) :is(#newSearchesTriage,#dashboard,#opsViews,#pmoActionCenter,#harvestAccess,#harvestWeekly,#accountCoverage,#dueDates,#pendingAssignments,#bench,#azumo,#harvestHours,#history,#forecast,#jiraProjects){
+body:not(.light) :is(#newSearchesTriage,#dashboard,#opsViews,#pmoActionCenter,#harvestAccess,#harvestWeekly,#accountCoverage,#dueDates,#pendingAssignments,#bench,#azumo,#harvestHours,#history,#forecast){
   --card:#10243F;
   --surf:#0D1E36;
   --brd:rgba(255,255,255,.12);
@@ -1228,6 +1228,37 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 .pm-fc-count{font-size:.82rem;font-weight:800}
 
 .hh-expand-row[data-hidden="true"]{display:none!important}
+.client-dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;padding:.25rem 0}
+.client-card{background:var(--bg-1);border:1px solid var(--brd);border-radius:12px;padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.6rem}
+.client-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem}
+.client-card-name{font-weight:700;font-size:.93rem;color:var(--txt);line-height:1.3}
+.client-team-rows{display:flex;flex-direction:column;gap:.28rem}
+.client-team-row{display:flex;align-items:baseline;gap:.45rem;font-size:.82rem}
+.client-team-role{font-weight:700;font-size:.68rem;min-width:2.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0}
+.client-devs{margin-top:.2rem}
+.client-devs summary{cursor:pointer;color:var(--muted);font-size:.77rem;user-select:none;list-style:none;display:flex;align-items:center;gap:.3rem}
+.client-devs summary::before{content:'›';font-size:.9rem;transition:transform .15s}
+details.client-devs[open] summary::before{transform:rotate(90deg)}
+.client-devs ul{margin:.35rem 0 0 1rem;padding:0;list-style:disc;color:var(--txt)}
+.client-devs li{font-size:.79rem;margin-bottom:.12rem;opacity:.82}
+.client-since{font-size:.73rem;color:var(--muted)}
+.client-card{cursor:pointer;transition:border-color .12s,background .12s}
+.client-card:hover{border-color:rgba(0,102,255,.35);background:rgba(0,102,255,.03)}
+.client-detail-back{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.82rem;padding:.2rem .4rem;border-radius:6px;margin-bottom:1.2rem;display:inline-flex;align-items:center;gap:.35rem;transition:color .12s}
+.client-detail-back:hover{color:var(--txt)}
+.client-detail-head{display:flex;align-items:center;gap:.75rem;margin-bottom:1.4rem;flex-wrap:wrap}
+.client-detail-name{font-size:1.3rem;font-weight:800;color:var(--txt);margin:0;line-height:1.2}
+.client-detail-sec{margin-bottom:1.4rem}
+.client-detail-sec-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding-bottom:.4rem;border-bottom:1px solid var(--brd);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+.client-lead-cards{display:flex;gap:.7rem;flex-wrap:wrap}
+.client-lead-card{background:rgba(0,102,255,.07);border:1px solid rgba(0,102,255,.18);border-radius:10px;padding:.75rem 1rem;min-width:110px}
+.client-lead-role{font-size:.63rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#60A5FA;margin-bottom:.25rem}
+.client-lead-name{font-size:.88rem;font-weight:600;color:var(--txt);line-height:1.3}
+.client-lead-empty{font-size:.82rem;color:var(--muted);font-style:italic}
+.client-detail-team-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.client-detail-team-table th{text-align:left;padding:.4rem .6rem;font-size:.72rem;font-weight:700;color:var(--muted);border-bottom:1px solid var(--brd);white-space:nowrap}
+.client-detail-team-table td{padding:.45rem .6rem;border-bottom:1px solid rgba(107,143,191,.1);color:var(--txt)}
+.client-detail-team-table tr:last-child td{border-bottom:0}
 </style>
 </head>
 <body class="auth-locked light">
@@ -1806,6 +1837,32 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   </div>
 </section>
 
+<!-- ── INFO HUB ──────────────────── -->
+<section id="infoHub">
+  <div class="sec-head">
+    <div class="sec-icon"><i class="ti ti-building"></i></div>
+    <h2>Client Directory</h2>
+    <div class="sec-tag">PM · CSM · TL per client</div>
+  </div>
+  <div class="qa-wrap">
+    <div id="clientDirToolbar" class="qa-toolbar" style="margin-bottom:1rem">
+      <label class="harvest-search">
+        <i class="ti ti-search"></i>
+        <input id="clientDirSearchInput" type="search" placeholder="Search client, PM, CSM or TL" oninput="setClientDirSearch(this.value)"/>
+      </label>
+      <div class="filter-field">
+        <label for="clientDirStatusFilter">Status</label>
+        <select id="clientDirStatusFilter" onchange="setClientDirStatusFilter(this.value)">
+          <option value="">All</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div id="clientDirGrid" class="client-dir-grid"></div>
+  </div>
+</section>
+
 <!-- ── DUE DATES ──────────────────── -->
 <section id="dueDates">
   <div class="sec-head">
@@ -1993,6 +2050,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <button class="hw-tab" id="hwTabBench" onclick="hwSwitchTab('bench')">Bench</button>
       <button class="hw-tab" id="hwTabInternal" onclick="hwSwitchTab('internal')">Internal</button>
       <button class="hw-tab" id="hwTabTeam" onclick="hwSwitchTab('team')">Team Summary</button>
+      <button class="hw-tab" id="hwTabControl" onclick="hwSwitchTab('control')">Control</button>
     </div>
     <div id="hwBody">
       <div class="hw-empty-state">No data yet — run a board refresh to populate this view.</div>
@@ -2000,26 +2058,11 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     <div id="hwBenchBody" style="display:none"></div>
     <div id="hwInternalBody" style="display:none"></div>
     <div id="hwTeamBody" style="display:none"></div>
+    <div id="hwControlBody" style="display:none"></div>
   </div>
 </section>
 
 <!-- ── JIRA PROJECTS ────────────────────────── -->
-<section id="jiraProjects">
-  <div class="sec-head compact-head">
-    <div class="sec-icon"><i class="ti ti-topology-star-ring"></i></div>
-    <h2>Jira Projects</h2>
-    <div class="sec-tag" id="jpFetchedTag">—</div>
-  </div>
-  <div class="tbl-wrap">
-    <div class="tbl-head">
-      <span class="badge badge-blue">Jira API · live</span>
-      <button class="btn btn-ghost btn-sm" id="jpLoadBtn" onclick="loadJiraProjects()">Load projects</button>
-    </div>
-    <div id="jpBody">
-      <div class="hw-empty-state">Click "Load projects" to fetch all Jira projects live from the API.</div>
-    </div>
-  </div>
-</section>
 
 <!-- ── FORECAST ────────────────────────────── -->
 <section id="forecast">
@@ -2108,6 +2151,9 @@ let harvestCollapsedClients = new Set();
 let accountCoverageSearch = '';
 let accountCoverageFilter = 'all';
 let accountCoverageStatusFilter = '';
+let clientDirSearch = '';
+let clientDirStatusFilter = '';
+let clientDirActive = null;
 let expandedAssignees = new Set();
 let expandedProjectManagers = new Set();
 const ACTION_STATE_KEY = 'pmo_action_center_state_v2';
@@ -2208,6 +2254,7 @@ function initDashboard(){
   renderHarvestAccess();
   renderHarvestWeeklyReport();
   renderAccountCoverageModule();
+  renderClientDirectory();
   renderDataTraceability();
   renderOpsViews();
   renderBench();
@@ -2589,6 +2636,9 @@ function renderOpsChartsMain(user) {
     
     +'</div>'
 
+    // PM OPERATIVE PROJECTS (populated async by renderOperativeOverview)
+    +'<div id="pmOperativeProjects"></div>'
+
     // ACTIONS
     +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
     +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/AA/form/150" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:12px;background:var(--highlight-blue);color:#fff;font-size:14px;font-weight:700;text-decoration:none"><i class=\"ti ti-plus\"></i>New Assignment</a>'
@@ -2596,6 +2646,93 @@ function renderOpsChartsMain(user) {
     +'<button onclick="goTo(\'opsViews\')" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:12px;background:var(--bg-1);border:1px solid var(--border-default);color:var(--fg-1);font-size:14px;font-weight:700;font-family:var(--font-sans);cursor:pointer"><i class=\"ti ti-compass\"></i>Operating Views</button>'
     +'</div>'
     +'</div>';
+
+  if (window.PMO_FLAGS && window.PMO_FLAGS.overviewOperative) renderOperativeOverview();
+}
+
+async function renderOperativeOverview() {
+  var slot = document.getElementById('pmOperativeProjects');
+  if (!slot) return;
+
+  slot.innerHTML = '<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:16px;padding:16px 20px;color:var(--fg-3);font-size:.83rem;display:flex;align-items:center;gap:8px"><i class="ti ti-loader-2"></i> Loading projects…</div>';
+
+  var data;
+  try {
+    var res = await fetch('/api/pm-overview');
+    if (!res.ok) { slot.innerHTML = ''; return; }
+    data = await res.json();
+  } catch(e) { slot.innerHTML = ''; return; }
+
+  var projects = (data && data.projects) || [];
+  if (!projects.length) { slot.innerHTML = ''; return; }
+
+  var today = new Date(); today.setHours(0,0,0,0);
+
+  function statusBadge(p) {
+    var st = String(p.status || '').trim();
+    if (st !== 'In Progress') {
+      return '<span style="background:rgba(107,143,191,.12);color:var(--fg-3);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px">' + esc(st || 'Unknown') + '</span>';
+    }
+    var reportAge = p.lastReport ? Math.floor((today - new Date(p.lastReport)) / 86400000) : null;
+    if (reportAge !== null && reportAge <= 30) {
+      return '<span style="background:rgba(16,185,129,.12);color:#34D399;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px">Active</span>';
+    }
+    if (reportAge === null) {
+      return '<span style="background:rgba(245,158,11,.12);color:#FCD34D;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px">No report</span>';
+    }
+    return '<span style="background:rgba(239,68,68,.12);color:#F87171;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px">Report overdue</span>';
+  }
+
+  var cards = projects.map(function(p) {
+    var billingBadge = p.billingPct != null
+      ? '<span style="background:rgba(0,102,255,.12);color:#60A5FA;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px">' + p.billingPct + '% billing</span>'
+      : '';
+    var reportLine = p.lastReport
+      ? '<div style="font-size:.74rem;color:var(--fg-3);margin-top:3px">Last report: ' + fmtDate(p.lastReport) + '</div>'
+      : '<div style="font-size:.74rem;color:var(--fg-3);margin-top:3px">No PSA report on file</div>';
+    var asns = p.assignments || [];
+    var asnHtml = asns.length === 0 ? '' :
+      '<details style="margin-top:10px">'
+      + '<summary style="cursor:pointer;font-size:.79rem;font-weight:700;color:var(--fg-2);display:flex;align-items:center;gap:6px;list-style:none">'
+      + '<i class="ti ti-users" style="font-size:.82rem;color:var(--fg-3)"></i>'
+      + asns.length + ' engineer' + (asns.length !== 1 ? 's' : '')
+      + '</summary>'
+      + '<div style="margin-top:8px;display:flex;flex-direction:column;gap:5px">'
+      + asns.map(function(a) {
+          var pctLabel = a.assignmentPct != null ? ' · ' + Math.round(a.assignmentPct) + '%' : '';
+          return '<div style="display:flex;align-items:center;gap:10px;padding:6px 10px;background:var(--bg-3);border-radius:8px">'
+            + '<div style="flex:1;min-width:0">'
+            + '<div style="font-size:.81rem;font-weight:700;color:var(--fg-1)">' + esc(a.name || '') + '</div>'
+            + '<div style="font-size:.71rem;color:var(--fg-3)">' + esc(a.position || '') + pctLabel + '</div>'
+            + '</div>'
+            + '<a href="https://azumohq.atlassian.net/jira/software/c/projects/AA/form/150" target="_blank" rel="noopener" style="flex-shrink:0;display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:7px;background:var(--bg-1);border:1px solid var(--border-subtle);color:var(--fg-2);font-size:.71rem;font-weight:700;text-decoration:none">Request change</a>'
+            + '</div>';
+        }).join('')
+      + '</div></details>';
+
+    return '<div style="background:var(--bg-2);border:1px solid var(--border-subtle);border-radius:12px;padding:14px 16px">'
+      + '<div style="display:flex;align-items:flex-start;gap:8px">'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-size:.9rem;font-weight:800;color:var(--fg-1)">' + esc(p.client || p.epicName || 'Unknown') + '</div>'
+      + (p.epicName && p.epicName !== p.client ? '<div style="font-size:.74rem;color:var(--fg-3);margin-top:1px">' + esc(p.epicName) + '</div>' : '')
+      + '</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex-shrink:0">'
+      + billingBadge + statusBadge(p)
+      + '</div>'
+      + '</div>'
+      + reportLine
+      + asnHtml
+      + '</div>';
+  }).join('');
+
+  slot.innerHTML = '<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:16px;padding:20px 24px">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">'
+    + '<i class="ti ti-briefcase" style="color:var(--fg-3)"></i>'
+    + '<span style="font-weight:800;font-size:15px;color:var(--fg-1)">My Projects</span>'
+    + '<span style="font-size:12px;color:var(--fg-3);margin-left:4px">' + projects.length + (projects.length === 1 ? ' project' : ' projects') + '</span>'
+    + '</div>'
+    + '<div style="display:flex;flex-direction:column;gap:10px">' + cards + '</div>'
+    + '</div>';
 }
 
 function renderAssignmentTimeline() {
@@ -2624,9 +2761,9 @@ function renderAssignmentTimeline() {
     return;
   }
 
-  const TYPE_ICON  = { new_assignment:'⊕', assignment_done:'✓', pct_change:'~', due_change:'◷', psa_report:'↑', pm_change:'→', status_change:'▶' };
-  const TYPE_COLOR = { new_assignment:'#6EE7B7', assignment_done:'var(--muted)', pct_change:'#FCD34D', due_change:'#FB923C', psa_report:'var(--blue-lt)', pm_change:'#C4B5FD', status_change:'#93C5FD' };
-  const TYPE_LABEL = { new_assignment:'New', assignment_done:'Done', pct_change:'Alloc', due_change:'Due', psa_report:'Report', pm_change:'PM', status_change:'Active' };
+  const TYPE_ICON  = { new_assignment:'⊕', assignment_done:'✓', pct_change:'~', due_change:'◷', psa_report:'↑', pm_change:'→', status_change:'▶', harvest_to_bench:'⬇', harvest_from_bench:'⬆', harvest_to_internal:'⤵', harvest_from_internal:'⤴', harvest_hours_edit:'✎' };
+  const TYPE_COLOR = { new_assignment:'#6EE7B7', assignment_done:'var(--muted)', pct_change:'#FCD34D', due_change:'#FB923C', psa_report:'var(--blue-lt)', pm_change:'#C4B5FD', status_change:'#93C5FD', harvest_to_bench:'#FDBA74', harvest_from_bench:'#6EE7B7', harvest_to_internal:'#A78BFA', harvest_from_internal:'#6EE7B7', harvest_hours_edit:'#FCD34D' };
+  const TYPE_LABEL = { new_assignment:'New', assignment_done:'Done', pct_change:'Alloc', due_change:'Due', psa_report:'Report', pm_change:'PM', status_change:'Active', harvest_to_bench:'→ Bench', harvest_from_bench:'→ Client', harvest_to_internal:'→ Internal', harvest_from_internal:'→ Client', harvest_hours_edit:'Harvest edit' };
 
   function dayKey(iso) { return new Date(iso).toLocaleDateString('en-CA'); }
   function dayLabel(iso) {
@@ -2776,8 +2913,8 @@ function sectionAllowedForCurrentRole(id){
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
   if(['executive','viewer','c-level','clevel','hr'].includes(role)) return true;
-  if(role === 'pm') return ['overview','opsViews','bench','forecast','harvestHours','harvestAccess','psaProjectStatus','accountCoverage','jiraProjects'].includes(id);
-  if(role === 'csm') return ['overview','opsViews','bench','accountCoverage','forecast','harvestHours','harvestAccess','jiraProjects'].includes(id);
+  if(role === 'pm') return ['overview','opsViews','bench','forecast','harvestHours','harvestAccess','psaProjectStatus','accountCoverage'].includes(id);
+  if(role === 'csm') return ['overview','opsViews','bench','accountCoverage','forecast','harvestHours','harvestAccess'].includes(id);
   if(role === 'tl') return ['overview','opsViews','accountCoverage','forecast'].includes(id);
   if(role === 'assignee') return ['overview','opsViews','forecast'].includes(id);
   return false;
@@ -2801,10 +2938,10 @@ const SECTION_ICON_MAP = {
   'forecast': 'ti-chart-arrows',
   'psaProjectStatus': 'ti-trending-up',
   'accountCoverage': 'ti-clipboard-list',
+  'infoHub': 'ti-building',
   'harvestHours': 'ti-stopwatch',
   'harvestAccess': 'ti-folders',
   'harvestWeekly': 'ti-users',
-  'jiraProjects': 'ti-topology-star-ring',
   'dashboard': 'ti-credit-card',
   'history': 'ti-trending-up',
   'newSearchesTriage': 'ti-search',
@@ -2847,7 +2984,7 @@ function sidebarNavConfig(){
     {id:'clientsGroup', icon:'', label:'Clients', children:[
       {id:'psaProjectStatus', icon:'<i class="ti ti-trending-up"></i>', label:'Project Status'},
       {id:'accountCoverage', icon:'<i class="ti ti-clipboard-list"></i>', label:'Accounts Coverage'},
-      {id:'jiraProjects', icon:'<i class="ti ti-topology-star-ring"></i>', label:'Jira Projects'}
+      {id:'infoHub', icon:'<i class="ti ti-building"></i>', label:'Client Directory'},
     ]},
     {id:'harvestGroup', icon:'', label:'Harvest', children:[
       {id:'harvestHours', icon:'<i class="ti ti-stopwatch"></i>', label:'Control'},
@@ -2868,7 +3005,7 @@ function currentModuleTabId(sections){
   const stored = localStorage.getItem(MODULE_TAB_KEY);
   if(sections.some(section => section.id === 'overview')) return 'overview';
   if(stored && sections.some(section => section.id === stored)) return stored;
-  const preferred = ['overview','opsViews','bench','azumo','pendingAssignments','dueDates','forecast','accountCoverage','jiraProjects','harvestHours','harvestAccess','dashboard','history','newSearchesTriage','harvestWeekly','pmoActionCenter'];
+  const preferred = ['overview','opsViews','bench','azumo','pendingAssignments','dueDates','forecast','accountCoverage','infoHub','harvestHours','harvestAccess','dashboard','history','newSearchesTriage','harvestWeekly','pmoActionCenter'];
   return preferred.find(id => sections.some(section => section.id === id)) || sections[0]?.id;
 }
 function moduleLeafItems(entry){
@@ -3497,8 +3634,8 @@ const METRIC_CFG = [
   {key:'freelancers',            label:'Freelancers',                   unit:'',   color:'#7C3AED', higherBetter:false, size:'small', target:'freelancers', hover:'freelancers'},
   {divider:'Team / client level'},
   {key:'active_clients',         label:'Active Clients',                unit:'',   color:'#7C3AED', higherBetter:true,  target:'clients', hover:'clients'},
-  {key:'utilization_assignment', label:'Utilization Rate (Assignment)', unit:'%',  color:'#10B981', higherBetter:true,  target:'headcount'},
-  {key:'utilization_billing',    label:'Utilization Rate (Billing)',    unit:'%',  color:'#10B981', higherBetter:true,  target:'billable'},
+  {key:'utilization_assignment', label:'Utilization Rate (Assignment)', unit:'%',  color:'#10B981', higherBetter:true,  target:'headcount', formula:'People with any active assignment ÷ total billable headcount'},
+  {key:'utilization_billing',    label:'Utilization Rate (Billing)',    unit:'%',  color:'#10B981', higherBetter:true,  target:'billable',   formula:'People with billing > 0 ÷ total billable headcount'},
   {key:'bench',                  label:'Bench',                         unit:'',   color:'#EF4444', higherBetter:false, src:'Jira', target:'bench', hover:'bench'},
   {key:'bench_rate',             label:'Bench (FTE)',                   unit:'',   color:'#EF4444', higherBetter:false, src:'Jira', target:'bench'},
   {key:'pending_assignments',    label:'Pending Assignments',           unit:'',   color:'#F59E0B', higherBetter:false, src:'Jira'},
@@ -3598,6 +3735,7 @@ function renderMetrics(){
       <div class="mc-top">
         <button class="mc-name metric-title-link" type="button" onclick='openMetricOperatingView(${jsArg(cfg.target || cfg.key)})'>${cfg.label}</button>
         ${cfg.src ? `<span style="font-size:.68rem;color:var(--muted);background:var(--surf);border:1px solid var(--brd);border-radius:4px;padding:1px 5px;">${cfg.src}</span>` : ''}
+        ${cfg.formula ? `<span style="position:relative;margin-left:auto;flex-shrink:0"><button style="background:none;border:none;color:var(--muted);cursor:help;padding:1px 4px;font-size:.8rem;opacity:.55;transition:opacity .12s;line-height:1" aria-label="Cómo se calcula" onmouseenter="var t=this.nextElementSibling;t.style.display='block';this.style.opacity='1'" onmouseleave="var t=this.nextElementSibling;t.style.display='none';this.style.opacity='.55'">ⓘ</button><span style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--card);border:1px solid var(--brd);border-radius:8px;padding:8px 10px;font-size:.73rem;color:var(--txt);min-width:220px;z-index:300;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.4);white-space:normal;text-align:left">${cfg.formula}</span></span>` : ''}
       </div>
       <div class="mc-val">${typeof cur === 'number' ? (cur % 1 !== 0 ? cur.toFixed(2) : cur) : '—'}<span class="mc-unit"> ${cfg.unit}</span></div>
       ${hoverHtml}
@@ -7387,15 +7525,21 @@ async function hwCopyBenchInternal() {
         rows.push([p.user_name, fmt(personHours), ''].join(TAB));
       }
     });
-    // Module-level total is ground truth; fall back to sum of per-person totals.
-    const total = moduleTotal != null ? moduleTotal : personTotal;
-    rows.push(['Total', fmt(total), ''].join(TAB));
+    rows.push(['Total', fmt(personTotal), ''].join(TAB));
     return rows;
   }
 
-  const benchers  = people.filter(p => Number(p.bench_hours || 0) > 0)
+  // If bench + internal > committed_harvest_hours + 1h, the by_person record is
+  // from a different week than the totals — exclude that person from per-person rows.
+  const isRecordStale = p => {
+    const nonBill = Number(p.bench_hours || 0) + Number(p.internal_projects_hours || 0);
+    const total   = Number(p.committed_harvest_hours || 0);
+    return total > 0 && nonBill > total + 1;
+  };
+
+  const benchers  = people.filter(p => Number(p.bench_hours || 0) > 0 && !isRecordStale(p))
                           .sort((a, b) => a.user_name.localeCompare(b.user_name));
-  const internals = people.filter(p => Number(p.internal_projects_hours || 0) > 0)
+  const internals = people.filter(p => Number(p.internal_projects_hours || 0) > 0 && !isRecordStale(p))
                           .sort((a, b) => a.user_name.localeCompare(b.user_name));
 
   const lines = [
@@ -7432,12 +7576,14 @@ function hwSwitchTab(tab) {
     bench:    document.getElementById('hwBenchBody'),
     internal: document.getElementById('hwInternalBody'),
     team:     document.getElementById('hwTeamBody'),
+    control:  document.getElementById('hwControlBody'),
   };
   const tabs = {
     report:   document.getElementById('hwTabReport'),
     bench:    document.getElementById('hwTabBench'),
     internal: document.getElementById('hwTabInternal'),
     team:     document.getElementById('hwTabTeam'),
+    control:  document.getElementById('hwTabControl'),
   };
   Object.entries(panels).forEach(([key, el]) => { if (el) el.style.display = key === tab ? '' : 'none'; });
   Object.entries(tabs).forEach(([key, el]) => { if (el) el.classList.toggle('active', key === tab); });
@@ -7445,6 +7591,7 @@ function hwSwitchTab(tab) {
   if (tab === 'bench')    renderHarvestWeeklyBench();
   if (tab === 'internal') renderHarvestWeeklyInternal();
   if (tab === 'team')     renderHarvestWeeklyTeam();
+  if (tab === 'control')  renderHarvestWeeklyControl();
 }
 
 function renderHarvestWeeklyTeam() {
@@ -7535,6 +7682,236 @@ function renderHarvestWeeklyTeam() {
   </div>`;
 }
 
+function renderHarvestWeeklyControl() {
+  const body = document.getElementById('hwControlBody');
+  if (!body) return;
+  const metrics = latest && latest.harvest_metrics;
+  const people  = metrics && Array.isArray(metrics.by_person) ? metrics.by_person : [];
+  if (!metrics || !metrics.committed_harvest_hours) {
+    body.innerHTML = '<div class="hw-empty-state">No data — run a board refresh to populate.</div>';
+    return;
+  }
+
+  const fmt2 = v => Number(v || 0).toFixed(2);
+  const round2 = v => Math.round(Number(v || 0) * 100) / 100;
+
+  // Module-level totals (ground truth — same snapshot, always consistent internally)
+  const modNonBill  = round2(Number(metrics.non_billable_hours || 0));
+  const modBench    = round2(Number(metrics.internal_bench_hours || 0));
+  const modInternal = round2(Number(metrics.internal_projects_logged_hours || 0));
+  const modSum      = round2(modBench + modInternal);
+  const diff        = round2(modNonBill - modSum);
+  const ok          = Math.abs(diff) < 0.05;
+
+  // Per-person sum of non_billable_hours — catches partial edits after a refresh
+  // (e.g. someone moved hours from billable to bench after the module totals were stored)
+  const personNonBillSum = round2(people.reduce((s, p) => s + Number(p.non_billable_hours || 0), 0));
+  const personVsModDiff  = round2(personNonBillSum - modNonBill);
+  const personVsModOk    = Math.abs(personVsModDiff) < 0.05;
+  // Who changed? people whose non_billable_hours ≠ round2(bench + internal)
+  const editedPeople = people.filter(p => {
+    const nb  = Number(p.non_billable_hours || 0);
+    const exp = round2(Number(p.bench_hours || 0) + Number(p.internal_projects_hours || 0));
+    return Math.abs(nb - exp) > 0.05 && (nb > 0 || exp > 0);
+  });
+
+  // Jira billing % lookup: max epic_billing from active In Progress rows per person
+  const jiraBillingByName = new Map();
+  for (const row of (latest && latest.assignment_rows ? latest.assignment_rows : [])) {
+    if (String(row.status || '').trim() !== 'In Progress') continue;
+    const aName = normalizeIdentity(row.assignee || row.name || '');
+    if (!aName) continue;
+    const b = Number(row.epic_billing || 0);
+    if (b > (jiraBillingByName.get(aName) || 0)) jiraBillingByName.set(aName, b);
+  }
+
+  // Per-person anomaly detection
+  const anomalies = [];
+  for (const p of people) {
+    const bench    = Number(p.bench_hours || 0);
+    const internal = Number(p.internal_projects_hours || 0);
+    const nonBill  = Number(p.non_billable_hours || 0);
+    const committed = Number(p.committed_harvest_hours || 0);
+    const expected = round2(bench + internal);
+
+    if (committed > 0 && (bench + internal) > committed + 1) {
+      anomalies.push({
+        name: p.user_name,
+        type: 'stale',
+        label: 'Stale record',
+        detail: `bench+internal = ${fmt2(bench + internal)}h › total = ${fmt2(committed)}h`
+      });
+    } else if (Math.abs(nonBill - expected) > 0.05 && (nonBill > 0 || expected > 0)) {
+      anomalies.push({
+        name: p.user_name,
+        type: 'mismatch',
+        label: 'Non-bill mismatch',
+        detail: `non_bill = ${fmt2(nonBill)}h ≠ bench+internal = ${fmt2(expected)}h`
+      });
+    }
+
+    // Cross-check: bench hours in Harvest but billing ≥ 80% in Jira
+    if (bench > 0) {
+      const jiraBilling = jiraBillingByName.get(normalizeIdentity(p.user_name)) ?? null;
+      if (jiraBilling !== null && jiraBilling >= 80) {
+        anomalies.push({
+          name: p.user_name,
+          type: 'billing_bench',
+          label: `Billing ${jiraBilling}% + bench`,
+          detail: `${fmt2(bench)}h bench logged, Jira billing = ${jiraBilling}%`
+        });
+      }
+    }
+  }
+
+  const diffCls  = ok ? 'is-pos' : 'is-neg';
+  const statusCls = ok ? 'is-pos' : 'is-neg';
+
+  const ctrlRow = (label, val, sub) => `
+    <tr>
+      <td style="padding:8px 12px;font-size:.82rem;color:var(--muted)">${label}</td>
+      <td style="padding:8px 12px;font-size:.82rem;font-weight:700;text-align:right;color:var(--fg)">${val}</td>
+      <td style="padding:8px 12px;font-size:.75rem;color:var(--muted)">${sub || ''}</td>
+    </tr>`;
+
+  const anomalyRows = anomalies.length === 0
+    ? `<tr><td colspan="3" style="padding:12px;font-size:.8rem;color:var(--muted);font-style:italic">No anomalies detected</td></tr>`
+    : anomalies.map(a => {
+        const chip = a.type === 'stale'
+          ? `<span style="background:rgba(251,191,36,.15);color:#FCD34D;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;padding:1px 8px;border-radius:999px">${a.label}</span>`
+          : a.type === 'billing_bench'
+          ? `<span style="background:rgba(239,68,68,.15);color:#F87171;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;padding:1px 8px;border-radius:999px">${a.label}</span>`
+          : `<span style="background:rgba(251,113,133,.15);color:#FCA5A5;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;padding:1px 8px;border-radius:999px">${a.label}</span>`;
+        return `<tr>
+          <td style="padding:8px 12px;font-size:.82rem;color:var(--fg)">${a.name}</td>
+          <td style="padding:8px 12px">${chip}</td>
+          <td style="padding:8px 12px;font-size:.78rem;color:var(--muted)">${a.detail}</td>
+        </tr>`;
+      }).join('');
+
+  const tblStyle = `width:100%;border-collapse:collapse;font-size:.82rem`;
+  const thStyle  = `padding:8px 12px;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--brd);text-align:left`;
+
+  // Hours balance check: billable + PTO + non-bill should equal committed total
+  const modBillable   = round2(Number(metrics.client_logged_hours || 0));
+  const modPTO        = round2(Number(metrics.total_off_hours || 0));
+  const modCommitted  = round2(Number(metrics.committed_harvest_hours || 0));
+  const balanceSum    = round2(modBillable + modPTO + modNonBill);
+  const balanceDiff   = round2(modCommitted - balanceSum);
+  const balanceOk     = Math.abs(balanceDiff) < 0.05;
+
+  body.innerHTML = `<div class="hw-team-wrap">
+
+    <div class="hw-team-section">
+      <div class="hw-team-section-label">Hours balance — Billable + PTO + Non-Bill = Committed total</div>
+      <div style="background:rgba(107,143,191,.05);border:1px solid var(--brd);border-radius:10px;overflow:hidden">
+        <table style="${tblStyle}">
+          <thead><tr>
+            <th style="${thStyle}">Item</th>
+            <th style="${thStyle};text-align:right">Hours</th>
+            <th style="${thStyle}">Notes</th>
+          </tr></thead>
+          <tbody>
+            ${ctrlRow('Client logged (billable)', fmt2(modBillable) + 'h', 'metrics.client_logged_hours')}
+            ${ctrlRow('PTO / time off', fmt2(modPTO) + 'h', 'metrics.total_off_hours')}
+            ${ctrlRow('Non-Billable (bench + internal)', fmt2(modNonBill) + 'h', 'metrics.non_billable_hours')}
+            <tr style="border-top:1px solid var(--brd)">
+              <td style="padding:8px 12px;font-size:.82rem;color:var(--muted)">Sum</td>
+              <td style="padding:8px 12px;font-size:.82rem;font-weight:700;text-align:right;color:var(--fg)">${fmt2(balanceSum)}h</td>
+              <td></td>
+            </tr>
+            <tr style="border-top:1px solid var(--brd)">
+              <td style="padding:8px 12px;font-size:.82rem;color:var(--muted)">Committed Harvest Hours (total)</td>
+              <td style="padding:8px 12px;font-size:.82rem;font-weight:700;text-align:right;color:var(--fg)">${fmt2(modCommitted)}h</td>
+              <td style="padding:8px 12px;font-size:.75rem;color:var(--muted)">metrics.committed_harvest_hours</td>
+            </tr>
+            <tr style="border-top:2px solid var(--brd)">
+              <td style="padding:10px 12px;font-size:.85rem;font-weight:800;color:var(--fg)">Difference</td>
+              <td style="padding:10px 12px;font-size:.95rem;font-weight:900;text-align:right" class="${balanceDiff === 0 ? 'is-pos' : (Math.abs(balanceDiff) < 0.05 ? 'is-pos' : 'is-neg')}">${balanceDiff >= 0 ? '+' : ''}${fmt2(balanceDiff)}h</td>
+              <td style="padding:10px 12px;font-size:.85rem;font-weight:800" class="${balanceOk ? 'is-pos' : 'is-neg'}">${balanceOk ? '✓ OK' : '✗ ERROR'}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="hw-team-section">
+      <div class="hw-team-section-label" style="display:flex;align-items:center;gap:8px">
+        Per-person sum vs module total
+        ${!personVsModOk ? `<span style="background:rgba(251,113,133,.2);color:#FCA5A5;font-size:.65rem;font-weight:900;padding:1px 8px;border-radius:999px">+${fmt2(Math.abs(personVsModDiff))}h drift</span>` : ''}
+      </div>
+      <div style="background:rgba(107,143,191,.05);border:1px solid var(--brd);border-radius:10px;overflow:hidden">
+        <table style="${tblStyle}">
+          <thead><tr>
+            <th style="${thStyle}">Item</th>
+            <th style="${thStyle};text-align:right">Hours</th>
+            <th style="${thStyle}">Notes</th>
+          </tr></thead>
+          <tbody>
+            ${ctrlRow('Sum of by_person non_billable_hours', fmt2(personNonBillSum) + 'h', 'reflects latest timesheet edits')}
+            ${ctrlRow('Module non_billable_hours', fmt2(modNonBill) + 'h', 'stored at refresh time')}
+            <tr style="border-top:2px solid var(--brd)">
+              <td style="padding:10px 12px;font-size:.85rem;font-weight:800;color:var(--fg)">Difference</td>
+              <td style="padding:10px 12px;font-size:.95rem;font-weight:900;text-align:right" class="${personVsModOk ? 'is-pos' : 'is-neg'}">${personVsModDiff >= 0 ? '+' : ''}${fmt2(personVsModDiff)}h</td>
+              <td style="padding:10px 12px;font-size:.85rem;font-weight:800" class="${personVsModOk ? 'is-pos' : 'is-neg'}">${personVsModOk ? '✓ OK' : '✗ Timesheet edited after refresh'}</td>
+            </tr>
+            ${!personVsModOk && editedPeople.length ? `<tr><td colspan="3" style="padding:8px 12px;font-size:.78rem;color:var(--muted)">
+              Affected: ${editedPeople.map(p => `<strong style="color:var(--fg)">${p.user_name}</strong> (non_bill=${fmt2(p.non_billable_hours)}h, bench+internal=${fmt2(Number(p.bench_hours||0)+Number(p.internal_projects_hours||0))}h)`).join(' · ')}
+            </td></tr>` : ''}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="hw-team-section">
+      <div class="hw-team-section-label">Non-Billable vs Bench + Internal</div>
+      <div style="background:rgba(107,143,191,.05);border:1px solid var(--brd);border-radius:10px;overflow:hidden">
+        <table style="${tblStyle}">
+          <thead><tr>
+            <th style="${thStyle}">Item</th>
+            <th style="${thStyle};text-align:right">Hours</th>
+            <th style="${thStyle}">Notes</th>
+          </tr></thead>
+          <tbody>
+            ${ctrlRow('Non-Billable — module total', fmt2(modNonBill) + 'h', 'metrics.non_billable_hours')}
+            ${ctrlRow('Bench total', fmt2(modBench) + 'h', 'metrics.internal_bench_hours')}
+            ${ctrlRow('Internal Projects total', fmt2(modInternal) + 'h', 'metrics.internal_projects_logged_hours')}
+            <tr style="border-top:1px solid var(--brd)">
+              <td style="padding:8px 12px;font-size:.82rem;color:var(--muted)">Bench + Internal</td>
+              <td style="padding:8px 12px;font-size:.82rem;font-weight:700;text-align:right;color:var(--fg)">${fmt2(modSum)}h</td>
+              <td></td>
+            </tr>
+            <tr style="border-top:2px solid var(--brd)">
+              <td style="padding:10px 12px;font-size:.85rem;font-weight:800;color:var(--fg)">Difference</td>
+              <td style="padding:10px 12px;font-size:.95rem;font-weight:900;text-align:right" class="${diffCls}">${diff >= 0 ? '+' : ''}${fmt2(diff)}h</td>
+              <td style="padding:10px 12px;font-size:.85rem;font-weight:800" class="${statusCls}">${ok ? '✓ OK' : '✗ ERROR'}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="hw-team-section">
+      <div class="hw-team-section-label" style="display:flex;align-items:center;gap:8px">
+        Per-person anomalies
+        ${anomalies.length > 0 ? `<span style="background:rgba(251,191,36,.2);color:#FCD34D;font-size:.65rem;font-weight:900;padding:1px 8px;border-radius:999px">${anomalies.length}</span>` : ''}
+      </div>
+      <div style="background:rgba(107,143,191,.05);border:1px solid var(--brd);border-radius:10px;overflow:hidden">
+        <table style="${tblStyle}">
+          <thead><tr>
+            <th style="${thStyle}">Name</th>
+            <th style="${thStyle}">Issue</th>
+            <th style="${thStyle}">Detail</th>
+          </tr></thead>
+          <tbody>${anomalyRows}</tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>`;
+}
+window.renderHarvestWeeklyControl = renderHarvestWeeklyControl;
+
 function hwToggleDrill(drillId, dataRow) {
   const drill = document.getElementById(drillId);
   if (!drill) return;
@@ -7550,6 +7927,7 @@ window.hwToggleDrill = hwToggleDrill;
 window.hwExportReportTSV = hwExportReportTSV;
 window.hwSwitchTab = hwSwitchTab;
 window.renderHarvestWeeklyTeam = renderHarvestWeeklyTeam;
+window.renderHarvestWeeklyControl = renderHarvestWeeklyControl;
 
 async function loadHarvestWeek() {
   const fromInput = document.getElementById('hwWeekFrom');
@@ -7591,6 +7969,7 @@ async function loadHarvestWeek() {
     if (hwActiveTab === 'bench')    renderHarvestWeeklyBench();
     if (hwActiveTab === 'internal') renderHarvestWeeklyInternal();
     if (hwActiveTab === 'team')     renderHarvestWeeklyTeam();
+    if (hwActiveTab === 'control')  renderHarvestWeeklyControl();
   } catch (err) {
     alert('Could not load that week: ' + err.message);
   } finally {
@@ -8305,6 +8684,206 @@ function renderPsaProjectStatusModule(){
   }).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No projects found.</td></tr>';
 }
 
+const INFO_HUB_COVERAGE = [
+  {client:'Screenwave Media', csm:'Lenin Salazar', responsable:'Pablo Bizzotto', pm:'Desi Pepermans', start:'2025-03-25', status:'Active', tl:'Gaspar Pollano'},
+  {client:'Spinwheel Solutions', csm:'', responsable:'Martin Calvo', pm:'Antonella Grasso', start:'2025-03-25', status:'Active', tl:'Martin Li Causi'},
+  {client:'Alkalight', csm:'Mauricio Besse', responsable:'Martin Calvo', pm:'Micaela Goicoechea', start:'2025-04-10', status:'Active', tl:'Martin Perez'},
+  {client:'Angle Health', csm:'Lenin Salazar', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'2025-04-10', status:'Active', tl:''},
+  {client:'Syntrove', csm:'Matias Margossian', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'2025-04-10', status:'Active', tl:'Martin Li Causi'},
+  {client:'Zynga Inc', csm:'Lenin Salazar', responsable:'Martin Calvo', pm:'Jennifer Greyling', start:'2025-10-21', status:'Active', tl:'Gaspar Pollano, Martin Isla'},
+  {client:'NLX', csm:'Jenna Barna', responsable:'Pablo Bizzotto', pm:'Eliana Naveira', start:'2025-04-10', status:'Inactive', tl:'Luis Duque'},
+  {client:'Brierstone', csm:'Matias Margossian', responsable:'Pablo Bizzotto', pm:'Graciela Kremer', start:'2025-06-16', status:'Inactive', tl:'Martin Calvo'},
+  {client:'Alpine', csm:'Jenna Barna', responsable:'Martin Calvo', pm:'Natalia Alarcon', start:'2025-06-16', status:'Inactive', tl:'Miguel Godoy'},
+  {client:'Bitumio LLC', csm:'Matias Margossian', responsable:'Federica Gonzalez', pm:'Marcos Dlugovitzky', start:'2025-06-16', status:'Inactive', tl:'Ronald Castillo'},
+  {client:'CompuClaim', csm:'Matias Margossian', responsable:'Mauricio Besse', pm:'Roberta Ferreira', start:'2025-06-16', status:'Active', tl:'Wilmy Gonzalez'},
+  {client:'Moti', csm:'Matias Margossian', responsable:'Matias Margossian', pm:'Graciela Kremer', start:'2025-06-16', status:'Inactive', tl:'Juan Ledesma'},
+  {client:'Nacurh', csm:'Lenin Salazar', responsable:'Federica Gonzalez', pm:'Laura Pimper', start:'2025-06-16', status:'Inactive', tl:''},
+  {client:'Algin2Fit', csm:'Lenin Salazar', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'2025-06-16', status:'Inactive', tl:'Martin Calvo'},
+  {client:'Azumo - Valkyrie', csm:'Jenna Barna', responsable:'Pablo Bizzotto', pm:'Roberta Ferreira', start:'2025-04-10', status:'Active', tl:'Paulo Omena'},
+  {client:'DataRipple', csm:'Jenna Barna', responsable:'Pablo Bizzotto', pm:'Laura Pimper', start:'', status:'Inactive', tl:'Victor Rodriguez'},
+  {client:'Fairwater', csm:'Jenna Barna', responsable:'Federica Gonzalez', pm:'Micaela Goicoechea', start:'', status:'Active', tl:'Jesus Ibanez'},
+  {client:'nVenue', csm:'', responsable:'Martin Calvo', pm:'Lean Lacave', start:'', status:'Active', tl:'Manuel Alfonso'},
+  {client:'Riley ABA', csm:'Jenna Barna', responsable:'Federica Gonzalez', pm:'Natalia Alarcon', start:'', status:'Inactive', tl:'Rommel Berrios'},
+  {client:'Carwire', csm:'Lenin Salazar', responsable:'Martin Calvo', pm:'Desi Pepermans', start:'', status:'Active', tl:'Facundo Fumaneri'},
+  {client:'Finstrat', csm:'Matias Margossian', responsable:'Martin Calvo', pm:'Micaela Goicoechea', start:'', status:'Inactive', tl:''},
+  {client:'Workleap', csm:'Matias Margossian', responsable:'Federica Gonzalez', pm:'Jennifer Greyling', start:'2025-10-21', status:'Inactive', tl:'Carlos Perez'},
+  {client:'Azumo - Charlibot', csm:'', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'', status:'Active', tl:'Luis Duque'},
+  {client:'Jostens', csm:'Lenin Salazar', responsable:'Roberta Ferreira', pm:'Graciela Kremer', start:'', status:'Active', tl:''},
+  {client:'Stovell', csm:'Matias Margossian', responsable:'Federica Gonzalez', pm:'Eliana Naveira', start:'2025-10-21', status:'Active', tl:''},
+  {client:'Command Investigations', csm:'Matias Margossian', responsable:'Mauricio Besse', pm:'Roberta Ferreira', start:'2025-10-21', status:'Active', tl:'Jorge Sandoval'},
+  {client:'Brierstone (new)', csm:'Matias Margossian', responsable:'Martin Calvo', pm:'Micaela Goicoechea', start:'2025-12-05', status:'Active', tl:'Fabio Bocampagni'},
+  {client:'NGL', csm:'', responsable:'Martin Calvo', pm:'Jennifer Greyling', start:'', status:'Active', tl:'Guillermo Germade'},
+  {client:'SurvivorNet', csm:'Lenin Salazar', responsable:'Mauricio Besse', pm:'Micaela Goicoechea', start:'', status:'Active', tl:'David gonzalez'},
+  {client:'Centegix', csm:'Matias Margossian', responsable:'Mauricio Besse', pm:'Antonella Grasso', start:'', status:'Active', tl:'Victor Meza, Hector Nail'},
+  {client:'Bonzai', csm:'Shivam Bawa', responsable:'Federica Gonzalez', pm:'Laura Pimper', start:'', status:'Inactive', tl:'Guillermo Acosta'},
+  {client:'Standard Normal', csm:'', responsable:'Mauricio Besse', pm:'Roberta Ferreira', start:'', status:'Active', tl:'Martin Li Causi'},
+  {client:'CSSI', csm:'', responsable:'Federica Gonzalez', pm:'Graciela Kremer', start:'', status:'Active', tl:''},
+  {client:'Build to Sell - Value Builder', csm:'Matias Margossian', responsable:'Pablo Bizzotto', pm:'Lean Lacave', start:'', status:'Active', tl:'Pamela Alvarez'},
+  {client:'Solea IA', csm:'', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'', status:'Active', tl:''},
+  {client:'Phaidon', csm:'', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'', status:'Active', tl:''},
+  {client:'Profusa', csm:'', responsable:'Federica Gonzalez', pm:'Micaela Goicoechea', start:'', status:'Active', tl:''},
+  {client:'Wrenchwise', csm:'', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'', status:'Active', tl:''},
+  {client:'Window World', csm:'Lenin Salazar', responsable:'Federica Gonzalez', pm:'cesar.ramirez', start:'', status:'Active', tl:''},
+  {client:'Azumo - Website', csm:'', responsable:'Pablo Bizzotto', pm:'Roberta Ferreira', start:'', status:'Active', tl:'Martin Calvo'}
+];
+function setClientDirSearch(value){
+  clientDirSearch = String(value || '');
+  renderClientDirectory();
+}
+function setClientDirStatusFilter(value){
+  clientDirStatusFilter = value || '';
+  renderClientDirectory();
+}
+function setClientDirActive(name){
+  clientDirActive = name || null;
+  const toolbar = document.getElementById('clientDirToolbar');
+  if(toolbar) toolbar.style.display = clientDirActive ? 'none' : '';
+  renderClientDirectory();
+}
+function renderClientDirectory(){
+  const grid = document.getElementById('clientDirGrid');
+  if(!grid) return;
+
+  if(clientDirActive !== null){
+    const r = INFO_HUB_COVERAGE.find(x => x.client === clientDirActive);
+    if(r){ renderClientDetail(grid, r); return; }
+    clientDirActive = null;
+  }
+
+  const search = clientDirSearch.trim().toLowerCase();
+  let rows = INFO_HUB_COVERAGE;
+  if(search) rows = rows.filter(r => [r.client,r.csm,r.pm,r.tl,r.responsable].join(' ').toLowerCase().includes(search));
+  if(clientDirStatusFilter) rows = rows.filter(r => r.status === clientDirStatusFilter);
+
+  const teamByClient = new Map();
+  const assignRows = latest && latest.assignment_rows ? latest.assignment_rows : [];
+  for(const row of assignRows){
+    if(!row.client) continue;
+    const cn = row.client.trim();
+    if(!teamByClient.has(cn)) teamByClient.set(cn, new Set());
+    if(row.assignee) teamByClient.get(cn).add(row.assignee);
+  }
+
+  const activeBadge = '<span class="badge badge-green" style="font-size:.68rem;padding:0 8px">Active</span>';
+  const inactiveBadge = '<span class="badge" style="font-size:.68rem;padding:0 8px;background:rgba(107,143,191,.13);color:var(--muted)">Inactive</span>';
+
+  const teamRow = (role, name) => name ? `<div class="client-team-row">
+    <span class="client-team-role">${role}</span>
+    <span>${esc(name)}</span>
+  </div>` : '';
+
+  if(!rows.length){
+    grid.innerHTML = '<p style="color:var(--muted);padding:.5rem 0;grid-column:1/-1">No clients match the filter.</p>';
+    return;
+  }
+
+  grid.innerHTML = rows.map(r => {
+    const rk = normalizeClientKey(r.client);
+    const allTeam = [...assignRows.reduce((s, row) => {
+      if(!row.client || !row.assignee) return s;
+      const jk = normalizeClientKey(row.client);
+      if(jk === rk || jk.startsWith(rk) || rk.startsWith(jk)) s.add(row.assignee);
+      return s;
+    }, new Set())];
+    const devTeam = allTeam.filter(n => {
+      const ni = normalizeIdentity(n);
+      return ni !== normalizeIdentity(r.pm) && ni !== normalizeIdentity(r.tl);
+    });
+    const teamHtml = devTeam.length ? `<details class="client-devs">
+      <summary>${devTeam.length} team member${devTeam.length !== 1 ? 's' : ''}</summary>
+      <ul>${devTeam.map(n => `<li>${esc(n)}</li>`).join('')}</ul>
+    </details>` : '';
+    const since = r.start ? `<div class="client-since">Since ${fmtDate(r.start)}</div>` : '';
+    return `<div class="client-card" onclick="setClientDirActive(${jsArg(r.client)})">
+      <div class="client-card-head">
+        <span class="client-card-name">${esc(r.client)}</span>
+        ${r.status === 'Active' ? activeBadge : inactiveBadge}
+      </div>
+      <div class="client-team-rows">
+        ${teamRow('PM', r.pm)}
+        ${teamRow('CSM', r.csm)}
+        ${teamRow('TL', r.tl)}
+        ${r.responsable && normalizeIdentity(r.responsable) !== normalizeIdentity(r.pm) ? teamRow('Resp', r.responsable) : ''}
+      </div>
+      ${teamHtml}
+      ${since}
+    </div>`;
+  }).join('');
+
+  const si = document.getElementById('clientDirSearchInput');
+  if(si && si.value !== clientDirSearch) si.value = clientDirSearch;
+  const sf = document.getElementById('clientDirStatusFilter');
+  if(sf && sf.value !== clientDirStatusFilter) sf.value = clientDirStatusFilter;
+}
+function renderClientDetail(grid, r){
+  const assignRows = latest && latest.assignment_rows ? latest.assignment_rows : [];
+  const rk = normalizeClientKey(r.client);
+  const seen = new Set();
+  const teamRows = assignRows.filter(row => {
+    if(!row.client || !row.assignee) return false;
+    const jk = normalizeClientKey(row.client);
+    return (jk === rk || jk.startsWith(rk) || rk.startsWith(jk))
+      && String(row.status || '').trim().toLowerCase() === 'in progress';
+  }).filter(row => {
+    const k = normalizeIdentity(row.assignee);
+    if(seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+
+  const activeBadge = '<span class="badge badge-green" style="font-size:.68rem;padding:0 8px">Active</span>';
+  const inactiveBadge = '<span class="badge" style="font-size:.68rem;padding:0 8px;background:rgba(107,143,191,.13);color:var(--muted)">Inactive</span>';
+
+  const leadCard = (role, name) => `<div class="client-lead-card">
+    <div class="client-lead-role">${role}</div>
+    ${name ? `<div class="client-lead-name">${esc(name)}</div>` : '<div class="client-lead-empty">—</div>'}
+  </div>`;
+
+  const teamTable = teamRows.length ? `<table class="client-detail-team-table">
+    <thead><tr><th>Name</th><th>Position</th><th>Assignment</th><th>Billing</th></tr></thead>
+    <tbody>${teamRows.map(row => {
+      const pct = rowAssignmentPct(row);
+      const bill = rowBillingPct(row) ?? row.epic_billing ?? '';
+      return `<tr>
+        <td style="font-weight:600">${esc(row.assignee)}</td>
+        <td style="color:var(--muted)">${esc(row.position || '—')}</td>
+        <td>${pct != null ? fmtPct(pct) : '—'}</td>
+        <td>${bill !== '' ? fmtPct(bill) : '—'}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>` : '<p style="color:var(--muted);font-size:.82rem;margin:0">No active Jira assignments found for this client.</p>';
+
+  const since = r.start ? `<div class="client-since" style="margin-top:.5rem">Client since ${fmtDate(r.start)}</div>` : '';
+  const resp = r.responsable && normalizeIdentity(r.responsable) !== normalizeIdentity(r.pm)
+    ? `<div class="client-detail-sec">
+        <div class="client-detail-sec-label"><i class="ti ti-id-badge"></i> Account Lead</div>
+        <div style="font-size:.88rem;font-weight:600;color:var(--txt)">${esc(r.responsable)}</div>
+      </div>` : '';
+
+  grid.innerHTML = `<div style="grid-column:1/-1">
+    <button class="client-detail-back" onclick="setClientDirActive(null)">
+      <i class="ti ti-arrow-left"></i> Back to directory
+    </button>
+    <div class="client-detail-head">
+      <h2 class="client-detail-name">${esc(r.client)}</h2>
+      ${r.status === 'Active' ? activeBadge : inactiveBadge}
+    </div>
+    <div class="client-detail-sec">
+      <div class="client-detail-sec-label"><i class="ti ti-users"></i> Leadership</div>
+      <div class="client-lead-cards">
+        ${leadCard('PM', r.pm)}
+        ${leadCard('CSM', r.csm)}
+        ${leadCard('TL', r.tl)}
+      </div>
+      ${since}
+    </div>
+    ${resp}
+    <div class="client-detail-sec">
+      <div class="client-detail-sec-label"><i class="ti ti-user-check"></i> Active Team</div>
+      ${teamTable}
+    </div>
+  </div>`;
+}
 function renderAccountCoverageModule(){
   if(!latest) return;
   const sourceTag = document.getElementById('accountCoverageTag');
