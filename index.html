@@ -1883,7 +1883,7 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
         <span style="font-size:.75rem;color:var(--muted)">Upcoming from Jira due dates</span>
       </div>
     </div>
-    <div style="max-height:420px;overflow-y:auto"><table><thead><tr><th>Assignee</th><th>Client</th><th>Position</th><th>Due Date</th></tr></thead><tbody id="expiringTbody"></tbody></table></div>
+    <div style="max-height:420px;overflow-y:auto"><table><thead><tr><th>Assignee</th><th>Client</th><th>Position</th><th>Due Date</th><th>Assignment</th></tr></thead><tbody id="expiringTbody"></tbody></table></div>
   </div>
 </section>
 
@@ -4760,7 +4760,7 @@ function buildClientDataQuality(){
     check('missing_project_manager','Missing Project Manager','warning', rows.filter(row => isExternalInProgress(row) && !row.project_manager), 'External client assignments should have a PM for escalation and Slack reminders.'),
     check('zero_assignment_pct','In-progress rows with 0% assignment','warning', rows.filter(row => row.status === 'In Progress' && row.client && !isBenchRow(row) && rowAssignmentPct(row) === 0), 'Assignment (%) should be populated for active capacity calculations.'),
     check('external_zero_billing','External assignments with Billing 0','warning', externalZeroBillingRows(rows), 'List people with Billing 0 while assigned to a real client. Bench and Azumo are excluded.'),
-    check('account_coverage_gaps','Account Coverage gaps','warning', coverage.filter(row => row.complete === false || (row.missing || []).length), 'PSA account coverage should include PM, CSM, and TL where applicable.'),
+    check('account_coverage_gaps','Account Coverage gaps','warning', accountCoverageRows().filter(row => !row.complete), 'PSA account coverage should include PM, CSM, and TL where applicable.'),
     check('client_source_mismatch','PSA clients vs Operating Views','warning', clientSourceMismatchRows(rows, coverage), 'Clients in Jira PSA should match the external active clients feeding Operating Views from AA.'),
     check('epic_due_before_child_due','Epic due date before child assignment due date','warning', buildEpicDueBeforeChildDueRows(rows), 'The Epic due date should be equal to or later than the furthest In Progress child Assignment due date.'),
     check('bench_residual_mismatch','Bench assignment percent does not match residual capacity','error', benchResidualMismatchRows(rows), 'Active Bench should equal 100% minus all active non-Bench assignments for the same person, including Azumo/internal work. Correct Jira if the Bench issue percent differs.')
@@ -4768,12 +4768,12 @@ function buildClientDataQuality(){
   const snapshotChecks = latest.data_quality?.checks || [];
   const harvestChecks = snapshotChecks.filter(item => String(item.id || '').startsWith('harvest_'));
   if(harvestChecks.length && !checks.some(existing => existing.id === 'harvest_access_inconsistencies')){
-    const count = harvestChecks.reduce((sum,item)=>sum + Number(item.count || 0), 0);
     const rows = harvestChecks.flatMap(item => (item.rows || []).map(row => ({
       ...row,
       reason: row.reason || item.label || 'Harvest / Jira mismatch',
       harvest_check: item.label || item.id || 'Harvest QA'
     })));
+    const count = new Set(rows.map(row => normalizeIdentity(row.assignee || row.name || row.harvest_user || '')).filter(Boolean)).size;
     checks.push({
       id:'harvest_access_inconsistencies',
       label:'Harvest/Jira access',
@@ -6073,12 +6073,17 @@ function normalizeIdentity(value){
     .toLowerCase()
     .replace(/\s+/g,' ');
 }
+const CLIENT_KEY_CANONICAL = {
+  'thealdridgegrouptagtag': 'tagthealdridgegroup',
+  'thealdridgegrouptag':    'tagthealdridgegroup',
+};
 function normalizeClientKey(value){
-  return String(value || '')
+  const raw = String(value || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g,'')
     .toLowerCase()
     .replace(/[^a-z0-9]/g,'');
+  return CLIENT_KEY_CANONICAL[raw] || raw;
 }
 function jsArg(value){
   return JSON.stringify(String(value ?? '')).replace(/</g,'\\u003c');
@@ -6211,7 +6216,8 @@ function renderExpiring(){
     <td style="color:var(--muted);font-size:.8rem">${esc(e.client)}</td>
     <td style="color:var(--muted);font-size:.75rem">${esc(e.position)}</td>
     <td><span class="${expCls(e.due)}">${fmtDate(e.due)}</span></td>
-  </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--muted)">No upcoming assignment due dates found.</td></tr>';
+    <td style="font-size:.78rem">${e.key ? sowLink(e) : '<span style="color:var(--muted)">—</span>'}</td>
+  </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;padding:1rem;color:var(--muted)">No upcoming assignment due dates found.</td></tr>';
 }
 
 function slackMentionName(name){
