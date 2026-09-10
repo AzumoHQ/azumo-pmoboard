@@ -1963,8 +1963,8 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
     <div class="harvest-hours-controls">
       <div class="filter-field"><label for="hhDateFrom">From</label><input id="hhDateFrom" type="date"/></div>
       <div class="filter-field"><label for="hhDateTo">To</label><input id="hhDateTo" type="date"/></div>
-      <div class="filter-field"><label for="hhExpectedHours">Weekly expected hours</label><input id="hhExpectedHours" type="number" min="1" max="80" value="40"/></div>
-      <div class="filter-field"><label for="hhThreshold">Complete threshold %</label><input id="hhThreshold" type="number" min="1" max="100" value="90"/></div>
+      <div class="filter-field"><label for="hhExpectedHours">Weekly expected hours</label><input id="hhExpectedHours" type="number" min="1" max="80" value="40" oninput="localStorage.setItem('hh_weekly_expected',this.value)"/></div>
+      <div class="filter-field"><label for="hhThreshold">Complete threshold %</label><input id="hhThreshold" type="number" min="1" max="100" value="90" oninput="localStorage.setItem('hh_threshold',this.value)"/></div>
       <button class="btn btn-primary" id="hhRunButton" type="button" onclick="runHarvestHoursReport()">Generate report</button>
     </div>
     <div class="harvest-hours-controls hh-filter-row" id="hhFilterRow" style="display:none">
@@ -2095,7 +2095,10 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
       </div>
       <div class="filter-field">
         <label for="forecastAssigneeFilter">Assignee</label>
-        <select id="forecastAssigneeFilter" onchange="setForecastFilter('assignee', this.value)"></select>
+        <label class="harvest-search" style="min-width:180px">
+          <i class="ti ti-search"></i>
+          <input id="forecastAssigneeFilter" type="search" placeholder="Filter assignee…" oninput="setForecastFilter('assignee',this.value)" style="width:100%"/>
+        </label>
       </div>
       <button class="btn btn-ghost" type="button" id="forecastResetFilters" onclick="resetForecastFilters()">Reset filters</button>
       <div class="forecast-filter-summary" id="forecastFilterSummary">—</div>
@@ -3735,7 +3738,7 @@ function renderMetrics(){
       <div class="mc-top">
         <button class="mc-name metric-title-link" type="button" onclick='openMetricOperatingView(${jsArg(cfg.target || cfg.key)})'>${cfg.label}</button>
         ${cfg.src ? `<span style="font-size:.68rem;color:var(--muted);background:var(--surf);border:1px solid var(--brd);border-radius:4px;padding:1px 5px;">${cfg.src}</span>` : ''}
-        ${cfg.formula ? `<span style="position:relative;margin-left:auto;flex-shrink:0"><button style="background:none;border:none;color:var(--muted);cursor:help;padding:1px 4px;font-size:.8rem;opacity:.55;transition:opacity .12s;line-height:1" aria-label="Cómo se calcula" onmouseenter="var t=this.nextElementSibling;t.style.display='block';this.style.opacity='1'" onmouseleave="var t=this.nextElementSibling;t.style.display='none';this.style.opacity='.55'">ⓘ</button><span style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--card);border:1px solid var(--brd);border-radius:8px;padding:8px 10px;font-size:.73rem;color:var(--txt);min-width:220px;z-index:300;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.4);white-space:normal;text-align:left">${cfg.formula}</span></span>` : ''}
+        ${cfg.formula ? `<span style="position:relative;margin-left:auto;flex-shrink:0"><button style="background:none;border:none;color:var(--muted);cursor:help;padding:1px 4px;font-size:.8rem;opacity:.55;transition:opacity .12s;line-height:1" aria-label="How it's calculated" onmouseenter="var t=this.nextElementSibling;t.style.display='block';this.style.opacity='1'" onmouseleave="var t=this.nextElementSibling;t.style.display='none';this.style.opacity='.55'">ⓘ</button><span style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--card);border:1px solid var(--brd);border-radius:8px;padding:8px 10px;font-size:.73rem;color:var(--txt);min-width:220px;z-index:300;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.4);white-space:normal;text-align:left">${cfg.formula}</span></span>` : ''}
       </div>
       <div class="mc-val">${typeof cur === 'number' ? (cur % 1 !== 0 ? cur.toFixed(2) : cur) : '—'}<span class="mc-unit"> ${cfg.unit}</span></div>
       ${hoverHtml}
@@ -6294,6 +6297,12 @@ function initHarvestHoursDefaults(){
   friday.setDate(monday.getDate() + 4);
   if(!from.value) from.value = hhFormatIsoDate(monday);
   if(!to.value) to.value = hhFormatIsoDate(friday);
+  const expectedEl = document.getElementById('hhExpectedHours');
+  const thresholdEl = document.getElementById('hhThreshold');
+  const savedExpected = localStorage.getItem('hh_weekly_expected');
+  const savedThreshold = localStorage.getItem('hh_threshold');
+  if(expectedEl && savedExpected) expectedEl.value = savedExpected;
+  if(thresholdEl && savedThreshold) thresholdEl.value = savedThreshold;
 }
 function setHarvestHoursStatus(message, type="info"){
   const el = document.getElementById("hhStatus");
@@ -7154,7 +7163,7 @@ async function copyHarvestHoursTSV(){
     const btn = document.getElementById('hhCopyTsvBtn');
     if(btn){ const orig = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(() => { btn.textContent = orig; }, 2000); }
   } catch {
-    prompt('Copiá esto y pegalo en tu spreadsheet:', tsv);
+    prompt('Copy and paste into your spreadsheet:', tsv);
   }
 }
 async function copyHarvestHoursSlack(){
@@ -7323,8 +7332,8 @@ function renderHarvestWeeklyReport() {
   }).join('');
 
   const deltaHeaders = hwBillingDeltaVisible ? `
-          <th style="text-align:right;opacity:.8" title="Jira billing % — snapshot más cercano al ${monSnapDate || metrics.range.from}">Mon&nbsp;%</th>
-          <th style="text-align:right" title="Jira billing % — snapshot más cercano al ${sunSnapDate || metrics.range.to}">Sun&nbsp;%</th>` : '';
+          <th style="text-align:right;opacity:.8" title="Jira billing % — nearest snapshot to ${monSnapDate || metrics.range.from}">Mon&nbsp;%</th>
+          <th style="text-align:right" title="Jira billing % — nearest snapshot to ${sunSnapDate || metrics.range.to}">Sun&nbsp;%</th>` : '';
 
   hwRenderHealthBadges(metrics.health_checks || []);
 
@@ -9290,13 +9299,13 @@ function renderForecastFilterControls(){
     const count = scopedForecastRows(rows || []).filter(row => {
       return (!forecastFilters.client || (row.client || '') === forecastFilters.client)
         && (!forecastFilters.position || (row.position || '') === forecastFilters.position)
-        && (!forecastFilters.assignee || (row.assignee || '') === forecastFilters.assignee);
+        && (!forecastFilters.assignee || (row.assignee || '').toLowerCase().includes(forecastFilters.assignee.toLowerCase()));
     }).length;
     if(count) monthCounts.set(month, count);
   });
   if(forecastFilters.client && !clientCounts.has(forecastFilters.client)) forecastFilters.client = '';
   if(forecastFilters.position && !positionCounts.has(forecastFilters.position)) forecastFilters.position = '';
-  if(forecastFilters.assignee && !assigneeCounts.has(forecastFilters.assignee)) forecastFilters.assignee = '';
+  // assignee is free-text search — no reset needed
   if(forecastFilters.month && !monthCounts.has(forecastFilters.month)) forecastFilters.month = '';
 
   const clientSelect = document.getElementById('forecastClientFilter');
@@ -9317,12 +9326,7 @@ function renderForecastFilterControls(){
     positionSelect.value = forecastFilters.position;
     positionSelect.onchange = () => setForecastFilter('position', positionSelect.value);
   }
-  if(assigneeSelect){
-    const assignees = [...assigneeCounts.keys()].sort((a,b)=>a.localeCompare(b));
-    assigneeSelect.innerHTML = optionHTML('', `All assignees (${items.length})`) + assignees.map(a => optionHTML(a, `${a} (${assigneeCounts.get(a)})`)).join('');
-    assigneeSelect.value = forecastFilters.assignee;
-    assigneeSelect.onchange = () => setForecastFilter('assignee', assigneeSelect.value);
-  }
+  if(assigneeSelect && assigneeSelect.value !== forecastFilters.assignee) assigneeSelect.value = forecastFilters.assignee;
   if(monthSelect){
     const months = [...monthCounts.keys()].sort();
     const monthTotal = [...monthCounts.values()].reduce((sum, count) => sum + count, 0);
@@ -9346,7 +9350,7 @@ function resetForecastFilters(){
 function forecastRowMatches(row){
   return (!forecastFilters.client || (row.client || '') === forecastFilters.client)
     && (!forecastFilters.position || (row.position || '') === forecastFilters.position)
-    && (!forecastFilters.assignee || (row.assignee || '') === forecastFilters.assignee);
+    && (!forecastFilters.assignee || (row.assignee || '').toLowerCase().includes(forecastFilters.assignee.toLowerCase()));
 }
 function filteredForecastByMonth(){
   const fc = latest.forecast || {};
