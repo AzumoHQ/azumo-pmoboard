@@ -1394,7 +1394,7 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
 <!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-badge">PMO Board</div>
+    <div class="hero-badge">PMO Board <span style="opacity:.55;font-weight:500;font-size:.8em;letter-spacing:.01em">v3</span></div>
     <h1>Operations Center — <span>Azumo PMO</span></h1>
     <p class="hero-copy">Current snapshot for staffing capacity, utilization, client coverage, and delivery risk.</p>
     <div class="hero-stats" aria-label="Current PMO snapshot summary">
@@ -2116,15 +2116,86 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
   <section id="helpChangelog">
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-help-circle"></i></div>
-      <h2>Help</h2>
-      <span class="badge badge-wip">Work in progress</span>
+      <h2>Help &amp; Changelog</h2>
+      <div class="sec-tag">v3</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem">
+
+      <!-- What's new -->
+      <div class="qa-wrap" style="grid-column:1/-1">
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.9rem">What's new in v3</div>
+        <div style="display:flex;flex-direction:column;gap:.55rem">
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Sep 2026</span>
+            <span><strong>Client Directory</strong> — new section under Clients: cards per client with PM/CSM/TL, click-through detail with active Jira team</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Sep 2026</span>
+            <span><strong>Data integrity</strong> — TAG/Aldridge Group deduplicated, PMO QA counts unified with Accounts Coverage, Due Dates now shows ticket column</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Sep 2026</span>
+            <span><strong>Harvest Hours</strong> — weekly expected hours and threshold % now remembered across sessions; Forecast assignee filter is now free-text search</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Aug 2026</span>
+            <span><strong>Harvest Weekly</strong> — Mon/Sun billing delta columns; Bench/Internal export in spreadsheet template format</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Aug 2026</span>
+            <span><strong>Activity log</strong> — detects assignment changes, PM changes, and Harvest bench in/out over 14 days</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Jul 2026</span>
+            <span><strong>QA Center</strong> — billing × bench anomaly detection (flags people billing ≥80% in Jira who also have bench hours in Harvest)</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Jul 2026</span>
+            <span><strong>Info icons</strong> — Utilization Rate (Assignment) and Utilization Rate (Billing) KPI cards now show formula tooltip on hover</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section guide -->
+      <div class="qa-wrap">
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.9rem">Section guide</div>
+        <div style="display:flex;flex-direction:column;gap:.5rem;font-size:.83rem">
+          <div><strong>Overview</strong> — KPI snapshot: headcount, utilization, bench, active clients</div>
+          <div><strong>Operating Views</strong> — assignee/PM/client breakdown with filters</div>
+          <div><strong>PMO QA</strong> — anomaly detection: bench conflicts, missing coverage, access mismatches</div>
+          <div><strong>Accounts Coverage</strong> — Jira PSA coverage: who has PM/CSM/TL assigned</div>
+          <div><strong>Client Directory</strong> — Notion-sourced directory: PM, CSM, TL + active Jira team per client</div>
+          <div><strong>Due Dates</strong> — assignments expiring within 60 days</div>
+          <div><strong>Forecast</strong> — assignments expiring by month (future)</div>
+          <div><strong>Bench</strong> — people with available capacity</div>
+          <div><strong>Harvest Hours</strong> — weekly logged hours vs. expected; copy to spreadsheet</div>
+          <div><strong>Logged Harvest Hours</strong> — QA: Harvest vs. Jira billing cross-check</div>
+          <div><strong>Billing</strong> — eaZyBI billing report embed</div>
+          <div><strong>Trends</strong> — historical KPI snapshots</div>
+        </div>
+      </div>
+
+      <!-- Support -->
+      <div class="qa-wrap">
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.9rem">Support &amp; access</div>
+        <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.83rem">
+          <div><strong>Access issues</strong> — contact PMO. Only <code style="font-size:.8em;background:var(--surf);padding:1px 5px;border-radius:4px">@azumo.co</code> accounts are authorized.</div>
+          <div><strong>Data refresh</strong> — board data syncs automatically. The "Last updated" timestamp in the footer shows the most recent sync.</div>
+          <div><strong>Missing client / wrong coverage</strong> — update the source in Jira PSA. The board reflects Jira data within one refresh cycle.</div>
+          <div><strong>Feedback / bugs</strong> — open a ticket in the PMO project or message <strong>Federica González</strong> directly.</div>
+          <div style="margin-top:.4rem;padding-top:.6rem;border-top:1px solid var(--brd);color:var(--muted);font-size:.78rem">
+            PMO Board is maintained by the Azumo PMO team. Source: Jira PSA · Harvest · Notion.
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
 </main>
 <footer>
   <img src="assets/azumo-logo.png" alt="Azumo" height="16" style="opacity:.7"/>
-  PMO Board · Azumo · <span id="footerLastUpdated">Last updated: —</span>
+  PMO Board v3 · Azumo · <span id="footerLastUpdated">Last updated: —</span>
 </footer>
 
 <script>window.PMO_FLAGS = window.PMO_FLAGS || { overviewRoleScopedKpis: true, overviewOperative: true };</script>
