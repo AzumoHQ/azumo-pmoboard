@@ -25,6 +25,14 @@
     {
       "path": "/api/cron-snapshot",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron-harvest-digest?kind=friday",
+      "schedule": "30 17 * * 5"
+    },
+    {
+      "path": "/api/cron-harvest-digest?kind=monday",
+      "schedule": "30 12 * * 1"
     }
   ]
 }
