@@ -361,6 +361,24 @@ main>section.tab-section-active{animation:tabFade .18s ease-out}
 .fc-bar.ok{background:linear-gradient(180deg,#0066FF,#0047B3)}
 .fc-count{font-size:.8rem;font-weight:700;color:var(--txt)}
 .fc-month{font-size:.72rem;color:var(--muted);text-align:center;white-space:nowrap}
+.fc-cap-card{border:1px solid var(--brd);border-radius:var(--r);background:var(--surf);padding:1rem 1.1rem;margin-bottom:1.2rem}
+.fc-cap-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:.4rem;margin-bottom:.15rem}
+.fc-cap-title{font-size:.86rem;font-weight:700;color:var(--txt)}
+.fc-cap-note{font-size:.72rem;color:var(--muted)}
+.fc-cap-legend{display:flex;gap:14px;margin:.5rem 0 .8rem;font-size:.74rem;color:var(--muted)}
+.fc-cap-legend span{display:inline-flex;align-items:center;gap:5px}
+.fc-cap-swatch{width:10px;height:10px;border-radius:3px;display:inline-block}
+.fc-cap-swatch.cap{background:linear-gradient(180deg,#34D399,#059669)}
+.fc-cap-swatch.dem{background:linear-gradient(180deg,#0066FF,#0047B3)}
+.fc-cap-chart{display:flex;align-items:flex-end;gap:10px;height:150px}
+.fc-cap-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.fc-cap-delta{font-size:.72rem;font-weight:700;color:var(--muted);white-space:nowrap}
+.fc-cap-delta.ok{color:#34D399}
+.fc-cap-delta.urgent{color:#F87171}
+.fc-cap-bars{width:100%;display:flex;align-items:flex-end;justify-content:center;gap:4px}
+.fc-cap-bar{width:44%;border-radius:5px 5px 0 0;transition:height .4s ease}
+.fc-cap-bar-capacity{background:linear-gradient(180deg,#34D399,#059669)}
+.fc-cap-bar-demand{background:linear-gradient(180deg,#0066FF,#0047B3)}
 .fc-table-wrap{overflow:auto;max-height:520px}
 .headcount-line{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);padding:1.5rem;margin-top:16px}
 .hc-chart{width:100%;overflow:hidden}
@@ -2080,6 +2098,19 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
 
   <div class="forecast-wrap">
     <p style="font-size:.82rem;color:var(--muted);margin-bottom:1.2rem">In Progress assignment due dates grouped by month. Each Jira assignment key counts once; overdue rows remain visible until updated.</p>
+
+    <div class="fc-cap-card">
+      <div class="fc-cap-head">
+        <div class="fc-cap-title"><i class="ti ti-scale"></i> Demand vs. Capacity — next 6 months</div>
+        <div class="fc-cap-note">FTE, org-wide (not filtered below)</div>
+      </div>
+      <div class="fc-cap-legend">
+        <span><i class="fc-cap-swatch cap"></i> Capacity available (Bench + freed that month)</span>
+        <span><i class="fc-cap-swatch dem"></i> Committed demand (active assignments + won searches)</span>
+      </div>
+      <div class="fc-cap-chart" id="forecastCapacityChart"></div>
+    </div>
+
     <div class="forecast-filters" aria-label="Forecast filters">
       <div class="filter-field">
         <label for="forecastClientFilter">Client</label>
@@ -9508,7 +9539,72 @@ function filteredForecastByMonth(){
       .filter(([, rows]) => rows.length)
   );
 }
+function forecastHorizonMonths(n){
+  const out = [];
+  const now = new Date();
+  for(let i=0;i<n;i++){
+    const d = new Date(now.getFullYear(), now.getMonth()+i, 1);
+    out.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  return out;
+}
+function monthKeyFromDateStr(s){
+  if(!s) return '';
+  const d = new Date(s);
+  if(Number.isNaN(d.getTime())) return '';
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+// Demand vs. Capacity — org-wide 6-month view (Celoxis-inspired; see Portal de Procesos strategy doc).
+// FTE approximation: 1.0 FTE per assignment / won search (positions are treated as full-time roles);
+// bench capacity is weighted by each person's current availability %.
+function computeDemandCapacity(){
+  const months = forecastHorizonMonths(6);
+  const benchFTE = (latest.bench_list || []).reduce((sum, p) => {
+    const av = rowAvailability(p);
+    return sum + (av === null ? 0 : av / 100);
+  }, 0);
+  const forecastRows = Object.values(latest.forecast || {}).flat().filter(Boolean);
+  const wonSearches = ((latest.new_searches_triage || {}).rows || [])
+    .filter(r => /won/i.test(r.status || ''));
+  return months.map(month => {
+    const freed = forecastRows.filter(r => monthKeyFromDateStr(r.due) === month).length;
+    const stillActive = forecastRows.filter(r => {
+      const rk = monthKeyFromDateStr(r.due);
+      return rk && rk >= month;
+    }).length;
+    const startingSearches = wonSearches.filter(r => monthKeyFromDateStr(r.start_date || r.potential_start_date) === month).length;
+    const capacidad = benchFTE + freed;
+    const demanda = stillActive + startingSearches;
+    return {month, capacidad, demanda, delta: capacidad - demanda, freed, stillActive, startingSearches, benchFTE};
+  });
+}
+function renderForecastCapacity(){
+  const wrap = document.getElementById('forecastCapacityChart');
+  if(!wrap) return;
+  const data = computeDemandCapacity();
+  const maxVal = Math.max(1, ...data.flatMap(d => [d.capacidad, d.demanda]));
+  const MAX_H = 110;
+  wrap.innerHTML = data.map(d => {
+    const capH = Math.max(4, (d.capacidad / maxVal) * MAX_H);
+    const demH = Math.max(4, (d.demanda / maxVal) * MAX_H);
+    const mDate = new Date(d.month + '-01T00:00:00');
+    const label = mDate.toLocaleDateString('en-US',{month:'short',year:'2-digit'});
+    const deltaCls = d.delta < -0.05 ? 'urgent' : d.delta > 0.05 ? 'ok' : '';
+    const deltaLabel = `${d.delta > 0 ? '+' : ''}${d.delta.toFixed(1)}`;
+    const capTitle = `Capacity: ${d.capacidad.toFixed(1)} FTE\nBench today: ${d.benchFTE.toFixed(1)} FTE\nFreed in ${label}: ${d.freed} assignment(s)`;
+    const demTitle = `Demand: ${d.demanda.toFixed(1)} FTE\nActive assignments still running: ${d.stillActive}\nWon searches starting: ${d.startingSearches}`;
+    return `<div class="fc-cap-col">
+      <div class="fc-cap-delta ${deltaCls}">${deltaLabel} FTE</div>
+      <div class="fc-cap-bars" style="height:${MAX_H}px">
+        <div class="fc-cap-bar fc-cap-bar-capacity" style="height:${capH}px" title="${esc(capTitle)}"></div>
+        <div class="fc-cap-bar fc-cap-bar-demand" style="height:${demH}px" title="${esc(demTitle)}"></div>
+      </div>
+      <div class="fc-month">${label}</div>
+    </div>`;
+  }).join('');
+}
 function renderForecast(){
+  renderForecastCapacity();
   const fcAll   = latest.forecast || {};
   const source  = latest.forecast_source || 'Jira In Progress due dates';
   const sourceTag = document.getElementById('forecastSourceTag');
