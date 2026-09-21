@@ -2006,6 +2006,158 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 </section>
 
   <!-- ── HELP / CHANGELOG ───────────────────────── -->
+  <section id="processes">
+    <div class="sec-head">
+      <div class="sec-icon"><i class="ti ti-route"></i></div>
+      <h2>Processes</h2>
+      <div class="sec-tag">7 processes · source: Notion</div>
+    </div>
+
+    <div class="mc" style="padding:1.2rem 1.4rem;margin-bottom:1rem">
+      <h3 style="margin-bottom:.4rem">Azumo Process Definition Framework</h3>
+      <div class="mc-sub" style="margin-bottom:.9rem">Goal</div>
+      <p style="font-size:.86rem;color:var(--txt);line-height:1.5;margin:0 0 .8rem">The main objective of the Azumo Process Definition Framework is to centralize and standardize the documentation of all key processes within Azumo — from project management and software development to customer service and HR management.</p>
+      <p style="font-size:.86rem;color:var(--txt);line-height:1.5;margin:0">Its mission is to provide a single source of truth accessible to all employees, promoting transparency, efficiency, and consistency in the execution of tasks — a guide for training new employees and for the continuous improvement of processes.</p>
+
+      <div style="margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--brd)">
+        <div class="mc-sub" style="margin-bottom:.8rem">How we get there</div>
+        <div class="lineage-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px">
+          <div class="lineage-item"><b>01 · Definition &amp; documentation</b><div>Formalize steps, owners, inputs, outputs, metrics. Store it somewhere accessible — this module.</div></div>
+          <div class="lineage-item"><b>02 · Implementation &amp; monitoring</b><div>Communicate, train, support with the right tooling (Jira, Harvest), monitor performance.</div></div>
+          <div class="lineage-item"><b>03 · Evaluation &amp; improvement</b><div>Analyze the data, adjust the process, automate repetitive tasks, ask for feedback.</div></div>
+          <div class="lineage-item"><b>04 · Continuous cycle</b><div>Not an end state — every process gets re-evaluated and feeds back into step 01.</div></div>
+        </div>
+        <div class="locked-note" style="margin-top:.9rem">💡 Process maturity is not achieved overnight. It requires a long-term commitment to continuous improvement and the active participation of the whole team.</div>
+      </div>
+    </div>
+
+    <div class="forecast-filters" aria-label="Process filters">
+      <div class="filter-field">
+        <label for="processSearchInput">Search</label>
+        <input id="processSearchInput" type="search" placeholder="Process, tool, owner..." oninput="setProcessSearch(this.value)"/>
+      </div>
+    </div>
+    <div class="action-filter-tabs" id="processCategoryTabs">
+      <button class="action-filter active" data-cat="all" onclick="setProcessCategory('all')">All</button>
+      <button class="action-filter" data-cat="talent" onclick="setProcessCategory('talent')">Talent &amp; staffing</button>
+      <button class="action-filter" data-cat="delivery" onclick="setProcessCategory('delivery')">Delivery &amp; PM</button>
+      <button class="action-filter" data-cat="reference" onclick="setProcessCategory('reference')">Reference</button>
+    </div>
+
+    <div id="processList" style="display:flex;flex-direction:column;gap:10px;margin-top:1rem">
+
+      <details class="qa-check" data-cat="talent" data-search="registration onboarding new hire jira pto slack agustina stocco">
+        <summary><span>Registration Process <span class="chip badge-green" style="margin-left:8px">Documented</span></span><span class="qa-status ok">PMO / People Ops</span></summary>
+        <div class="qa-check-body">
+          <p style="margin:0 0 .6rem">Onboards a new hire into Jira and the Assignment project once HR confirms their first day.</p>
+          <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
+            <li><b>Trigger.</b> A "First Day" event is created automatically via Zapier.</li>
+            <li><b>Confirm new hire email.</b> Confirm the new hire's email with Agustina Stocco in the #registration-process Slack channel.</li>
+            <li><b>Invite to Jira.</b> Send a Jira invitation with that email — set the Jira role to User, leave the rest as None — then click Invite users.</li>
+            <li><b>Add to the PTO project.</b> Add the person to the Jira PTO (Paid Time Off) project.</li>
+            <li><b>Create the Epic.</b> In the Azumo Assignment Jira project, create a new Epic-type issue named "First Name + Last Name".</li>
+          </ol>
+          <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/1f82bdecc60a80329bddd0758335b909" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
+        </div>
+      </details>
+
+      <details class="qa-check" data-cat="talent" data-search="assignment proceso asignacion harvest jira epic add remove spreadsheet pm form">
+        <summary><span>Assignment Process <span style="color:var(--muted);font-weight:600">· Proceso Asignación</span> <span class="chip badge-green" style="margin-left:8px">Documented</span></span><span class="qa-status ok">PMO / Delivery</span></summary>
+        <div class="qa-check-body">
+          <p style="margin:0 0 .6rem">How a resource goes from an approved assignment form to being staffed and billable in Harvest.</p>
+          <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
+            <li><b>Form submission.</b> The PM submits the assignment form; Delivery receives the request in Jira.</li>
+            <li><b>Epic handling in Jira.</b> Open the ticket. Update the Epic if it exists, or create a new one. Assign the ticket and update the Epic's Due Date / Start Date.</li>
+            <li><b>Start date assignment.</b> In Harvest, assign the resource with the Start Date from the form. On that date, move the Jira task to Started.</li>
+            <li><b>Harvest project setup.</b> Find the client's project in Harvest, click Edit Project, set role and rate per the form, confirm tasks are assigned, click Update.</li>
+            <li><b>Update the internal spreadsheet.</b> Reflect the new assignment in the internal Add/Remove spreadsheet.</li>
+          </ol>
+          <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/1eb2bdecc60a8076a873f86ee23ee35a" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
+        </div>
+      </details>
+
+      <details class="qa-check" data-cat="talent" data-search="unassignment offboarding jira harvest ended epic">
+        <summary><span>Unassignment Process <span class="chip badge-green" style="margin-left:8px">Documented</span></span><span class="qa-status ok">PMO / Delivery</span></summary>
+        <div class="qa-check-body">
+          <p style="margin:0 0 .6rem">Closes out an assignment cleanly across Jira and Harvest so billing and capacity stay accurate.</p>
+          <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
+            <li><b>Move the assignment ticket to "Ended".</b> Locate the assignment issue linked to the Epic in Jira and change its status.</li>
+            <li><b>Update the Epic, if needed.</b> Modify the due date and % assignment fields on the linked Epic.</li>
+            <li><b>Unassign in Harvest.</b> Locate the project and SOW, find the role, remove the assignee, click Update Project.</li>
+          </ol>
+          <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/1f82bdecc60a800d9b69e556bdbb9421" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
+        </div>
+      </details>
+
+      <details class="qa-check" data-cat="talent" data-search="new search triage nst hiring backlog bench warm active search engineering review hiring offer workflow talent acquisition">
+        <summary><span>New Search Triage (NST) <span class="chip badge-yellow" style="margin-left:8px">Draft</span></span><span class="qa-status warning">Talent Acquisition</span></summary>
+        <div class="qa-check-body">
+          <p style="margin:0 0 .6rem">Jira workflow moving a staffing request from backlog to a hired candidate. Ownership by stage: Backlog → Sales, Bench/Warm Review → Martín Calvo, Active Search onward → Talent Acquisition. Still being finalized in Notion — treat as draft.</p>
+          <div class="fc-table-wrap" style="max-height:280px">
+            <table>
+              <thead><tr><th>#</th><th>From → to</th><th>Transition</th><th>Screen?</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>Backlog → Bench/Warm Review</td><td>Send for Initial Review</td><td>No</td><td>Start of the request process</td></tr>
+                <tr><td>2</td><td>Bench/Warm Review → Active Search</td><td>Start Active Search</td><td>Yes</td><td>Confirm key fields before launching</td></tr>
+                <tr><td>3</td><td>Bench/Warm Review → Engineering Review</td><td>Send to Engineering</td><td>No</td><td>Validation / alignment with Engineering</td></tr>
+                <tr><td>4</td><td>Bench/Warm Review → Hiring Offer</td><td>Skip to Offer</td><td>No</td><td>Jump straight to offer if already approved</td></tr>
+                <tr><td>5</td><td>Engineering Review → Active Search</td><td>Approve Search</td><td>No</td><td>Engineering approves the search going live</td></tr>
+                <tr><td>6</td><td>Engineering Review → Hiring Offer</td><td>Approve Offer</td><td>No</td><td>Engineering approves a direct offer</td></tr>
+                <tr><td>7</td><td>Active Search → Engineering Review</td><td>Request Engineering Review</td><td>No</td><td>Mid-process input from Engineering</td></tr>
+                <tr><td>8</td><td>Active Search → Hiring Offer</td><td>Move to Offer Stage</td><td>Yes</td><td>Confirm readiness for an offer</td></tr>
+                <tr><td>9</td><td>Active Search → Done</td><td>Mark as Completed</td><td>Yes</td><td>Ends the search, optional closing note</td></tr>
+                <tr><td>10</td><td>Hiring Offer → Conditional</td><td>Set Conditional Offer</td><td>Yes</td><td>Reason/details for a conditional offer</td></tr>
+                <tr><td>11</td><td>Hiring Offer → Done</td><td>Mark as Hired</td><td>Yes</td><td>Confirms hire and closes the request</td></tr>
+                <tr><td>12</td><td>Conditional → Done</td><td>Finalize Hiring</td><td>Yes</td><td>Closes after the conditional step resolves</td></tr>
+                <tr><td>13</td><td>Any → Cancelled</td><td>Cancel Request</td><td>Yes</td><td>Requires a comment with the reason</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/2092bdecc60a808e859ee60f59c7f219" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
+        </div>
+      </details>
+
+      <details class="qa-check" data-cat="delivery" data-search="project kickoff sow csm pm ba harvest slack channel deck delivery">
+        <summary><span>Project Kick Off <span class="chip badge-green" style="margin-left:8px">Documented</span></span><span class="qa-status ok">PM / BA</span></summary>
+        <div class="qa-check-body">
+          <p style="margin:0 0 .6rem">Guides a PM/BA from a signed SOW to a fully kicked-off project with the client. Begins the moment a new contract and SOW is signed.</p>
+          <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
+            <li><b>Assign CSM and PM/BA.</b> JP assigns a CSM; once Delivery notifies, a PM/BA is assigned. CSM or PM/BA creates a Slack channel with all involved parties.</li>
+            <li><b>Understand the SOW.</b> Fully understand its content, schedule internal calls before the client kickoff.</li>
+            <li><b>Set up Harvest.</b> Create the project, add all internal team members and leadership, double-check rates and assignment %.</li>
+            <li><b>Plan &amp; sign-off.</b> Build a high-level plan (tasks, owners, deliverables, dependencies) and get written sign-off from Sales and Technical teams before scheduling the kickoff.</li>
+            <li><b>Build the kickoff deck</b> and schedule the meeting with VP of Engineering, Delivery Manager, Sales and Technical team.</li>
+            <li><b>Follow up.</b> Share the deck as PDF with decisions and action items; ensure client tool access is granted promptly.</li>
+            <li><b>Run the project.</b> Weekly status to the client, weekly Project Follow-up form for leadership, meeting minutes after every client call.</li>
+          </ol>
+          <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/2092bdecc60a80f79312c00346a338ef" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
+        </div>
+      </details>
+
+      <details class="qa-check" data-cat="reference" data-search="okr kpi objectives key results metrics performance">
+        <summary><span>OKRs vs. KPIs</span><span class="qa-status" style="background:rgba(107,143,191,.14);color:var(--muted)">Concept reference</span></summary>
+        <div class="qa-check-body">
+          <p style="margin:0 0 .6rem">Quick distinction used when defining metrics for a process, before it gets an OKR or a KPI attached.</p>
+          <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
+            <li><b>OKRs — Objectives and Key Results.</b> Directional and aspiring, public across the org, reviewed quarterly/monthly, intentionally ambitious, usually not tied to bonuses.</li>
+            <li><b>KPIs — Key Performance Indicators.</b> Operational and continuous, more stable over time. A KPI can be a Key Result, but not every KPI is.</li>
+          </ol>
+          <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/24d2bdecc60a80f0a339cf8c18bb2331" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
+        </div>
+      </details>
+
+      <details class="qa-check" data-cat="reference" data-search="bpmn business process model notation diagram notation standard flowchart">
+        <summary><span>BPMN notation guide</span><span class="qa-status" style="background:rgba(107,143,191,.14);color:var(--muted)">Documentation standard</span></summary>
+        <div class="qa-check-body">
+          <p style="margin:0">Business Process Model and Notation is the standard Azumo uses when a process needs a visual flowchart instead of a step list — useful for anything with branches, parallel paths or handoffs between teams.</p>
+          <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Reference: <a href="https://www.bpmn.org/" target="_blank" rel="noopener" style="color:var(--blue-lt)">bpmn.org ↗</a> · <a href="https://app.notion.com/p/1ea2bdecc60a8048b648c3b3e204cc41" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
+        </div>
+      </details>
+
+    </div>
+    <div id="processEmptyState" style="display:none;text-align:center;color:var(--muted);font-size:.82rem;padding:2rem 0">No processes match that search.</div>
+  </section>
+
   <section id="helpChangelog">
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-help-circle"></i></div>
@@ -2694,6 +2846,7 @@ let openModuleGroup = null;
 function canSeePmoGroup(){ return ['admin','pmo'].includes(effectiveUserRole()); }
 function sectionAllowedForCurrentRole(id){
   if(id === 'helpChangelog') return true;
+  if(id === 'processes') return true;
   const role = effectiveUserRole();
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
@@ -2730,6 +2883,7 @@ const SECTION_ICON_MAP = {
   'newSearchesTriage': 'ti-search',
   'pmoActionCenter': 'ti-alert-triangle',
   'helpChangelog': 'ti-help-circle',
+  'processes': 'ti-route',
 };
 function sectionIcon(id) {
   var cls = SECTION_ICON_MAP[id];
@@ -2777,6 +2931,7 @@ function sidebarNavConfig(){
       {id:'history', icon:'<i class="ti ti-trending-up"></i>', label:'Trends'},
       {id:'newSearchesTriage', icon:'<i class="ti ti-search"></i>', label:'New Searches'}
     ]},
+    {id:'processes', icon:'<i class="ti ti-route"></i>', label:'Processes'},
     {id:'pmoActionCenter', icon:'<i class="ti ti-alert-triangle"></i>', label:'PMO QA', count: qaCount},
     {id:'helpChangelog', icon:'<i class="ti ti-help-circle"></i>', label:'Help'}
   ];
@@ -7979,6 +8134,36 @@ async function bootDashboard(){
   }else{
     updateAuthUi();
   }
+}
+let processSearch = '';
+let processCategory = 'all';
+function applyProcessFilters(){
+  const q = processSearch.trim().toLowerCase();
+  const list = document.getElementById('processList');
+  if(!list) return;
+  let anyVisible = false;
+  list.querySelectorAll('.qa-check').forEach(card => {
+    const cat = card.getAttribute('data-cat') || '';
+    const text = (card.getAttribute('data-search') || '') + ' ' + (card.querySelector('summary')?.textContent || '').toLowerCase();
+    const matchesCat = processCategory === 'all' || processCategory === cat;
+    const matchesQuery = !q || text.toLowerCase().includes(q);
+    const show = matchesCat && matchesQuery;
+    card.style.display = show ? '' : 'none';
+    if(show) anyVisible = true;
+  });
+  const empty = document.getElementById('processEmptyState');
+  if(empty) empty.style.display = anyVisible ? 'none' : 'block';
+}
+function setProcessSearch(value){
+  processSearch = String(value || '');
+  applyProcessFilters();
+}
+function setProcessCategory(id){
+  processCategory = id;
+  document.querySelectorAll('#processCategoryTabs .action-filter').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-cat') === id);
+  });
+  applyProcessFilters();
 }
 window.loginFromGate = loginFromGate;
 window.startGoogleSignIn = startGoogleSignIn;
