@@ -231,35 +231,6 @@ body.light .qa-recurring,body.light .qa-checklist-item{background:#FFFFFF}
 .lineage-item b{display:block;margin-bottom:.25rem}.lineage-item div{color:var(--muted);font-size:.76rem;line-height:1.45}
 .locked-note{border:1px dashed var(--brd);border-radius:14px;padding:1rem;color:var(--muted);font-size:.82rem;line-height:1.5;background:rgba(0,102,255,.06)}
 
-/* PROCESSES MODULE */
-.proc-cycle{display:flex;flex-wrap:wrap;gap:0}
-.proc-cycle-step{flex:1;min-width:180px;position:relative;padding:0 1rem 0 0}
-.proc-cycle-step:not(:last-child)::after{content:'';position:absolute;top:17px;left:34px;width:calc(100% - 34px);height:2px;background:var(--brd)}
-.proc-cycle-num{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--blue-dk),var(--blue));color:#fff;font-weight:900;font-size:.86rem;margin-bottom:.6rem;position:relative;z-index:1}
-.proc-cycle-step h4{font-size:.84rem;margin:0 0 .3rem;font-weight:800;color:var(--txt)}
-.proc-cycle-step p{margin:0;font-size:.76rem;color:var(--muted);line-height:1.42}
-.proc-group{margin-top:1.4rem}
-.proc-group:first-child{margin-top:0}
-.proc-group-head{display:flex;align-items:center;gap:8px;margin-bottom:.6rem;padding-left:2px}
-.proc-group-dot{width:8px;height:8px;border-radius:50%;flex:0 0 8px}
-.proc-group-head h3{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;font-weight:900;color:var(--muted);margin:0}
-.proc-group-count{font-size:.7rem;color:var(--muted);font-weight:700;background:var(--surf);border:1px solid var(--brd);border-radius:999px;padding:1px 8px}
-.proc-card > summary{display:flex;align-items:center;gap:12px;padding:.8rem .95rem}
-.proc-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:0 0 34px;font-size:15px}
-.proc-icon.cat-talent{background:rgba(124,58,237,.14);color:var(--purple)}
-.proc-icon.cat-delivery{background:rgba(0,102,255,.14);color:var(--blue-lt)}
-.proc-icon.cat-billing{background:rgba(6,182,212,.14);color:var(--teal)}
-.proc-icon.cat-reference{background:rgba(249,115,22,.14);color:var(--orange)}
-.proc-group-dot.cat-talent{background:var(--purple)}
-.proc-group-dot.cat-delivery{background:var(--blue-lt)}
-.proc-group-dot.cat-billing{background:var(--teal)}
-.proc-group-dot.cat-reference{background:var(--orange)}
-.proc-card-title{flex:1;min-width:0;text-align:left}
-.proc-card-title .name{font-weight:800;font-size:.88rem;display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:var(--txt)}
-.proc-card-title .owner{font-size:.72rem;color:var(--muted);margin-top:2px}
-.proc-chev{flex:0 0 auto;color:var(--muted);font-size:.72rem;transition:transform .18s ease}
-.proc-card[open] .proc-chev{transform:rotate(180deg)}
-
 /* PMO ACTION CENTER */
 .action-wrap{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);padding:1.2rem}
 .action-toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:1rem}
@@ -2039,253 +2010,58 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-route"></i></div>
       <h2>Processes</h2>
-      <div class="sec-tag">8 processes · source: Notion</div>
+      <div class="sec-tag">1 process · source: Notion</div>
     </div>
 
-    <div class="mc" style="padding:1.2rem 1.4rem;margin-bottom:1rem">
-      <h3 style="margin-bottom:.4rem">Azumo Process Definition Framework</h3>
-      <div class="mc-sub" style="margin-bottom:.9rem">Goal</div>
-      <p style="font-size:.86rem;color:var(--txt);line-height:1.5;margin:0 0 .8rem">The main objective of the Azumo Process Definition Framework is to centralize and standardize the documentation of all key processes within Azumo — from project management and software development to customer service and HR management.</p>
-      <p style="font-size:.86rem;color:var(--txt);line-height:1.5;margin:0">Its mission is to provide a single source of truth accessible to all employees, promoting transparency, efficiency, and consistency in the execution of tasks — a guide for training new employees and for the continuous improvement of processes.</p>
-
-      <div style="margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--brd)">
-        <div class="mc-sub" style="margin-bottom:.8rem">How we get there</div>
-        <div class="proc-cycle">
-          <div class="proc-cycle-step">
-            <div class="proc-cycle-num">01</div>
-            <h4>Definition &amp; documentation</h4>
-            <p>Formalize steps, owners, inputs, outputs, metrics. Store it somewhere accessible — this module.</p>
-          </div>
-          <div class="proc-cycle-step">
-            <div class="proc-cycle-num">02</div>
-            <h4>Implementation &amp; monitoring</h4>
-            <p>Communicate, train, support with the right tooling (Jira, Harvest), monitor performance.</p>
-          </div>
-          <div class="proc-cycle-step">
-            <div class="proc-cycle-num">03</div>
-            <h4>Evaluation &amp; improvement</h4>
-            <p>Analyze the data, adjust the process, automate repetitive tasks, ask for feedback.</p>
-          </div>
-          <div class="proc-cycle-step">
-            <div class="proc-cycle-num">04</div>
-            <h4>Continuous cycle</h4>
-            <p>Not an end state — every process gets re-evaluated and feeds back into step 01.</p>
-          </div>
+    <details class="qa-check" style="margin-bottom:1rem">
+      <summary><span>Process Definition Framework</span><span class="qa-status" style="background:rgba(107,143,191,.14);color:var(--muted)">Goal &amp; methodology</span></summary>
+      <div class="qa-check-body">
+        <p style="margin:0 0 .7rem;font-size:.82rem;color:var(--txt);line-height:1.5">The main objective of the Azumo Process Definition Framework is to centralize and standardize the documentation of all key processes within Azumo — from project management and software development to customer service and HR management.</p>
+        <p style="margin:0 0 1rem;font-size:.82rem;color:var(--txt);line-height:1.5">Its mission is to provide a single source of truth accessible to all employees, promoting transparency, efficiency, and consistency in the execution of tasks — a guide for training new employees and for the continuous improvement of processes.</p>
+        <div class="mc-sub" style="margin-bottom:.6rem">How we get there</div>
+        <div class="lineage-list">
+          <div class="lineage-item"><b>01 · Definition &amp; documentation</b><div>Formalize steps, owners, inputs, outputs, metrics. Store it somewhere accessible — this module.</div></div>
+          <div class="lineage-item"><b>02 · Implementation &amp; monitoring</b><div>Communicate, train, support with the right tooling (Jira, Harvest), monitor performance.</div></div>
+          <div class="lineage-item"><b>03 · Evaluation &amp; improvement</b><div>Analyze the data, adjust the process, automate repetitive tasks, ask for feedback.</div></div>
+          <div class="lineage-item"><b>04 · Continuous cycle</b><div>Not an end state — every process gets re-evaluated and feeds back into step 01.</div></div>
         </div>
         <div class="locked-note" style="margin-top:.9rem">💡 Process maturity is not achieved overnight. It requires a long-term commitment to continuous improvement and the active participation of the whole team.</div>
       </div>
+    </details>
+
+    <div class="tbl-head" style="border:1px solid var(--brd);border-radius:var(--r) var(--r) 0 0;border-bottom:0">
+      <h3><i class="ti ti-receipt-2"></i> Billing &amp; Ops <span class="badge badge-blue">1</span></h3>
     </div>
 
-    <div class="forecast-filters" aria-label="Process filters">
-      <div class="filter-field">
-        <label for="processSearchInput">Search</label>
-        <input id="processSearchInput" type="search" placeholder="Process, tool, owner..." oninput="setProcessSearch(this.value)"/>
-      </div>
-    </div>
-    <div class="action-filter-tabs" id="processCategoryTabs">
-      <button class="action-filter active" data-cat="all" onclick="setProcessCategory('all')">All</button>
-      <button class="action-filter" data-cat="talent" onclick="setProcessCategory('talent')">Talent &amp; staffing</button>
-      <button class="action-filter" data-cat="delivery" onclick="setProcessCategory('delivery')">Delivery &amp; PM</button>
-      <button class="action-filter" data-cat="billing" onclick="setProcessCategory('billing')">Billing &amp; Ops</button>
-      <button class="action-filter" data-cat="reference" onclick="setProcessCategory('reference')">Reference</button>
-    </div>
-
-    <div id="processList" style="margin-top:1.1rem">
-
-      <div class="proc-group" data-group="talent">
-        <div class="proc-group-head"><span class="proc-group-dot cat-talent"></span><h3>Talent &amp; staffing</h3><span class="proc-group-count">4</span></div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-
-          <details class="qa-check proc-card" data-cat="talent" data-search="registration onboarding new hire jira pto slack agustina stocco">
-            <summary>
-              <span class="proc-icon cat-talent"><i class="ti ti-user-plus"></i></span>
-              <span class="proc-card-title"><span class="name">Registration Process <span class="chip badge-green">Documented</span></span><span class="owner">PMO / People Ops</span></span>
-              <span class="proc-chev"><i class="ti ti-chevron-down"></i></span>
-            </summary>
-            <div class="qa-check-body">
-              <p style="margin:0 0 .6rem">Onboards a new hire into Jira and the Assignment project once HR confirms their first day.</p>
-              <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
-                <li><b>Trigger.</b> A "First Day" event is created automatically via Zapier.</li>
-                <li><b>Confirm new hire email.</b> Confirm the new hire's email with Agustina Stocco in the #registration-process Slack channel.</li>
-                <li><b>Invite to Jira.</b> Send a Jira invitation with that email — set the Jira role to User, leave the rest as None — then click Invite users.</li>
-                <li><b>Add to the PTO project.</b> Add the person to the Jira PTO (Paid Time Off) project.</li>
-                <li><b>Create the Epic.</b> In the Azumo Assignment Jira project, create a new Epic-type issue named "First Name + Last Name".</li>
-              </ol>
-              <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/1f82bdecc60a80329bddd0758335b909" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
-            </div>
-          </details>
-
-          <details class="qa-check proc-card" data-cat="talent" data-search="assignment proceso asignacion harvest jira epic add remove spreadsheet pm form">
-            <summary>
-              <span class="proc-icon cat-talent"><i class="ti ti-user-check"></i></span>
-              <span class="proc-card-title"><span class="name">Assignment Process <span style="color:var(--muted);font-weight:600">· Proceso Asignación</span> <span class="chip badge-green">Documented</span></span><span class="owner">PMO / Delivery</span></span>
-              <span class="proc-chev"><i class="ti ti-chevron-down"></i></span>
-            </summary>
-            <div class="qa-check-body">
-              <p style="margin:0 0 .6rem">How a resource goes from an approved assignment form to being staffed and billable in Harvest.</p>
-              <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
-                <li><b>Form submission.</b> The PM submits the assignment form; Delivery receives the request in Jira.</li>
-                <li><b>Epic handling in Jira.</b> Open the ticket. Update the Epic if it exists, or create a new one. Assign the ticket and update the Epic's Due Date / Start Date.</li>
-                <li><b>Start date assignment.</b> In Harvest, assign the resource with the Start Date from the form. On that date, move the Jira task to Started.</li>
-                <li><b>Harvest project setup.</b> Find the client's project in Harvest, click Edit Project, set role and rate per the form, confirm tasks are assigned, click Update.</li>
-                <li><b>Update the internal spreadsheet.</b> Reflect the new assignment in the internal Add/Remove spreadsheet.</li>
-              </ol>
-              <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/1eb2bdecc60a8076a873f86ee23ee35a" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
-            </div>
-          </details>
-
-          <details class="qa-check proc-card" data-cat="talent" data-search="unassignment offboarding jira harvest ended epic">
-            <summary>
-              <span class="proc-icon cat-talent"><i class="ti ti-user-x"></i></span>
-              <span class="proc-card-title"><span class="name">Unassignment Process <span class="chip badge-green">Documented</span></span><span class="owner">PMO / Delivery</span></span>
-              <span class="proc-chev"><i class="ti ti-chevron-down"></i></span>
-            </summary>
-            <div class="qa-check-body">
-              <p style="margin:0 0 .6rem">Closes out an assignment cleanly across Jira and Harvest so billing and capacity stay accurate.</p>
-              <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
-                <li><b>Move the assignment ticket to "Ended".</b> Locate the assignment issue linked to the Epic in Jira and change its status.</li>
-                <li><b>Update the Epic, if needed.</b> Modify the due date and % assignment fields on the linked Epic.</li>
-                <li><b>Unassign in Harvest.</b> Locate the project and SOW, find the role, remove the assignee, click Update Project.</li>
-              </ol>
-              <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/1f82bdecc60a800d9b69e556bdbb9421" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
-            </div>
-          </details>
-
-          <details class="qa-check proc-card" data-cat="talent" data-search="new search triage nst hiring backlog bench warm active search engineering review hiring offer workflow talent acquisition">
-            <summary>
-              <span class="proc-icon cat-talent"><i class="ti ti-search"></i></span>
-              <span class="proc-card-title"><span class="name">New Search Triage (NST) <span class="chip badge-yellow">Draft</span></span><span class="owner">Talent Acquisition</span></span>
-              <span class="proc-chev"><i class="ti ti-chevron-down"></i></span>
-            </summary>
-            <div class="qa-check-body">
-              <p style="margin:0 0 .6rem">Jira workflow moving a staffing request from backlog to a hired candidate. Ownership by stage: Backlog → Sales, Bench/Warm Review → Martín Calvo, Active Search onward → Talent Acquisition. Still being finalized in Notion — treat as draft.</p>
-              <div class="fc-table-wrap" style="max-height:280px">
-                <table>
-                  <thead><tr><th>#</th><th>From → to</th><th>Transition</th><th>Screen?</th><th>Notes</th></tr></thead>
-                  <tbody>
-                    <tr><td>1</td><td>Backlog → Bench/Warm Review</td><td>Send for Initial Review</td><td>No</td><td>Start of the request process</td></tr>
-                    <tr><td>2</td><td>Bench/Warm Review → Active Search</td><td>Start Active Search</td><td>Yes</td><td>Confirm key fields before launching</td></tr>
-                    <tr><td>3</td><td>Bench/Warm Review → Engineering Review</td><td>Send to Engineering</td><td>No</td><td>Validation / alignment with Engineering</td></tr>
-                    <tr><td>4</td><td>Bench/Warm Review → Hiring Offer</td><td>Skip to Offer</td><td>No</td><td>Jump straight to offer if already approved</td></tr>
-                    <tr><td>5</td><td>Engineering Review → Active Search</td><td>Approve Search</td><td>No</td><td>Engineering approves the search going live</td></tr>
-                    <tr><td>6</td><td>Engineering Review → Hiring Offer</td><td>Approve Offer</td><td>No</td><td>Engineering approves a direct offer</td></tr>
-                    <tr><td>7</td><td>Active Search → Engineering Review</td><td>Request Engineering Review</td><td>No</td><td>Mid-process input from Engineering</td></tr>
-                    <tr><td>8</td><td>Active Search → Hiring Offer</td><td>Move to Offer Stage</td><td>Yes</td><td>Confirm readiness for an offer</td></tr>
-                    <tr><td>9</td><td>Active Search → Done</td><td>Mark as Completed</td><td>Yes</td><td>Ends the search, optional closing note</td></tr>
-                    <tr><td>10</td><td>Hiring Offer → Conditional</td><td>Set Conditional Offer</td><td>Yes</td><td>Reason/details for a conditional offer</td></tr>
-                    <tr><td>11</td><td>Hiring Offer → Done</td><td>Mark as Hired</td><td>Yes</td><td>Confirms hire and closes the request</td></tr>
-                    <tr><td>12</td><td>Conditional → Done</td><td>Finalize Hiring</td><td>Yes</td><td>Closes after the conditional step resolves</td></tr>
-                    <tr><td>13</td><td>Any → Cancelled</td><td>Cancel Request</td><td>Yes</td><td>Requires a comment with the reason</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/2092bdecc60a808e859ee60f59c7f219" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
-            </div>
-          </details>
-
-        </div>
-      </div>
-
-      <div class="proc-group" data-group="delivery">
-        <div class="proc-group-head"><span class="proc-group-dot cat-delivery"></span><h3>Delivery &amp; PM</h3><span class="proc-group-count">1</span></div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-
-          <details class="qa-check proc-card" data-cat="delivery" data-search="project kickoff sow csm pm ba harvest slack channel deck delivery">
-            <summary>
-              <span class="proc-icon cat-delivery"><i class="ti ti-rocket"></i></span>
-              <span class="proc-card-title"><span class="name">Project Kick Off <span class="chip badge-green">Documented</span></span><span class="owner">PM / BA</span></span>
-              <span class="proc-chev"><i class="ti ti-chevron-down"></i></span>
-            </summary>
-            <div class="qa-check-body">
-              <p style="margin:0 0 .6rem">Guides a PM/BA from a signed SOW to a fully kicked-off project with the client. Begins the moment a new contract and SOW is signed.</p>
-              <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
-                <li><b>Assign CSM and PM/BA.</b> JP assigns a CSM; once Delivery notifies, a PM/BA is assigned. CSM or PM/BA creates a Slack channel with all involved parties.</li>
-                <li><b>Understand the SOW.</b> Fully understand its content, schedule internal calls before the client kickoff.</li>
-                <li><b>Set up Harvest.</b> Create the project, add all internal team members and leadership, double-check rates and assignment %.</li>
-                <li><b>Plan &amp; sign-off.</b> Build a high-level plan (tasks, owners, deliverables, dependencies) and get written sign-off from Sales and Technical teams before scheduling the kickoff.</li>
-                <li><b>Build the kickoff deck</b> and schedule the meeting with VP of Engineering, Delivery Manager, Sales and Technical team.</li>
-                <li><b>Follow up.</b> Share the deck as PDF with decisions and action items; ensure client tool access is granted promptly.</li>
-                <li><b>Run the project.</b> Weekly status to the client, weekly Project Follow-up form for leadership, meeting minutes after every client call.</li>
-              </ol>
-              <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/2092bdecc60a80f79312c00346a338ef" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
-            </div>
-          </details>
-
-        </div>
-      </div>
-
+    <div id="processList" style="border:1px solid var(--brd);border-top:0;border-radius:0 0 var(--r) var(--r);padding:.8rem;background:var(--surf)">
       <div class="proc-group" data-group="billing">
-        <div class="proc-group-head"><span class="proc-group-dot cat-billing"></span><h3>Billing &amp; Ops</h3><span class="proc-group-count">1</span></div>
-        <div style="display:flex;flex-direction:column;gap:10px">
 
-          <details class="qa-check proc-card" data-cat="billing" data-roles="assignee pm csm pmo admin executive" data-search="billing process time tracking harvest invoice claim csm pm cos chief of staff pablo baio weekly register week time">
-            <summary>
-              <span class="proc-icon cat-billing"><i class="ti ti-receipt-2"></i></span>
-              <span class="proc-card-title"><span class="name">Billing Process <span class="chip badge-green">Documented</span></span><span class="owner">Owner: Pablo Baio · v1.00</span></span>
-              <span class="proc-chev"><i class="ti ti-chevron-down"></i></span>
-            </summary>
-            <div class="qa-check-body">
-              <p style="margin:0 0 .6rem">Improve the efficiency of the billing process. Visible to Team, Project Manager, CSM and Chief of Staff — the roles that own a lane in the flow below.</p>
-              <img src="assets/process-billing-flow.jpg" alt="Billing Process swimlane diagram: Team, Project Manager, CSM and COS" style="max-width:100%;border-radius:10px;border:1px solid var(--brd);margin-bottom:.9rem;display:block"/>
-              <div class="mc-sub" style="margin-bottom:.5rem">Roles &amp; responsibilities</div>
-              <ul style="margin:0 0 .9rem;padding-left:1.15rem;display:flex;flex-direction:column;gap:.35rem;font-size:.82rem;color:var(--muted)">
-                <li><b style="color:var(--txt)">Team.</b> Register week time.</li>
-                <li><b style="color:var(--txt)">Project Manager.</b> Weekly contract time register review.</li>
-                <li><b style="color:var(--txt)">CSM.</b> Weekly contract time tracking review.</li>
-                <li><b style="color:var(--txt)">Chief of Staff.</b> Final time register review.</li>
-              </ul>
-              <div class="mc-sub" style="margin-bottom:.5rem">Process steps</div>
-              <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
-                <li><b>Time registration</b> — Friday morning. Each team member logs their weekly hours in the time tracking system.</li>
-                <li><b>Initial review by PM</b> — Friday afternoon. The PM checks entries for their contracts for completeness and correctness.</li>
-                <li><b>Time entry adjustment</b> (if needed). If there are discrepancies, the PM requests corrections and the team re-submits — the claim cycle.</li>
-                <li><b>CSM weekly review</b> — Monday morning. The CSM reviews the weekly contract time records for consistency with client expectations.</li>
-                <li><b>CSM feedback loop</b> (if needed). Additional issues trigger the claim process again for clarification.</li>
-                <li><b>Final time register review (COS)</b> — Tuesday morning. The Chief of Staff does a final check of all approved timesheets.</li>
-                <li><b>Invoice issuance.</b> Once every validation is complete, the invoice is generated and sent to the client.</li>
-              </ol>
-              <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Resources: <a href="https://docs.google.com/spreadsheets/d/1ZrkOk2kOygmjmJmUGnMC28QIJHIuocqz-qJMvHmRzx4/edit?gid=1319034044#gid=1319034044" target="_blank" rel="noopener" style="color:var(--blue-lt)">Billing tracking sheet ↗</a> · Owner for questions: Pablo Baio · v1.00</div>
+        <details class="qa-check" open data-cat="billing" data-roles="assignee pm csm pmo admin executive" data-search="billing process time tracking harvest invoice claim csm pm cos chief of staff pablo baio weekly register week time">
+          <summary><span>Billing Process <span class="chip badge-green" style="margin-left:8px">Documented</span></span><span class="qa-status ok">v1.00</span></summary>
+          <div class="qa-check-body">
+            <img src="assets/process-billing-flow.jpg" alt="Billing Process swimlane diagram: Team, Project Manager, CSM and COS" style="max-width:100%;border-radius:10px;border:1px solid var(--brd);margin-bottom:.85rem;display:block"/>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.9rem">
+              <span class="badge badge-blue">Team</span>
+              <span class="badge badge-blue">PM</span>
+              <span class="badge badge-blue">CSM</span>
+              <span class="badge badge-blue">PMO</span>
             </div>
-          </details>
+            <p style="margin:0 0 .9rem;font-size:.82rem;color:var(--muted)">Improve the efficiency of the billing process — every role above owns one lane in the flow (Team registers time, PM and CSM review it, PMO/Chief of Staff does the final check before invoicing).</p>
+            <div class="mc-sub" style="margin-bottom:.5rem">Process steps</div>
+            <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
+              <li><b>Time registration</b> — Friday morning. Each team member logs their weekly hours in the time tracking system.</li>
+              <li><b>Initial review by PM</b> — Friday afternoon. The PM checks entries for their contracts for completeness and correctness.</li>
+              <li><b>Time entry adjustment</b> (if needed). If there are discrepancies, the PM requests corrections and the team re-submits — the claim cycle.</li>
+              <li><b>CSM weekly review</b> — Monday morning. The CSM reviews the weekly contract time records for consistency with client expectations.</li>
+              <li><b>CSM feedback loop</b> (if needed). Additional issues trigger the claim process again for clarification.</li>
+              <li><b>Final time register review (PMO / Chief of Staff)</b> — Tuesday morning. Final check of all approved timesheets.</li>
+              <li><b>Invoice issuance.</b> Once every validation is complete, the invoice is generated and sent to the client.</li>
+            </ol>
+            <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Resources: <a href="https://docs.google.com/spreadsheets/d/1ZrkOk2kOygmjmJmUGnMC28QIJHIuocqz-qJMvHmRzx4/edit?gid=1319034044#gid=1319034044" target="_blank" rel="noopener" style="color:var(--blue-lt)">Billing tracking sheet ↗</a> · Owner for questions: Pablo Baio · v1.00</div>
+          </div>
+        </details>
 
-        </div>
       </div>
-
-      <div class="proc-group" data-group="reference">
-        <div class="proc-group-head"><span class="proc-group-dot cat-reference"></span><h3>Reference</h3><span class="proc-group-count">2</span></div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-
-          <details class="qa-check proc-card" data-cat="reference" data-search="okr kpi objectives key results metrics performance">
-            <summary>
-              <span class="proc-icon cat-reference"><i class="ti ti-target-arrow"></i></span>
-              <span class="proc-card-title"><span class="name">OKRs vs. KPIs</span><span class="owner">Concept reference</span></span>
-              <span class="proc-chev"><i class="ti ti-chevron-down"></i></span>
-            </summary>
-            <div class="qa-check-body">
-              <p style="margin:0 0 .6rem">Quick distinction used when defining metrics for a process, before it gets an OKR or a KPI attached.</p>
-              <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
-                <li><b>OKRs — Objectives and Key Results.</b> Directional and aspiring, public across the org, reviewed quarterly/monthly, intentionally ambitious, usually not tied to bonuses.</li>
-                <li><b>KPIs — Key Performance Indicators.</b> Operational and continuous, more stable over time. A KPI can be a Key Result, but not every KPI is.</li>
-              </ol>
-              <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/24d2bdecc60a80f0a339cf8c18bb2331" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
-            </div>
-          </details>
-
-          <details class="qa-check proc-card" data-cat="reference" data-search="bpmn business process model notation diagram notation standard flowchart">
-            <summary>
-              <span class="proc-icon cat-reference"><i class="ti ti-sitemap"></i></span>
-              <span class="proc-card-title"><span class="name">BPMN notation guide</span><span class="owner">Documentation standard</span></span>
-              <span class="proc-chev"><i class="ti ti-chevron-down"></i></span>
-            </summary>
-            <div class="qa-check-body">
-              <p style="margin:0">Business Process Model and Notation is the standard Azumo uses when a process needs a visual flowchart instead of a step list — useful for anything with branches, parallel paths or handoffs between teams.</p>
-              <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Reference: <a href="https://www.bpmn.org/" target="_blank" rel="noopener" style="color:var(--blue-lt)">bpmn.org ↗</a> · <a href="https://app.notion.com/p/1ea2bdecc60a8048b648c3b3e204cc41" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
-            </div>
-          </details>
-
-        </div>
-      </div>
-
     </div>
     <div id="processEmptyState" style="display:none;text-align:center;color:var(--muted);font-size:.82rem;padding:2rem 0">No processes match that search.</div>
   </section>
