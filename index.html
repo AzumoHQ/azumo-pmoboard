@@ -228,6 +228,13 @@ body.light .qa-recurring,body.light .qa-checklist-item{background:#FFFFFF}
 .qa-check summary{cursor:pointer;padding:.75rem .9rem;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800;font-size:.82rem}
 .qa-check-body{padding:0 .9rem .9rem;color:var(--muted);font-size:.76rem;line-height:1.45}
 .lineage-list{display:flex;flex-direction:column;gap:8px}
+.proc-diagram{border:1px solid var(--brd);border-radius:10px;background:var(--surf);padding:.6rem .4rem;margin-bottom:.85rem}
+.proc-diagram-svg{width:100%;height:auto;display:block}
+.proc-step-node:hover circle{stroke-width:3}
+.proc-diagram-detail{padding:0 .6rem}
+.proc-step-detail-card{margin-top:.6rem;padding:.6rem .75rem;background:rgba(0,102,255,.06);border:1px solid var(--brd);border-radius:8px;font-size:.8rem;color:var(--txt)}
+.proc-step-detail-card b{display:block;margin-bottom:.25rem;color:var(--blue-lt)}
+.proc-step-detail-card p{margin:0;color:var(--muted);line-height:1.5}
 .lineage-item{background:var(--surf);border:1px solid var(--brd);border-radius:12px;padding:.85rem}
 .lineage-item b{display:block;margin-bottom:.25rem}.lineage-item div{color:var(--muted);font-size:.76rem;line-height:1.45}
 .locked-note{border:1px dashed var(--brd);border-radius:14px;padding:1rem;color:var(--muted);font-size:.82rem;line-height:1.5;background:rgba(0,102,255,.06)}
@@ -2177,7 +2184,7 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
         <details class="qa-check" open data-cat="billing" data-roles="assignee pm csm pmo admin executive" data-search="billing process time tracking harvest invoice claim csm pm cos chief of staff pablo baio weekly register week time">
           <summary><span>Billing Process <span class="chip badge-green" style="margin-left:8px">Documented</span></span><span class="qa-status ok">v1.00</span></summary>
           <div class="qa-check-body">
-            <img src="assets/process-billing-flow.jpg" alt="Billing Process swimlane diagram: Team, Project Manager, CSM and COS" style="max-width:100%;border-radius:10px;border:1px solid var(--brd);margin-bottom:.85rem;display:block"/>
+            <div id="billingProcessDiagram" class="proc-diagram" data-fallback-img="assets/process-billing-flow.jpg"></div>
             <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.9rem">
               <span class="badge badge-blue">Team</span>
               <span class="badge badge-blue">PM</span>
@@ -3454,6 +3461,101 @@ function renderImpersonationBanner(){
     document.body.classList.remove('impersonating');
   }
 }
+// Generated process flow diagrams — built from structured step data instead of a hand-drawn/exported
+// image, so the picture can never drift from the documented steps. See the Portal de Procesos
+// strategy doc, "Visual flows: generated, not drawn." Viewer's own role lane is highlighted using the
+// same effectiveUserRole() signal the rest of the board uses for role-scoped views.
+const PROCESS_LANES = [
+  {key:'assignee', label:'Team'},
+  {key:'pm', label:'PM'},
+  {key:'csm', label:'CSM'},
+  {key:'pmo', label:'PMO / COS'},
+];
+const BILLING_PROCESS_STEPS = [
+  {id:1, role:'assignee', title:'Time registration', desc:'Friday morning. Each team member logs their weekly hours in the time tracking system.'},
+  {id:2, role:'pm', title:'Initial review by PM', desc:'Friday afternoon. The PM checks entries for their contracts for completeness and correctness.'},
+  {id:3, role:'pm', title:'Time entry adjustment (if needed)', desc:'If there are discrepancies, the PM requests corrections and the team re-submits — the claim cycle.', returns_to:1},
+  {id:4, role:'csm', title:'CSM weekly review', desc:'Monday morning. The CSM reviews the weekly contract time records for consistency with client expectations.'},
+  {id:5, role:'csm', title:'CSM feedback loop (if needed)', desc:'Additional issues trigger the claim process again for clarification.', returns_to:1},
+  {id:6, role:'pmo', title:'Final time register review (PMO / Chief of Staff)', desc:'Tuesday morning. Final check of all approved timesheets.'},
+  {id:7, role:'pmo', title:'Invoice issuance', desc:'Once every validation is complete, the invoice is generated and sent to the client.'},
+];
+function processLaneKeyForRole(role){
+  if(['pmo','admin'].includes(role)) return 'pmo';
+  if(['pm','csm','assignee'].includes(role)) return role;
+  return '';
+}
+function renderProcessDiagram(containerId, steps, lanes = PROCESS_LANES){
+  const el = document.getElementById(containerId);
+  if(!el || !steps.length) return;
+  const activeLaneKey = processLaneKeyForRole(effectiveUserRole());
+  const W = 900, laneH = 64, laneGap = 8, marginTop = 16, labelW = 118;
+  const plotW = W - labelW - 60;
+  const laneY = {};
+  lanes.forEach((l,i) => { laneY[l.key] = marginTop + i * (laneH + laneGap) + laneH / 2; });
+  const H = marginTop + lanes.length * (laneH + laneGap) + 56;
+  const stepX = steps.map((s,i) => labelW + 30 + (steps.length > 1 ? (i / (steps.length - 1)) * (plotW - 20) : 0));
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" class="proc-diagram-svg" role="img" aria-label="Process flow diagram">`;
+  svg += `<defs>
+    <marker id="pdArrow-${containerId}" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--blue-lt)"/></marker>
+    <marker id="pdArrowLoop-${containerId}" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#F97316"/></marker>
+  </defs>`;
+
+  lanes.forEach(l => {
+    const y = laneY[l.key] - laneH / 2;
+    const active = l.key === activeLaneKey;
+    svg += `<rect x="0" y="${y}" width="${W}" height="${laneH}" fill="${active ? 'rgba(0,102,255,.09)' : 'transparent'}" stroke="var(--brd)" stroke-width="1"/>`;
+    svg += `<text x="10" y="${laneY[l.key] + 4}" font-size="12" font-weight="700" fill="${active ? 'var(--blue-lt)' : 'var(--muted)'}">${esc(l.label)}${active ? ' (you)' : ''}</text>`;
+  });
+
+  for(let i = 0; i < steps.length - 1; i++){
+    const a = steps[i], b = steps[i+1];
+    const x1 = stepX[i], y1 = laneY[a.role], x2 = stepX[i+1], y2 = laneY[b.role];
+    const midx = (x1 + x2) / 2;
+    svg += `<path d="M${x1},${y1} L${midx},${y1} L${midx},${y2} L${x2},${y2}" fill="none" stroke="var(--blue-lt)" stroke-width="2" marker-end="url(#pdArrow-${containerId})" opacity=".55"/>`;
+  }
+
+  steps.forEach((s,i) => {
+    if(!s.returns_to) return;
+    const targetIdx = steps.findIndex(t => t.id === s.returns_to);
+    if(targetIdx < 0) return;
+    const x1 = stepX[i], y1 = laneY[s.role] + laneH / 2 - 8;
+    const x2 = stepX[targetIdx], y2 = laneY[steps[targetIdx].role] + laneH / 2 - 8;
+    const arcY = H - 14;
+    svg += `<path d="M${x1},${y1} C${x1},${arcY} ${x2},${arcY} ${x2},${y2}" fill="none" stroke="#F97316" stroke-width="1.6" stroke-dasharray="5,4" marker-end="url(#pdArrowLoop-${containerId})"/>`;
+  });
+
+  steps.forEach((s,i) => {
+    const x = stepX[i], y = laneY[s.role];
+    svg += `<g class="proc-step-node" style="cursor:pointer" onclick="toggleProcessStepDetail(${jsArg(containerId)}, ${s.id})">
+      <circle cx="${x}" cy="${y}" r="15" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+      <text x="${x}" y="${y + 4}" font-size="12" font-weight="700" text-anchor="middle" fill="var(--blue-lt)">${s.id}</text>
+    </g>`;
+  });
+  svg += `</svg>`;
+
+  el.innerHTML = svg + `<div class="proc-diagram-detail" id="${containerId}Detail"></div>`;
+  el.dataset.steps = JSON.stringify(steps);
+}
+function toggleProcessStepDetail(containerId, stepId){
+  const el = document.getElementById(containerId);
+  const detailEl = document.getElementById(containerId + 'Detail');
+  if(!el || !detailEl) return;
+  const steps = JSON.parse(el.dataset.steps || '[]');
+  const step = steps.find(s => s.id === stepId);
+  if(detailEl.dataset.active === String(stepId)){
+    detailEl.innerHTML = '';
+    detailEl.dataset.active = '';
+    return;
+  }
+  detailEl.dataset.active = String(stepId);
+  detailEl.innerHTML = step
+    ? `<div class="proc-step-detail-card"><b>${step.id}. ${esc(step.title)}</b><p>${esc(step.desc)}</p></div>`
+    : '';
+}
+window.toggleProcessStepDetail = toggleProcessStepDetail;
+
 function updateRoleSensitiveUi(){
   const canSync = canRunRefresh();
   document.querySelectorAll('[data-sync-action]').forEach(btn => {
@@ -3473,6 +3575,7 @@ function updateRoleSensitiveUi(){
   document.body.classList.toggle('role-preview-active', Boolean(requestedPreviewRole() && canPreviewRole()));
   renderImpersonationBanner();
   if(document.getElementById('processList')) applyProcessFilters();
+  if(document.getElementById('billingProcessDiagram')) renderProcessDiagram('billingProcessDiagram', BILLING_PROCESS_STEPS);
 }
 
 function userInitials(user){
