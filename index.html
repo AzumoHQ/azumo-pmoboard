@@ -235,6 +235,12 @@ body.light .qa-recurring,body.light .qa-checklist-item{background:#FFFFFF}
 .proc-step-detail-card{margin-top:.6rem;padding:.6rem .75rem;background:rgba(0,102,255,.06);border:1px solid var(--brd);border-radius:8px;font-size:.8rem;color:var(--txt)}
 .proc-step-detail-card b{display:block;margin-bottom:.25rem;color:var(--blue-lt)}
 .proc-step-detail-card p{margin:0;color:var(--muted);line-height:1.5}
+.proc-health-strip{display:flex;flex-wrap:wrap;gap:14px;font-size:.78rem;color:var(--muted);margin:.6rem 0 1rem;padding:.65rem .9rem;border:1px solid var(--brd);border-radius:var(--r);background:var(--surf)}
+.proc-health-strip span{display:inline-flex;align-items:center;gap:6px}
+.proc-health-dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.proc-health-dot.green{background:#34D399}.proc-health-dot.yellow{background:#FDBA74}.proc-health-dot.red{background:#F87171}
+.proc-report-change{font-size:.72rem;color:var(--blue-lt);text-decoration:none;white-space:nowrap}
+.proc-report-change:hover{text-decoration:underline}
 .lineage-item{background:var(--surf);border:1px solid var(--brd);border-radius:12px;padding:.85rem}
 .lineage-item b{display:block;margin-bottom:.25rem}.lineage-item div{color:var(--muted);font-size:.76rem;line-height:1.45}
 .locked-note{border:1px dashed var(--brd);border-radius:14px;padding:1rem;color:var(--muted);font-size:.82rem;line-height:1.5;background:rgba(0,102,255,.06)}
@@ -2178,11 +2184,13 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
       <h3><i class="ti ti-receipt-2"></i> Billing &amp; Ops <span class="badge badge-blue">1</span></h3>
     </div>
 
+    <div class="proc-health-strip" id="processHealthStrip"></div>
+
     <div id="processList" style="border:1px solid var(--brd);border-top:0;border-radius:0 0 var(--r) var(--r);padding:.8rem;background:var(--surf)">
       <div class="proc-group" data-group="billing">
 
         <details class="qa-check" open data-cat="billing" data-roles="assignee pm csm pmo admin executive" data-search="billing process time tracking harvest invoice claim csm pm cos chief of staff pablo baio weekly register week time">
-          <summary><span>Billing Process <span class="chip badge-green" style="margin-left:8px">Documented</span></span><span class="qa-status ok">v1.00</span></summary>
+          <summary><span>Billing Process <span class="chip badge-green" style="margin-left:8px">Documented</span> <span class="chip" id="procHealth-billing" style="margin-left:6px"></span></span><span class="qa-status ok">v1.00</span></summary>
           <div class="qa-check-body">
             <div id="billingProcessDiagram" class="proc-diagram" data-fallback-img="assets/process-billing-flow.jpg"></div>
             <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.9rem">
@@ -2202,7 +2210,10 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
               <li><b>Final time register review (PMO / Chief of Staff)</b> — Tuesday morning. Final check of all approved timesheets.</li>
               <li><b>Invoice issuance.</b> Once every validation is complete, the invoice is generated and sent to the client.</li>
             </ol>
-            <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Resources: <a href="https://docs.google.com/spreadsheets/d/1ZrkOk2kOygmjmJmUGnMC28QIJHIuocqz-qJMvHmRzx4/edit?gid=1319034044#gid=1319034044" target="_blank" rel="noopener" style="color:var(--blue-lt)">Billing tracking sheet ↗</a> · Owner for questions: Pablo Baio · v1.00</div>
+            <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;justify-content:space-between">
+              <span>Resources: <a href="https://docs.google.com/spreadsheets/d/1ZrkOk2kOygmjmJmUGnMC28QIJHIuocqz-qJMvHmRzx4/edit?gid=1319034044#gid=1319034044" target="_blank" rel="noopener" style="color:var(--blue-lt)">Billing tracking sheet ↗</a> · Owner for questions: Pablo Baio · v1.00</span>
+              <a class="proc-report-change" href="mailto:federica.gonzalez@azumo.co?subject=Process%20change%20report%3A%20Billing%20Process&amp;body=Process%3A%20Billing%20Process%0AWhat%20changed%3A%20%0AWhy%3A%20%0AReported%20by%20(role)%3A%20"><i class="ti ti-message-report"></i> Report a change</a>
+            </div>
           </div>
         </details>
 
@@ -3461,6 +3472,46 @@ function renderImpersonationBanner(){
     document.body.classList.remove('impersonating');
   }
 }
+// Process health (RAG) — Green/Amber/Red computed from how long it has been since a process was
+// last reviewed, vs. its review cadence. See Portal de Procesos strategy doc, "Process health — the
+// RAG idea, applied to processes." A process that has never been reviewed (no lastReviewed) is Red —
+// same as a stale one — because an unreviewed draft carries the same risk as an outdated one.
+const PROCESS_HEALTH_META = {
+  billing: {lastReviewed: '2026-07-06', reviewCadenceMonths: 6, owner: 'Pablo Baio'},
+};
+function computeProcessHealth(meta){
+  if(!meta || !meta.lastReviewed) return {level: 'red', label: 'Never reviewed', cls: 'badge-red'};
+  const reviewed = new Date(meta.lastReviewed + 'T00:00:00');
+  if(Number.isNaN(reviewed.getTime())) return {level: 'red', label: 'Never reviewed', cls: 'badge-red'};
+  const cadence = meta.reviewCadenceMonths || 6;
+  const monthsSince = (Date.now() - reviewed.getTime()) / (1000 * 60 * 60 * 24 * 30.44);
+  if(monthsSince <= cadence) return {level: 'green', label: 'Reviewed', cls: 'badge-green'};
+  if(monthsSince <= cadence * 1.5) return {level: 'yellow', label: 'Review due', cls: 'badge-yellow'};
+  return {level: 'red', label: 'Review overdue', cls: 'badge-red'};
+}
+function renderProcessHealthStrip(){
+  const strip = document.getElementById('processHealthStrip');
+  const entries = Object.entries(PROCESS_HEALTH_META);
+  entries.forEach(([id, meta]) => {
+    const health = computeProcessHealth(meta);
+    const badge = document.getElementById(`procHealth-${id}`);
+    if(badge){
+      badge.className = `chip ${health.cls}`;
+      badge.style.marginLeft = '6px';
+      badge.textContent = health.label;
+      badge.title = meta.lastReviewed ? `Last reviewed ${meta.lastReviewed} · cadence every ${meta.reviewCadenceMonths}mo` : 'No review on record';
+    }
+  });
+  if(!strip) return;
+  const counts = {green: 0, yellow: 0, red: 0};
+  entries.forEach(([, meta]) => { counts[computeProcessHealth(meta).level]++; });
+  strip.innerHTML = `
+    <span><i class="proc-health-dot green"></i> ${counts.green} healthy</span>
+    <span><i class="proc-health-dot yellow"></i> ${counts.yellow} review due</span>
+    <span><i class="proc-health-dot red"></i> ${counts.red} overdue / never reviewed</span>
+    <span style="margin-left:auto;color:var(--muted)">Reviewed vs. cadence — see Section guide for the process framework</span>
+  `;
+}
 // Generated process flow diagrams — built from structured step data instead of a hand-drawn/exported
 // image, so the picture can never drift from the documented steps. See the Portal de Procesos
 // strategy doc, "Visual flows: generated, not drawn." Viewer's own role lane is highlighted using the
@@ -3576,6 +3627,7 @@ function updateRoleSensitiveUi(){
   renderImpersonationBanner();
   if(document.getElementById('processList')) applyProcessFilters();
   if(document.getElementById('billingProcessDiagram')) renderProcessDiagram('billingProcessDiagram', BILLING_PROCESS_STEPS);
+  if(document.getElementById('processHealthStrip')) renderProcessHealthStrip();
 }
 
 function userInitials(user){
