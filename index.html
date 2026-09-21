@@ -2010,7 +2010,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-route"></i></div>
       <h2>Processes</h2>
-      <div class="sec-tag">7 processes · source: Notion</div>
+      <div class="sec-tag">8 processes · source: Notion</div>
     </div>
 
     <div class="mc" style="padding:1.2rem 1.4rem;margin-bottom:1rem">
@@ -2041,6 +2041,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <button class="action-filter active" data-cat="all" onclick="setProcessCategory('all')">All</button>
       <button class="action-filter" data-cat="talent" onclick="setProcessCategory('talent')">Talent &amp; staffing</button>
       <button class="action-filter" data-cat="delivery" onclick="setProcessCategory('delivery')">Delivery &amp; PM</button>
+      <button class="action-filter" data-cat="billing" onclick="setProcessCategory('billing')">Billing &amp; Ops</button>
       <button class="action-filter" data-cat="reference" onclick="setProcessCategory('reference')">Reference</button>
     </div>
 
@@ -2131,6 +2132,32 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
             <li><b>Run the project.</b> Weekly status to the client, weekly Project Follow-up form for leadership, meeting minutes after every client call.</li>
           </ol>
           <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Source: <a href="https://app.notion.com/p/2092bdecc60a80f79312c00346a338ef" target="_blank" rel="noopener" style="color:var(--blue-lt)">Notion ↗</a></div>
+        </div>
+      </details>
+
+      <details class="qa-check" data-cat="billing" data-roles="assignee pm csm pmo admin executive" data-search="billing process time tracking harvest invoice claim csm pm cos chief of staff pablo baio weekly register week time">
+        <summary><span>Billing Process <span class="chip badge-green" style="margin-left:8px">Documented</span></span><span class="qa-status ok">Owner: Pablo Baio · v1.00</span></summary>
+        <div class="qa-check-body">
+          <p style="margin:0 0 .6rem">Improve the efficiency of the billing process. Visible to Team, Project Manager, CSM and Chief of Staff — the roles that own a lane in the flow below.</p>
+          <img src="assets/process-billing-flow.jpg" alt="Billing Process swimlane diagram: Team, Project Manager, CSM and COS" style="max-width:100%;border-radius:10px;border:1px solid var(--brd);margin-bottom:.9rem;display:block"/>
+          <div class="mc-sub" style="margin-bottom:.5rem">Roles &amp; responsibilities</div>
+          <ul style="margin:0 0 .9rem;padding-left:1.15rem;display:flex;flex-direction:column;gap:.35rem;font-size:.82rem;color:var(--muted)">
+            <li><b style="color:var(--txt)">Team.</b> Register week time.</li>
+            <li><b style="color:var(--txt)">Project Manager.</b> Weekly contract time register review.</li>
+            <li><b style="color:var(--txt)">CSM.</b> Weekly contract time tracking review.</li>
+            <li><b style="color:var(--txt)">Chief of Staff.</b> Final time register review.</li>
+          </ul>
+          <div class="mc-sub" style="margin-bottom:.5rem">Process steps</div>
+          <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
+            <li><b>Time registration</b> — Friday morning. Each team member logs their weekly hours in the time tracking system.</li>
+            <li><b>Initial review by PM</b> — Friday afternoon. The PM checks entries for their contracts for completeness and correctness.</li>
+            <li><b>Time entry adjustment</b> (if needed). If there are discrepancies, the PM requests corrections and the team re-submits — the claim cycle.</li>
+            <li><b>CSM weekly review</b> — Monday morning. The CSM reviews the weekly contract time records for consistency with client expectations.</li>
+            <li><b>CSM feedback loop</b> (if needed). Additional issues trigger the claim process again for clarification.</li>
+            <li><b>Final time register review (COS)</b> — Tuesday morning. The Chief of Staff does a final check of all approved timesheets.</li>
+            <li><b>Invoice issuance.</b> Once every validation is complete, the invoice is generated and sent to the client.</li>
+          </ol>
+          <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted)">Resources: <a href="https://docs.google.com/spreadsheets/d/1ZrkOk2kOygmjmJmUGnMC28QIJHIuocqz-qJMvHmRzx4/edit?gid=1319034044#gid=1319034044" target="_blank" rel="noopener" style="color:var(--blue-lt)">Billing tracking sheet ↗</a> · Owner for questions: Pablo Baio · v1.00</div>
         </div>
       </details>
 
@@ -3209,6 +3236,7 @@ function updateRoleSensitiveUi(){
   if(pmoQuick) pmoQuick.style.display = canSeePmoGroup() ? '' : 'none';
   document.body.classList.toggle('role-preview-active', Boolean(requestedPreviewRole() && canPreviewRole()));
   renderImpersonationBanner();
+  if(document.getElementById('processList')) applyProcessFilters();
 }
 
 function userInitials(user){
@@ -8145,9 +8173,11 @@ function applyProcessFilters(){
   list.querySelectorAll('.qa-check').forEach(card => {
     const cat = card.getAttribute('data-cat') || '';
     const text = (card.getAttribute('data-search') || '') + ' ' + (card.querySelector('summary')?.textContent || '').toLowerCase();
+    const rolesAttr = card.getAttribute('data-roles');
+    const roleOk = !rolesAttr || canSeePmoGroup() || rolesAttr.split(' ').includes(effectiveUserRole());
     const matchesCat = processCategory === 'all' || processCategory === cat;
     const matchesQuery = !q || text.toLowerCase().includes(q);
-    const show = matchesCat && matchesQuery;
+    const show = roleOk && matchesCat && matchesQuery;
     card.style.display = show ? '' : 'none';
     if(show) anyVisible = true;
   });
