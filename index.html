@@ -172,6 +172,7 @@ body.light .bench-table-wrap tbody tr:nth-child(even) td{background:rgba(0,102,2
 .badge-yellow{background:rgba(249,115,22,.16);color:#FDBA74}
 .badge-blue{background:rgba(0,102,255,.15);color:#60A5FA}
 .badge-green{background:rgba(16,185,129,.15);color:#34D399}
+.badge-wip{background:rgba(249,115,22,.16);color:#FDBA74;border:1px dashed rgba(249,115,22,.55);font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;margin-left:10px}
 table{width:100%;border-collapse:collapse;font-size:.82rem}
 th{padding:10px 16px;text-align:left;color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:rgba(255,255,255,.02);white-space:nowrap}
 td{padding:12px 16px;border-top:1px solid var(--brd);vertical-align:middle}
@@ -572,8 +573,16 @@ section{margin-bottom:1.65rem!important}
 .internal-projects-table td:nth-child(2){font-weight:850;color:var(--txt)}
 .internal-projects-table .muted-value{color:var(--muted)}
 .internal-client-row td{background:rgba(0,102,255,.08)!important;border-top:0;font-weight:850}.internal-client-main{display:flex;align-items:center;gap:8px}.internal-toggle{background:rgba(0,102,255,.12);border:1px solid rgba(0,102,255,.3);color:var(--blue-lt);border-radius:9px;padding:5px 9px;font-size:.72rem;font-weight:950;cursor:pointer}.internal-toggle:hover{background:rgba(0,102,255,.18)}.internal-sow-row td:first-child{padding-left:2.2rem}.internal-assignment-chip{display:inline-flex;align-items:center;justify-content:center;min-height:24px;border-radius:999px;padding:0 10px;font-size:.72rem;font-weight:900;line-height:1;background:rgba(0,102,255,.14);color:#93C5FD}.internal-assignment-chip.full{background:rgba(16,185,129,.14);color:#6EE7B7}.internal-assignment-chip.partial{background:rgba(249,115,22,.14);color:#FDBA74}
-.hh-filter-row{border-bottom:1px solid var(--brd)}.hh-check-field{grid-column:span 2}.hh-checks{display:flex;gap:14px;flex-wrap:wrap;align-items:center;height:40px}.hh-check{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:800;color:var(--txt);cursor:pointer;white-space:nowrap}.hh-check input{cursor:pointer;accent-color:#E8501A}
-.harvest-hours-module{padding-bottom:1rem}.harvest-hours-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;align-items:end;padding:1rem 1.2rem;border-bottom:1px solid var(--brd)}.harvest-hours-controls .btn{height:40px;justify-content:center}.harvest-hours-summary{padding:1rem 1.2rem;margin-bottom:0}.harvest-hours-subhead{border-top:1px solid var(--brd)}.harvest-hours-table-wrap{max-height:440px}.hh-progress{height:7px;background:rgba(107,143,191,.18);border-radius:999px;overflow:hidden;min-width:90px}.hh-progress-fill{height:100%;border-radius:999px}.info-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(16,185,129,.12);color:#6EE7B7;border:1px solid rgba(16,185,129,.32);font-size:.8rem}.err-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.35);font-size:.8rem}
+.hh-filter-row{border-bottom:1px solid var(--brd)}.hh-check-field{grid-column:span 2}.hh-checks{display:flex;gap:14px;flex-wrap:wrap;align-items:center;height:40px}.hh-check{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:800;color:var(--txt);cursor:pointer;white-space:nowrap}.hh-check input{cursor:pointer;accent-color:#E8501A}.hh-ms-wrap{position:relative}.hh-ms-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.65rem .8rem;font:inherit;font-size:.88rem;outline:none;cursor:pointer;text-align:left}.hh-ms-btn:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,102,255,.15)}.hh-ms-caret{font-size:.7rem;color:var(--muted);flex-shrink:0}.hh-ms-panel{position:absolute;top:calc(100% + 4px);left:0;z-index:200;min-width:100%;max-height:230px;overflow-y:auto;background:var(--surf);border:1px solid var(--brd);border-radius:10px;padding:.35rem 0;box-shadow:0 8px 24px rgba(0,0,0,.25)}.hh-ms-option{display:flex;align-items:center;gap:8px;padding:.38rem .85rem;font-size:.82rem;cursor:pointer;user-select:none}.hh-ms-option:hover{background:rgba(0,102,255,.08)}.hh-ms-option input{cursor:pointer;accent-color:#E8501A;flex-shrink:0}
+.harvest-hours-module{padding-bottom:1rem}.harvest-hours-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;align-items:end;padding:1rem 1.2rem;border-bottom:1px solid var(--brd)}.harvest-hours-controls .btn{height:40px;justify-content:center}.harvest-hours-summary{padding:1rem 1.2rem;margin-bottom:0}.harvest-hours-subhead{border-top:1px solid var(--brd)}.harvest-hours-table-wrap{max-height:440px}.hh-progress{height:7px;background:rgba(107,143,191,.18);border-radius:999px;overflow:hidden;min-width:90px}.hh-progress-fill{height:100%;border-radius:999px}.hh-task-chip{display:inline-flex;align-items:center;font-size:.64rem;font-weight:700;letter-spacing:.03em;padding:1px 7px;border-radius:999px;background:rgba(107,143,191,.12);color:var(--muted);white-space:nowrap;flex-shrink:0}.hh-day-subtotal{display:flex;gap:10px;align-items:baseline;border-top:1px solid rgba(107,143,191,.14);padding-top:3px;margin-top:1px}.hh-day-subtotal>span:first-child{min-width:64px;font-size:.7rem;color:var(--fg-3)}.hh-day-subtotal-hrs{font-size:.75rem;font-weight:900;color:var(--fg-2)}.info-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(16,185,129,.12);color:#6EE7B7;border:1px solid rgba(16,185,129,.32);font-size:.8rem}.hh-issue-trigger{position:relative;cursor:help}.hh-issue-trigger .hh-issue-preview{display:none;position:absolute;top:22px;left:0;z-index:60;background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:8px 10px;min-width:230px;box-shadow:0 10px 28px rgba(0,0,0,.35);font-size:.76rem;white-space:normal;text-align:left}.hh-issue-trigger:hover .hh-issue-preview{display:block}.hh-issue-preview-title{font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:.64rem;color:var(--muted);margin-bottom:6px}.hh-issue-preview-row{display:flex;gap:10px;padding:4px 0;border-top:1px solid var(--brd);color:var(--txt)}.hh-issue-preview-row:first-of-type{border-top:none}.hh-issue-preview-row span:first-child{min-width:64px;color:var(--muted)}.hh-issue-preview-row span:nth-child(2){min-width:36px;font-weight:700}.err-box{margin:.6rem 1.2rem 1rem;padding:.75rem .9rem;border-radius:12px;background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.35);font-size:.8rem}
+.hw-table-wrap{overflow-x:auto;max-height:540px}.hw-table-wrap table{min-width:700px}.hw-table-wrap th{position:sticky;top:0;z-index:4;background:var(--surf)}.hw-table-wrap td{padding-top:12px;padding-bottom:12px}.hw-table-wrap tbody tr.hw-data-row{cursor:pointer}.hw-table-wrap tbody tr.hw-data-row:hover td{background:rgba(0,102,255,.04)}.hw-table-wrap tbody tr.hw-data-row.is-open td{background:rgba(0,102,255,.06)}.hw-sort-btn{background:none;border:none;color:inherit;font:inherit;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:0;white-space:nowrap}.hw-sort-btn .hw-caret{color:var(--muted);font-size:.65rem}.hw-sort-btn.active .hw-caret{color:var(--blue-lt)}.hw-filter-row{display:flex;align-items:center;gap:10px;padding:.75rem 1.2rem;border-bottom:1px solid var(--brd)}.hw-filter-row input{flex:1;max-width:280px;background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:8px;padding:6px 10px;font:inherit;font-size:.82rem;outline:none}.hw-filter-row input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,102,255,.12)}.hw-meta{font-size:.72rem;color:var(--muted)}.hw-drill-row td{padding:0!important;border-top:none!important}.hw-drill-inner{padding:.5rem 1.2rem .75rem;border-top:1px solid rgba(107,143,191,.18);background:rgba(0,0,0,.06)}.hw-dl-table{width:100%;border-collapse:collapse;font-size:.78rem}.hw-dl-table td{padding:5px 8px;border-bottom:1px solid rgba(107,143,191,.08);vertical-align:middle}.hw-dl-table tr:last-child td{border-bottom:none}.hw-dl-chip{display:inline-block;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;padding:1px 8px;border-radius:999px;white-space:nowrap;line-height:1.7}.hw-dl-client .hw-dl-chip{background:rgba(0,102,255,.14);color:#93C5FD}.hw-dl-internal .hw-dl-chip{background:rgba(16,185,129,.14);color:#6EE7B7}.hw-dl-bench .hw-dl-chip{background:rgba(249,115,22,.14);color:#FDBA74}.hw-dl-off .hw-dl-chip{background:rgba(107,143,191,.14);color:var(--muted)}.hw-dl-pname{color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px}.hw-dl-hcell{text-align:right;font-weight:800;color:var(--muted);white-space:nowrap;width:72px}.hw-dl-empty-row td{color:var(--muted);font-size:.75rem;font-style:italic;padding:8px}.hw-empty-state{padding:2rem 1.2rem;text-align:center;color:var(--muted);font-size:.85rem}.hw-copy-row-btn{background:none;border:1px solid rgba(107,143,191,.3);color:var(--muted);border-radius:5px;padding:2px 7px;font-size:.7rem;cursor:pointer;opacity:0;transition:opacity .12s,color .12s,border-color .12s;white-space:nowrap}.hw-data-row:hover .hw-copy-row-btn{opacity:1}.hw-copy-row-btn:hover{color:var(--fg);border-color:rgba(107,143,191,.7)}.hw-copy-row-btn.copied{color:#6EE7B7;border-color:#6EE7B7;opacity:1}
+.atl-wrap{margin-bottom:1.2rem;padding:0 .25rem}.atl-header{display:flex;align-items:center;gap:10px;margin-bottom:.75rem}.atl-title{font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}.atl-count{font-size:.68rem;color:var(--muted)}.atl-scroll{max-height:280px;overflow-y:auto;padding-right:4px}.atl-day{display:flex;align-items:center;gap:10px;margin:.75rem 0 .4rem}.atl-day-line{flex:1;height:1px;background:var(--brd)}.atl-day-label{font-size:.68rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);white-space:nowrap}.atl-list{display:flex;flex-direction:column;gap:3px;padding-left:1rem;border-left:2px solid var(--brd)}.atl-item{display:flex;align-items:flex-start;gap:10px;padding:7px 10px;border-radius:8px;transition:background .1s;position:relative}.atl-item:hover{background:var(--hover,rgba(0,102,255,.05))}.atl-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--surf);position:absolute;left:-1.45rem;top:.6rem;flex-shrink:0}.atl-icon{font-size:.9rem;min-width:20px;text-align:center;margin-top:1px}.atl-body{flex:1;min-width:0}.atl-label{font-size:.8rem;color:var(--txt);line-height:1.4;word-break:break-word}.atl-meta{font-size:.68rem;color:var(--muted);margin-top:1px}.atl-time{font-size:.68rem;color:var(--muted);white-space:nowrap;margin-top:2px;margin-left:auto;padding-left:8px}.atl-empty{font-size:.82rem;color:var(--muted);text-align:center;padding:1.5rem;font-style:italic}
+.hwr-table-wrap{overflow-x:auto;max-height:600px}.hwr-table-wrap table{min-width:820px;width:100%;border-collapse:collapse}.hwr-table-wrap th{position:sticky;top:0;z-index:4;background:var(--surf);font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;padding:10px 8px;white-space:nowrap;border-bottom:1px solid var(--brd)}.hwr-table-wrap td{padding:10px 8px;font-size:.83rem;border-bottom:1px solid rgba(107,143,191,.1);vertical-align:top}.hwr-table-wrap tbody tr:hover td{background:rgba(0,102,255,.04)}.hwr-diff-pos{color:#6EE7B7;font-weight:800}.hwr-diff-neg{color:#FCA5A5;font-weight:800}.hwr-detail{display:flex;flex-direction:column;gap:2px}.hwr-detail-row{display:flex;justify-content:space-between;gap:12px;font-size:.75rem;padding:1px 0}.hwr-detail-row span:last-child{font-weight:800;white-space:nowrap;color:var(--muted)}
+.hw-health-strip{border-bottom:1px solid var(--brd);padding:.65rem 1.2rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:flex-start;font-size:.78rem}.hw-health-ok{color:var(--green);font-weight:800;font-size:.75rem;line-height:2}.hw-health-group{flex-shrink:0}.hw-health-group>summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:950}.hw-health-group>summary::-webkit-details-marker{display:none}.hw-health-error>summary{background:rgba(239,68,68,.16);color:#FCA5A5}.hw-health-warning>summary{background:rgba(249,115,22,.16);color:#FDBA74}.hw-health-group[open]>summary{border-radius:8px 8px 0 0}.hw-health-list{margin:.3rem 0 0;padding:.4rem .65rem;list-style:none;border-radius:0 8px 8px 8px;display:flex;flex-direction:column;gap:.3rem;max-width:580px}.hw-health-error .hw-health-list{background:rgba(239,68,68,.1)}.hw-health-warning .hw-health-list{background:rgba(249,115,22,.1)}.hw-health-list li{font-size:.72rem;line-height:1.45}.hw-health-error .hw-health-list li{color:#FCA5A5}.hw-health-warning .hw-health-list li{color:#FDBA74}.hw-hltype{font-size:.63rem;font-weight:950;text-transform:uppercase;letter-spacing:.06em;opacity:.75;margin-right:4px}
+.hw-hb-bar{display:flex;align-items:center;gap:6px;flex-shrink:0}.hw-hb-ok{font-size:.72rem;font-weight:800;color:var(--green);opacity:.85}.hw-hb-group{position:relative;flex-shrink:0}.hw-hb-group>summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:999px;font-size:.72rem;font-weight:900;line-height:1.6;white-space:nowrap;border:none;outline:none}.hw-hb-group>summary::-webkit-details-marker{display:none}.hw-hb-error>summary{background:rgba(239,68,68,.18);color:#FCA5A5}.hw-hb-warning>summary{background:rgba(249,115,22,.18);color:#FDBA74}.hw-hb-group[open]>summary{border-radius:8px 8px 0 0}.hw-hb-panel{position:absolute;right:0;top:calc(100% + 2px);z-index:300;min-width:240px;max-width:400px;background:var(--card);border:1px solid var(--brd);border-radius:0 0 10px 10px;padding:.5rem .75rem .6rem;box-shadow:0 8px 24px rgba(0,0,0,.28)}.hw-hb-error .hw-hb-panel{border-top:2px solid rgba(239,68,68,.4)}.hw-hb-warning .hw-hb-panel{border-top:2px solid rgba(249,115,22,.4)}.hw-hb-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.3rem}.hw-hb-list li{font-size:.71rem;line-height:1.45;display:flex;gap:5px}.hw-hb-error .hw-hb-list li{color:#FCA5A5}.hw-hb-warning .hw-hb-list li{color:#FDBA74}.hw-hb-type{font-size:.61rem;font-weight:950;text-transform:uppercase;letter-spacing:.05em;opacity:.65;flex-shrink:0;margin-top:1px}
+.hw-week-picker{display:flex;align-items:center;gap:6px;flex-shrink:0}.hw-date-input{background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:8px;padding:5px 8px;font:inherit;font-size:.78rem;outline:none}.hw-date-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,102,255,.12)}.hw-picker-sep{color:var(--muted);font-size:.75rem;line-height:1}
+.hw-tab-bar{display:flex;gap:0;border-bottom:1px solid var(--brd);background:var(--surf);padding:0 1rem;flex-shrink:0}.hw-tab{padding:.55rem 1.1rem;border:none;background:none;color:var(--muted);font-size:.78rem;font-weight:700;letter-spacing:.05em;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;white-space:nowrap}.hw-tab:hover{color:var(--fg)}.hw-tab.active{color:var(--blue-lt);border-bottom-color:var(--blue-lt)}.hw-team-wrap{padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:1.5rem}.hw-team-section{display:flex;flex-direction:column;gap:.5rem}.hw-team-section-label{font-size:.68rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}.hw-team-grid{display:grid;gap:.75rem}.hw-team-grid-3{grid-template-columns:repeat(3,1fr)}.hw-team-grid-4{grid-template-columns:repeat(4,1fr)}.hw-team-grid-5{grid-template-columns:repeat(5,1fr)}.hw-stat{padding:.8rem 1rem;background:rgba(107,143,191,.06);border:1px solid rgba(107,143,191,.18);border-radius:10px;display:flex;flex-direction:column;gap:.25rem}.hw-stat-lbl{font-size:.66rem;color:var(--muted);font-weight:600;letter-spacing:.04em;line-height:1.3}.hw-stat-val{font-size:1.2rem;font-weight:800;color:var(--fg);line-height:1.2}.hw-stat-sub{font-size:.68rem;color:var(--muted);margin-top:.1rem}.hw-stat.is-accent .hw-stat-val{color:var(--blue-lt)}.hw-stat.is-pos .hw-stat-val{color:#6EE7B7}.hw-stat.is-neg .hw-stat-val{color:#FCA5A5}
+@media(max-width:700px){.hw-team-grid-3,.hw-team-grid-4,.hw-team-grid-5{grid-template-columns:repeat(2,1fr)}}
 
 /* PMO-LAYOUT: nav work-in-progress badge */
 @media(max-width:980px){.nav-wip-pill a{display:none}.nav-wip-pill{padding:2px 7px;font-size:.58rem}.nav-title-row{gap:6px}}
@@ -1190,7 +1199,7 @@ body:not(.light) .pmo-ov{
   --ov-chip-fg:#90E0EF;
   --ov-accent-text:#90E0EF;
 }
-body:not(.light) :is(#newSearchesTriage,#dashboard,#opsViews,#pmoActionCenter,#harvestAccess,#accountCoverage,#dueDates,#pendingAssignments,#bench,#azumo,#harvestHours,#history,#forecast){
+body:not(.light) :is(#newSearchesTriage,#dashboard,#opsViews,#pmoActionCenter,#harvestAccess,#harvestWeekly,#accountCoverage,#dueDates,#pendingAssignments,#bench,#azumo,#harvestHours,#history,#forecast){
   --card:#10243F;
   --surf:#0D1E36;
   --brd:rgba(255,255,255,.12);
@@ -1219,6 +1228,37 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 .pm-fc-count{font-size:.82rem;font-weight:800}
 
 .hh-expand-row[data-hidden="true"]{display:none!important}
+.client-dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;padding:.25rem 0}
+.client-card{background:var(--bg-1);border:1px solid var(--brd);border-radius:12px;padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.6rem}
+.client-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem}
+.client-card-name{font-weight:700;font-size:.93rem;color:var(--txt);line-height:1.3}
+.client-team-rows{display:flex;flex-direction:column;gap:.28rem}
+.client-team-row{display:flex;align-items:baseline;gap:.45rem;font-size:.82rem}
+.client-team-role{font-weight:700;font-size:.68rem;min-width:2.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0}
+.client-devs{margin-top:.2rem}
+.client-devs summary{cursor:pointer;color:var(--muted);font-size:.77rem;user-select:none;list-style:none;display:flex;align-items:center;gap:.3rem}
+.client-devs summary::before{content:'›';font-size:.9rem;transition:transform .15s}
+details.client-devs[open] summary::before{transform:rotate(90deg)}
+.client-devs ul{margin:.35rem 0 0 1rem;padding:0;list-style:disc;color:var(--txt)}
+.client-devs li{font-size:.79rem;margin-bottom:.12rem;opacity:.82}
+.client-since{font-size:.73rem;color:var(--muted)}
+.client-card{cursor:pointer;transition:border-color .12s,background .12s}
+.client-card:hover{border-color:rgba(0,102,255,.35);background:rgba(0,102,255,.03)}
+.client-detail-back{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.82rem;padding:.2rem .4rem;border-radius:6px;margin-bottom:1.2rem;display:inline-flex;align-items:center;gap:.35rem;transition:color .12s}
+.client-detail-back:hover{color:var(--txt)}
+.client-detail-head{display:flex;align-items:center;gap:.75rem;margin-bottom:1.4rem;flex-wrap:wrap}
+.client-detail-name{font-size:1.3rem;font-weight:800;color:var(--txt);margin:0;line-height:1.2}
+.client-detail-sec{margin-bottom:1.4rem}
+.client-detail-sec-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding-bottom:.4rem;border-bottom:1px solid var(--brd);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+.client-lead-cards{display:flex;gap:.7rem;flex-wrap:wrap}
+.client-lead-card{background:rgba(0,102,255,.07);border:1px solid rgba(0,102,255,.18);border-radius:10px;padding:.75rem 1rem;min-width:110px}
+.client-lead-role{font-size:.63rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#60A5FA;margin-bottom:.25rem}
+.client-lead-name{font-size:.88rem;font-weight:600;color:var(--txt);line-height:1.3}
+.client-lead-empty{font-size:.82rem;color:var(--muted);font-style:italic}
+.client-detail-team-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.client-detail-team-table th{text-align:left;padding:.4rem .6rem;font-size:.72rem;font-weight:700;color:var(--muted);border-bottom:1px solid var(--brd);white-space:nowrap}
+.client-detail-team-table td{padding:.45rem .6rem;border-bottom:1px solid rgba(107,143,191,.1);color:var(--txt)}
+.client-detail-team-table tr:last-child td{border-bottom:0}
 </style>
 </head>
 <body class="auth-locked light">
@@ -1354,7 +1394,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
 <!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-badge">PMO Board</div>
+    <div class="hero-badge">PMO Board <span style="opacity:.55;font-weight:500;font-size:.8em;letter-spacing:.01em">v3</span></div>
     <h1>Operations Center — <span>Azumo PMO</span></h1>
     <p class="hero-copy">Current snapshot for staffing capacity, utilization, client coverage, and delivery risk.</p>
     <div class="hero-stats" aria-label="Current PMO snapshot summary">
@@ -1384,6 +1424,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <div class="pmo-ov-hero-copy">
         <div class="pmo-ov-eyebrow">Azumo · Operations Command Center</div>
         <h1 id="pmoGreeting">Welcome back</h1>
+        <span class="badge badge-wip" title="Seccion en reestructuracion.">Work in progress</span>
         <div class="pmo-ov-hero-meta">
           <span>Synced from Jira &amp; Harvest</span>
           <span class="dot"></span>
@@ -1392,6 +1433,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       </div>
     </div>
 
+    <div id="assignmentTimeline" hidden></div>
     <div class="pmo-ov-kpis" id="pmoOverviewKpis"></div>
     <div id="pmoOverviewCharts" hidden></div>
     <div class="pmo-ov-details" id="pmoOverviewDetails" aria-live="polite" hidden></div>
@@ -1485,6 +1527,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   <div class="sec-head">
     <div class="sec-icon"><i class="ti ti-chart-bar"></i></div>
     <h2>Billing — <span id="currentSnapshotLabel" style="color:var(--blue-lt)"></span></h2>
+    <span class="badge badge-wip" title="Seccion en reestructuracion: los reportes de EazyBI se van a reagrupar bajo la pestana Jira.">Work in progress</span>
     <div class="sec-tag" id="lastRefreshTag">Last refresh: —</div>
   </div>
   <div class="metrics-grid" id="metricsGrid"></div>
@@ -1794,6 +1837,32 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   </div>
 </section>
 
+<!-- ── INFO HUB ──────────────────── -->
+<section id="infoHub">
+  <div class="sec-head">
+    <div class="sec-icon"><i class="ti ti-building"></i></div>
+    <h2>Client Directory</h2>
+    <div class="sec-tag">PM · CSM · TL per client</div>
+  </div>
+  <div class="qa-wrap">
+    <div id="clientDirToolbar" class="qa-toolbar" style="margin-bottom:1rem">
+      <label class="harvest-search">
+        <i class="ti ti-search"></i>
+        <input id="clientDirSearchInput" type="search" placeholder="Search client, PM, CSM or TL" oninput="setClientDirSearch(this.value)"/>
+      </label>
+      <div class="filter-field">
+        <label for="clientDirStatusFilter">Status</label>
+        <select id="clientDirStatusFilter" onchange="setClientDirStatusFilter(this.value)">
+          <option value="">All</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div id="clientDirGrid" class="client-dir-grid"></div>
+  </div>
+</section>
+
 <!-- ── DUE DATES ──────────────────── -->
 <section id="dueDates">
   <div class="sec-head">
@@ -1814,7 +1883,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         <span style="font-size:.75rem;color:var(--muted)">Upcoming from Jira due dates</span>
       </div>
     </div>
-    <div style="max-height:420px;overflow-y:auto"><table><thead><tr><th>Assignee</th><th>Client</th><th>Position</th><th>Due Date</th></tr></thead><tbody id="expiringTbody"></tbody></table></div>
+    <div style="max-height:420px;overflow-y:auto"><table><thead><tr><th>Assignee</th><th>Client</th><th>Position</th><th>Due Date</th><th>Assignment</th></tr></thead><tbody id="expiringTbody"></tbody></table></div>
   </div>
 </section>
 
@@ -1894,8 +1963,8 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
     <div class="harvest-hours-controls">
       <div class="filter-field"><label for="hhDateFrom">From</label><input id="hhDateFrom" type="date"/></div>
       <div class="filter-field"><label for="hhDateTo">To</label><input id="hhDateTo" type="date"/></div>
-      <div class="filter-field"><label for="hhExpectedHours">Weekly expected hours</label><input id="hhExpectedHours" type="number" min="1" max="80" value="40"/></div>
-      <div class="filter-field"><label for="hhThreshold">Complete threshold %</label><input id="hhThreshold" type="number" min="1" max="100" value="90"/></div>
+      <div class="filter-field"><label for="hhExpectedHours">Weekly expected hours</label><input id="hhExpectedHours" type="number" min="1" max="80" value="40" oninput="localStorage.setItem('hh_weekly_expected',this.value)"/></div>
+      <div class="filter-field"><label for="hhThreshold">Complete threshold %</label><input id="hhThreshold" type="number" min="1" max="100" value="90" oninput="localStorage.setItem('hh_threshold',this.value)"/></div>
       <button class="btn btn-primary" id="hhRunButton" type="button" onclick="runHarvestHoursReport()">Generate report</button>
     </div>
     <div class="harvest-hours-controls hh-filter-row" id="hhFilterRow" style="display:none">
@@ -1904,18 +1973,15 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
         <input type="text" id="hhAssigneeSearch" placeholder="Search by name…" oninput="renderHarvestHoursReport()"/>
       </div>
       <div class="filter-field">
-        <label for="hhClientFilter">Client</label>
-        <select id="hhClientFilter" onchange="renderHarvestHoursReport()"></select>
-      </div>
-      <div class="filter-field">
-        <label for="hhPmFilter">Project Manager</label>
-        <select id="hhPmFilter" onchange="renderHarvestHoursReport()"></select>
-      </div>
-      <div class="filter-field hh-check-field">
-        <label>Type</label>
-        <div class="hh-checks">
-          <label class="hh-check"><input type="checkbox" id="hhTypeBillable" onchange="renderHarvestHoursReport()"/> Billable</label>
-          <label class="hh-check"><input type="checkbox" id="hhTypeNonBillable" onchange="renderHarvestHoursReport()"/> Non-Billable</label>
+        <label>Client</label>
+        <div class="hh-ms-wrap" id="hhClientWrap">
+          <button type="button" class="hh-ms-btn" id="hhClientBtn" onclick="hhToggleClientDropdown(event)">
+            <span id="hhClientBtnLabel">All clients</span>
+            <span class="hh-ms-caret">▾</span>
+          </button>
+          <div class="hh-ms-panel" id="hhClientPanel" style="display:none">
+            <div id="hhClientOptions"></div>
+          </div>
         </div>
       </div>
       <div class="filter-field hh-check-field">
@@ -1936,7 +2002,7 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       <div id="hhPanelTable">
         <div class="tbl-head harvest-hours-subhead">
           <h3>Detail by person</h3>
-          <div class="tbl-actions"><button class="btn btn-ghost btn-sm" type="button" onclick="exportHarvestHoursCSV()">Export CSV</button><button class="btn btn-primary btn-sm" type="button" onclick="copyHarvestHoursSlack()">Copy</button></div>
+          <div class="tbl-actions"><button class="btn btn-ghost btn-sm" type="button" onclick="exportHarvestHoursCSV()">Export CSV</button><button class="btn btn-ghost btn-sm" type="button" id="hhCopyTsvBtn" onclick="copyHarvestHoursTSV()">Copy TSV</button><button class="btn btn-primary btn-sm" type="button" onclick="copyHarvestHoursSlack()">Copy</button></div>
         </div>
         <div class="fc-table-wrap harvest-hours-table-wrap">
           <table>
@@ -1955,10 +2021,48 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   <div class="sec-head">
     <div class="sec-icon"><i class="ti ti-trending-up"></i></div>
     <h2>Trends</h2>
+    <span class="badge badge-wip" title="Seccion en reestructuracion: vista mensual de Jira/EazyBI. Las metricas semanales de Harvest van a vivir en Metrics.">Work in progress</span>
     <div class="sec-tag" id="historySnapshotsTag">—</div>
   </div>
   <div class="history-grid" id="historyGrid"></div>
 </section>
+
+<!-- ── HARVEST WEEKLY BY PERSON ───────────── -->
+<section id="harvestWeekly">
+  <div class="sec-head compact-head">
+    <div class="sec-icon"><i class="ti ti-users"></i></div>
+    <h2>Logged Harvest Hours</h2>
+    <div class="sec-tag" id="hwRangeTag">—</div>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-head">
+      <span class="badge badge-blue">Harvest API · weekly snapshot</span>
+      <div id="hwHealthBadges" class="hw-hb-bar"></div>
+      <div class="hw-week-picker">
+        <input type="date" id="hwWeekFrom" class="hw-date-input">
+        <span class="hw-picker-sep">→</span>
+        <input type="date" id="hwWeekTo" class="hw-date-input">
+        <button class="btn btn-ghost btn-sm" id="hwLoadWeekBtn" onclick="loadHarvestWeek()">Load week</button>
+      </div>
+    </div>
+    <div class="hw-tab-bar">
+      <button class="hw-tab active" id="hwTabReport" onclick="hwSwitchTab('report')">Report</button>
+      <button class="hw-tab" id="hwTabBench" onclick="hwSwitchTab('bench')">Bench</button>
+      <button class="hw-tab" id="hwTabInternal" onclick="hwSwitchTab('internal')">Internal</button>
+      <button class="hw-tab" id="hwTabTeam" onclick="hwSwitchTab('team')">Team Summary</button>
+      <button class="hw-tab" id="hwTabControl" onclick="hwSwitchTab('control')">Control</button>
+    </div>
+    <div id="hwBody">
+      <div class="hw-empty-state">No data yet — run a board refresh to populate this view.</div>
+    </div>
+    <div id="hwBenchBody" style="display:none"></div>
+    <div id="hwInternalBody" style="display:none"></div>
+    <div id="hwTeamBody" style="display:none"></div>
+    <div id="hwControlBody" style="display:none"></div>
+  </div>
+</section>
+
+<!-- ── JIRA PROJECTS ────────────────────────── -->
 
 <!-- ── FORECAST ────────────────────────────── -->
 <section id="forecast">
@@ -1991,7 +2095,10 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
       </div>
       <div class="filter-field">
         <label for="forecastAssigneeFilter">Assignee</label>
-        <select id="forecastAssigneeFilter" onchange="setForecastFilter('assignee', this.value)"></select>
+        <label class="harvest-search" style="min-width:180px">
+          <i class="ti ti-search"></i>
+          <input id="forecastAssigneeFilter" type="search" placeholder="Filter assignee…" oninput="setForecastFilter('assignee',this.value)" style="width:100%"/>
+        </label>
       </div>
       <button class="btn btn-ghost" type="button" id="forecastResetFilters" onclick="resetForecastFilters()">Reset filters</button>
       <div class="forecast-filter-summary" id="forecastFilterSummary">—</div>
@@ -2069,38 +2176,98 @@ body:not(.light) .pmo-ov-popover-row{background:#0D1E36}
   <section id="helpChangelog">
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-help-circle"></i></div>
-      <h2>Help</h2>
-      <div class="sec-tag">v2.1 · What's new</div>
+      <h2>Help &amp; Changelog</h2>
+      <div class="sec-tag">v3</div>
     </div>
-    <div class="mc" style="padding:1.2rem 1.4rem">
-      <h3 style="margin-bottom:.4rem">v2.1 — Aug 24, 2026</h3>
-      <div class="mc-sub" style="margin-bottom:1rem">Role-scoped views, nav menu fixes, bench count alignment.</div>
-      <ul style="margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.55rem;font-size:.86rem;color:var(--txt)">
-        <li><strong>Role-scoped views.</strong> Harvest Hours Control, Pending Assignments and Due Dates now filter by your role (PM/CSM/TL/Assignee), matching how Forecast already worked.</li>
-        <li><strong>Bench count fix.</strong> The Bench (FTE) metric now counts people consistently between the Overview card and the detailed bench list.</li>
-        <li><strong>Nav menu fixes.</strong> Module dropdowns no longer stay open on top of each other, and closing them by clicking outside the menu works again.</li>
-        <li><strong>Dark mode polish.</strong> Fixed low-contrast KPI icons in dark mode.</li>
-      </ul>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem">
 
-      <div style="margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--brd)">
-        <h3 style="margin-bottom:.4rem">v2.0 — Aug 20, 2026 · Harvest Hours Control</h3>
-        <div class="mc-sub" style="margin-bottom:1rem">Latest updates to the hours audit module.</div>
-        <ul style="margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.55rem;font-size:.86rem;color:var(--txt)">
-          <li><strong>Nested breakdown.</strong> Expand any person to see client → project → individual Harvest entry, each level foldable on its own.</li>
-          <li><strong>Jira % per client.</strong> The weekly target is now prorated by each client's own Jira assignment %, instead of using the full weekly hours as the target for every client.</li>
-          <li><strong>Cross-client detection.</strong> Flags entries whose notes reference a Jira ticket that belongs to a different client than the one hours were logged under.</li>
-          <li><strong>Needs review only.</strong> New toggle to filter the list down to just the people with something flagged.</li>
-          <li><strong>Billable filter simplified.</strong> "Billable" now includes freelancers; Non-Billable stays separate.</li>
-          <li><strong>Cleaner columns.</strong> Removed redundant Description/Status/Progress columns; hours now show green/red directly.</li>
-        </ul>
+      <!-- What's new -->
+      <div class="qa-wrap" style="grid-column:1/-1">
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.9rem">What's new in v3</div>
+        <div style="display:flex;flex-direction:column;gap:.55rem">
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Sep 2026</span>
+            <span><strong>Client Directory</strong> — new section under Clients: cards per client with PM/CSM/TL, click-through detail with active Jira team</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Sep 2026</span>
+            <span><strong>Data integrity</strong> — TAG/Aldridge Group deduplicated, PMO QA counts unified with Accounts Coverage, Due Dates now shows ticket column</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Sep 2026</span>
+            <span><strong>Harvest Hours</strong> — weekly expected hours and threshold % now remembered across sessions; Forecast assignee filter is now free-text search</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Aug 2026</span>
+            <span><strong>Harvest Weekly</strong> — Mon/Sun billing delta columns; Bench/Internal export in spreadsheet template format</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Aug 2026</span>
+            <span><strong>Role-scoped views</strong> — Harvest Hours Control, Pending Assignments and Due Dates now filter by role (PM/CSM/TL/Assignee), matching Forecast</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Aug 2026</span>
+            <span><strong>Bench count fix</strong> — Bench (FTE) metric now counts people consistently between the Overview card and the detailed bench list</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Aug 2026</span>
+            <span><strong>Nav &amp; dark mode fixes</strong> — module dropdowns no longer stack on top of each other; fixed low-contrast KPI icons in dark mode</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Aug 2026</span>
+            <span><strong>Activity log</strong> — detects assignment changes, PM changes, and Harvest bench in/out over 14 days</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Jul 2026</span>
+            <span><strong>QA Center</strong> — billing × bench anomaly detection (flags people billing ≥80% in Jira who also have bench hours in Harvest)</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Jul 2026</span>
+            <span><strong>Info icons</strong> — Utilization Rate (Assignment) and Utilization Rate (Billing) KPI cards now show formula tooltip on hover</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Section guide -->
+      <div class="qa-wrap">
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.9rem">Section guide</div>
+        <div style="display:flex;flex-direction:column;gap:.5rem;font-size:.83rem">
+          <div><strong>Overview</strong> — KPI snapshot: headcount, utilization, bench, active clients</div>
+          <div><strong>Operating Views</strong> — assignee/PM/client breakdown with filters</div>
+          <div><strong>PMO QA</strong> — anomaly detection: bench conflicts, missing coverage, access mismatches</div>
+          <div><strong>Accounts Coverage</strong> — Jira PSA coverage: who has PM/CSM/TL assigned</div>
+          <div><strong>Client Directory</strong> — Notion-sourced directory: PM, CSM, TL + active Jira team per client</div>
+          <div><strong>Due Dates</strong> — assignments expiring within 60 days</div>
+          <div><strong>Forecast</strong> — assignments expiring by month (future)</div>
+          <div><strong>Bench</strong> — people with available capacity</div>
+          <div><strong>Harvest Hours</strong> — weekly logged hours vs. expected; copy to spreadsheet</div>
+          <div><strong>Logged Harvest Hours</strong> — QA: Harvest vs. Jira billing cross-check</div>
+          <div><strong>Billing</strong> — eaZyBI billing report embed</div>
+          <div><strong>Trends</strong> — historical KPI snapshots</div>
+        </div>
+      </div>
+
+      <!-- Support -->
+      <div class="qa-wrap">
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.9rem">Support &amp; access</div>
+        <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.83rem">
+          <div><strong>Access issues</strong> — contact PMO. Only <code style="font-size:.8em;background:var(--surf);padding:1px 5px;border-radius:4px">@azumo.co</code> accounts are authorized.</div>
+          <div><strong>Data refresh</strong> — board data syncs automatically. The "Last updated" timestamp in the footer shows the most recent sync.</div>
+          <div><strong>Missing client / wrong coverage</strong> — update the source in Jira PSA. The board reflects Jira data within one refresh cycle.</div>
+          <div><strong>Feedback / bugs</strong> — open a ticket in the PMO project or message <strong>Federica González</strong> directly.</div>
+          <div style="margin-top:.4rem;padding-top:.6rem;border-top:1px solid var(--brd);color:var(--muted);font-size:.78rem">
+            PMO Board is maintained by the Azumo PMO team. Source: Jira PSA · Harvest · Notion.
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
 </main>
 <footer>
   <img src="assets/azumo-logo.png" alt="Azumo" height="16" style="opacity:.7"/>
-  PMO Board · Azumo · <span id="footerLastUpdated">Last updated: —</span>
+  PMO Board v3 · Azumo · <span id="footerLastUpdated">Last updated: —</span>
 </footer>
 
 <script>window.PMO_FLAGS = window.PMO_FLAGS || { overviewRoleScopedKpis: true, overviewOperative: true };</script>
@@ -2130,6 +2297,9 @@ let harvestCollapsedClients = new Set();
 let accountCoverageSearch = '';
 let accountCoverageFilter = 'all';
 let accountCoverageStatusFilter = '';
+let clientDirSearch = '';
+let clientDirStatusFilter = '';
+let clientDirActive = null;
 let expandedAssignees = new Set();
 let expandedProjectManagers = new Set();
 const ACTION_STATE_KEY = 'pmo_action_center_state_v2';
@@ -2228,7 +2398,9 @@ function initDashboard(){
   renderPmoActionCenter();
   renderEazyBIReports();
   renderHarvestAccess();
+  renderHarvestWeeklyReport();
   renderAccountCoverageModule();
+  renderClientDirectory();
   renderDataTraceability();
   renderOpsViews();
   renderBench();
@@ -2610,6 +2782,9 @@ function renderOpsChartsMain(user) {
     
     +'</div>'
 
+    // PM OPERATIVE PROJECTS (populated async by renderOperativeOverview)
+    +'<div id="pmOperativeProjects"></div>'
+
     // ACTIONS
     +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
     +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/AA/form/150" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:12px;background:var(--highlight-blue);color:#fff;font-size:14px;font-weight:700;text-decoration:none"><i class=\"ti ti-plus\"></i>New Assignment</a>'
@@ -2617,64 +2792,190 @@ function renderOpsChartsMain(user) {
     +'<button onclick="goTo(\'opsViews\')" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:12px;background:var(--bg-1);border:1px solid var(--border-default);color:var(--fg-1);font-size:14px;font-weight:700;font-family:var(--font-sans);cursor:pointer"><i class=\"ti ti-compass\"></i>Operating Views</button>'
     +'</div>'
     +'</div>';
+
+  if (window.PMO_FLAGS && window.PMO_FLAGS.overviewOperative) renderOperativeOverview();
 }
 
-function renderActivityFeed(user) {
-  const host = document.getElementById('overviewActivityFeed');
+async function renderOperativeOverview() {
+  var slot = document.getElementById('pmOperativeProjects');
+  if (!slot) return;
+
+  slot.innerHTML = '<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:16px;padding:16px 20px;color:var(--fg-3);font-size:.83rem;display:flex;align-items:center;gap:8px"><i class="ti ti-loader-2"></i> Loading projects…</div>';
+
+  var data;
+  try {
+    var res = await fetch('/api/pm-overview');
+    if (!res.ok) { slot.innerHTML = ''; return; }
+    data = await res.json();
+  } catch(e) { slot.innerHTML = ''; return; }
+
+  var projects = (data && data.projects) || [];
+  if (!projects.length) { slot.innerHTML = ''; return; }
+
+  var today = new Date(); today.setHours(0,0,0,0);
+
+  function statusBadge(p) {
+    var st = String(p.status || '').trim();
+    if (st !== 'In Progress') {
+      return '<span style="background:rgba(107,143,191,.12);color:var(--fg-3);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px">' + esc(st || 'Unknown') + '</span>';
+    }
+    var reportAge = p.lastReport ? Math.floor((today - new Date(p.lastReport)) / 86400000) : null;
+    if (reportAge !== null && reportAge <= 30) {
+      return '<span style="background:rgba(16,185,129,.12);color:#34D399;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px">Active</span>';
+    }
+    if (reportAge === null) {
+      return '<span style="background:rgba(245,158,11,.12);color:#FCD34D;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px">No report</span>';
+    }
+    return '<span style="background:rgba(239,68,68,.12);color:#F87171;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px">Report overdue</span>';
+  }
+
+  var cards = projects.map(function(p) {
+    var billingBadge = p.billingPct != null
+      ? '<span style="background:rgba(0,102,255,.12);color:#60A5FA;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px">' + p.billingPct + '% billing</span>'
+      : '';
+    var reportLine = p.lastReport
+      ? '<div style="font-size:.74rem;color:var(--fg-3);margin-top:3px">Last report: ' + fmtDate(p.lastReport) + '</div>'
+      : '<div style="font-size:.74rem;color:var(--fg-3);margin-top:3px">No PSA report on file</div>';
+    var asns = p.assignments || [];
+    var asnHtml = asns.length === 0 ? '' :
+      '<details style="margin-top:10px">'
+      + '<summary style="cursor:pointer;font-size:.79rem;font-weight:700;color:var(--fg-2);display:flex;align-items:center;gap:6px;list-style:none">'
+      + '<i class="ti ti-users" style="font-size:.82rem;color:var(--fg-3)"></i>'
+      + asns.length + ' engineer' + (asns.length !== 1 ? 's' : '')
+      + '</summary>'
+      + '<div style="margin-top:8px;display:flex;flex-direction:column;gap:5px">'
+      + asns.map(function(a) {
+          var pctLabel = a.assignmentPct != null ? ' · ' + Math.round(a.assignmentPct) + '%' : '';
+          return '<div style="display:flex;align-items:center;gap:10px;padding:6px 10px;background:var(--bg-3);border-radius:8px">'
+            + '<div style="flex:1;min-width:0">'
+            + '<div style="font-size:.81rem;font-weight:700;color:var(--fg-1)">' + esc(a.name || '') + '</div>'
+            + '<div style="font-size:.71rem;color:var(--fg-3)">' + esc(a.position || '') + pctLabel + '</div>'
+            + '</div>'
+            + '<a href="https://azumohq.atlassian.net/jira/software/c/projects/AA/form/150" target="_blank" rel="noopener" style="flex-shrink:0;display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:7px;background:var(--bg-1);border:1px solid var(--border-subtle);color:var(--fg-2);font-size:.71rem;font-weight:700;text-decoration:none">Request change</a>'
+            + '</div>';
+        }).join('')
+      + '</div></details>';
+
+    return '<div style="background:var(--bg-2);border:1px solid var(--border-subtle);border-radius:12px;padding:14px 16px">'
+      + '<div style="display:flex;align-items:flex-start;gap:8px">'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-size:.9rem;font-weight:800;color:var(--fg-1)">' + esc(p.client || p.epicName || 'Unknown') + '</div>'
+      + (p.epicName && p.epicName !== p.client ? '<div style="font-size:.74rem;color:var(--fg-3);margin-top:1px">' + esc(p.epicName) + '</div>' : '')
+      + '</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex-shrink:0">'
+      + billingBadge + statusBadge(p)
+      + '</div>'
+      + '</div>'
+      + reportLine
+      + asnHtml
+      + '</div>';
+  }).join('');
+
+  slot.innerHTML = '<div style="background:var(--bg-1);border:1px solid var(--border-subtle);border-radius:16px;padding:20px 24px">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">'
+    + '<i class="ti ti-briefcase" style="color:var(--fg-3)"></i>'
+    + '<span style="font-weight:800;font-size:15px;color:var(--fg-1)">My Projects</span>'
+    + '<span style="font-size:12px;color:var(--fg-3);margin-left:4px">' + projects.length + (projects.length === 1 ? ' project' : ' projects') + '</span>'
+    + '</div>'
+    + '<div style="display:flex;flex-direction:column;gap:10px">' + cards + '</div>'
+    + '</div>';
+}
+
+function renderAssignmentTimeline() {
+  const host = document.getElementById('assignmentTimeline');
   if (!host) return;
-  const latest = PMO && PMO.latest;
   const events = (latest && latest.activity_log) || [];
-  if (!events.length) { host.hidden = true; return; }
-  host.hidden = false;
 
-  const role = String((user && user.role) || effectiveUserRole() || '').toLowerCase();
-  const isPmo = ['pmo','admin','executive'].includes(role);
-  const email = (user && user.email || '').toLowerCase();
-
+  const role = effectiveUserRole();
+  const isPmo = executiveLikeRole(role);
   const filtered = events.filter(e => {
     if (isPmo) return true;
-    if (role === 'pm') return (e.project_manager||'').toLowerCase().includes(email.split('@')[0]);
-    if (role === 'csm' || role === 'tl') return effectiveOwnedClientKeys && effectiveOwnedClientKeys().has((e.client||'').toLowerCase().replace(/\s+/g,'-'));
-    return (e.assignee||'').toLowerCase().includes(email.split('@')[0]);
-  }).slice(0, 20);
+    if (role === 'pm') {
+      const ac = effectiveOwnedClientKeys();
+      return ac.size ? ac.has(normalizeClientKey(e.client || '')) : identityMatchesTokens(e.project_manager || '');
+    }
+    if (role === 'csm' || role === 'tl') return effectiveOwnedClientKeys().has(normalizeClientKey(e.client || ''));
+    return identityMatchesTokens(e.assignee || '');
+  });
 
-  if (!filtered.length) { host.hidden = true; return; }
+  host.hidden = false;
+  if (!filtered.length) {
+    host.innerHTML = `<div class="atl-wrap">
+      <div class="atl-header"><span class="atl-title">Recent changes</span></div>
+      <div class="atl-empty">No changes yet — they'll appear here after the next data refresh.</div>
+    </div>`;
+    return;
+  }
 
-  const typeIcon = {
-    new_assignment: '⊕', assignment_done: '✓', pct_change: '~',
-    due_change: '◷', psa_report: '↑'
-  };
-  const typeColor = {
-    new_assignment: 'var(--success)',
-    assignment_done: 'var(--fg-3)',
-    pct_change: 'var(--warning)',
-    due_change: 'var(--saffron)',
-    psa_report: 'var(--highlight-blue)'
-  };
+  const TYPE_ICON  = { new_assignment:'⊕', assignment_done:'✓', pct_change:'~', due_change:'◷', psa_report:'↑', pm_change:'→', status_change:'▶', harvest_to_bench:'⬇', harvest_from_bench:'⬆', harvest_to_internal:'⤵', harvest_from_internal:'⤴', harvest_hours_edit:'✎' };
+  const TYPE_COLOR = { new_assignment:'#6EE7B7', assignment_done:'var(--muted)', pct_change:'#FCD34D', due_change:'#FB923C', psa_report:'var(--blue-lt)', pm_change:'#C4B5FD', status_change:'#93C5FD', harvest_to_bench:'#FDBA74', harvest_from_bench:'#6EE7B7', harvest_to_internal:'#A78BFA', harvest_from_internal:'#6EE7B7', harvest_hours_edit:'#FCD34D' };
+  const TYPE_LABEL = { new_assignment:'New', assignment_done:'Done', pct_change:'Alloc', due_change:'Due', psa_report:'Report', pm_change:'PM', status_change:'Active', harvest_to_bench:'→ Bench', harvest_from_bench:'→ Client', harvest_to_internal:'→ Internal', harvest_from_internal:'→ Client', harvest_hours_edit:'Harvest edit' };
 
-  function fmt(iso) {
+  function dayKey(iso) { return new Date(iso).toLocaleDateString('en-CA'); }
+  function dayLabel(iso) {
     const d = new Date(iso);
     const today = new Date(); today.setHours(0,0,0,0);
     const diff = Math.floor((today - new Date(d.toDateString())) / 86400000);
-    if (diff === 0) return d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+    if (diff === 0) return 'Today';
     if (diff === 1) return 'Yesterday';
-    return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    return d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+  }
+  function fmtTime(iso) {
+    const d = new Date(iso);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const diff = Math.floor((today - new Date(d.toDateString())) / 86400000);
+    return diff < 2
+      ? d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', hour12:false })
+      : d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
   }
 
-  host.innerHTML = `
-    <div style="margin-top:24px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-        <span style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3)">Live activity</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        ${filtered.map(e => `
-          <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--bg-2);border:1px solid var(--border-subtle);border-radius:10px">
-            <span style="font-size:13px;min-width:28px;text-align:center;color:${typeColor[e.type]||'var(--fg-3)'};margin-top:1px">${typeIcon[e.type]||'·'}</span>
-            <span style="flex:1;font-size:13px;color:var(--fg-1);line-height:1.45">${esc(e.label)}</span>
-            <span style="font-size:11px;color:var(--fg-mute);white-space:nowrap;margin-top:2px">${fmt(e.ts)}</span>
-          </div>`).join('')}
-      </div>
-    </div>`;
+  const byDay = [];
+  const seen = new Map();
+  filtered.forEach(e => {
+    const k = dayKey(e.ts);
+    if (!seen.has(k)) { seen.set(k, []); byDay.push({ label: dayLabel(e.ts), events: seen.get(k) }); }
+    seen.get(k).push(e);
+  });
+
+  const daysHtml = byDay.map(day => `
+    <div class="atl-day">
+      <span class="atl-day-label">${esc(day.label)}</span>
+      <span class="atl-day-line"></span>
+      <span class="atl-count">${day.events.length}</span>
+    </div>
+    <div class="atl-list">
+      ${day.events.map(e => {
+        const color = TYPE_COLOR[e.type] || 'var(--muted)';
+        const jiraHref = e.key ? `https://azumohq.atlassian.net/browse/${esc(e.key)}` : '';
+        return `<div class="atl-item">
+          <span class="atl-dot" style="background:${color}"></span>
+          <span class="atl-icon" style="color:${color}">${TYPE_ICON[e.type]||'·'}</span>
+          <div class="atl-body">
+            <div class="atl-label">${jiraHref
+              ? `<a href="${jiraHref}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none">${esc(e.label)}</a>`
+              : esc(e.label)}</div>
+            <div class="atl-meta">
+              <span class="badge" style="font-size:.62rem;padding:1px 5px;background:${color}22;color:${color}">${esc(TYPE_LABEL[e.type]||e.type)}</span>
+              ${e.client ? ` · ${esc(e.client)}` : ''}
+            </div>
+          </div>
+          <span class="atl-time">${fmtTime(e.ts)}</span>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+
+  host.innerHTML = `<div class="atl-wrap">
+    <div class="atl-header">
+      <span class="atl-title">Recent changes</span>
+      <span class="atl-count">${filtered.length} event${filtered.length !== 1 ? 's' : ''}</span>
+    </div>
+    <div class="atl-scroll">${daysHtml}</div>
+  </div>`;
+}
+window.renderAssignmentTimeline = renderAssignmentTimeline;
+
+function renderActivityFeed(user) {
+  renderAssignmentTimeline();
 }
 
 
@@ -2759,7 +3060,7 @@ function sectionAllowedForCurrentRole(id){
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
   if(['executive','viewer','c-level','clevel','hr'].includes(role)) return true;
-  if(role === 'pm') return ['overview','opsViews','bench','forecast','harvestHours','harvestAccess','psaProjectStatus'].includes(id);
+  if(role === 'pm') return ['overview','opsViews','bench','forecast','harvestHours','harvestAccess','psaProjectStatus','accountCoverage'].includes(id);
   if(role === 'csm') return ['overview','opsViews','bench','accountCoverage','forecast','harvestHours','harvestAccess'].includes(id);
   if(role === 'tl') return ['overview','opsViews','accountCoverage','forecast'].includes(id);
   if(role === 'assignee') return ['overview','opsViews','forecast'].includes(id);
@@ -2784,8 +3085,10 @@ const SECTION_ICON_MAP = {
   'forecast': 'ti-chart-arrows',
   'psaProjectStatus': 'ti-trending-up',
   'accountCoverage': 'ti-clipboard-list',
+  'infoHub': 'ti-building',
   'harvestHours': 'ti-stopwatch',
   'harvestAccess': 'ti-folders',
+  'harvestWeekly': 'ti-users',
   'dashboard': 'ti-credit-card',
   'history': 'ti-trending-up',
   'newSearchesTriage': 'ti-search',
@@ -2802,7 +3105,7 @@ function sidebarNavConfig(){
   const pendingCount = scopedByOwnership(latest?.pending_list || []).length;
   const dueAlertCount = latest ? scopedByOwnership(dueRowsForActionCenter()).length : 0;
   // Overdue alert banner
-  const overdueRows = dueRowsForActionCenter().filter(r => r.severity === 'critical');
+  const overdueRows = scopedByOwnership(dueRowsForActionCenter()).filter(r => r.severity === 'critical');
   const overdueAlertEl = document.getElementById('overdueAlert');
   const overdueAlertCount = document.getElementById('overdueAlertCount');
   if (overdueAlertEl) {
@@ -2828,7 +3131,8 @@ function sidebarNavConfig(){
     ]},
     {id:'clientsGroup', icon:'', label:'Clients', children:[
       {id:'psaProjectStatus', icon:'<i class="ti ti-trending-up"></i>', label:'Project Status'},
-      {id:'accountCoverage', icon:'<i class="ti ti-clipboard-list"></i>', label:'Accounts Coverage'}
+      {id:'accountCoverage', icon:'<i class="ti ti-clipboard-list"></i>', label:'Accounts Coverage'},
+      {id:'infoHub', icon:'<i class="ti ti-building"></i>', label:'Client Directory'},
     ]},
     {id:'harvestGroup', icon:'', label:'Harvest', children:[
       {id:'harvestHours', icon:'<i class="ti ti-stopwatch"></i>', label:'Control'},
@@ -2837,7 +3141,8 @@ function sidebarNavConfig(){
     {id:'reportsGroup', icon:'', label:'Reports', children:[
       {id:'dashboard', icon:'<i class="ti ti-credit-card"></i>', label:'Billing'},
       {id:'history', icon:'<i class="ti ti-trending-up"></i>', label:'Trends'},
-      {id:'newSearchesTriage', icon:'<i class="ti ti-search"></i>', label:'New Searches'}
+      {id:'newSearchesTriage', icon:'<i class="ti ti-search"></i>', label:'New Searches'},
+      {id:'harvestWeekly', icon:'<i class="ti ti-users"></i>', label:'Logged Harvest Hours'}
     ]},
     {id:'processes', icon:'<i class="ti ti-route"></i>', label:'Processes'},
     {id:'pmoActionCenter', icon:'<i class="ti ti-alert-triangle"></i>', label:'PMO QA', count: qaCount},
@@ -2849,7 +3154,7 @@ function currentModuleTabId(sections){
   const stored = localStorage.getItem(MODULE_TAB_KEY);
   if(sections.some(section => section.id === 'overview')) return 'overview';
   if(stored && sections.some(section => section.id === stored)) return stored;
-  const preferred = ['overview','opsViews','bench','azumo','pendingAssignments','dueDates','forecast','accountCoverage','harvestHours','harvestAccess','dashboard','history','newSearchesTriage','pmoActionCenter'];
+  const preferred = ['overview','opsViews','bench','azumo','pendingAssignments','dueDates','forecast','accountCoverage','infoHub','harvestHours','harvestAccess','dashboard','history','newSearchesTriage','harvestWeekly','pmoActionCenter'];
   return preferred.find(id => sections.some(section => section.id === id)) || sections[0]?.id;
 }
 function moduleLeafItems(entry){
@@ -3058,10 +3363,29 @@ function userIdentityTokens(user){
 function effectiveUserTokens(){
   return userIdentityTokens(effectiveSessionUser());
 }
+function identityNameWords(value){
+  return String(value || '').split(' ').filter(Boolean);
+}
 function identityMatchesTokens(value, tokens = effectiveUserTokens()){
   const normalized = normalizeIdentity(value);
   if(!normalized || !tokens.size) return false;
-  return tokens.has(normalized);
+  if(tokens.has(normalized)) return true;
+  // Defensive fallback: full names sometimes differ between Jira's display
+  // name and the users table (e.g. a second surname present on one side and
+  // not the other -- "Camila Navarro" vs "Camila Navarro Perez"). Match when
+  // every word of the shorter name appears in the longer name, word-by-word
+  // (not a raw substring check, to avoid false positives like "Ana Garcia"
+  // matching inside "Mariana Garcia"). Only applies to multi-word names --
+  // single-word tokens (first/last name alone) keep the exact match above.
+  const valueWords = identityNameWords(normalized);
+  if(valueWords.length < 2) return false;
+  for(const token of tokens){
+    const tokenWords = identityNameWords(token);
+    if(tokenWords.length < 2) continue;
+    const [shorter, longer] = valueWords.length <= tokenWords.length ? [valueWords, tokenWords] : [tokenWords, valueWords];
+    if(shorter.every(w => longer.includes(w))) return true;
+  }
+  return false;
 }
 function effectivePersonMatch(row){
   const tokens = effectiveUserTokens();
@@ -3071,7 +3395,7 @@ function effectivePersonMatch(row){
 }
 function effectiveOwnedClientKeys(){
   const role = effectiveUserRole();
-  const field = role === 'csm' ? 'csm_assigned' : role === 'tl' ? 'tl_assigned' : '';
+  const field = role === 'pm' ? 'pm_assigned' : role === 'csm' ? 'csm_assigned' : role === 'tl' ? 'tl_assigned' : '';
   const allowed = new Set();
   if(!field || !latest) return allowed;
   (latest.account_coverage || []).forEach(row => {
@@ -3460,8 +3784,8 @@ const METRIC_CFG = [
   {key:'freelancers',            label:'Freelancers',                   unit:'',   color:'#7C3AED', higherBetter:false, size:'small', target:'freelancers', hover:'freelancers'},
   {divider:'Team / client level'},
   {key:'active_clients',         label:'Active Clients',                unit:'',   color:'#7C3AED', higherBetter:true,  target:'clients', hover:'clients'},
-  {key:'utilization_assignment', label:'Utilization Rate (Assignment)', unit:'%',  color:'#10B981', higherBetter:true,  target:'headcount'},
-  {key:'utilization_billing',    label:'Utilization Rate (Billing)',    unit:'%',  color:'#10B981', higherBetter:true,  target:'billable'},
+  {key:'utilization_assignment', label:'Utilization Rate (Assignment)', unit:'%',  color:'#10B981', higherBetter:true,  target:'headcount', formula:'People with any active assignment ÷ total billable headcount'},
+  {key:'utilization_billing',    label:'Utilization Rate (Billing)',    unit:'%',  color:'#10B981', higherBetter:true,  target:'billable',   formula:'People with billing > 0 ÷ total billable headcount'},
   {key:'bench',                  label:'Bench',                         unit:'',   color:'#EF4444', higherBetter:false, src:'Jira', target:'bench', hover:'bench'},
   {key:'bench_rate',             label:'Bench (FTE)',                   unit:'',   color:'#EF4444', higherBetter:false, src:'Jira', target:'bench'},
   {key:'pending_assignments',    label:'Pending Assignments',           unit:'',   color:'#F59E0B', higherBetter:false, src:'Jira'},
@@ -3561,6 +3885,7 @@ function renderMetrics(){
       <div class="mc-top">
         <button class="mc-name metric-title-link" type="button" onclick='openMetricOperatingView(${jsArg(cfg.target || cfg.key)})'>${cfg.label}</button>
         ${cfg.src ? `<span style="font-size:.68rem;color:var(--muted);background:var(--surf);border:1px solid var(--brd);border-radius:4px;padding:1px 5px;">${cfg.src}</span>` : ''}
+        ${cfg.formula ? `<span style="position:relative;margin-left:auto;flex-shrink:0"><button style="background:none;border:none;color:var(--muted);cursor:help;padding:1px 4px;font-size:.8rem;opacity:.55;transition:opacity .12s;line-height:1" aria-label="How it's calculated" onmouseenter="var t=this.nextElementSibling;t.style.display='block';this.style.opacity='1'" onmouseleave="var t=this.nextElementSibling;t.style.display='none';this.style.opacity='.55'">ⓘ</button><span style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--card);border:1px solid var(--brd);border-radius:8px;padding:8px 10px;font-size:.73rem;color:var(--txt);min-width:220px;z-index:300;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.4);white-space:normal;text-align:left">${cfg.formula}</span></span>` : ''}
       </div>
       <div class="mc-val">${typeof cur === 'number' ? (cur % 1 !== 0 ? cur.toFixed(2) : cur) : '—'}<span class="mc-unit"> ${cfg.unit}</span></div>
       ${hoverHtml}
@@ -3984,7 +4309,7 @@ function clientNamesFuzzyMatch(a, b){
 }
 function myScopedClientNames(){
   const role = effectiveUserRole();
-  if(['admin','pmo','executive','c-level','clevel','viewer'].includes(role)) return [];
+  if(['admin','pmo','executive','c-level','clevel','viewer','pm'].includes(role)) return [];
   const email = myEffectiveEmail();
   if(!email) return [];
   const fieldByRole = {
@@ -4004,7 +4329,7 @@ function myScopedClientNames(){
 }
 function myScopedClientKeys(){
   const role = effectiveUserRole();
-  if(['admin','pmo','executive','c-level','clevel','viewer'].includes(role)) return null;
+  if(['admin','pmo','executive','c-level','clevel','viewer','pm'].includes(role)) return null;
   const email = myEffectiveEmail();
   if(!email) return new Set();
   const fieldByRole = {
@@ -4370,8 +4695,8 @@ function activeClientMetricRows(){
     .slice()
     .sort((a,b)=>a.client.localeCompare(b.client))
     .map(row => {
-      const deliveryPm = uniqueNonEmpty((row.items || []).map(item => item.project_manager)).join(', ');
-      const accountPm = row.coverage?.pm_assigned || '';
+      const deliveryPm = uniqueNonEmpty((row.items || []).map(item => activePmName(item.project_manager))).join(', ');
+      const accountPm = activePmName(row.coverage?.pm_assigned) || '';
       const pm = deliveryPm || accountPm || '—';
       return {
         client: row.client,
@@ -4585,7 +4910,7 @@ function buildClientDataQuality(){
     check('missing_project_manager','Missing Project Manager','warning', rows.filter(row => isExternalInProgress(row) && !row.project_manager), 'External client assignments should have a PM for escalation and Slack reminders.'),
     check('zero_assignment_pct','In-progress rows with 0% assignment','warning', rows.filter(row => row.status === 'In Progress' && row.client && !isBenchRow(row) && rowAssignmentPct(row) === 0), 'Assignment (%) should be populated for active capacity calculations.'),
     check('external_zero_billing','External assignments with Billing 0','warning', externalZeroBillingRows(rows), 'List people with Billing 0 while assigned to a real client. Bench and Azumo are excluded.'),
-    check('account_coverage_gaps','Account Coverage gaps','warning', coverage.filter(row => row.complete === false || (row.missing || []).length), 'PSA account coverage should include PM, CSM, and TL where applicable.'),
+    check('account_coverage_gaps','Account Coverage gaps','warning', accountCoverageRows().filter(row => !row.complete), 'PSA account coverage should include PM, CSM, and TL where applicable.'),
     check('client_source_mismatch','PSA clients vs Operating Views','warning', clientSourceMismatchRows(rows, coverage), 'Clients in Jira PSA should match the external active clients feeding Operating Views from AA.'),
     check('epic_due_before_child_due','Epic due date before child assignment due date','warning', buildEpicDueBeforeChildDueRows(rows), 'The Epic due date should be equal to or later than the furthest In Progress child Assignment due date.'),
     check('bench_residual_mismatch','Bench assignment percent does not match residual capacity','error', benchResidualMismatchRows(rows), 'Active Bench should equal 100% minus all active non-Bench assignments for the same person, including Azumo/internal work. Correct Jira if the Bench issue percent differs.')
@@ -4593,12 +4918,12 @@ function buildClientDataQuality(){
   const snapshotChecks = latest.data_quality?.checks || [];
   const harvestChecks = snapshotChecks.filter(item => String(item.id || '').startsWith('harvest_'));
   if(harvestChecks.length && !checks.some(existing => existing.id === 'harvest_access_inconsistencies')){
-    const count = harvestChecks.reduce((sum,item)=>sum + Number(item.count || 0), 0);
     const rows = harvestChecks.flatMap(item => (item.rows || []).map(row => ({
       ...row,
       reason: row.reason || item.label || 'Harvest / Jira mismatch',
       harvest_check: item.label || item.id || 'Harvest QA'
     })));
+    const count = new Set(rows.map(row => normalizeIdentity(row.assignee || row.name || row.harvest_user || '')).filter(Boolean)).size;
     checks.push({
       id:'harvest_access_inconsistencies',
       label:'Harvest/Jira access',
@@ -5097,7 +5422,7 @@ function buildPmoActions(){
       assignee: displayName(row),
       client: row.client || '',
       position: row.position || '',
-      project_manager: row.project_manager || '',
+      project_manager: activePmName(row.project_manager) || '',
       action_url: row.key ? jiraIssueUrl(row.key) : '',
       source: row.source || 'Jira / EazyBI Next Due Dates',
       rows:[row]
@@ -5236,7 +5561,7 @@ function harvestPresenceTable(rows){
       <td>${esc(compactText(client, 42))}${project}</td>
       <td class="presence-cell">${presenceBadge(status.jira, status.jira ? 'In Jira' : 'Missing in Jira')}${jiraDetail}</td>
       <td class="presence-cell">${presenceBadge(status.harvest, status.harvest ? 'In Harvest' : 'Missing in Harvest')}${harvestDetail}</td>
-      <td>${esc(compactText(row.project_manager || '—', 30))}</td>
+      <td>${esc(compactText(activePmName(row.project_manager) || '—', 30))}</td>
     </tr>`;
   }).join('');
   return `<div class="action-mini-table harvest-presence-table">${legend}<table><thead><tr><th>Person</th><th>Client / Project</th><th class="presence-cell">Jira</th><th class="presence-cell">Harvest</th><th>PM</th></tr></thead><tbody>${body}</tbody></table>${deduped.length > list.length ? `<div class="audit-note" style="border-bottom:0;padding:.55rem .75rem">+${deduped.length - list.length} more in QA Trace.</div>` : ''}</div>`;
@@ -5276,7 +5601,7 @@ function actionRowsTable(rows, action={}){
   if(action.category === 'billing'){
     return `<div class="action-mini-table"><table><thead><tr><th>Key</th><th>Person</th><th>Client</th><th>Position</th><th>Billing</th><th>Due</th><th>Invoice discount</th></tr></thead><tbody>${list.map(row => `<tr><td>${row.key ? sowLink(row,row.key) : '—'}</td><td>${esc(row.assignee || row.name || row.harvest_user || '—')}</td><td>${esc(row.client || row.harvest_client || '—')}</td><td>${esc(row.position || '—')}</td><td><span class="billing-zero-pill">${fmtRawPct(rowBillingPct(row))}</span></td><td>${esc(fmtDate(row.due || row.epic_due || ''))}</td><td>${billingDiscountControl(row)}</td></tr>`).join('')}</tbody></table>${deduped.length > list.length ? `<div class="audit-note" style="border-bottom:0;padding:.55rem .75rem">+${deduped.length - list.length} more in QA Trace.</div>` : ''}</div>`;
   }
-  return `<div class="action-mini-table"><table><thead><tr><th>Key</th><th>Person</th><th>Client</th><th>Position</th><th>Due</th><th>PM</th></tr></thead><tbody>${list.map(row => `<tr><td>${row.key ? sowLink(row,row.key) : '—'}</td><td>${esc(row.assignee || row.name || row.harvest_user || '—')}</td><td>${esc(row.client || row.harvest_client || '—')}</td><td>${esc(row.position || '—')}</td><td>${esc(fmtDate(row.due || row.epic_due || ''))}</td><td>${esc(row.project_manager || '—')}</td></tr>`).join('')}</tbody></table>${deduped.length > list.length ? `<div class="audit-note" style="border-bottom:0;padding:.55rem .75rem">+${deduped.length - list.length} more in QA Trace.</div>` : ''}</div>`;
+  return `<div class="action-mini-table"><table><thead><tr><th>Key</th><th>Person</th><th>Client</th><th>Position</th><th>Due</th><th>PM</th></tr></thead><tbody>${list.map(row => `<tr><td>${row.key ? sowLink(row,row.key) : '—'}</td><td>${esc(row.assignee || row.name || row.harvest_user || '—')}</td><td>${esc(row.client || row.harvest_client || '—')}</td><td>${esc(row.position || '—')}</td><td>${esc(fmtDate(row.due || row.epic_due || ''))}</td><td>${esc(activePmName(row.project_manager) || '—')}</td></tr>`).join('')}</tbody></table>${deduped.length > list.length ? `<div class="audit-note" style="border-bottom:0;padding:.55rem .75rem">+${deduped.length - list.length} more in QA Trace.</div>` : ''}</div>`;
 }
 
 function actionJiraTicket(action){
@@ -5837,7 +6162,7 @@ function renderDataTraceability(){
   if(list){
     list.innerHTML = checks.map(check => {
       const rows = check.rows || [];
-      const rowTable = rows.length ? `<div class="fc-table-wrap" style="max-height:240px;margin-top:.7rem"><table><thead><tr><th>Key</th><th>Assignee</th><th>Client</th><th>Position</th><th>Due / Epic due</th><th>Max child due</th><th>Harvest project</th><th>PM</th></tr></thead><tbody>${rows.map(row => `<tr><td>${row.key ? sowLink(row,row.key) : '—'}</td><td>${esc(row.assignee || row.harvest_user || '—')}</td><td>${esc(row.client || row.harvest_client || '—')}</td><td>${esc(row.position || '—')}</td><td>${esc(row.epic_due || row.due || '—')}</td><td>${row.child_key ? `${sowLink({key:row.child_key}, row.max_child_due || row.child_key)}` : esc(row.max_child_due || '—')}</td><td>${esc(row.harvest_project || '—')}</td><td>${esc(row.project_manager || '—')}</td></tr>`).join('')}</tbody></table></div>` : '';
+      const rowTable = rows.length ? `<div class="fc-table-wrap" style="max-height:240px;margin-top:.7rem"><table><thead><tr><th>Key</th><th>Assignee</th><th>Client</th><th>Position</th><th>Due / Epic due</th><th>Max child due</th><th>Harvest project</th><th>PM</th></tr></thead><tbody>${rows.map(row => `<tr><td>${row.key ? sowLink(row,row.key) : '—'}</td><td>${esc(row.assignee || row.harvest_user || '—')}</td><td>${esc(row.client || row.harvest_client || '—')}</td><td>${esc(row.position || '—')}</td><td>${esc(row.epic_due || row.due || '—')}</td><td>${row.child_key ? `${sowLink({key:row.child_key}, row.max_child_due || row.child_key)}` : esc(row.max_child_due || '—')}</td><td>${esc(row.harvest_project || '—')}</td><td>${esc(activePmName(row.project_manager) || '—')}</td></tr>`).join('')}</tbody></table></div>` : '';
       return `<details class="qa-check" ${check.count ? 'open' : ''}>
         <summary><span>${esc(check.label)}</span><span class="qa-status ${check.status}">${esc(check.status)} · ${check.count}</span></summary>
         <div class="qa-check-body">${esc(check.description || '')}${rowTable}</div>
@@ -5898,12 +6223,17 @@ function normalizeIdentity(value){
     .toLowerCase()
     .replace(/\s+/g,' ');
 }
+const CLIENT_KEY_CANONICAL = {
+  'thealdridgegrouptagtag': 'tagthealdridgegroup',
+  'thealdridgegrouptag':    'tagthealdridgegroup',
+};
 function normalizeClientKey(value){
-  return String(value || '')
+  const raw = String(value || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g,'')
     .toLowerCase()
     .replace(/[^a-z0-9]/g,'');
+  return CLIENT_KEY_CANONICAL[raw] || raw;
 }
 function jsArg(value){
   return JSON.stringify(String(value ?? '')).replace(/</g,'\\u003c');
@@ -5982,7 +6312,7 @@ function renderPending(){
 }
 
 function renderExpiring(){
-  const sourceRows = (latest.expiring_60d && latest.expiring_60d.length)
+  let sourceRows = (latest.expiring_60d && latest.expiring_60d.length)
     ? latest.expiring_60d
     : Object.values(latest.forecast || {}).flat();
   const seen = new Set();
@@ -6036,7 +6366,8 @@ function renderExpiring(){
     <td style="color:var(--muted);font-size:.8rem">${esc(e.client)}</td>
     <td style="color:var(--muted);font-size:.75rem">${esc(e.position)}</td>
     <td><span class="${expCls(e.due)}">${fmtDate(e.due)}</span></td>
-  </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--muted)">No upcoming assignment due dates found.</td></tr>';
+    <td style="font-size:.78rem">${e.key ? sowLink(e) : '<span style="color:var(--muted)">—</span>'}</td>
+  </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;padding:1rem;color:var(--muted)">No upcoming assignment due dates found.</td></tr>';
 }
 
 function slackMentionName(name){
@@ -6113,6 +6444,12 @@ function initHarvestHoursDefaults(){
   friday.setDate(monday.getDate() + 4);
   if(!from.value) from.value = hhFormatIsoDate(monday);
   if(!to.value) to.value = hhFormatIsoDate(friday);
+  const expectedEl = document.getElementById('hhExpectedHours');
+  const thresholdEl = document.getElementById('hhThreshold');
+  const savedExpected = localStorage.getItem('hh_weekly_expected');
+  const savedThreshold = localStorage.getItem('hh_threshold');
+  if(expectedEl && savedExpected) expectedEl.value = savedExpected;
+  if(thresholdEl && savedThreshold) thresholdEl.value = savedThreshold;
 }
 function setHarvestHoursStatus(message, type="info"){
   const el = document.getElementById("hhStatus");
@@ -6360,10 +6697,32 @@ function harvestHoursGaugeHTML(pct){
     <span style="font-size:.8rem;font-weight:700;color:${color}">${clamped}%</span>
   </div>`;
 }
-function harvestHoursInfoIcon(missingCount, mentionedClients){
+function harvestHoursInfoIcon(missingCount, mentionedClients, source){
   if(!missingCount && !(mentionedClients && mentionedClients.length)) return '';
-  const tooltip = harvestHoursIssueTooltip(missingCount, mentionedClients);
-  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;flex:none;margin-left:6px;cursor:help" title="${esc(tooltip)}"><svg viewBox="0 0 26 26" width="15" height="15" xmlns="http://www.w3.org/2000/svg"><path d="M13 25C19.6274 25 25 19.6274 25 13C25 6.37258 19.6274 1 13 1C6.37258 1 1 6.37258 1 13C1 19.6274 6.37258 25 13 25Z" fill="none" stroke="var(--danger)" stroke-width="2"/><path d="M13 9.00003C13.718 9.00003 14.3 8.41801 14.3 7.70004C14.3 6.98207 13.718 6.40002 13 6.40002C12.282 6.40002 11.7 6.98207 11.7 7.70004C11.7 8.41801 12.282 9.00003 13 9.00003Z" fill="var(--danger)"/><path d="M13 19.7C12.2 19.7 11.6 19.1 11.6 18.4V11.6C11.6 10.9 12.2 10.3 12.9 10.3H13C13.7 10.3 14.3 10.9 14.3 11.6V18.4C14.3 19.1 13.8 19.7 13 19.7Z" fill="var(--danger)"/></svg></span>`;
+  const preview = harvestHoursIssuePreviewHTML(source);
+  return `<span class="hh-issue-trigger" style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;flex:none;margin-left:6px" title="Needs review"><svg viewBox="0 0 26 26" width="15" height="15" xmlns="http://www.w3.org/2000/svg"><path d="M13 25C19.6274 25 25 19.6274 25 13C25 6.37258 19.6274 1 13 1C6.37258 1 1 6.37258 1 13C1 19.6274 6.37258 25 13 25Z" fill="none" stroke="var(--danger)" stroke-width="2"/><path d="M13 9.00003C13.718 9.00003 14.3 8.41801 14.3 7.70004C14.3 6.98207 13.718 6.40002 13 6.40002C12.282 6.40002 11.7 6.98207 11.7 7.70004C11.7 8.41801 12.282 9.00003 13 9.00003Z" fill="var(--danger)"/><path d="M13 19.7C12.2 19.7 11.6 19.1 11.6 18.4V11.6C11.6 10.9 12.2 10.3 12.9 10.3H13C13.7 10.3 14.3 10.9 14.3 11.6V18.4C14.3 19.1 13.8 19.7 13 19.7Z" fill="var(--danger)"/></svg>${preview}</span>`;
+}
+function harvestHoursFlattenEntries(source){
+  if(!Array.isArray(source) || !source.length) return [];
+  if(source[0] && source[0].projects) return source.flatMap(cg => harvestHoursFlattenEntries(cg.projects));
+  if(source[0] && source[0].entries) return source.flatMap(pg => pg.entries || []);
+  return source;
+}
+function harvestHoursIssueDetailRows(source){
+  const rows = [];
+  harvestHoursFlattenEntries(source).forEach(e => {
+    if(e.missingDescription) rows.push({date: e.date, hours: e.hours, label: 'Missing description'});
+    if(e.mentionedClient) rows.push({date: e.date, hours: e.hours, label: `Mentions ${e.mentionedClient}`});
+  });
+  return rows.sort((a,b) => String(a.date).localeCompare(String(b.date)));
+}
+function harvestHoursIssuePreviewHTML(source){
+  const rows = harvestHoursIssueDetailRows(source);
+  if(!rows.length) return '';
+  return `<div class="hh-issue-preview">
+    <div class="hh-issue-preview-title">Needs review</div>
+    ${rows.map(r => `<div class="hh-issue-preview-row"><span>${esc(r.date || "\u2014")}</span><span>${esc(r.hours)}h</span><span>${esc(r.label)}</span></div>`).join('')}
+  </div>`;
 }
 function harvestHoursHighlightMention(notes, mentionedClient){
   const safeNotes = esc(notes);
@@ -6372,62 +6731,75 @@ function harvestHoursHighlightMention(notes, mentionedClient){
   const re = new RegExp('\\b(' + escaped + ')\\b', 'ig');
   return safeNotes.replace(re, '<span style="color:var(--warning);font-weight:700">$1</span>');
 }
-function harvestHoursFlagIcon(hasIssue, tooltip){
+function harvestHoursFlagIcon(hasIssue, tooltip, source){
   if(!hasIssue) return '';
-  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--warning);color:var(--card);font-size:9px;font-weight:700;cursor:help;flex:none;margin-left:5px" title="${esc(tooltip)}">!</span>`;
+  const preview = harvestHoursIssuePreviewHTML(source);
+  return `<span class="hh-issue-trigger" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--warning);color:var(--card);font-size:9px;font-weight:700;flex:none;margin-left:5px" title="Needs review">!${preview}</span>`;
 }
+function hhGetSelectedClients(){
+  return [...document.querySelectorAll('#hhClientOptions input[type=checkbox]:checked')].map(i => i.value);
+}
+function hhUpdateClientBtnLabel(){
+  const selected = hhGetSelectedClients();
+  const label = document.getElementById('hhClientBtnLabel');
+  if(label) label.textContent = selected.length ? `${selected.length} client${selected.length > 1 ? 's' : ''}` : 'All clients';
+}
+function hhClientCheckChange(){
+  hhUpdateClientBtnLabel();
+  renderHarvestHoursReport();
+}
+function hhToggleClientDropdown(e){
+  e.stopPropagation();
+  const panel = document.getElementById('hhClientPanel');
+  if(!panel) return;
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', function(e){
+  const wrap = document.getElementById('hhClientWrap');
+  if(wrap && !wrap.contains(e.target)){
+    const panel = document.getElementById('hhClientPanel');
+    if(panel) panel.style.display = 'none';
+  }
+});
 function harvestHoursFilterState(){
   return {
     search: (document.getElementById("hhAssigneeSearch")?.value || "").trim().toLowerCase(),
-    client: document.getElementById("hhClientFilter")?.value || "",
-    pm: document.getElementById("hhPmFilter")?.value || "",
-    billable: Boolean(document.getElementById("hhTypeBillable")?.checked),
-    nonBillable: Boolean(document.getElementById("hhTypeNonBillable")?.checked),
+    clients: hhGetSelectedClients(),
     needsReviewOnly: Boolean(document.getElementById("hhNeedsReviewOnly")?.checked)
   };
 }
 function harvestHoursRowMatchesFilters(row, f){
   if(f.search && !String(row.name || "").toLowerCase().includes(f.search)) return false;
-  if(f.client && !(row.clients || []).some(cl => normalizeClientKey(cl) === normalizeClientKey(f.client))) return false;
-  if(f.pm && !(row.pms || []).includes(f.pm)) return false;
+  if(f.clients.length && !f.clients.some(cl => (row.clients || []).some(rc => normalizeClientKey(rc) === normalizeClientKey(cl)))) return false;
   if(f.needsReviewOnly){
     const hasIssue = Boolean(row.missingCount) || Boolean(row.mentionedClients && row.mentionedClients.length);
     if(!hasIssue) return false;
   }
-  const anyType = f.billable || f.nonBillable;
-  if(!anyType) return true;
-  // Use epic billing class from Jira snapshot (customfield_12711) — most reliable source
+  // Internal billable filter: freelancers and billable-class people always show; personNonBillable always hidden
   const isFreelancer = Boolean(row.freelance);
-  const bc = (row.billingClasses || []);
-  // "Billable" agrupa empleados facturables y freelancers (a ambos se les factura al cliente).
-  const isBillable = isFreelancer || bc.includes('Billable');
-  const isNonBillable = !isFreelancer && Boolean(row.personNonBillable);
-  if(f.billable && isBillable) return true;
-  if(f.nonBillable && isNonBillable) return true;
-  return false;
+  const isBillable = isFreelancer || (row.billingClasses || []).includes('Billable');
+  if(!isBillable) return false;
+  return true;
 }
 function populateHarvestHoursFilterOptions(){
-  const clientSel = document.getElementById("hhClientFilter");
-  const pmSel = document.getElementById("hhPmFilter");
-  if(!clientSel || !pmSel) return;
-  const prevClient = clientSel.value, prevPm = pmSel.value;
+  const optionsEl = document.getElementById("hhClientOptions");
+  if(!optionsEl) return;
+  const prevSelected = new Set(hhGetSelectedClients());
   const _scoped = scopedHarvestHoursRows();
   const clients = [...new Set(_scoped.flatMap(r => r.clients || []))].filter(Boolean).sort((a,b) => a.localeCompare(b));
-  const pms = [...new Set(_scoped.flatMap(r => r.pms || []))].filter(Boolean).sort((a,b) => a.localeCompare(b));
-  clientSel.innerHTML = '<option value="">All clients</option>' + clients.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
-  pmSel.innerHTML = '<option value="">All PMs</option>' + pms.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
-  if(clients.includes(prevClient)) clientSel.value = prevClient;
-  if(pms.includes(prevPm)) pmSel.value = prevPm;
+  optionsEl.innerHTML = clients.map(c =>
+    `<label class="hh-ms-option"><input type="checkbox" value="${esc(c)}" onchange="hhClientCheckChange()"${prevSelected.has(c) ? ' checked' : ''}> ${esc(c)}</label>`
+  ).join('');
+  hhUpdateClientBtnLabel();
   const row = document.getElementById("hhFilterRow");
   if(row) row.style.display = "grid";
-  const nonBillableField = document.getElementById("hhTypeNonBillable")?.closest("label.hh-check");
-  if(nonBillableField) nonBillableField.style.display = executiveLikeRole() ? "" : "none";
 }
 function clearHarvestHoursFilters(){
   const searchEl = document.getElementById("hhAssigneeSearch");
   if(searchEl) searchEl.value = "";
-  ["hhClientFilter","hhPmFilter"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
-  ["hhTypeBillable","hhTypeNonBillable","hhNeedsReviewOnly"].forEach(id => { const el = document.getElementById(id); if(el) el.checked = false; });
+  document.querySelectorAll('#hhClientOptions input[type=checkbox]').forEach(i => i.checked = false);
+  hhUpdateClientBtnLabel();
+  ["hhNeedsReviewOnly"].forEach(id => { const el = document.getElementById(id); if(el) el.checked = false; });
   renderHarvestHoursReport();
 }
 function hhOwnedClientKeys(role = effectiveUserRole()){
@@ -6441,7 +6813,7 @@ function hhOwnedClientKeys(role = effectiveUserRole()){
 }
 function scopedHarvestHoursRows(rows = harvestHoursReportData){
   const role = effectiveUserRole();
-  if(executiveLikeRole(role)) return rows.slice();
+  if(executiveLikeRole(role) || role === 'pm') return rows.slice();
   if(role === 'assignee') return rows.filter(row => identityMatchesTokens(normalizeIdentity(row.name || '')));
   const ownedClients = hhOwnedClientKeys(role);
   if(!ownedClients.size) return rows.slice();
@@ -6472,7 +6844,7 @@ function renderHarvestHoursReport(){
     const hasGroups = row.groups && row.groups.length > 0;
     const jiraPctLabel = (row.jiraPct === null || row.jiraPct === undefined) ? "—" : (esc(row.jiraPct) + "%");
     const jiraGapWarning = (row.jiraPct !== null && row.jiraPct !== undefined && row.jiraPct > 0 && row.pct < row.jiraPct - 15);
-    const infoIcon = harvestHoursInfoIcon(row.missingCount, row.mentionedClients);
+    const infoIcon = harvestHoursInfoIcon(row.missingCount, row.mentionedClients, row.groups);
 
     const mainRow = `<tr onclick="toggleHarvestExpand('${personId}')" style="cursor:${hasGroups?'pointer':'default'}">
       <td style="font-weight:700">
@@ -6491,7 +6863,7 @@ function renderHarvestHoursReport(){
       const hasProjects = cg.projects && cg.projects.length > 0;
       const clientMissing = cg.projects.reduce((n,pg) => n + pg.entries.filter(e => e.missingDescription).length, 0);
       const clientMentions = [...new Set(cg.projects.flatMap(pg => pg.entries.map(e => e.mentionedClient).filter(Boolean)))];
-      const clientFlag = harvestHoursFlagIcon(cg.hasIssue, harvestHoursIssueTooltip(clientMissing, clientMentions));
+      const clientFlag = harvestHoursFlagIcon(cg.hasIssue, harvestHoursIssueTooltip(clientMissing, clientMentions), cg.projects);
       const clientLabel = cg.client === 'Azumo' ? 'Azumo <span style="color:var(--fg-mute)">(internal)</span>' : esc(cg.client);
 
       const clientJiraPctLabel = (cg.jiraPct === null || cg.jiraPct === undefined) ? "—" : (esc(cg.jiraPct) + "%");
@@ -6512,7 +6884,7 @@ function renderHarvestHoursReport(){
         const hasEntries = pg.entries && pg.entries.length > 0;
         const projectMissing = pg.entries.filter(e => e.missingDescription).length;
         const projectMentions = [...new Set(pg.entries.map(e => e.mentionedClient).filter(Boolean))];
-        const projectFlag = harvestHoursFlagIcon(pg.hasIssue, harvestHoursIssueTooltip(projectMissing, projectMentions));
+        const projectFlag = harvestHoursFlagIcon(pg.hasIssue, harvestHoursIssueTooltip(projectMissing, projectMentions), pg.entries);
 
         const projectRow = `<tr class="hh-expand-row hh-g-${personId} hh-g-${clientId}" data-hidden="true" onclick="event.stopPropagation();toggleHarvestExpand('${projectId}')" style="background:var(--bg-2);cursor:${hasEntries?'pointer':'default'}">
           <td style="padding:5px 8px 5px 54px;font-size:.82rem;color:var(--fg-3);font-style:italic">
@@ -6526,20 +6898,44 @@ function renderHarvestHoursReport(){
           <td style="text-align:center;font-size:.78rem;color:var(--fg-3)">${pg.pct}%</td>
         </tr>`;
 
-        const entryRows = hasEntries ? pg.entries.map(e => {
-          const noteHtml = e.missingDescription
-            ? `<span style="font-style:italic">No description</span>`
-            : harvestHoursHighlightMention(e.notes, e.mentionedKey || e.mentionedClient);
-          return `<tr class="hh-expand-row hh-g-${personId} hh-g-${clientId} hh-g-${projectId}" data-hidden="true" style="background:var(--bg-2);${e.missingDescription ? 'color:var(--danger)' : ''}">
-            <td colspan="6" style="padding:4px 8px 4px 78px;font-size:.8rem">
-              <div style="display:flex;gap:12px;align-items:baseline">
-                <span style="min-width:64px;color:${e.missingDescription ? 'inherit' : 'var(--fg-2)'}">${esc(e.date || "—")}</span>
-                <span style="min-width:44px;font-weight:700;color:${e.missingDescription ? 'inherit' : 'var(--fg-1)'}">${esc(e.hours)}h</span>
-                <span style="flex:1">${noteHtml}</span>
-              </div>
-            </td>
-          </tr>`;
-        }).join("") : "";
+        const entryRows = (() => {
+          if (!hasEntries) return '';
+          const clsSuffix = `hh-expand-row hh-g-${personId} hh-g-${clientId} hh-g-${projectId}`;
+          const byDate = new Map();
+          pg.entries.forEach(e => {
+            const d = e.date || '—';
+            if (!byDate.has(d)) byDate.set(d, []);
+            byDate.get(d).push(e);
+          });
+          return [...byDate.entries()].sort(([a],[b]) => a.localeCompare(b)).map(([date, dayEntries]) => {
+            const dayTotal = dayEntries.reduce((s, e) => s + Number(e.hours || 0), 0);
+            const rows = dayEntries.map(e => {
+              const noteHtml = e.missingDescription
+                ? `<span style="font-style:italic">No description</span>`
+                : harvestHoursHighlightMention(e.notes, e.mentionedKey || e.mentionedClient);
+              const taskChip = e.task ? `<span class="hh-task-chip">${esc(e.task)}</span>` : '';
+              return `<tr class="${clsSuffix}" data-hidden="true" style="background:var(--bg-2);${e.missingDescription ? 'color:var(--danger)' : ''}">
+                <td colspan="6" style="padding:3px 8px 3px 78px;font-size:.8rem">
+                  <div style="display:flex;gap:10px;align-items:baseline">
+                    <span style="min-width:64px;color:${e.missingDescription ? 'inherit' : 'var(--fg-2)'}">${esc(e.date || '—')}</span>
+                    <span style="min-width:44px;font-weight:700;color:${e.missingDescription ? 'inherit' : 'var(--fg-1)'}">${esc(e.hours)}h</span>
+                    ${taskChip}
+                    <span style="flex:1">${noteHtml}</span>
+                  </div>
+                </td>
+              </tr>`;
+            }).join('');
+            const subtotalRow = dayEntries.length > 1 ? `<tr class="${clsSuffix}" data-hidden="true" style="background:var(--bg-2)">
+              <td colspan="6" style="padding:2px 8px 6px 78px">
+                <div class="hh-day-subtotal">
+                  <span>Total</span>
+                  <span class="hh-day-subtotal-hrs">${dayTotal % 1 === 0 ? dayTotal : dayTotal.toFixed(1)}h</span>
+                </div>
+              </td>
+            </tr>` : '';
+            return rows + subtotalRow;
+          }).join('');
+        })();
 
         return projectRow + entryRows;
       }).join("") : "";
@@ -6604,21 +7000,19 @@ function harvestHoursApplyCoverageDefaults(){
   hhFiltersInitialized = true;
   if(isHarvestScopedToSelf()) return;
   const names = myScopedClientNames();
-  const clientSelect = document.getElementById('hhClientFilter');
-  if(clientSelect && names.length === 1){
-    clientSelect.value = names[0];
+  if(names.length === 1){
+    document.querySelectorAll('#hhClientOptions input[type=checkbox]').forEach(i => {
+      i.checked = i.value === names[0];
+    });
+    hhUpdateClientBtnLabel();
   }
-  const billableSelect = document.getElementById('hhTypeBillable');
-  if(billableSelect) billableSelect.value = 'Billable';
 }
 
 function setHarvestHoursShowAll(checked){
   hhShowAll = checked;
-  const clientSelect = document.getElementById('hhClientFilter');
-  const billableSelect = document.getElementById('hhTypeBillable');
   if(checked){
-    if(clientSelect) clientSelect.value = '';
-    if(billableSelect) billableSelect.value = '';
+    document.querySelectorAll('#hhClientOptions input[type=checkbox]').forEach(i => i.checked = false);
+    hhUpdateClientBtnLabel();
   } else {
     hhFiltersInitialized = false;
     harvestHoursApplyCoverageDefaults();
@@ -6626,6 +7020,8 @@ function setHarvestHoursShowAll(checked){
   renderHarvestHoursReport();
 }
 window.setHarvestHoursShowAll = setHarvestHoursShowAll;
+window.hhToggleClientDropdown = hhToggleClientDropdown;
+window.hhClientCheckChange = hhClientCheckChange;
 
 async function runHarvestHoursReport(){
   initHarvestHoursDefaults();
@@ -6674,7 +7070,7 @@ async function runHarvestHoursReport(){
       const projectName = entry.project?.name || 'No project';
       if(hours > 0){
         if(!entriesByUser[id]) entriesByUser[id] = [];
-        entriesByUser[id].push({date: entry.spent_date || '', hours, client: clientName, project: projectName, notes: String(entry.notes || '').trim()});
+        entriesByUser[id].push({date: entry.spent_date || '', hours, client: clientName, project: projectName, task: entry.task?.name || '', notes: String(entry.notes || '').trim()});
       }
       if(clientName && hours > 0){
         if(!clientsByUser[id]) clientsByUser[id] = new Set();
@@ -6731,7 +7127,7 @@ async function runHarvestHoursReport(){
           const ticketMatch = harvestHoursMentionedTicketClient(e.notes, e.client, prefixClientMap, activeClientNames);
           if(ticketMatch){ mentionedClient = ticketMatch.client; mentionedKey = ticketMatch.key; }
         }
-        const entry = {date: e.date, hours: e.hours, notes: e.notes, missingDescription, mentionedClient, mentionedKey};
+        const entry = {date: e.date, hours: e.hours, notes: e.notes, task: e.task || '', missingDescription, mentionedClient, mentionedKey};
         const clientKey = e.client || 'No client';
         if(!byClient.has(clientKey)) byClient.set(clientKey, {client: clientKey, hours: 0, hasIssue: false, projects: new Map()});
         const cg = byClient.get(clientKey);
@@ -6896,6 +7292,27 @@ function exportHarvestHoursCSV(){
   link.download = `harvest-hours-${from}-${to}.csv`;
   link.click();
 }
+async function copyHarvestHoursTSV(){
+  const rows = [['Name','Client','Hours','Days filled','Jira %','%','Status']].concat(
+    harvestHoursReportData.map(row => [
+      row.name,
+      row.client || '',
+      row.hours,
+      row.daysFilled || 0,
+      row.jiraPct != null ? row.jiraPct + '%' : '—',
+      row.pct + '%',
+      row.complete ? 'Complete' : row.pct >= 50 ? 'Partial' : 'Incomplete'
+    ])
+  );
+  const tsv = rows.map(r => r.join('\t')).join('\n');
+  try {
+    await navigator.clipboard.writeText(tsv);
+    const btn = document.getElementById('hhCopyTsvBtn');
+    if(btn){ const orig = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(() => { btn.textContent = orig; }, 2000); }
+  } catch {
+    prompt('Copy and paste into your spreadsheet:', tsv);
+  }
+}
 async function copyHarvestHoursSlack(){
   const incomplete = harvestHoursReportData.filter(row => !row.complete);
   const noDescription = harvestHoursReportData.filter(row => row.missingDescription);
@@ -6912,8 +7329,915 @@ window.renderHarvestHoursReport = renderHarvestHoursReport;
 window.clearHarvestHoursFilters = clearHarvestHoursFilters;
 window.runHarvestHoursReport = runHarvestHoursReport;
 window.exportHarvestHoursCSV = exportHarvestHoursCSV;
+window.copyHarvestHoursTSV = copyHarvestHoursTSV;
 window.copyHarvestHoursSlack = copyHarvestHoursSlack;
 
+// ════════════════════════════════════════════════════
+// HARVEST WEEKLY REPORT
+// ════════════════════════════════════════════════════
+
+function hwWorkingDays(from, to) {
+  let d = new Date(from + 'T00:00:00');
+  const end = new Date(to + 'T00:00:00');
+  let count = 0;
+  while (d <= end) {
+    const dow = d.getDay();
+    if (dow >= 1 && dow <= 5) count++;
+    d.setDate(d.getDate() + 1);
+  }
+  return count;
+}
+
+function hwBillingPctByPerson() {
+  const rows = allAssignmentRows();
+  const map = {};
+  for (const row of rows) {
+    if (rowBillingClass(row) !== 'Billable') continue;
+    const name = normalizeIdentity(row.assignee || row.name || '');
+    if (!name) continue;
+    const pct = rowAssignmentPct(row);
+    if (pct == null) continue;
+    map[name] = Math.min(100, (map[name] || 0) + pct);
+  }
+  return map;
+}
+
+let hwBillingDeltaVisible = false;
+
+function hwSnapshotForDate(dateStr) {
+  const target = new Date(dateStr + 'T12:00:00');
+  const snaps = (PMO && PMO.snapshots) ? PMO.snapshots : [];
+  let best = null, bestDiff = Infinity;
+  for (const s of snaps) {
+    if (!s.date || !(s.assignment_rows && s.assignment_rows.length)) continue;
+    const d = new Date(s.date + 'T12:00:00');
+    const diff = Math.abs(d - target);
+    if (diff < bestDiff) { bestDiff = diff; best = s; }
+  }
+  return bestDiff <= 4 * 86400000 ? best : null; // max 4 days away
+}
+
+function hwBillingMapFromSnapshot(snap) {
+  const map = {};
+  for (const row of (snap && snap.assignment_rows || [])) {
+    if (rowBillingClass(row) !== 'Billable') continue;
+    const name = normalizeIdentity(row.assignee || row.name || '');
+    if (!name) continue;
+    const pct = rowAssignmentPct(row);
+    if (pct == null) continue;
+    map[name] = Math.min(100, (map[name] || 0) + pct);
+  }
+  return map;
+}
+
+function hwToggleBillingDelta() {
+  hwBillingDeltaVisible = !hwBillingDeltaVisible;
+  renderHarvestWeeklyReport();
+}
+window.hwToggleBillingDelta = hwToggleBillingDelta;
+
+function renderHarvestWeeklyReport() {
+  const body = document.getElementById('hwBody');
+  if (!body) return;
+
+  const yest = todayStartDate();
+  yest.setDate(yest.getDate() - 1);
+  const yestIso = localDateIso(yest);
+  const fromInput = document.getElementById('hwWeekFrom');
+  const toInput   = document.getElementById('hwWeekTo');
+  if (fromInput) fromInput.max = yestIso;
+  if (toInput)   toInput.max   = yestIso;
+
+  const metrics = latest && latest.harvest_metrics;
+  const people  = metrics && Array.isArray(metrics.by_person) ? metrics.by_person : null;
+
+  if (!people || people.length === 0) {
+    body.innerHTML = '<div class="hw-empty-state">No data yet — run a board refresh to populate this view.</div>';
+    const tag = document.getElementById('hwRangeTag');
+    if (tag) tag.textContent = '—';
+    return;
+  }
+
+  const rangeTag = document.getElementById('hwRangeTag');
+  if (rangeTag && metrics.range) {
+    const populationSuffix = metrics.population && metrics.population.roster_applied
+      ? ' · ' + metrics.population.people_counted + ' people' : '';
+    rangeTag.textContent = metrics.range.from + ' → ' + metrics.range.to + populationSuffix;
+  }
+
+  if (fromInput && toInput && metrics.range) {
+    if (!fromInput.value) fromInput.value = metrics.range.from;
+    if (!toInput.value)   toInput.value   = metrics.range.to;
+  }
+
+  const wDays = metrics.range ? hwWorkingDays(metrics.range.from, metrics.range.to) : 5;
+  const billingByPerson = hwBillingPctByPerson();
+
+  // Optional Mon/Sun billing delta columns
+  let monMap = {}, sunMap = {}, monSnapDate = null, sunSnapDate = null;
+  if (hwBillingDeltaVisible && metrics.range) {
+    const monSnap = hwSnapshotForDate(metrics.range.from);
+    const sunSnap = hwSnapshotForDate(metrics.range.to);
+    if (monSnap) { monMap = hwBillingMapFromSnapshot(monSnap); monSnapDate = monSnap.date; }
+    if (sunSnap) { sunMap = hwBillingMapFromSnapshot(sunSnap); sunSnapDate = sunSnap.date; }
+  }
+
+  const fmtH = h => h == null || h === 0 ? '<span style="color:var(--muted)">—</span>' : Number(h).toFixed(2) + 'h';
+  const fmtPct = v => v == null ? '<span style="color:var(--muted)">—</span>' : Number(v).toFixed(1) + '%';
+
+  const rows = people.map(p => {
+    const nameKey = normalizeIdentity(p.user_name || '');
+    const jiraPct = billingByPerson[nameKey] != null ? billingByPerson[nameKey] : null;
+    const adjExpected = jiraPct != null ? (jiraPct / 100) * wDays * 8 : null;
+    const harvestPct = (adjExpected && adjExpected > 0) ? (p.client_logged_hours / adjExpected) * 100 : null;
+    const diffH = adjExpected != null ? p.client_logged_hours - adjExpected : null;
+    const diffStr = diffH == null
+      ? '<span style="color:var(--muted)">—</span>'
+      : `<span class="${diffH >= 0 ? 'hwr-diff-pos' : 'hwr-diff-neg'}">${diffH >= 0 ? '+' : ''}${diffH.toFixed(2)}h</span>`;
+
+    let deltaCols = '';
+    if (hwBillingDeltaVisible) {
+      const monPct = monMap[nameKey] != null ? monMap[nameKey] : null;
+      const sunPct = sunMap[nameKey] != null ? sunMap[nameKey] : null;
+      const changed = monPct != null && sunPct != null && Math.abs(sunPct - monPct) >= 0.5;
+      const sunStyle = changed ? (sunPct > monPct ? 'color:#6EE7B7;font-weight:700' : 'color:#F87171;font-weight:700') : '';
+      deltaCols = `<td style="text-align:right;opacity:.8">${fmtPct(monPct)}</td><td style="text-align:right;${sunStyle}">${fmtPct(sunPct)}</td>`;
+    }
+
+    return `<tr>
+      <td>${esc(p.user_name)}${p.is_contractor ? ' <span style="font-size:.68rem;color:var(--muted)">(c)</span>' : ''}</td>
+      <td style="text-align:right">${fmtPct(jiraPct)}</td>
+      ${deltaCols}
+      <td style="text-align:right">${fmtH(p.committed_harvest_hours)}</td>
+      <td style="text-align:right">${fmtH(p.client_logged_hours)}</td>
+      <td style="text-align:right">${fmtH(p.total_off_hours)}</td>
+      <td style="text-align:right">${fmtH(p.non_billable_hours)}</td>
+      <td style="text-align:right">${adjExpected != null ? adjExpected.toFixed(2) + 'h' : '<span style="color:var(--muted)">—</span>'}</td>
+      <td style="text-align:right">${fmtPct(harvestPct)}</td>
+      <td style="text-align:right">${diffStr}</td>
+    </tr>`;
+  }).join('');
+
+  const deltaHeaders = hwBillingDeltaVisible ? `
+          <th style="text-align:right;opacity:.8" title="Jira billing % — nearest snapshot to ${monSnapDate || metrics.range.from}">Mon&nbsp;%</th>
+          <th style="text-align:right" title="Jira billing % — nearest snapshot to ${sunSnapDate || metrics.range.to}">Sun&nbsp;%</th>` : '';
+
+  hwRenderHealthBadges(metrics.health_checks || []);
+
+  body.innerHTML = `
+    <div class="hw-filter-row">
+      <span class="hw-meta">${people.length} people · ${wDays} working day${wDays !== 1 ? 's' : ''}</span>
+      <button class="btn btn-ghost btn-sm" onclick="hwExportReportTSV()" title="Copy as TSV">↓ TSV</button>
+      <button class="btn btn-ghost btn-sm" id="hwCopySheetBtn" onclick="hwCopyForSheet()" title="Name · Total h · Client h · PTO h · Non-billable h — para pegar en la sheet">↓ Sheet</button>
+      <button class="btn btn-ghost btn-sm" id="hwCopyBenchInternalBtn" onclick="hwCopyBenchInternal()" title="Bench + Internal Projects — Assignee · Hours · Project">↓ Bench/Internal</button>
+      <button class="btn btn-ghost btn-sm${hwBillingDeltaVisible ? ' btn-active' : ''}" id="hwBillingDeltaBtn" onclick="hwToggleBillingDelta()" title="Mostrar Billing % de Jira del lunes y domingo de la semana trackeada">± Mon/Sun</button>
+    </div>
+    <div class="hwr-table-wrap">
+      <table>
+        <thead><tr>
+          <th>Name</th>
+          <th style="text-align:right">Billing&nbsp;% (Jira)</th>
+          ${deltaHeaders}
+          <th style="text-align:right">Total&nbsp;h</th>
+          <th style="text-align:right">Client&nbsp;h</th>
+          <th style="text-align:right">PTO&nbsp;h</th>
+          <th style="text-align:right">Non-Bill&nbsp;h</th>
+          <th style="text-align:right">Adj.&nbsp;Exp&nbsp;h</th>
+          <th style="text-align:right">Billing&nbsp;% (Harvest)</th>
+          <th style="text-align:right">Diff&nbsp;h</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderHarvestWeeklyBench() {
+  const body = document.getElementById('hwBenchBody');
+  if (!body) return;
+  const metrics = latest && latest.harvest_metrics;
+  const people  = metrics && Array.isArray(metrics.by_person) ? metrics.by_person : null;
+  const benchers = people ? people.filter(p => Number(p.bench_hours || 0) > 0) : [];
+  if (!benchers.length) {
+    body.innerHTML = '<div class="hw-empty-state">No bench hours logged this period.</div>';
+    return;
+  }
+  const fmtN = h => Number(h || 0).toFixed(2) + 'h';
+  const rows = [...benchers].sort((a, b) => b.bench_hours - a.bench_hours).map(p => {
+    const bDetail = p.bench_detail || {};
+    const projects = Object.entries(bDetail).sort((a, b) => b[1] - a[1])
+      .map(([proj, hrs]) => `<div class="hwr-detail-row"><span>${esc(proj)}</span><span>${fmtN(hrs)}</span></div>`)
+      .join('');
+    return `<tr>
+      <td>${esc(p.user_name)}</td>
+      <td style="text-align:right;font-weight:800">${fmtN(p.bench_hours)}</td>
+      <td><div class="hwr-detail">${projects || '<span style="color:var(--muted);font-size:.75rem">—</span>'}</div></td>
+    </tr>`;
+  }).join('');
+  body.innerHTML = `<div class="hwr-table-wrap"><table>
+    <thead><tr><th>Name</th><th style="text-align:right">Bench&nbsp;h</th><th>Projects</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function renderHarvestWeeklyInternal() {
+  const body = document.getElementById('hwInternalBody');
+  if (!body) return;
+  const metrics = latest && latest.harvest_metrics;
+  const people  = metrics && Array.isArray(metrics.by_person) ? metrics.by_person : null;
+  const internals = people ? people.filter(p => Number(p.internal_projects_hours || 0) > 0) : [];
+  if (!internals.length) {
+    body.innerHTML = '<div class="hw-empty-state">No internal project hours logged this period.</div>';
+    return;
+  }
+  const fmtN = h => Number(h || 0).toFixed(2) + 'h';
+  const rows = [...internals].sort((a, b) => b.internal_projects_hours - a.internal_projects_hours).map(p => {
+    const ipDetail = p.internal_projects_detail || {};
+    const projects = Object.entries(ipDetail).sort((a, b) => b[1] - a[1])
+      .map(([proj, hrs]) => `<div class="hwr-detail-row"><span>${esc(proj)}</span><span>${fmtN(hrs)}</span></div>`)
+      .join('');
+    return `<tr>
+      <td>${esc(p.user_name)}</td>
+      <td style="text-align:right;font-weight:800">${fmtN(p.internal_projects_hours)}</td>
+      <td><div class="hwr-detail">${projects || '<span style="color:var(--muted);font-size:.75rem">—</span>'}</div></td>
+    </tr>`;
+  }).join('');
+  body.innerHTML = `<div class="hwr-table-wrap"><table>
+    <thead><tr><th>Name</th><th style="text-align:right">Internal&nbsp;h</th><th>Projects</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function hwRenderHealthBadges(checks) {
+  const el = document.getElementById('hwHealthBadges');
+  if (!el) return;
+  if (!checks || !checks.length) {
+    el.innerHTML = '<span class="hw-hb-ok">✓ all clear</span>';
+    return;
+  }
+  const errors   = checks.filter(c => c.severity === 'error');
+  const warnings = checks.filter(c => c.severity === 'warning');
+  const group = (items, cls, icon, label) => {
+    if (!items.length) return '';
+    const lis = items.map(c =>
+      `<li><span class="hw-hb-type">${esc(c.type.replace(/_/g,' '))}</span>${esc(c.message)}</li>`
+    ).join('');
+    return `<details class="hw-hb-group ${cls}">
+      <summary>${icon} ${items.length} ${label}${items.length > 1 ? 's' : ''}</summary>
+      <div class="hw-hb-panel"><ul class="hw-hb-list">${lis}</ul></div>
+    </details>`;
+  };
+  el.innerHTML = group(errors, 'hw-hb-error', '✕', 'error') + group(warnings, 'hw-hb-warning', '⚠', 'warning');
+}
+
+function hwExportReportTSV() {
+  const metrics = latest && latest.harvest_metrics;
+  const people  = metrics && Array.isArray(metrics.by_person) ? metrics.by_person : null;
+  if (!people || !people.length) return;
+  const wDays = metrics.range ? hwWorkingDays(metrics.range.from, metrics.range.to) : 5;
+  const billingByPerson = hwBillingPctByPerson();
+  const fmt = v => v != null ? Number(v).toFixed(2) : '0.00';
+  const fmtPct = v => v != null ? Number(v).toFixed(1) : '';
+  const header = ['Name','Billing % (Jira)','Total h','Client h','PTO h','Non-Billable h','Adj. Expected h','Billing % (Harvest)','Diff h'].join('\t');
+  const dataLines = people.map(p => {
+    const nameKey = normalizeIdentity(p.user_name || '');
+    const jiraPct = billingByPerson[nameKey] != null ? billingByPerson[nameKey] : null;
+    const adjExpected = jiraPct != null ? (jiraPct / 100) * wDays * 8 : null;
+    const harvestPct = (adjExpected && adjExpected > 0) ? (p.client_logged_hours / adjExpected) * 100 : null;
+    const diffH = adjExpected != null ? p.client_logged_hours - adjExpected : null;
+    return [
+      p.user_name,
+      fmtPct(jiraPct),
+      fmt(p.committed_harvest_hours),
+      fmt(p.client_logged_hours),
+      fmt(p.total_off_hours),
+      fmt(p.non_billable_hours),
+      adjExpected != null ? fmt(adjExpected) : '',
+      fmtPct(harvestPct),
+      diffH != null ? (diffH >= 0 ? '+' : '') + fmt(diffH) : ''
+    ].join('\t');
+  });
+  const tsv = [header, ...dataLines].join('\n');
+  navigator.clipboard.writeText(tsv).then(() => {
+    const btn = document.querySelector('#hwBody button[onclick="hwExportReportTSV()"]');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(() => { btn.textContent = orig; }, 2000); }
+  }).catch(() => {
+    const blob = new Blob([tsv], { type: 'text/tab-separated-values' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'harvest-weekly-report.tsv'; a.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+async function hwCopyForSheet() {
+  const metrics = latest && latest.harvest_metrics;
+  const people = metrics && Array.isArray(metrics.by_person) ? metrics.by_person : null;
+  if (!people || !people.length) return;
+  const fmt = v => v != null ? Number(v).toFixed(2) : '0.00';
+  // Columnas: Name | Total h (D) | Client h (E) | PTO h (I) | Non-billable h (J)
+  // F, G, H son fórmulas en la sheet — no se incluyen para no pisar nada
+  const header = ['Name', 'Total h', 'Client h', 'PTO h', 'Non-billable h'].join('\t');
+  const lines = people.map(p => [
+    p.user_name,
+    fmt(p.committed_harvest_hours),
+    fmt(p.client_logged_hours),
+    fmt(p.total_off_hours),
+    fmt(p.non_billable_hours)
+  ].join('\t'));
+  const tsv = [header, ...lines].join('\n');
+  try {
+    await navigator.clipboard.writeText(tsv);
+    const btn = document.getElementById('hwCopySheetBtn');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(() => { btn.textContent = orig; }, 2000); }
+  } catch {
+    const blob = new Blob([tsv], { type: 'text/tab-separated-values' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'harvest-sheet.tsv'; a.click();
+    URL.revokeObjectURL(url);
+  }
+}
+window.hwCopyForSheet = hwCopyForSheet;
+
+async function hwCopyBenchInternal() {
+  const metrics = latest && latest.harvest_metrics;
+  const people  = metrics && Array.isArray(metrics.by_person) ? metrics.by_person : null;
+  if (!people) return;
+  const fmt = h => Number(h || 0).toFixed(2);
+  const TAB = '\t', NL = '\n';
+
+  function expandRows(list, hoursKey, detailKey, moduleTotal) {
+    const rows = [];
+    let personTotal = 0;
+    list.forEach(p => {
+      const personHours = Number(p[hoursKey] || 0);
+      personTotal += personHours;
+      const detail = p[detailKey] || {};
+      const entries = Object.entries(detail).sort((a, b) => b[1] - a[1]);
+      const detailSum = entries.reduce((s, [, v]) => s + Number(v || 0), 0);
+      // If detail sum differs from per-person total by more than 5%+0.1h,
+      // the detail is stale (from a previous week's snapshot). In that case,
+      // show the authoritative per-person total without project breakdown.
+      const stale = entries.length > 0 && Math.abs(detailSum - personHours) > Math.max(personHours * 0.05, 0.1);
+      if (!stale && entries.length) {
+        entries.forEach(([proj, hrs]) => {
+          rows.push([p.user_name, fmt(hrs), proj].join(TAB));
+        });
+      } else {
+        rows.push([p.user_name, fmt(personHours), ''].join(TAB));
+      }
+    });
+    rows.push(['Total', fmt(personTotal), ''].join(TAB));
+    return rows;
+  }
+
+  // If bench + internal > committed_harvest_hours + 1h, the by_person record is
+  // from a different week than the totals — exclude that person from per-person rows.
+  const isRecordStale = p => {
+    const nonBill = Number(p.bench_hours || 0) + Number(p.internal_projects_hours || 0);
+    const total   = Number(p.committed_harvest_hours || 0);
+    return total > 0 && nonBill > total + 1;
+  };
+
+  const benchers  = people.filter(p => Number(p.bench_hours || 0) > 0 && !isRecordStale(p))
+                          .sort((a, b) => a.user_name.localeCompare(b.user_name));
+  const internals = people.filter(p => Number(p.internal_projects_hours || 0) > 0 && !isRecordStale(p))
+                          .sort((a, b) => a.user_name.localeCompare(b.user_name));
+
+  const lines = [
+    'BENCH' + TAB + TAB,
+    ['Assignee', 'Hours', 'Project'].join(TAB),
+    ...expandRows(benchers, 'bench_hours', 'bench_detail', metrics.internal_bench_hours),
+    TAB + TAB,
+    TAB + TAB,
+    'INTERNAL PROJECTS' + TAB + TAB,
+    TAB + TAB,
+    ['Assignee', 'Hours', 'Project'].join(TAB),
+    ...expandRows(internals, 'internal_projects_hours', 'internal_projects_detail', metrics.internal_projects_logged_hours),
+  ];
+  const tsv = lines.join(NL);
+  try {
+    await navigator.clipboard.writeText(tsv);
+    const btn = document.getElementById('hwCopyBenchInternalBtn');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(() => { btn.textContent = orig; }, 2000); }
+  } catch {
+    const blob = new Blob([tsv], { type: 'text/tab-separated-values' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'bench-internal.tsv'; a.click();
+    URL.revokeObjectURL(url);
+  }
+}
+window.hwCopyBenchInternal = hwCopyBenchInternal;
+
+let hwActiveTab = 'report';
+
+function hwSwitchTab(tab) {
+  hwActiveTab = tab;
+  const panels = {
+    report:   document.getElementById('hwBody'),
+    bench:    document.getElementById('hwBenchBody'),
+    internal: document.getElementById('hwInternalBody'),
+    team:     document.getElementById('hwTeamBody'),
+    control:  document.getElementById('hwControlBody'),
+  };
+  const tabs = {
+    report:   document.getElementById('hwTabReport'),
+    bench:    document.getElementById('hwTabBench'),
+    internal: document.getElementById('hwTabInternal'),
+    team:     document.getElementById('hwTabTeam'),
+    control:  document.getElementById('hwTabControl'),
+  };
+  Object.entries(panels).forEach(([key, el]) => { if (el) el.style.display = key === tab ? '' : 'none'; });
+  Object.entries(tabs).forEach(([key, el]) => { if (el) el.classList.toggle('active', key === tab); });
+  if (tab === 'report')   renderHarvestWeeklyReport();
+  if (tab === 'bench')    renderHarvestWeeklyBench();
+  if (tab === 'internal') renderHarvestWeeklyInternal();
+  if (tab === 'team')     renderHarvestWeeklyTeam();
+  if (tab === 'control')  renderHarvestWeeklyControl();
+}
+
+function renderHarvestWeeklyTeam() {
+  const body = document.getElementById('hwTeamBody');
+  if (!body) return;
+  const metrics = latest && latest.harvest_metrics;
+  if (!metrics || !metrics.committed_harvest_hours) {
+    body.innerHTML = '<div class="hw-empty-state">No data — run a board refresh to populate.</div>';
+    return;
+  }
+  const r   = metrics.rates || {};
+  const pop = metrics.population || {};
+  const headcount = r.headcount || pop.people_counted || 0;
+  const cap = r.billable_capacity_hours || (headcount * 40);
+
+  const pctFmt = (v) => v != null ? (Number(v) * 100).toFixed(2) + '%' : '—';
+  const hFmt   = (v) => v != null ? Number(v).toFixed(2) + 'h' : '—';
+
+  // Booking Billed Assignment % (Jira/EazyBI)
+  const bookingPct = latest && latest.metrics
+    ? (latest.metrics.utilization_billing != null ? latest.metrics.utilization_billing : latest.metrics.utilization_assignment)
+    : null;
+  const bookingHrs = bookingPct != null && cap ? bookingPct * cap : null;
+  const actualPct  = r.capacity_utilization_rate != null ? r.capacity_utilization_rate
+    : (cap ? Number(metrics.client_logged_hours || 0) / cap : null);
+  const gapPct  = bookingPct != null && actualPct != null ? bookingPct - actualPct : null;
+  const gapHrs  = bookingHrs != null ? bookingHrs - Number(metrics.client_logged_hours || 0) : null;
+  const gapCls  = gapPct != null ? (gapPct >= 0 ? 'is-pos' : 'is-neg') : '';
+
+  const s = (lbl, val, sub, cls) =>
+    `<div class="hw-stat${cls ? ' ' + cls : ''}">
+      <span class="hw-stat-lbl">${lbl}</span>
+      <span class="hw-stat-val">${val}</span>
+      ${sub ? `<span class="hw-stat-sub">${sub}</span>` : ''}
+    </div>`;
+
+  const ptoBk = (metrics.pto_hours != null || metrics.uto_hours != null) ? `
+    <div class="hw-team-section">
+      <div class="hw-team-section-label">PTO Breakdown</div>
+      <div class="hw-team-grid hw-team-grid-4">
+        ${s('Total Off Hours', hFmt(metrics.total_off_hours), pctFmt(r.total_off_rate) + ' of capacity', '')}
+        ${s('PTO Hours (Paid)', hFmt(metrics.pto_hours), pctFmt(r.pto_rate), '')}
+        ${s('UTO Hours (Unpaid)', hFmt(metrics.uto_hours), pctFmt(r.uto_rate), '')}
+        ${s('CTO Hours (Comp)', hFmt(metrics.cto_hours), pctFmt(r.cto_rate), '')}
+      </div>
+    </div>` : '';
+
+  const jiraBk = bookingPct != null ? `
+    <div class="hw-team-section">
+      <div class="hw-team-section-label">Booking vs Actuals (Jira)</div>
+      <div class="hw-team-grid hw-team-grid-5">
+        ${s('Booking Billed Assign. %', pctFmt(bookingPct), 'planned — from Jira / EazyBI', '')}
+        ${s('Booking Billed Hours', hFmt(bookingHrs), 'capacity × booking %', '')}
+        ${s('Capacity Utilization % (Harvest)', pctFmt(actualPct), 'client logged / capacity', 'is-accent')}
+        ${s('GAP %', gapPct != null ? (gapPct >= 0 ? '+' : '') + (gapPct * 100).toFixed(2) + '%' : '—', 'booking − actual', gapCls)}
+        ${s('GAP Hours', gapHrs != null ? (gapHrs >= 0 ? '+' : '') + gapHrs.toFixed(2) + 'h' : '—', 'booking hrs − client logged', gapCls)}
+      </div>
+    </div>` : '';
+
+  body.innerHTML = `<div class="hw-team-wrap">
+    <div class="hw-team-section">
+      <div class="hw-team-section-label">Capacity</div>
+      <div class="hw-team-grid hw-team-grid-3">
+        ${s('Headcount (Billable Team)', headcount, 'mid-week starters excluded', '')}
+        ${s('Billable Capacity Hours', hFmt(cap), 'headcount × 8h × working days', '')}
+        ${s('Committed Harvest Hours', hFmt(metrics.committed_harvest_hours), 'all hours logged by billable team', '')}
+      </div>
+    </div>
+    <div class="hw-team-section">
+      <div class="hw-team-section-label">Hours Distribution</div>
+      <div class="hw-team-grid hw-team-grid-4">
+        ${s('Client Logged Hours', hFmt(metrics.client_logged_hours), pctFmt(r.capacity_utilization_rate) + ' utilization', 'is-accent')}
+        ${s('Internal Projects Logged', hFmt(metrics.internal_projects_logged_hours), pctFmt(r.internal_project_rate) + ' of capacity', '')}
+        ${s('Internal Bench Hours', hFmt(metrics.internal_bench_hours), pctFmt(r.bench_rate) + ' of capacity', '')}
+        ${s('Total Off Hours', hFmt(metrics.total_off_hours), pctFmt(r.total_off_rate) + ' of capacity', '')}
+      </div>
+    </div>
+    <div class="hw-team-section">
+      <div class="hw-team-section-label">Utilization Rates</div>
+      <div class="hw-team-grid hw-team-grid-3">
+        ${s('Capacity Utilization Rate', pctFmt(r.capacity_utilization_rate), 'client logged / billable capacity', 'is-accent')}
+        ${s('Internal Project Rate', pctFmt(r.internal_project_rate), 'internal projects / billable capacity', '')}
+        ${s('Bench Rate', pctFmt(r.bench_rate), 'bench hours / billable capacity', '')}
+      </div>
+    </div>
+    ${ptoBk}
+    ${jiraBk}
+  </div>`;
+}
+
+function renderHarvestWeeklyControl() {
+  const body = document.getElementById('hwControlBody');
+  if (!body) return;
+  const metrics = latest && latest.harvest_metrics;
+  const people  = metrics && Array.isArray(metrics.by_person) ? metrics.by_person : [];
+  if (!metrics || !metrics.committed_harvest_hours) {
+    body.innerHTML = '<div class="hw-empty-state">No data — run a board refresh to populate.</div>';
+    return;
+  }
+
+  const fmt2 = v => Number(v || 0).toFixed(2);
+  const round2 = v => Math.round(Number(v || 0) * 100) / 100;
+
+  // Module-level totals (ground truth — same snapshot, always consistent internally)
+  const modNonBill  = round2(Number(metrics.non_billable_hours || 0));
+  const modBench    = round2(Number(metrics.internal_bench_hours || 0));
+  const modInternal = round2(Number(metrics.internal_projects_logged_hours || 0));
+  const modSum      = round2(modBench + modInternal);
+  const diff        = round2(modNonBill - modSum);
+  const ok          = Math.abs(diff) < 0.05;
+
+  // Per-person sum of non_billable_hours — catches partial edits after a refresh
+  // (e.g. someone moved hours from billable to bench after the module totals were stored)
+  const personNonBillSum = round2(people.reduce((s, p) => s + Number(p.non_billable_hours || 0), 0));
+  const personVsModDiff  = round2(personNonBillSum - modNonBill);
+  const personVsModOk    = Math.abs(personVsModDiff) < 0.05;
+  // Who changed? people whose non_billable_hours ≠ round2(bench + internal)
+  const editedPeople = people.filter(p => {
+    const nb  = Number(p.non_billable_hours || 0);
+    const exp = round2(Number(p.bench_hours || 0) + Number(p.internal_projects_hours || 0));
+    return Math.abs(nb - exp) > 0.05 && (nb > 0 || exp > 0);
+  });
+
+  // Jira billing % lookup: max epic_billing from active In Progress rows per person
+  const jiraBillingByName = new Map();
+  for (const row of (latest && latest.assignment_rows ? latest.assignment_rows : [])) {
+    if (String(row.status || '').trim() !== 'In Progress') continue;
+    const aName = normalizeIdentity(row.assignee || row.name || '');
+    if (!aName) continue;
+    const b = Number(row.epic_billing || 0);
+    if (b > (jiraBillingByName.get(aName) || 0)) jiraBillingByName.set(aName, b);
+  }
+
+  // Per-person anomaly detection
+  const anomalies = [];
+  for (const p of people) {
+    const bench    = Number(p.bench_hours || 0);
+    const internal = Number(p.internal_projects_hours || 0);
+    const nonBill  = Number(p.non_billable_hours || 0);
+    const committed = Number(p.committed_harvest_hours || 0);
+    const expected = round2(bench + internal);
+
+    if (committed > 0 && (bench + internal) > committed + 1) {
+      anomalies.push({
+        name: p.user_name,
+        type: 'stale',
+        label: 'Stale record',
+        detail: `bench+internal = ${fmt2(bench + internal)}h › total = ${fmt2(committed)}h`
+      });
+    } else if (Math.abs(nonBill - expected) > 0.05 && (nonBill > 0 || expected > 0)) {
+      anomalies.push({
+        name: p.user_name,
+        type: 'mismatch',
+        label: 'Non-bill mismatch',
+        detail: `non_bill = ${fmt2(nonBill)}h ≠ bench+internal = ${fmt2(expected)}h`
+      });
+    }
+
+    // Cross-check: bench hours in Harvest but billing ≥ 80% in Jira
+    if (bench > 0) {
+      const jiraBilling = jiraBillingByName.get(normalizeIdentity(p.user_name)) ?? null;
+      if (jiraBilling !== null && jiraBilling >= 80) {
+        anomalies.push({
+          name: p.user_name,
+          type: 'billing_bench',
+          label: `Billing ${jiraBilling}% + bench`,
+          detail: `${fmt2(bench)}h bench logged, Jira billing = ${jiraBilling}%`
+        });
+      }
+    }
+  }
+
+  const diffCls  = ok ? 'is-pos' : 'is-neg';
+  const statusCls = ok ? 'is-pos' : 'is-neg';
+
+  const ctrlRow = (label, val, sub) => `
+    <tr>
+      <td style="padding:8px 12px;font-size:.82rem;color:var(--muted)">${label}</td>
+      <td style="padding:8px 12px;font-size:.82rem;font-weight:700;text-align:right;color:var(--fg)">${val}</td>
+      <td style="padding:8px 12px;font-size:.75rem;color:var(--muted)">${sub || ''}</td>
+    </tr>`;
+
+  const anomalyRows = anomalies.length === 0
+    ? `<tr><td colspan="3" style="padding:12px;font-size:.8rem;color:var(--muted);font-style:italic">No anomalies detected</td></tr>`
+    : anomalies.map(a => {
+        const chip = a.type === 'stale'
+          ? `<span style="background:rgba(251,191,36,.15);color:#FCD34D;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;padding:1px 8px;border-radius:999px">${a.label}</span>`
+          : a.type === 'billing_bench'
+          ? `<span style="background:rgba(239,68,68,.15);color:#F87171;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;padding:1px 8px;border-radius:999px">${a.label}</span>`
+          : `<span style="background:rgba(251,113,133,.15);color:#FCA5A5;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;padding:1px 8px;border-radius:999px">${a.label}</span>`;
+        return `<tr>
+          <td style="padding:8px 12px;font-size:.82rem;color:var(--fg)">${a.name}</td>
+          <td style="padding:8px 12px">${chip}</td>
+          <td style="padding:8px 12px;font-size:.78rem;color:var(--muted)">${a.detail}</td>
+        </tr>`;
+      }).join('');
+
+  const tblStyle = `width:100%;border-collapse:collapse;font-size:.82rem`;
+  const thStyle  = `padding:8px 12px;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--brd);text-align:left`;
+
+  // Hours balance check: billable + PTO + non-bill should equal committed total
+  const modBillable   = round2(Number(metrics.client_logged_hours || 0));
+  const modPTO        = round2(Number(metrics.total_off_hours || 0));
+  const modCommitted  = round2(Number(metrics.committed_harvest_hours || 0));
+  const balanceSum    = round2(modBillable + modPTO + modNonBill);
+  const balanceDiff   = round2(modCommitted - balanceSum);
+  const balanceOk     = Math.abs(balanceDiff) < 0.05;
+
+  body.innerHTML = `<div class="hw-team-wrap">
+
+    <div class="hw-team-section">
+      <div class="hw-team-section-label">Hours balance — Billable + PTO + Non-Bill = Committed total</div>
+      <div style="background:rgba(107,143,191,.05);border:1px solid var(--brd);border-radius:10px;overflow:hidden">
+        <table style="${tblStyle}">
+          <thead><tr>
+            <th style="${thStyle}">Item</th>
+            <th style="${thStyle};text-align:right">Hours</th>
+            <th style="${thStyle}">Notes</th>
+          </tr></thead>
+          <tbody>
+            ${ctrlRow('Client logged (billable)', fmt2(modBillable) + 'h', 'metrics.client_logged_hours')}
+            ${ctrlRow('PTO / time off', fmt2(modPTO) + 'h', 'metrics.total_off_hours')}
+            ${ctrlRow('Non-Billable (bench + internal)', fmt2(modNonBill) + 'h', 'metrics.non_billable_hours')}
+            <tr style="border-top:1px solid var(--brd)">
+              <td style="padding:8px 12px;font-size:.82rem;color:var(--muted)">Sum</td>
+              <td style="padding:8px 12px;font-size:.82rem;font-weight:700;text-align:right;color:var(--fg)">${fmt2(balanceSum)}h</td>
+              <td></td>
+            </tr>
+            <tr style="border-top:1px solid var(--brd)">
+              <td style="padding:8px 12px;font-size:.82rem;color:var(--muted)">Committed Harvest Hours (total)</td>
+              <td style="padding:8px 12px;font-size:.82rem;font-weight:700;text-align:right;color:var(--fg)">${fmt2(modCommitted)}h</td>
+              <td style="padding:8px 12px;font-size:.75rem;color:var(--muted)">metrics.committed_harvest_hours</td>
+            </tr>
+            <tr style="border-top:2px solid var(--brd)">
+              <td style="padding:10px 12px;font-size:.85rem;font-weight:800;color:var(--fg)">Difference</td>
+              <td style="padding:10px 12px;font-size:.95rem;font-weight:900;text-align:right" class="${balanceDiff === 0 ? 'is-pos' : (Math.abs(balanceDiff) < 0.05 ? 'is-pos' : 'is-neg')}">${balanceDiff >= 0 ? '+' : ''}${fmt2(balanceDiff)}h</td>
+              <td style="padding:10px 12px;font-size:.85rem;font-weight:800" class="${balanceOk ? 'is-pos' : 'is-neg'}">${balanceOk ? '✓ OK' : '✗ ERROR'}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="hw-team-section">
+      <div class="hw-team-section-label" style="display:flex;align-items:center;gap:8px">
+        Per-person sum vs module total
+        ${!personVsModOk ? `<span style="background:rgba(251,113,133,.2);color:#FCA5A5;font-size:.65rem;font-weight:900;padding:1px 8px;border-radius:999px">+${fmt2(Math.abs(personVsModDiff))}h drift</span>` : ''}
+      </div>
+      <div style="background:rgba(107,143,191,.05);border:1px solid var(--brd);border-radius:10px;overflow:hidden">
+        <table style="${tblStyle}">
+          <thead><tr>
+            <th style="${thStyle}">Item</th>
+            <th style="${thStyle};text-align:right">Hours</th>
+            <th style="${thStyle}">Notes</th>
+          </tr></thead>
+          <tbody>
+            ${ctrlRow('Sum of by_person non_billable_hours', fmt2(personNonBillSum) + 'h', 'reflects latest timesheet edits')}
+            ${ctrlRow('Module non_billable_hours', fmt2(modNonBill) + 'h', 'stored at refresh time')}
+            <tr style="border-top:2px solid var(--brd)">
+              <td style="padding:10px 12px;font-size:.85rem;font-weight:800;color:var(--fg)">Difference</td>
+              <td style="padding:10px 12px;font-size:.95rem;font-weight:900;text-align:right" class="${personVsModOk ? 'is-pos' : 'is-neg'}">${personVsModDiff >= 0 ? '+' : ''}${fmt2(personVsModDiff)}h</td>
+              <td style="padding:10px 12px;font-size:.85rem;font-weight:800" class="${personVsModOk ? 'is-pos' : 'is-neg'}">${personVsModOk ? '✓ OK' : '✗ Timesheet edited after refresh'}</td>
+            </tr>
+            ${!personVsModOk && editedPeople.length ? `<tr><td colspan="3" style="padding:8px 12px;font-size:.78rem;color:var(--muted)">
+              Affected: ${editedPeople.map(p => `<strong style="color:var(--fg)">${p.user_name}</strong> (non_bill=${fmt2(p.non_billable_hours)}h, bench+internal=${fmt2(Number(p.bench_hours||0)+Number(p.internal_projects_hours||0))}h)`).join(' · ')}
+            </td></tr>` : ''}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="hw-team-section">
+      <div class="hw-team-section-label">Non-Billable vs Bench + Internal</div>
+      <div style="background:rgba(107,143,191,.05);border:1px solid var(--brd);border-radius:10px;overflow:hidden">
+        <table style="${tblStyle}">
+          <thead><tr>
+            <th style="${thStyle}">Item</th>
+            <th style="${thStyle};text-align:right">Hours</th>
+            <th style="${thStyle}">Notes</th>
+          </tr></thead>
+          <tbody>
+            ${ctrlRow('Non-Billable — module total', fmt2(modNonBill) + 'h', 'metrics.non_billable_hours')}
+            ${ctrlRow('Bench total', fmt2(modBench) + 'h', 'metrics.internal_bench_hours')}
+            ${ctrlRow('Internal Projects total', fmt2(modInternal) + 'h', 'metrics.internal_projects_logged_hours')}
+            <tr style="border-top:1px solid var(--brd)">
+              <td style="padding:8px 12px;font-size:.82rem;color:var(--muted)">Bench + Internal</td>
+              <td style="padding:8px 12px;font-size:.82rem;font-weight:700;text-align:right;color:var(--fg)">${fmt2(modSum)}h</td>
+              <td></td>
+            </tr>
+            <tr style="border-top:2px solid var(--brd)">
+              <td style="padding:10px 12px;font-size:.85rem;font-weight:800;color:var(--fg)">Difference</td>
+              <td style="padding:10px 12px;font-size:.95rem;font-weight:900;text-align:right" class="${diffCls}">${diff >= 0 ? '+' : ''}${fmt2(diff)}h</td>
+              <td style="padding:10px 12px;font-size:.85rem;font-weight:800" class="${statusCls}">${ok ? '✓ OK' : '✗ ERROR'}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="hw-team-section">
+      <div class="hw-team-section-label" style="display:flex;align-items:center;gap:8px">
+        Per-person anomalies
+        ${anomalies.length > 0 ? `<span style="background:rgba(251,191,36,.2);color:#FCD34D;font-size:.65rem;font-weight:900;padding:1px 8px;border-radius:999px">${anomalies.length}</span>` : ''}
+      </div>
+      <div style="background:rgba(107,143,191,.05);border:1px solid var(--brd);border-radius:10px;overflow:hidden">
+        <table style="${tblStyle}">
+          <thead><tr>
+            <th style="${thStyle}">Name</th>
+            <th style="${thStyle}">Issue</th>
+            <th style="${thStyle}">Detail</th>
+          </tr></thead>
+          <tbody>${anomalyRows}</tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>`;
+}
+window.renderHarvestWeeklyControl = renderHarvestWeeklyControl;
+
+function hwToggleDrill(drillId, dataRow) {
+  const drill = document.getElementById(drillId);
+  if (!drill) return;
+  const open = drill.style.display !== 'none';
+  drill.style.display = open ? 'none' : 'table-row';
+  dataRow.classList.toggle('is-open', !open);
+}
+
+window.renderHarvestWeeklyReport = renderHarvestWeeklyReport;
+window.renderHarvestWeeklyBench = renderHarvestWeeklyBench;
+window.renderHarvestWeeklyInternal = renderHarvestWeeklyInternal;
+window.hwToggleDrill = hwToggleDrill;
+window.hwExportReportTSV = hwExportReportTSV;
+window.hwSwitchTab = hwSwitchTab;
+window.renderHarvestWeeklyTeam = renderHarvestWeeklyTeam;
+window.renderHarvestWeeklyControl = renderHarvestWeeklyControl;
+
+async function loadHarvestWeek() {
+  const fromInput = document.getElementById('hwWeekFrom');
+  const toInput   = document.getElementById('hwWeekTo');
+  const from = fromInput ? fromInput.value : '';
+  const to   = toInput   ? toInput.value   : '';
+  if (!from || !to) { alert('Pick both dates.'); return; }
+
+  const fromDate = new Date(from + 'T00:00:00');
+  const toDate   = new Date(to   + 'T00:00:00');
+  const diffDays = Math.round((toDate - fromDate) / 86400000);
+  if (diffDays < 0 || diffDays > 30) {
+    alert('Date range must not exceed 31 days.');
+    return;
+  }
+
+  if (!canRunRefresh()) {
+    alert('Sync is available only while viewing as an Administrator / PMO user.');
+    return;
+  }
+  const btn = document.getElementById('hwLoadWeekBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
+  try {
+    const response = await fetch('/api/refresh', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ harvestWeekFrom: from, harvestWeekTo: to })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (response.status === 401) { showAuthModal('login', 'snapshot'); return; }
+    if (!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    const dashboardResponse = await fetch('/api/dashboard', { cache: 'no-store', credentials: 'same-origin' });
+    if (dashboardResponse.ok) {
+      PMO = await dashboardResponse.json();
+      initDashboard();
+    }
+    renderHarvestWeeklyReport();
+    if (hwActiveTab === 'bench')    renderHarvestWeeklyBench();
+    if (hwActiveTab === 'internal') renderHarvestWeeklyInternal();
+    if (hwActiveTab === 'team')     renderHarvestWeeklyTeam();
+    if (hwActiveTab === 'control')  renderHarvestWeeklyControl();
+  } catch (err) {
+    alert('Could not load that week: ' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Load week'; }
+  }
+}
+window.loadHarvestWeek = loadHarvestWeek;
+
+// ════════════════════════════════════════════════════
+// JIRA PROJECTS — LIVE BROWSER
+// ════════════════════════════════════════════════════
+let jpData = null;
+let jpSortCol = 'key';
+let jpSortDir = 1;
+window.jpSort = function(col){
+  jpSortDir = jpSortCol === col ? -jpSortDir : 1;
+  jpSortCol = col;
+  renderJiraProjects();
+};
+
+async function loadJiraProjects(){
+  const btn = document.getElementById('jpLoadBtn');
+  const body = document.getElementById('jpBody');
+  if(btn){ btn.disabled = true; btn.textContent = 'Loading…'; }
+  try {
+    const res = await fetch('/api/jira-projects', { credentials: 'same-origin' });
+    const data = await res.json();
+    if(res.status === 401){ showAuthModal('login','jiraProjects'); return; }
+    if(!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    jpData = data;
+    const tag = document.getElementById('jpFetchedTag');
+    const t = new Date(data.fetched_at);
+    if(tag) tag.textContent = `${data.total} projects · ${t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
+    renderJiraProjects();
+  } catch(err){
+    if(body) body.innerHTML = `<div class="hw-empty-state" style="color:#FCA5A5">Error: ${esc(err.message)}</div>`;
+  } finally {
+    if(btn){ btn.disabled = false; btn.textContent = 'Load projects'; }
+  }
+}
+
+function renderJiraProjects(){
+  const body = document.getElementById('jpBody');
+  if(!body) return;
+  if(!jpData || !jpData.projects || !jpData.projects.length){
+    body.innerHTML = '<div class="hw-empty-state">Click "Load projects" to fetch all Jira projects live from the API.</div>';
+    return;
+  }
+  const q = (document.getElementById('jpSearch')||{}).value || '';
+  const typeFilter = (document.getElementById('jpTypeFilter')||{}).value || '';
+  const needle = q.trim().toLowerCase();
+  let projects = jpData.projects;
+  if(needle) projects = projects.filter(p =>
+    p.key.toLowerCase().includes(needle) ||
+    p.name.toLowerCase().includes(needle) ||
+    (p.lead?.name||'').toLowerCase().includes(needle) ||
+    (p.category?.name||'').toLowerCase().includes(needle)
+  );
+  if(typeFilter) projects = projects.filter(p => p.type === typeFilter);
+  projects = [...projects].sort((a,b) => {
+    const av = jpSortCol === 'category' ? (a.category?.name||'') : jpSortCol === 'lead' ? (a.lead?.name||'') : (a[jpSortCol]||'');
+    const bv = jpSortCol === 'category' ? (b.category?.name||'') : jpSortCol === 'lead' ? (b.lead?.name||'') : (b[jpSortCol]||'');
+    return String(av).localeCompare(String(bv)) * jpSortDir;
+  });
+  const typeBadge = type => {
+    const m = {software:['badge-blue','Software'],business:['badge-green','Business'],service_desk:['badge-orange','Service Desk']};
+    const [cls,lbl] = m[type]||['',''];
+    return lbl ? `<span class="badge ${cls}">${lbl}</span>` : `<span style="color:var(--muted)">${esc(type||'—')}</span>`;
+  };
+  const caret = col => col !== jpSortCol ? '<span class="hw-caret">⇅</span>' : (jpSortDir === -1 ? '<span class="hw-caret">↓</span>' : '<span class="hw-caret">↑</span>');
+  const th = (col,lbl) => `<th><button class="hw-sort-btn${col===jpSortCol?' active':''}" onclick="jpSort('${col}')">${lbl} ${caret(col)}</button></th>`;
+  const uniqueTypes = [...new Set(jpData.projects.map(p => p.type).filter(Boolean))].sort();
+  body.innerHTML = `
+    <div class="hw-filter-row">
+      <input id="jpSearch" type="text" placeholder="Search key, name, lead, category…" value="${esc(q)}" oninput="renderJiraProjects()"/>
+      <select id="jpTypeFilter" onchange="renderJiraProjects()" class="hw-date-input" style="height:32px;padding:0 8px">
+        <option value="">All types</option>
+        ${uniqueTypes.map(t => `<option value="${esc(t)}"${typeFilter===t?' selected':''}>${esc(t)}</option>`).join('')}
+      </select>
+      <span class="hw-meta">${projects.length} of ${jpData.projects.length} projects</span>
+    </div>
+    <div class="hwr-table-wrap" style="max-height:580px">
+      <table>
+        <thead><tr>
+          ${th('key','Key')}
+          ${th('name','Name')}
+          ${th('type','Type')}
+          ${th('category','Category')}
+          ${th('lead','Lead')}
+        </tr></thead>
+        <tbody>
+          ${projects.map(p => `<tr>
+            <td style="font-family:monospace;font-weight:700">${p.url
+              ? `<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none" title="Open in Jira">${esc(p.key)} <i class="ti ti-external-link" style="font-size:.7em;opacity:.5"></i></a>`
+              : esc(p.key)}</td>
+            <td style="font-weight:600">${esc(p.name)}</td>
+            <td>${typeBadge(p.type)}</td>
+            <td style="color:var(--muted)">${p.category?.name ? esc(p.category.name) : '<span style="opacity:.4">—</span>'}</td>
+            <td>${p.lead?.name ? esc(p.lead.name) : '<span style="opacity:.4">—</span>'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+window.loadJiraProjects = loadJiraProjects;
+window.renderJiraProjects = renderJiraProjects;
 
 // ════════════════════════════════════════════════════
 // OPERATING VIEWS — ASSIGNEES / CLIENTS / POSITIONS
@@ -7047,12 +8371,12 @@ function sowLink(row, label){
 }
 function allAssignmentRows(){
   const direct = (latest.assignment_rows || []).filter(Boolean);
-  if(direct.length) return direct;
-  return [
+  const rows = direct.length ? direct : [
     ...Object.values(latest.forecast || {}).flat(),
     ...(latest.bench_list || []),
     ...(latest.pending_list || [])
   ].filter(Boolean);
+  return filterActiveOnly(rows);
 }
 function scopedAssignmentRows(rows = allAssignmentRows()){
   const role = effectiveUserRole();
@@ -7060,11 +8384,13 @@ function scopedAssignmentRows(rows = allAssignmentRows()){
   if(role === 'assignee') return rows.filter(effectivePersonMatch);
 
   let primaryRows = [];
-  if(role === 'pm'){
-    primaryRows = rows.filter(row => identityMatchesTokens(row.project_manager || ''));
-  }else if(role === 'csm' || role === 'tl'){
+  if(role === 'pm' || role === 'csm' || role === 'tl'){
     const allowedClients = effectiveOwnedClientKeys();
-    primaryRows = rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+    if(allowedClients.size){
+      primaryRows = rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+    } else if(role === 'pm'){
+      primaryRows = rows.filter(row => identityMatchesTokens(row.project_manager || ''));
+    }
   }else{
     return rows.slice();
   }
@@ -7090,16 +8416,17 @@ function scopedByOwnership(rows = []){
   const role = effectiveUserRole();
   if(executiveLikeRole(role)) return rows.slice();
   if(role === 'assignee') return rows.filter(effectivePersonMatch);
-  if(role === 'csm' || role === 'tl'){
+  if(role === 'pm' || role === 'csm' || role === 'tl'){
     const allowedClients = effectiveOwnedClientKeys();
-    return rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
-  }
-  if(role === 'pm'){
-    const pmMap = clientToProjectManagerMap();
-    return rows.filter(row => {
-      const pm = row.project_manager || pmMap.get(normalizeClientKey(row.client || '')) || '';
-      return identityMatchesTokens(pm);
-    });
+    if(allowedClients.size) return rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+    if(role === 'pm'){
+      const pmMap = clientToProjectManagerMap();
+      return rows.filter(row => {
+        const pm = row.project_manager || pmMap.get(normalizeClientKey(row.client || '')) || '';
+        return identityMatchesTokens(pm);
+      });
+    }
+    return [];
   }
   return rows.slice();
 }
@@ -7107,22 +8434,20 @@ function scopedForecastRows(rows = []){
   const role = effectiveUserRole();
   if(executiveLikeRole(role)) return rows.slice();
   if(role === 'assignee') return rows.filter(effectivePersonMatch);
-  if(role === 'pm') return rows.filter(row => identityMatchesTokens(row.project_manager || ''));
-  if(role === 'csm' || role === 'tl'){
+  if(role === 'pm' || role === 'csm' || role === 'tl'){
     const allowedClients = effectiveOwnedClientKeys();
-    return rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+    if(allowedClients.size) return rows.filter(row => allowedClients.has(normalizeClientKey(row.client || '')));
+    if(role === 'pm') return rows.filter(row => identityMatchesTokens(row.project_manager || ''));
+    return [];
   }
   return rows.slice();
 }
 function scopedAccountCoverageRowsSource(rows = latest?.account_coverage || []){
   const role = effectiveUserRole();
-  if(executiveLikeRole(role) || role === 'pm') return rows.slice();
-  if(role === 'csm'){
-    return rows.filter(row => identityMatchesTokens(row.csm_assigned || ''));
-  }
-  if(role === 'tl'){
-    return rows.filter(row => identityMatchesTokens(row.tl_assigned || ''));
-  }
+  if(executiveLikeRole(role)) return rows.slice();
+  if(role === 'pm') return rows.filter(row => identityMatchesTokens(row.pm_assigned || ''));
+  if(role === 'csm') return rows.filter(row => identityMatchesTokens(row.csm_assigned || ''));
+  if(role === 'tl') return rows.filter(row => identityMatchesTokens(row.tl_assigned || ''));
   if(role === 'assignee') return [];
   return rows.slice();
 }
@@ -7188,7 +8513,8 @@ function renderOpsFilterControls(){
     positionSelect.value = opsFilters.position;
   }
   if(projectManagerSelect){
-    const projectManagers = [...projectManagerCounts.keys()].sort((a,b)=>a.localeCompare(b));
+    const projectManagers = [...projectManagerCounts.keys()].filter(pm => pm && activePmName(pm)).sort((a,b)=>a.localeCompare(b));
+    if(opsFilters.projectManager && !projectManagers.includes(opsFilters.projectManager)) opsFilters.projectManager = '';
     projectManagerSelect.innerHTML = optionHTML('', `All PMs (${rows.length})`) + projectManagers.map(pm => optionHTML(pm, `${pm} (${projectManagerCounts.get(pm)})`)).join('');
     projectManagerSelect.value = opsFilters.projectManager;
   }
@@ -7263,7 +8589,7 @@ function renderAssignmentDetails(group){
         const pct = rowAssignmentPct(row);
         return `<tr>
           <td style="font-weight:700">${esc(client)}</td>
-          <td style="color:var(--muted)">${esc(row.project_manager || '—')}</td>
+          <td style="color:var(--muted)">${esc(activePmName(row.project_manager) || '—')}</td>
           <td>${fmtRawPct(pct)}</td>
           <td style="white-space:nowrap">${fmtOperationalDue(row)}</td>
           <td style="color:var(--muted);max-width:420px">${row.key ? sowLink(row, row.summary || row.sow || row.key) : esc(row.summary || row.sow || row.potential_next_assignment || '—')}</td>
@@ -7324,8 +8650,52 @@ function coverageForClient(client){
     source: latest.account_coverage_source || 'Jira PSA Epic Account Coverage'
   };
 }
+function harvestActiveRoster(){
+  const names = new Set();
+  const emails = new Set();
+  (latest?.harvest?.users || []).forEach(u => {
+    const n = normalizeIdentity(u.name || '');
+    const e = String(u.email || '').toLowerCase().trim();
+    if(n) names.add(n);
+    if(e) emails.add(e);
+  });
+  return { names, emails };
+}
+function filterActiveOnly(rows){
+  const { names, emails } = harvestActiveRoster();
+  if(!names.size && !emails.size) return rows;
+  return rows.filter(row => {
+    const name  = normalizeIdentity(row.assignee || row.name || '');
+    const email = String(row.email || '').toLowerCase().trim();
+    if(!name && !email) return true;
+    if(email && emails.has(email)) return true;
+    if(name  && names.has(name))   return true;
+    return false;
+  });
+}
+function knownActiveRoster(){
+  const { names } = harvestActiveRoster();
+  if(names.size) return names;
+  const fallback = new Set();
+  const addRow = row => { const n = normalizeIdentity(row.assignee||row.name||''); if(n) fallback.add(n); };
+  (latest?.assignment_rows||[]).forEach(addRow);
+  (latest?.bench_list||[]).forEach(addRow);
+  (latest?.pending_list||[]).forEach(addRow);
+  return fallback;
+}
+function activePmName(name){
+  if(!name) return '';
+  const roster = knownActiveRoster();
+  if(roster.size && !roster.has(normalizeIdentity(name))) return '';
+  return name;
+}
 function coverageBadge(value){
-  return value ? esc(value) : '<span class="badge badge-red">Missing</span>';
+  if(!value) return '<span class="badge badge-red">Missing</span>';
+  const roster = knownActiveRoster();
+  if(roster.size > 0 && !roster.has(normalizeIdentity(value))){
+    return `<span class="badge badge-red" title="${esc(value)} — not in Harvest active users">Missing</span>`;
+  }
+  return esc(value);
 }
 function jiraSearchUrl(jql){
   return `https://azumohq.atlassian.net/issues/?jql=${encodeURIComponent(jql)}`;
@@ -7476,6 +8846,206 @@ function renderPsaProjectStatusModule(){
   }).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No projects found.</td></tr>';
 }
 
+const INFO_HUB_COVERAGE = [
+  {client:'Screenwave Media', csm:'Lenin Salazar', responsable:'Pablo Bizzotto', pm:'Desi Pepermans', start:'2025-03-25', status:'Active', tl:'Gaspar Pollano'},
+  {client:'Spinwheel Solutions', csm:'', responsable:'Martin Calvo', pm:'Antonella Grasso', start:'2025-03-25', status:'Active', tl:'Martin Li Causi'},
+  {client:'Alkalight', csm:'Mauricio Besse', responsable:'Martin Calvo', pm:'Micaela Goicoechea', start:'2025-04-10', status:'Active', tl:'Martin Perez'},
+  {client:'Angle Health', csm:'Lenin Salazar', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'2025-04-10', status:'Active', tl:''},
+  {client:'Syntrove', csm:'Matias Margossian', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'2025-04-10', status:'Active', tl:'Martin Li Causi'},
+  {client:'Zynga Inc', csm:'Lenin Salazar', responsable:'Martin Calvo', pm:'Jennifer Greyling', start:'2025-10-21', status:'Active', tl:'Gaspar Pollano, Martin Isla'},
+  {client:'NLX', csm:'Jenna Barna', responsable:'Pablo Bizzotto', pm:'Eliana Naveira', start:'2025-04-10', status:'Inactive', tl:'Luis Duque'},
+  {client:'Brierstone', csm:'Matias Margossian', responsable:'Pablo Bizzotto', pm:'Graciela Kremer', start:'2025-06-16', status:'Inactive', tl:'Martin Calvo'},
+  {client:'Alpine', csm:'Jenna Barna', responsable:'Martin Calvo', pm:'Natalia Alarcon', start:'2025-06-16', status:'Inactive', tl:'Miguel Godoy'},
+  {client:'Bitumio LLC', csm:'Matias Margossian', responsable:'Federica Gonzalez', pm:'Marcos Dlugovitzky', start:'2025-06-16', status:'Inactive', tl:'Ronald Castillo'},
+  {client:'CompuClaim', csm:'Matias Margossian', responsable:'Mauricio Besse', pm:'Roberta Ferreira', start:'2025-06-16', status:'Active', tl:'Wilmy Gonzalez'},
+  {client:'Moti', csm:'Matias Margossian', responsable:'Matias Margossian', pm:'Graciela Kremer', start:'2025-06-16', status:'Inactive', tl:'Juan Ledesma'},
+  {client:'Nacurh', csm:'Lenin Salazar', responsable:'Federica Gonzalez', pm:'Laura Pimper', start:'2025-06-16', status:'Inactive', tl:''},
+  {client:'Algin2Fit', csm:'Lenin Salazar', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'2025-06-16', status:'Inactive', tl:'Martin Calvo'},
+  {client:'Azumo - Valkyrie', csm:'Jenna Barna', responsable:'Pablo Bizzotto', pm:'Roberta Ferreira', start:'2025-04-10', status:'Active', tl:'Paulo Omena'},
+  {client:'DataRipple', csm:'Jenna Barna', responsable:'Pablo Bizzotto', pm:'Laura Pimper', start:'', status:'Inactive', tl:'Victor Rodriguez'},
+  {client:'Fairwater', csm:'Jenna Barna', responsable:'Federica Gonzalez', pm:'Micaela Goicoechea', start:'', status:'Active', tl:'Jesus Ibanez'},
+  {client:'nVenue', csm:'', responsable:'Martin Calvo', pm:'Lean Lacave', start:'', status:'Active', tl:'Manuel Alfonso'},
+  {client:'Riley ABA', csm:'Jenna Barna', responsable:'Federica Gonzalez', pm:'Natalia Alarcon', start:'', status:'Inactive', tl:'Rommel Berrios'},
+  {client:'Carwire', csm:'Lenin Salazar', responsable:'Martin Calvo', pm:'Desi Pepermans', start:'', status:'Active', tl:'Facundo Fumaneri'},
+  {client:'Finstrat', csm:'Matias Margossian', responsable:'Martin Calvo', pm:'Micaela Goicoechea', start:'', status:'Inactive', tl:''},
+  {client:'Workleap', csm:'Matias Margossian', responsable:'Federica Gonzalez', pm:'Jennifer Greyling', start:'2025-10-21', status:'Inactive', tl:'Carlos Perez'},
+  {client:'Azumo - Charlibot', csm:'', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'', status:'Active', tl:'Luis Duque'},
+  {client:'Jostens', csm:'Lenin Salazar', responsable:'Roberta Ferreira', pm:'Graciela Kremer', start:'', status:'Active', tl:''},
+  {client:'Stovell', csm:'Matias Margossian', responsable:'Federica Gonzalez', pm:'Eliana Naveira', start:'2025-10-21', status:'Active', tl:''},
+  {client:'Command Investigations', csm:'Matias Margossian', responsable:'Mauricio Besse', pm:'Roberta Ferreira', start:'2025-10-21', status:'Active', tl:'Jorge Sandoval'},
+  {client:'Brierstone (new)', csm:'Matias Margossian', responsable:'Martin Calvo', pm:'Micaela Goicoechea', start:'2025-12-05', status:'Active', tl:'Fabio Bocampagni'},
+  {client:'NGL', csm:'', responsable:'Martin Calvo', pm:'Jennifer Greyling', start:'', status:'Active', tl:'Guillermo Germade'},
+  {client:'SurvivorNet', csm:'Lenin Salazar', responsable:'Mauricio Besse', pm:'Micaela Goicoechea', start:'', status:'Active', tl:'David gonzalez'},
+  {client:'Centegix', csm:'Matias Margossian', responsable:'Mauricio Besse', pm:'Antonella Grasso', start:'', status:'Active', tl:'Victor Meza, Hector Nail'},
+  {client:'Bonzai', csm:'Shivam Bawa', responsable:'Federica Gonzalez', pm:'Laura Pimper', start:'', status:'Inactive', tl:'Guillermo Acosta'},
+  {client:'Standard Normal', csm:'', responsable:'Mauricio Besse', pm:'Roberta Ferreira', start:'', status:'Active', tl:'Martin Li Causi'},
+  {client:'CSSI', csm:'', responsable:'Federica Gonzalez', pm:'Graciela Kremer', start:'', status:'Active', tl:''},
+  {client:'Build to Sell - Value Builder', csm:'Matias Margossian', responsable:'Pablo Bizzotto', pm:'Lean Lacave', start:'', status:'Active', tl:'Pamela Alvarez'},
+  {client:'Solea IA', csm:'', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'', status:'Active', tl:''},
+  {client:'Phaidon', csm:'', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'', status:'Active', tl:''},
+  {client:'Profusa', csm:'', responsable:'Federica Gonzalez', pm:'Micaela Goicoechea', start:'', status:'Active', tl:''},
+  {client:'Wrenchwise', csm:'', responsable:'Federica Gonzalez', pm:'Roberta Ferreira', start:'', status:'Active', tl:''},
+  {client:'Window World', csm:'Lenin Salazar', responsable:'Federica Gonzalez', pm:'cesar.ramirez', start:'', status:'Active', tl:''},
+  {client:'Azumo - Website', csm:'', responsable:'Pablo Bizzotto', pm:'Roberta Ferreira', start:'', status:'Active', tl:'Martin Calvo'}
+];
+function setClientDirSearch(value){
+  clientDirSearch = String(value || '');
+  renderClientDirectory();
+}
+function setClientDirStatusFilter(value){
+  clientDirStatusFilter = value || '';
+  renderClientDirectory();
+}
+function setClientDirActive(name){
+  clientDirActive = name || null;
+  const toolbar = document.getElementById('clientDirToolbar');
+  if(toolbar) toolbar.style.display = clientDirActive ? 'none' : '';
+  renderClientDirectory();
+}
+function renderClientDirectory(){
+  const grid = document.getElementById('clientDirGrid');
+  if(!grid) return;
+
+  if(clientDirActive !== null){
+    const r = INFO_HUB_COVERAGE.find(x => x.client === clientDirActive);
+    if(r){ renderClientDetail(grid, r); return; }
+    clientDirActive = null;
+  }
+
+  const search = clientDirSearch.trim().toLowerCase();
+  let rows = INFO_HUB_COVERAGE;
+  if(search) rows = rows.filter(r => [r.client,r.csm,r.pm,r.tl,r.responsable].join(' ').toLowerCase().includes(search));
+  if(clientDirStatusFilter) rows = rows.filter(r => r.status === clientDirStatusFilter);
+
+  const teamByClient = new Map();
+  const assignRows = latest && latest.assignment_rows ? latest.assignment_rows : [];
+  for(const row of assignRows){
+    if(!row.client) continue;
+    const cn = row.client.trim();
+    if(!teamByClient.has(cn)) teamByClient.set(cn, new Set());
+    if(row.assignee) teamByClient.get(cn).add(row.assignee);
+  }
+
+  const activeBadge = '<span class="badge badge-green" style="font-size:.68rem;padding:0 8px">Active</span>';
+  const inactiveBadge = '<span class="badge" style="font-size:.68rem;padding:0 8px;background:rgba(107,143,191,.13);color:var(--muted)">Inactive</span>';
+
+  const teamRow = (role, name) => name ? `<div class="client-team-row">
+    <span class="client-team-role">${role}</span>
+    <span>${esc(name)}</span>
+  </div>` : '';
+
+  if(!rows.length){
+    grid.innerHTML = '<p style="color:var(--muted);padding:.5rem 0;grid-column:1/-1">No clients match the filter.</p>';
+    return;
+  }
+
+  grid.innerHTML = rows.map(r => {
+    const rk = normalizeClientKey(r.client);
+    const allTeam = [...assignRows.reduce((s, row) => {
+      if(!row.client || !row.assignee) return s;
+      const jk = normalizeClientKey(row.client);
+      if(jk === rk || jk.startsWith(rk) || rk.startsWith(jk)) s.add(row.assignee);
+      return s;
+    }, new Set())];
+    const devTeam = allTeam.filter(n => {
+      const ni = normalizeIdentity(n);
+      return ni !== normalizeIdentity(r.pm) && ni !== normalizeIdentity(r.tl);
+    });
+    const teamHtml = devTeam.length ? `<details class="client-devs">
+      <summary>${devTeam.length} team member${devTeam.length !== 1 ? 's' : ''}</summary>
+      <ul>${devTeam.map(n => `<li>${esc(n)}</li>`).join('')}</ul>
+    </details>` : '';
+    const since = r.start ? `<div class="client-since">Since ${fmtDate(r.start)}</div>` : '';
+    return `<div class="client-card" onclick="setClientDirActive(${jsArg(r.client)})">
+      <div class="client-card-head">
+        <span class="client-card-name">${esc(r.client)}</span>
+        ${r.status === 'Active' ? activeBadge : inactiveBadge}
+      </div>
+      <div class="client-team-rows">
+        ${teamRow('PM', r.pm)}
+        ${teamRow('CSM', r.csm)}
+        ${teamRow('TL', r.tl)}
+        ${r.responsable && normalizeIdentity(r.responsable) !== normalizeIdentity(r.pm) ? teamRow('Resp', r.responsable) : ''}
+      </div>
+      ${teamHtml}
+      ${since}
+    </div>`;
+  }).join('');
+
+  const si = document.getElementById('clientDirSearchInput');
+  if(si && si.value !== clientDirSearch) si.value = clientDirSearch;
+  const sf = document.getElementById('clientDirStatusFilter');
+  if(sf && sf.value !== clientDirStatusFilter) sf.value = clientDirStatusFilter;
+}
+function renderClientDetail(grid, r){
+  const assignRows = latest && latest.assignment_rows ? latest.assignment_rows : [];
+  const rk = normalizeClientKey(r.client);
+  const seen = new Set();
+  const teamRows = assignRows.filter(row => {
+    if(!row.client || !row.assignee) return false;
+    const jk = normalizeClientKey(row.client);
+    return (jk === rk || jk.startsWith(rk) || rk.startsWith(jk))
+      && String(row.status || '').trim().toLowerCase() === 'in progress';
+  }).filter(row => {
+    const k = normalizeIdentity(row.assignee);
+    if(seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+
+  const activeBadge = '<span class="badge badge-green" style="font-size:.68rem;padding:0 8px">Active</span>';
+  const inactiveBadge = '<span class="badge" style="font-size:.68rem;padding:0 8px;background:rgba(107,143,191,.13);color:var(--muted)">Inactive</span>';
+
+  const leadCard = (role, name) => `<div class="client-lead-card">
+    <div class="client-lead-role">${role}</div>
+    ${name ? `<div class="client-lead-name">${esc(name)}</div>` : '<div class="client-lead-empty">—</div>'}
+  </div>`;
+
+  const teamTable = teamRows.length ? `<table class="client-detail-team-table">
+    <thead><tr><th>Name</th><th>Position</th><th>Assignment</th><th>Billing</th></tr></thead>
+    <tbody>${teamRows.map(row => {
+      const pct = rowAssignmentPct(row);
+      const bill = rowBillingPct(row) ?? row.epic_billing ?? '';
+      return `<tr>
+        <td style="font-weight:600">${esc(row.assignee)}</td>
+        <td style="color:var(--muted)">${esc(row.position || '—')}</td>
+        <td>${pct != null ? fmtPct(pct) : '—'}</td>
+        <td>${bill !== '' ? fmtPct(bill) : '—'}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>` : '<p style="color:var(--muted);font-size:.82rem;margin:0">No active Jira assignments found for this client.</p>';
+
+  const since = r.start ? `<div class="client-since" style="margin-top:.5rem">Client since ${fmtDate(r.start)}</div>` : '';
+  const resp = r.responsable && normalizeIdentity(r.responsable) !== normalizeIdentity(r.pm)
+    ? `<div class="client-detail-sec">
+        <div class="client-detail-sec-label"><i class="ti ti-id-badge"></i> Account Lead</div>
+        <div style="font-size:.88rem;font-weight:600;color:var(--txt)">${esc(r.responsable)}</div>
+      </div>` : '';
+
+  grid.innerHTML = `<div style="grid-column:1/-1">
+    <button class="client-detail-back" onclick="setClientDirActive(null)">
+      <i class="ti ti-arrow-left"></i> Back to directory
+    </button>
+    <div class="client-detail-head">
+      <h2 class="client-detail-name">${esc(r.client)}</h2>
+      ${r.status === 'Active' ? activeBadge : inactiveBadge}
+    </div>
+    <div class="client-detail-sec">
+      <div class="client-detail-sec-label"><i class="ti ti-users"></i> Leadership</div>
+      <div class="client-lead-cards">
+        ${leadCard('PM', r.pm)}
+        ${leadCard('CSM', r.csm)}
+        ${leadCard('TL', r.tl)}
+      </div>
+      ${since}
+    </div>
+    ${resp}
+    <div class="client-detail-sec">
+      <div class="client-detail-sec-label"><i class="ti ti-user-check"></i> Active Team</div>
+      ${teamTable}
+    </div>
+  </div>`;
+}
 function renderAccountCoverageModule(){
   if(!latest) return;
   const sourceTag = document.getElementById('accountCoverageTag');
@@ -7517,13 +9087,18 @@ function renderAccountCoverageModule(){
     if(btn) btn.classList.toggle('active', accountCoverageFilter === filter);
   });
 
+  const roster = knownActiveRoster();
+  const inactiveRows = roster.size ? (latest.account_coverage||[]).filter(row =>
+    [row.pm_assigned, row.csm_assigned, row.tl_assigned].some(v => v && !roster.has(normalizeIdentity(v)))
+  ) : [];
+
   const cards = document.getElementById('accountCoverageSummaryCards');
   if(cards){
     cards.innerHTML = [
       `<div class="action-card"><div class="action-label">Clients tracked</div><div class="action-value">${total}</div><div class="action-copy">Active Jira clients + PSA coverage records</div></div>`,
       `<div class="action-card ${missingRowsAll.length ? 'warning' : 'ok'}"><div class="action-label">Missing coverage</div><div class="action-value">${missingRowsAll.length}</div><div class="action-copy">Need PM, CSM, or TL assigned</div></div>`,
-      `<div class="action-card ok"><div class="action-label">Complete</div><div class="action-value">${completeRowsAll.length}</div><div class="action-copy">PM + CSM + TL populated</div></div>`,
-      `<div class="action-card"><div class="action-label">Visible rows</div><div class="action-value">${rows.length}</div><div class="action-copy">${search ? 'Filtered by search' : 'Current filter'}</div></div>`
+      `<div class="action-card ${inactiveRows.length ? 'critical' : 'ok'}"><div class="action-label">Inactive assignees</div><div class="action-value">${inactiveRows.length}</div><div class="action-copy">PM/CSM/TL not found in current Jira data</div></div>`,
+      `<div class="action-card ok"><div class="action-label">Complete</div><div class="action-value">${completeRowsAll.length}</div><div class="action-copy">PM + CSM + TL populated</div></div>`
     ].join('');
   }
 
@@ -7595,8 +9170,8 @@ function renderOpsClients(rows){
   const clientRows = sortClientRows(clientRowsFromAssignments(rows));
   document.getElementById('opsThead').innerHTML = '<tr><th>Client</th><th>Resources</th><th>PM</th><th>Next Due</th><th>Assignees</th></tr>';
   document.getElementById('opsTbody').innerHTML = clientRows.map(row => {
-    const deliveryPm = uniqueNonEmpty((row.items || []).map(item => item.project_manager)).join(', ');
-    const accountPm = row.coverage?.pm_assigned || '';
+    const deliveryPm = uniqueNonEmpty((row.items || []).map(item => activePmName(item.project_manager))).join(', ');
+    const accountPm = activePmName(row.coverage?.pm_assigned) || '';
     const pm = deliveryPm || accountPm || '—';
     return `<tr>
       <td style="font-weight:800"><button class="inline-filter" onclick='setOpsFilter("client", ${jsArg(row.client)})'>${esc(row.client)}</button></td>
@@ -7612,7 +9187,7 @@ function renderOpsProjectManagers(rows){
   rows
     .filter(row => row.client !== 'Bench' && ['Active','Azumo'].includes(rowStatus(row)))
     .forEach(row => {
-      const pm = row.project_manager || 'Unassigned PM';
+      const pm = activePmName(row.project_manager) || 'Unassigned PM';
       if(!grouped.has(pm)) grouped.set(pm, []);
       grouped.get(pm).push(row);
     });
@@ -7871,13 +9446,13 @@ function renderForecastFilterControls(){
     const count = scopedForecastRows(rows || []).filter(row => {
       return (!forecastFilters.client || (row.client || '') === forecastFilters.client)
         && (!forecastFilters.position || (row.position || '') === forecastFilters.position)
-        && (!forecastFilters.assignee || (row.assignee || '') === forecastFilters.assignee);
+        && (!forecastFilters.assignee || (row.assignee || '').toLowerCase().includes(forecastFilters.assignee.toLowerCase()));
     }).length;
     if(count) monthCounts.set(month, count);
   });
   if(forecastFilters.client && !clientCounts.has(forecastFilters.client)) forecastFilters.client = '';
   if(forecastFilters.position && !positionCounts.has(forecastFilters.position)) forecastFilters.position = '';
-  if(forecastFilters.assignee && !assigneeCounts.has(forecastFilters.assignee)) forecastFilters.assignee = '';
+  // assignee is free-text search — no reset needed
   if(forecastFilters.month && !monthCounts.has(forecastFilters.month)) forecastFilters.month = '';
 
   const clientSelect = document.getElementById('forecastClientFilter');
@@ -7898,12 +9473,7 @@ function renderForecastFilterControls(){
     positionSelect.value = forecastFilters.position;
     positionSelect.onchange = () => setForecastFilter('position', positionSelect.value);
   }
-  if(assigneeSelect){
-    const assignees = [...assigneeCounts.keys()].sort((a,b)=>a.localeCompare(b));
-    assigneeSelect.innerHTML = optionHTML('', `All assignees (${items.length})`) + assignees.map(a => optionHTML(a, `${a} (${assigneeCounts.get(a)})`)).join('');
-    assigneeSelect.value = forecastFilters.assignee;
-    assigneeSelect.onchange = () => setForecastFilter('assignee', assigneeSelect.value);
-  }
+  if(assigneeSelect && assigneeSelect.value !== forecastFilters.assignee) assigneeSelect.value = forecastFilters.assignee;
   if(monthSelect){
     const months = [...monthCounts.keys()].sort();
     const monthTotal = [...monthCounts.values()].reduce((sum, count) => sum + count, 0);
@@ -7927,7 +9497,7 @@ function resetForecastFilters(){
 function forecastRowMatches(row){
   return (!forecastFilters.client || (row.client || '') === forecastFilters.client)
     && (!forecastFilters.position || (row.position || '') === forecastFilters.position)
-    && (!forecastFilters.assignee || (row.assignee || '') === forecastFilters.assignee);
+    && (!forecastFilters.assignee || (row.assignee || '').toLowerCase().includes(forecastFilters.assignee.toLowerCase()));
 }
 function filteredForecastByMonth(){
   const fc = latest.forecast || {};

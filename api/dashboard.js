@@ -24,9 +24,13 @@ function embedUrlFor(reportKey) {
   return `${publicBase}/accounts/${encodeURIComponent(config.account_id)}/embed/report/${encodeURIComponent(config.report_id)}?embed_token=${encodeURIComponent(config.embed_token)}`;
 }
 
-function normalizeEmbeddedReportHtml(html) {
+function normalizeEmbeddedReportHtml(html, eazybiOrigin) {
   const frameCss = 'width:100%!important;min-width:100%!important;height:1120px!important;min-height:72vh!important;border:0!important;display:block!important;background:#FEFEFE!important;';
   const injectedStyle = `<style>html,body{margin:0!important;padding:0!important;width:100%!important;min-height:100%!important;background:#FEFEFE!important;}iframe{${frameCss}}</style>`;
+  // Inject <base href> so that relative asset URLs (CSS/JS) in the eaZyBI HTML resolve
+  // against the eaZyBI origin, not against the PMO board domain where this response is served.
+  const baseTag = eazybiOrigin ? `<base href="${eazybiOrigin}/">` : '';
+  const headInject = `${baseTag}${injectedStyle}`;
   let normalized = String(html || '').replace(/<iframe\b([^>]*)>/gi, (match, rawAttrs) => {
     const attrs = String(rawAttrs || '')
       .replace(/\swidth=(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
@@ -36,9 +40,9 @@ function normalizeEmbeddedReportHtml(html) {
     return `<iframe ${attrs} width="100%" height="1120" style="${frameCss}">`;
   });
   if (/<head[^>]*>/i.test(normalized)) {
-    return normalized.replace(/<head([^>]*)>/i, `<head$1>${injectedStyle}`);
+    return normalized.replace(/<head([^>]*)>/i, `<head$1>${headInject}`);
   }
-  return `<!doctype html><html><head>${injectedStyle}</head><body>${normalized}</body></html>`;
+  return `<!doctype html><html><head>${headInject}</head><body>${normalized}</body></html>`;
 }
 
 module.exports = async function dashboardHandler(req, res) {
@@ -64,6 +68,9 @@ module.exports = async function dashboardHandler(req, res) {
         return;
       }
 
+      let eazybiOrigin = '';
+      try { eazybiOrigin = new URL(url).origin; } catch (_) {}
+
       const response = await fetch(url, {
         headers: {
           Accept: 'text/html,application/xhtml+xml'
@@ -71,13 +78,13 @@ module.exports = async function dashboardHandler(req, res) {
       });
       const html = await response.text();
       if (!response.ok) {
-        sendError(res, 502, `EazyBI embed error ${response.status}`);
+        sendError(res, 502, `EazyBI embed error ${response.status} — verify EAZYBI_PUBLIC_URL points to the eaZyBI domain (e.g. https://aod.eazybi.com), not to the PMO board`);
         return;
       }
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.setHeader('Cache-Control', 'no-store');
-      res.status(200).send(normalizeEmbeddedReportHtml(html));
+      res.status(200).send(normalizeEmbeddedReportHtml(html, eazybiOrigin));
       return;
     }
 

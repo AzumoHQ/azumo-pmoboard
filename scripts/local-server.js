@@ -10,6 +10,8 @@ const dashboardHandler = require('../api/dashboard');
 const authHandler = require('../api/auth');
 const cronSnapshotHandler = require('../api/cron-snapshot');
 const healthHandler = require('../api/health');
+const harvestHoursHandler = require('../api/harvest-hours');
+const jiraProjectsHandler = require('../api/jira-projects');
 const notesHandler = require('../api/notes');
 const refreshHandler = require('../api/refresh');
 const snapshotsHandler = require('../api/snapshots');
@@ -23,7 +25,9 @@ const API_ROUTES = {
   '/api/auth': authHandler,
   '/api/cron-snapshot': cronSnapshotHandler,
   '/api/dashboard': dashboardHandler,
+  '/api/harvest-hours': harvestHoursHandler,
   '/api/health': healthHandler,
+  '/api/jira-projects': jiraProjectsHandler,
   '/api/notes': notesHandler,
   '/api/refresh': refreshHandler,
   '/api/snapshots': snapshotsHandler,

@@ -92,6 +92,10 @@ function normalizeEntry(entry = {}) {
       id: entry.client?.id || '',
       name: entry.client?.name || ''
     },
+    task: {
+      id: entry.task?.id || '',
+      name: entry.task?.name || ''
+    },
     notes: entry.notes || entry.description || ''
   };
 }

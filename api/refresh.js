@@ -6,7 +6,7 @@ const {
   hasEazyBIConfig,
   summarizeEazyBIReport
 } = require('../lib/eazybi-client');
-const { fetchHarvestSnapshot, hasHarvestConfig, harvestConfigStatus } = require('../lib/harvest-client');
+const { fetchHarvestSnapshot, hasHarvestConfig, harvestConfigStatus, fetchWeeklyHarvestMetrics } = require('../lib/harvest-client');
 const { getAccountCoverageIssues, getIssues, countIssues } = require('../lib/jira-client');
 const { canRefresh, getSessionUser } = require('../lib/auth');
 const { getDashboardData, saveSnapshot } = require('../lib/data-store');
@@ -39,6 +39,40 @@ function readJson(req) {
     });
     req.on('error', reject);
   });
+}
+
+// Semana Lunes-Domingo mas reciente que ya cerro (en UTC), la que el COO
+// revisa cada martes. Overridable con body.harvestWeekFrom/harvestWeekTo
+// por si en algun refresh puntual se necesita recalcular otra semana.
+function lastCompletedWeekRange(reference = new Date()) {
+  const ref = new Date(Date.UTC(reference.getUTCFullYear(), reference.getUTCMonth(), reference.getUTCDate()));
+  const dow = ref.getUTCDay(); // 0=domingo .. 6=sabado
+  const daysSinceMonday = (dow + 6) % 7;
+  const thisMonday = new Date(ref);
+  thisMonday.setUTCDate(ref.getUTCDate() - daysSinceMonday);
+  const lastSunday = new Date(thisMonday);
+  lastSunday.setUTCDate(thisMonday.getUTCDate() - 1);
+  const lastMonday = new Date(lastSunday);
+  lastMonday.setUTCDate(lastSunday.getUTCDate() - 6);
+  const toIso = (d) => d.toISOString().slice(0, 10);
+  return { from: toIso(lastMonday), to: toIso(lastSunday) };
+}
+
+// The glossary scopes Committed Harvest Hours to "the Billable Team", which
+// is the roster the COO sheet lists -- not everyone who logs hours in Harvest.
+// Jira assignment rows carry billing_type per person, so the roster is built
+// from there. Falls back to null (count everyone, and warn) when the rows are
+// missing or carry no emails, which is safer than silently zeroing the week.
+function billableRosterFromAssignments(assignmentRows = []) {
+  const roster = new Set();
+  for (const row of assignmentRows) {
+    const email = String(row?.email || '').trim().toLowerCase();
+    if (!email) continue;
+    const billingType = String(row?.billing_type || '').trim().toLowerCase();
+    if (billingType && billingType !== 'billable') continue;
+    roster.add(email);
+  }
+  return roster.size ? roster : null;
 }
 
 async function isAuthorized(req) {
@@ -179,8 +213,29 @@ async function runRefresh(body = {}) {
   }
   harvestSynced = Boolean(parsed.harvest?.fetched_at && parsed.harvest?.fetched_at !== previousSnapshot?.harvest?.fetched_at);
 
+  if (hasHarvestConfig() && body.useHarvest !== false) {
+    try {
+      const weekRange = (body.harvestWeekFrom && body.harvestWeekTo)
+        ? { from: body.harvestWeekFrom, to: body.harvestWeekTo }
+        : lastCompletedWeekRange();
+      parsed.harvest_metrics = await fetchWeeklyHarvestMetrics(weekRange, {
+        roster: billableRosterFromAssignments([
+          ...(parsed.active || []),
+          ...(parsed.bench || []),
+          ...(parsed.pending || []),
+        ])
+      });
+    } catch (error) {
+      console.warn('Harvest weekly metrics refresh skipped:', error.message);
+      warnings.push(`Harvest weekly metrics refresh skipped: ${error.message}`);
+      parsed.harvest_metrics = previousSnapshot?.harvest_metrics || {};
+    }
+  } else {
+    parsed.harvest_metrics = previousSnapshot?.harvest_metrics || {};
+  }
+
   const snapshot = buildSnapshot(parsed, overrides);
-  snapshot.activity_log = buildActivityLog(parsed.assignment_rows||[], previousSnapshot, parsed.psaProjects||[]);
+  snapshot.activity_log = buildActivityLog(parsed.assignment_rows||[], previousSnapshot, parsed.psaProjects||[], undefined, parsed.harvest_metrics);
   preservePreviousMetricFallbacks(snapshot, previousMetrics, explicitOverrideKeys, authoritativeMetricKeys);
   const refreshedAt = new Date().toISOString();
   const data = await saveSnapshot(snapshot, {

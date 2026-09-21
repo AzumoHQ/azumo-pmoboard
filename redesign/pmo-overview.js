@@ -358,8 +358,13 @@
   function renderOverviewDetails(snapshot, activeKind) {
     var host = el('pmoOverviewDetails');
     if (!host) return;
-    host.hidden = true;
-    host.innerHTML = '';
+    if (!activeKind) {
+      host.hidden = true;
+      host.innerHTML = '';
+      return;
+    }
+    host.hidden = false;
+    host.innerHTML = activeKind === 'bench' ? renderBenchDetail(snapshot) : renderClientsDetail(snapshot);
   }
 
   /* ---- KPI cards (data-driven) ---- */
@@ -409,7 +414,6 @@
         '<div class="pmo-ov-kpi-lbl">' + c.label + '</div>' +
         (c.sub ? '<div class="pmo-ov-kpi-sub">' + esc(c.sub) + '</div>' : '') +
         (c.detail ? detailButton(c.detail, activeDetail, c.detailCount) : '') +
-        (open ? (c.detail === 'bench' ? renderBenchDetail(snapshot) : renderClientsDetail(snapshot)) : '') +
       '</article>';
     }).join('');
     bindDetailActions();
