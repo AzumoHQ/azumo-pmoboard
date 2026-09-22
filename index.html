@@ -2965,14 +2965,12 @@ function renderAssignmentTimeline() {
     return identityMatchesTokens(e.assignee || '');
   });
 
-  host.hidden = false;
   if (!filtered.length) {
-    host.innerHTML = `<div class="atl-wrap">
-      <div class="atl-header"><span class="atl-title">Recent changes</span></div>
-      <div class="atl-empty">No changes yet — they'll appear here after the next data refresh.</div>
-    </div>`;
+    host.hidden = true;
+    host.innerHTML = '';
     return;
   }
+  host.hidden = false;
 
   const TYPE_ICON  = { new_assignment:'⊕', assignment_done:'✓', pct_change:'~', due_change:'◷', psa_report:'↑', pm_change:'→', status_change:'▶', harvest_to_bench:'⬇', harvest_from_bench:'⬆', harvest_to_internal:'⤵', harvest_from_internal:'⤴', harvest_hours_edit:'✎' };
   const TYPE_COLOR = { new_assignment:'#6EE7B7', assignment_done:'var(--muted)', pct_change:'#FCD34D', due_change:'#FB923C', psa_report:'var(--blue-lt)', pm_change:'#C4B5FD', status_change:'#93C5FD', harvest_to_bench:'#FDBA74', harvest_from_bench:'#6EE7B7', harvest_to_internal:'#A78BFA', harvest_from_internal:'#6EE7B7', harvest_hours_edit:'#FCD34D' };
