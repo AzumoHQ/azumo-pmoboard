@@ -27,6 +27,7 @@
   function num(v) { return (typeof v === 'number' && isFinite(v)) ? v : null; }
   function pct(v) { var n = num(v); return n === null ? '—' : (Math.round(n * 100) / 100) + '%'; }
   function intStr(v) { var n = num(v); return n === null ? '—' : String(Math.round(n)); }
+  function fteStr(v) { var n = num(v); return n === null ? '—' : (Math.round(n * 10) / 10).toFixed(1); }
   function esc(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
@@ -384,9 +385,12 @@
       : '';
     var benchRows = benchDetailRows(snapshot);
     var clientRows = clientDetailRows(snapshot);
+    var benchCapacityFte = benchRows.reduce(function (sum, row) {
+      return sum + (num(row.availability) || 0);
+    }, 0) / 100;
 
     var cards = [
-      { id: 'benchCount',        icon: ICON.bench,    label: 'On bench',           val: intStr(m.bench),              delta: deltaBadge(m.bench, pm && pm.bench, { goodWhenDown: true }), detail: 'bench', detailCount: intStr(benchRows.length) },
+      { id: 'benchCount',        icon: ICON.bench,    label: 'On bench',           val: intStr(m.bench),              delta: deltaBadge(m.bench, pm && pm.bench, { goodWhenDown: true }), detail: 'bench', detailCount: intStr(benchRows.length), sub: fteStr(benchCapacityFte) + ' FTE available' },
       { id: 'kpiActiveClients',  icon: ICON.clients,  label: 'Active clients',     val: intStr(clients),              delta: deltaBadge(clients, pClients), detail: 'clients', detailCount: intStr(clientRows.length), popoverAlign: 'right' },
       { id: 'kpiUtilBilling',    icon: ICON.util,     label: 'Utilization Rate (Billing)', val: pct(m.utilization_billing), delta: deltaBadge(m.utilization_billing, pm && pm.utilization_billing, { suffix: 'pp' }) },
       { id: 'kpiUtilAssignment', icon: ICON.util,     label: 'Utilization Rate (Assignment)', val: pct(m.utilization_assignment), delta: deltaBadge(m.utilization_assignment, pm && pm.utilization_assignment, { suffix: 'pp' }) },
