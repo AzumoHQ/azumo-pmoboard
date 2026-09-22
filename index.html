@@ -3656,7 +3656,7 @@ function renderProcessDiagram(containerId, steps, lanes = PROCESS_LANES){
 
   steps.forEach((s,i) => {
     const x = stepX[i], y = laneY[s.role];
-    svg += `<g class="proc-step-node" style="cursor:pointer" onclick="toggleProcessStepDetail(${jsArg(containerId)}, ${s.id})">
+    svg += `<g class="proc-step-node" style="cursor:pointer" onclick='toggleProcessStepDetail(${jsArg(containerId)}, ${s.id})'>
       <circle cx="${x}" cy="${y}" r="15" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
       <text x="${x}" y="${y + 4}" font-size="12" font-weight="700" text-anchor="middle" fill="var(--blue-lt)">${s.id}</text>
     </g>`;
@@ -5324,7 +5324,7 @@ function actionNoteHtml(action){
     ${note ? `<div class="action-note-current"><strong>PMO note:</strong> ${esc(note)}${meta}</div>` : ''}
     <div class="action-note-row">
       <textarea class="action-note-input" id="${esc(actionNoteInputId(action.id))}" placeholder="Add PMO note: why is this still open?">${esc(note)}</textarea>
-      <button class="btn btn-ghost btn-sm action-note-save" type="button" onclick="saveActionNote(${jsArg(action.id)})">Save note</button>
+      <button class="btn btn-ghost btn-sm action-note-save" type="button" onclick='saveActionNote(${jsArg(action.id)})'>Save note</button>
     </div>
     <div class="action-note-hint">Visible to other PMO users after saving.</div>
   </div>`;
@@ -5467,7 +5467,7 @@ function billingDiscountControl(row){
   const expired = state.until && daysUntil(state.until) !== null && daysUntil(state.until) < 0;
   return `<div class="billing-discount-control">
     ${label ? `<span class="billing-discount-date ${expired ? 'expired' : ''}">${esc(label)}</span>` : ''}
-    <button class="billing-discount-btn" type="button" onclick="setBillingDiscountDeadline(${jsArg(id)})">${label ? 'Edit deadline' : 'Discount from invoice? Until when?'}</button>
+    <button class="billing-discount-btn" type="button" onclick='setBillingDiscountDeadline(${jsArg(id)})'>${label ? 'Edit deadline' : 'Discount from invoice? Until when?'}</button>
   </div>`;
 }
 async function setBillingDiscountDeadline(rowId){
@@ -6040,7 +6040,7 @@ function renderActionItem(action){
   ].filter(Boolean).join('');
   const urgentButton = action.category === 'urgent' && action.severity === 'critical' ? `<button class="btn btn-primary btn-sm" onclick="openDueAssignmentsSlackDraft()">Open Slack overdue</button>` : '';
   const jiraButton = action.action_url ? `<a class="btn btn-ghost btn-sm" href="${action.action_url}" target="_blank" rel="noopener noreferrer">Open source Jira</a>` : '';
-  const copyButton = `<button class="btn btn-ghost btn-sm" onclick="copySingleAction(${jsArg(action.id)})">Copy action</button>`;
+  const copyButton = `<button class="btn btn-ghost btn-sm" onclick='copySingleAction(${jsArg(action.id)})'>Copy action</button>`;
   const actionsHtml = [actionModuleButton(action), jiraButton, urgentButton, copyButton].filter(Boolean).join('');
   return `<div class="action-item ${severity}">
     <div class="action-top">
@@ -6297,7 +6297,7 @@ function renderQaChecklist(){
         <span class="qa-checklist-pill">Next: ${esc(next)}</span>
       </div>
       <div class="qa-review-date">Last review:<br/><strong>${esc(formatReviewDate(last))}</strong>${esc(by)}</div>
-      <div class="qa-checklist-actions"><button class="btn btn-ghost btn-sm" data-qa-review="${esc(item.id)}" onclick="markQaChecklistReviewed(${jsArg(item.id)})">${status.state === 'ok' ? 'Done' : 'Done'}</button></div>
+      <div class="qa-checklist-actions"><button class="btn btn-ghost btn-sm" data-qa-review="${esc(item.id)}" onclick='markQaChecklistReviewed(${jsArg(item.id)})'>${status.state === 'ok' ? 'Done' : 'Done'}</button></div>
     </div>`;
   }).join('');
 }
@@ -6546,7 +6546,7 @@ function renderBench(){
       <td style="color:var(--muted);font-size:.78rem">${esc(tech || '—')}</td>
       <td style="white-space:nowrap">
         <button class="btn btn-ghost btn-sm" style="font-size:.72rem;padding:3px 10px"
-          onclick="openAssignModal(${jsArg(p.name)},${jsArg(p.avail)},${jsArg(p.key||'')})">
+          onclick='openAssignModal(${jsArg(p.name)},${jsArg(p.avail)},${jsArg(p.key||'')})'>
           Assign
         </button>
       </td>
