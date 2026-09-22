@@ -3586,6 +3586,33 @@ function processLaneKeyForRole(role){
   if(['pm','csm','assignee'].includes(role)) return role;
   return '';
 }
+// Loads a process's steps from the new /api/processes backend (see lib/data-store.js),
+// falling back to the built-in constant (e.g. BILLING_PROCESS_STEPS) until the fetch
+// resolves or if it fails — so the diagram never goes blank while migrating a process
+// off its hardcoded JS array. See "Portal de Procesos: Plan de Backend", section E.
+const PROCESS_API_STATE = {};
+function ensureProcessLoadedFromApi(id){
+  if(!PROCESS_API_STATE[id]) PROCESS_API_STATE[id] = {data: null, loading: false, failed: false};
+  const state = PROCESS_API_STATE[id];
+  if(state.data || state.loading || state.failed) return;
+  state.loading = true;
+  fetch(`/api/processes?id=${encodeURIComponent(id)}`, {credentials: 'same-origin'})
+    .then(r => r.ok ? r.json() : Promise.reject(new Error(`http ${r.status}`)))
+    .then(json => {
+      state.data = json.process;
+      state.loading = false;
+      updateRoleSensitiveUi();
+    })
+    .catch(err => {
+      state.loading = false;
+      state.failed = true;
+      console.warn(`Processes API unavailable for "${id}", using built-in steps:`, err.message);
+    });
+}
+function processStepsFor(id, fallbackSteps){
+  const state = PROCESS_API_STATE[id];
+  return (state && state.data && state.data.steps && state.data.steps.length) ? state.data.steps : fallbackSteps;
+}
 function renderProcessDiagram(containerId, steps, lanes = PROCESS_LANES){
   const el = document.getElementById(containerId);
   if(!el || !steps.length) return;
@@ -3676,7 +3703,10 @@ function updateRoleSensitiveUi(){
   document.body.classList.toggle('role-preview-active', Boolean(requestedPreviewRole() && canPreviewRole()));
   renderImpersonationBanner();
   if(document.getElementById('processList')) applyProcessFilters();
-  if(document.getElementById('billingProcessDiagram')) renderProcessDiagram('billingProcessDiagram', BILLING_PROCESS_STEPS);
+  if(document.getElementById('billingProcessDiagram')){
+    ensureProcessLoadedFromApi('billing');
+    renderProcessDiagram('billingProcessDiagram', processStepsFor('billing', BILLING_PROCESS_STEPS));
+  }
   if(document.getElementById('processHealthStrip')) renderProcessHealthStrip();
   if(document.getElementById('processWeekCalendarGrid')) renderProcessWeekCalendar();
 }
