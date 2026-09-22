@@ -390,7 +390,7 @@
     }, 0) / 100;
 
     var cards = [
-      { id: 'benchCount',        icon: ICON.bench,    label: 'On bench',           val: intStr(m.bench),              delta: deltaBadge(m.bench, pm && pm.bench, { goodWhenDown: true }), detail: 'bench', detailCount: intStr(benchRows.length), sub: fteStr(benchCapacityFte) + ' FTE available', subTitle: 'Sum of each bench person\'s availability % \u00f7 100. E.g. someone on bench at 50% availability counts as 0.5 FTE, not a full person.' },
+      { id: 'benchCount',        icon: ICON.bench,    label: 'On bench',           val: intStr(m.bench),              delta: deltaBadge(m.bench, pm && pm.bench, { goodWhenDown: true }), detail: 'bench', detailCount: intStr(benchRows.length), sub: fteStr(benchCapacityFte) + ' FTE available', subTip: 'Sum of each bench person\'s availability % \u00f7 100. E.g. someone on bench at 50% availability counts as 0.5 FTE, not a full person.' },
       { id: 'kpiActiveClients',  icon: ICON.clients,  label: 'Active clients',     val: intStr(clients),              delta: deltaBadge(clients, pClients), detail: 'clients', detailCount: intStr(clientRows.length), popoverAlign: 'right' },
       { id: 'kpiUtilBilling',    icon: ICON.util,     label: 'Utilization Rate (Billing)', val: pct(m.utilization_billing), delta: deltaBadge(m.utilization_billing, pm && pm.utilization_billing, { suffix: 'pp' }) },
       { id: 'kpiUtilAssignment', icon: ICON.util,     label: 'Utilization Rate (Assignment)', val: pct(m.utilization_assignment), delta: deltaBadge(m.utilization_assignment, pm && pm.utilization_assignment, { suffix: 'pp' }) },
@@ -416,7 +416,10 @@
         '</div>' +
         '<div class="pmo-ov-kpi-val" id="' + c.id + '">' + c.val + '</div>' +
         '<div class="pmo-ov-kpi-lbl">' + c.label + '</div>' +
-        (c.sub ? '<div class="pmo-ov-kpi-sub"' + (c.subTitle ? ' title="' + esc(c.subTitle) + '"' : '') + '>' + esc(c.sub) + (c.subTitle ? '*' : '') + '</div>' : '') +
+        (c.sub ? '<div class="pmo-ov-kpi-sub">' + (c.subTip
+          ? '<span class="pmo-ov-kpi-sub-tip" tabindex="0">' + esc(c.sub) + '*' +
+            '<span class="pmo-ov-kpi-tip-panel" role="tooltip">' + esc(c.subTip) + '</span></span>'
+          : esc(c.sub)) + '</div>' : '') +
         (c.detail ? detailButton(c.detail, activeDetail, c.detailCount) : '') +
       '</article>';
     }).join('');
