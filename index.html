@@ -253,6 +253,27 @@ body.light .qa-recurring,body.light .qa-checklist-item{background:#FFFFFF}
 .proc-week-cal-item b{display:block;color:var(--blue-lt);font-weight:700}
 .proc-week-cal-empty{font-size:.7rem;color:var(--muted);font-style:italic}
 @media (max-width:820px){.proc-week-cal-grid{grid-template-columns:repeat(7,minmax(90px,1fr));overflow-x:auto}}
+.proc-toolbar{display:flex;justify-content:flex-end;margin-bottom:.7rem}
+.proc-manager-actions{display:flex;gap:8px;align-items:center;margin-top:.7rem;padding-top:.6rem;border-top:1px dashed var(--brd);flex-wrap:wrap}
+.process-modal .auth-card{width:min(760px,100%);max-height:88vh;overflow-y:auto}
+.pf-section{margin-top:1.1rem;padding-top:1rem;border-top:1px solid var(--brd)}
+.pf-section:first-of-type{margin-top:0;padding-top:0;border-top:0}
+.pf-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+.pf-section-head h4{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0}
+.pf-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem .9rem}
+.pf-grid .auth-field{margin-bottom:0}
+.pf-field-full{grid-column:1/-1}
+.pf-row-card{border:1px solid var(--brd);border-radius:10px;background:var(--card);padding:.7rem .8rem;margin-bottom:.6rem}
+.pf-row-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;gap:8px}
+.pf-row-card-head b{font-size:.78rem;color:var(--txt)}
+.pf-row-actions{display:flex;gap:6px}
+.pf-icon-btn{background:none;border:1px solid var(--brd);color:var(--muted);border-radius:7px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:.75rem}
+.pf-icon-btn:hover{color:var(--txt);border-color:var(--blue-lt)}
+.pf-add-btn{background:var(--surf);border:1px dashed var(--brd);color:var(--blue-lt);border-radius:9px;padding:7px 12px;font-size:.78rem;font-weight:700;cursor:pointer;width:100%;text-align:center}
+.pf-add-btn:hover{border-color:var(--blue-lt);background:rgba(0,102,255,.06)}
+.pf-inline-row{display:flex;gap:8px;align-items:center;margin-bottom:.5rem}
+.pf-inline-row input{flex:1;background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:8px;padding:.55rem .7rem;font:inherit}
+.pf-error{display:none;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.1);color:#FCA5A5;border-radius:10px;padding:.6rem .75rem;font-size:.78rem;margin-top:.8rem}
 .lineage-item{background:var(--surf);border:1px solid var(--brd);border-radius:12px;padding:.85rem}
 .lineage-item b{display:block;margin-bottom:.25rem}.lineage-item div{color:var(--muted);font-size:.76rem;line-height:1.45}
 .locked-note{border:1px dashed var(--brd);border-radius:14px;padding:1rem;color:var(--muted);font-size:.82rem;line-height:1.5;background:rgba(0,102,255,.06)}
@@ -2176,6 +2197,10 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
       <div class="sec-tag">1 process · source: Notion</div>
     </div>
 
+    <div class="proc-toolbar" id="procToolbar" style="display:none">
+      <button class="btn btn-primary btn-sm" type="button" onclick="openProcessForm(null)"><i class="ti ti-plus"></i> Nuevo proceso</button>
+    </div>
+
     <details class="qa-check" style="margin-bottom:1rem">
       <summary><span>Process Definition Framework</span><span class="qa-status" style="background:rgba(107,143,191,.14);color:var(--muted)">Goal &amp; methodology</span></summary>
       <div class="qa-check-body">
@@ -2236,6 +2261,8 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
         </details>
 
       </div>
+
+      <div id="processManagerGroup"></div>
     </div>
     <div id="processEmptyState" style="display:none;text-align:center;color:var(--muted);font-size:.82rem;padding:2rem 0">No processes match that search.</div>
   </section>
@@ -3705,6 +3732,9 @@ function updateRoleSensitiveUi(){
     ensureProcessLoadedFromApi('billing');
     renderProcessDiagram('billingProcessDiagram', processStepsFor('billing', BILLING_PROCESS_STEPS));
   }
+  const procToolbar = document.getElementById('procToolbar');
+  if(procToolbar) procToolbar.style.display = canManageProcesses() ? '' : 'none';
+  if(document.getElementById('processManagerGroup')) loadProcessManagerList();
   if(document.getElementById('processHealthStrip')) renderProcessHealthStrip();
   if(document.getElementById('processWeekCalendarGrid')) renderProcessWeekCalendar();
 }
@@ -9974,17 +10004,473 @@ function setProcessSearch(value){
   processSearch = String(value || '');
   applyProcessFilters();
 }
-function setProcessCategory(id){
-  processCategory = id;
-  document.querySelectorAll('#processCategoryTabs .action-filter').forEach(btn => {
-    btn.classList.toggle('active', btn.getAttribute('data-cat') === id);
-  });
+
+
+// ===== Processes: manage (create/edit/delete) — Portal de Procesos Fase 2 =====
+// Lets a PMO/admin user create and edit processes directly from the board instead of
+// depending on Notion content that doesn't exist yet (the Notion pages are still empty).
+// Read access matches api/processes.js: any signed-in user sees the list; only PMO/admin
+// (canManageProcesses) get the Nuevo/Editar/Eliminar controls. Billing keeps its own
+// hand-authored card above (renderProcessDiagram); every other process loaded this way
+// renders generically here from /api/processes.
+function canManageProcesses(){
+  return Boolean(effectiveSessionUser()) && ['admin','pmo'].includes(effectiveUserRole());
+}
+
+const PROCESS_MANAGER_STATE = { list: [], loaded: false, loading: false };
+
+const PROCESS_CATEGORY_LABEL = {
+  billing: 'Billing', delivery: 'Delivery / Ops', assignment: 'Assignment',
+  account: 'Account management', sales: 'Sales', hr: 'HR / Recruiting',
+  pm: 'Project management', reporting: 'Reporting', other: 'Other'
+};
+function processCategoryLabel(cat){ return PROCESS_CATEGORY_LABEL[cat] || 'Other'; }
+
+function loadProcessManagerList(force){
+  if(!effectiveSessionUser()) return;
+  if(PROCESS_MANAGER_STATE.loading) return;
+  if(PROCESS_MANAGER_STATE.loaded && !force) return;
+  PROCESS_MANAGER_STATE.loading = true;
+  fetch('/api/processes', {credentials:'same-origin', cache:'no-store'})
+    .then(r => r.ok ? r.json() : Promise.reject(new Error(`http ${r.status}`)))
+    .then(json => (json.processes || []).filter(p => p.id !== 'billing'))
+    .then(list => Promise.all(list.map(p =>
+      fetch(`/api/processes?id=${encodeURIComponent(p.id)}`, {credentials:'same-origin', cache:'no-store'})
+        .then(r => r.ok ? r.json() : {process: p})
+        .then(j => j.process || p)
+        .catch(() => p)
+    )))
+    .then(detailed => {
+      PROCESS_MANAGER_STATE.list = detailed;
+      PROCESS_MANAGER_STATE.loaded = true;
+      PROCESS_MANAGER_STATE.loading = false;
+      renderProcessManagerList();
+    })
+    .catch(err => {
+      PROCESS_MANAGER_STATE.loading = false;
+      console.warn('Could not load processes list:', err.message);
+    });
+}
+
+function renderProcessManagerCard(p){
+  const steps = p.steps || [];
+  const stepsHtml = steps.length
+    ? '<ol style="margin:0 0 .9rem;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">' +
+      steps.map(s => `<li><b>${esc(s.title || '')}</b>${s.role ? ` <span style="color:var(--muted);font-weight:400">(${esc(s.role)}${s.day ? ', ' + esc(s.day) : ''})</span>` : ''}${s.desc ? ' — ' + esc(s.desc) : ''}</li>`).join('') +
+      '</ol>'
+    : '<p style="margin:0 0 .9rem;font-size:.8rem;color:var(--muted);font-style:italic">No steps loaded yet.</p>';
+  const validationsHtml = (p.validations || []).length
+    ? '<div class="mc-sub" style="margin-bottom:.4rem">Validations</div><ul style="margin:0 0 .9rem;padding-left:1.15rem;font-size:.8rem;color:var(--txt);display:flex;flex-direction:column;gap:.3rem">' +
+      (p.validations || []).map(v => `<li>${esc(v)}</li>`).join('') + '</ul>'
+    : '';
+  const resourcesHtml = (p.resources || []).length
+    ? '<div style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.78rem;color:var(--muted);margin-bottom:.7rem">Resources: ' +
+      (p.resources || []).map(r => r.url
+        ? `<a href="${esc(r.url)}" target="_blank" rel="noopener" style="color:var(--blue-lt)">${esc(r.label)} ↗</a>`
+        : `<span>${esc(r.label)}</span>`
+      ).join(' · ') + '</div>'
+    : '';
+  const searchText = [p.name, p.category, p.owner_role, p.corresponsable_role, p.objective].filter(Boolean).join(' ').toLowerCase();
+  const manageActions = canManageProcesses()
+    ? `<button class="btn btn-ghost btn-sm" type="button" onclick="openProcessForm(${jsArg(p.id)})"><i class="ti ti-pencil"></i> Editar</button>
+       <button class="btn btn-ghost btn-sm" type="button" onclick="confirmDeleteProcess(${jsArg(p.id)},${jsArg(p.name)})"><i class="ti ti-trash"></i> Eliminar</button>`
+    : '';
+  return `<div class="proc-group" data-group=${jsArg(p.id)}>
+    <details class="qa-check" data-cat="${esc(p.category || 'other')}" data-roles="assignee pm csm pmo admin executive" data-search="${esc(searchText)}">
+      <summary><span>${esc(p.name)} <span class="chip badge-green" style="margin-left:8px">Documented</span></span><span class="qa-status ok">v${esc(p.version || '1.00')}</span></summary>
+      <div class="qa-check-body">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.9rem">
+          <span class="badge badge-blue">${esc(processCategoryLabel(p.category))}</span>
+          ${p.owner_role ? `<span class="badge badge-blue">Owner: ${esc(p.owner_role)}</span>` : ''}
+          ${p.corresponsable_role ? `<span class="badge badge-blue">Co: ${esc(p.corresponsable_role)}</span>` : ''}
+        </div>
+        ${p.objective ? `<p style="margin:0 0 .7rem;font-size:.82rem;color:var(--txt);line-height:1.5">${esc(p.objective)}</p>` : ''}
+        ${p.scope ? `<p style="margin:0 0 .9rem;font-size:.82rem;color:var(--muted);line-height:1.5"><b style="color:var(--txt)">Scope:</b> ${esc(p.scope)}</p>` : ''}
+        <div class="mc-sub" style="margin-bottom:.5rem">Process steps</div>
+        ${stepsHtml}
+        ${validationsHtml}
+        ${resourcesHtml}
+        <div class="proc-manager-actions">
+          <span style="font-size:.72rem;color:var(--muted);flex:1">Last reviewed: ${p.last_reviewed ? esc(p.last_reviewed) : '—'} · reviews every ${esc(String(p.review_cadence_months ?? 6))} mo</span>
+          ${manageActions}
+        </div>
+      </div>
+    </details>
+  </div>`;
+}
+
+function renderProcessManagerList(){
+  const host = document.getElementById('processManagerGroup');
+  if(!host) return;
+  if(!PROCESS_MANAGER_STATE.list.length){
+    host.innerHTML = canManageProcesses()
+      ? '<div style="font-size:.78rem;color:var(--muted);padding:.6rem .2rem 1rem">No processes loaded yet — use "Nuevo proceso" above to add the rest of the 13.</div>'
+      : '';
+    applyProcessFilters();
+    return;
+  }
+  host.innerHTML = PROCESS_MANAGER_STATE.list.map(renderProcessManagerCard).join('');
   applyProcessFilters();
 }
+
+async function confirmDeleteProcess(id, name){
+  if(!canManageProcesses()) return;
+  if(!confirm(`Delete "${name}"? This removes its steps, validations and resources too.`)) return;
+  try{
+    const response = await fetch(`/api/processes?id=${encodeURIComponent(id)}`, {method: 'DELETE', credentials: 'same-origin'});
+    if(!response.ok){
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.error || `http ${response.status}`);
+    }
+    loadProcessManagerList(true);
+  }catch(error){
+    alert('Could not delete the process: ' + error.message);
+  }
+}
+window.confirmDeleteProcess = confirmDeleteProcess;
+
+// --- Nuevo/Editar proceso form ---
+function pfStepRowHtml(step){
+  const s = step || {};
+  return `<div class="pf-row-card">
+    <div class="pf-row-card-head">
+      <b>Step</b>
+      <div class="pf-row-actions">
+        <button type="button" class="pf-icon-btn" title="Move up" onclick="pfMoveRow(this,-1)"><i class="ti ti-chevron-up"></i></button>
+        <button type="button" class="pf-icon-btn" title="Move down" onclick="pfMoveRow(this,1)"><i class="ti ti-chevron-down"></i></button>
+        <button type="button" class="pf-icon-btn" title="Remove step" onclick="this.closest('.pf-row-card').remove()"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>
+    <div class="pf-grid">
+      <div class="auth-field"><label>Role</label><input type="text" class="pf-step-role" value="${esc(s.role || '')}" placeholder="pm"></div>
+      <div class="auth-field"><label>Day of week</label><input type="text" class="pf-step-day" value="${esc(s.day || '')}" placeholder="Mon"></div>
+      <div class="auth-field pf-field-full"><label>Title</label><input type="text" class="pf-step-title" value="${esc(s.title || '')}" placeholder="Time registration"></div>
+      <div class="auth-field pf-field-full"><label>Description</label><input type="text" class="pf-step-desc" value="${esc(s.desc || '')}" placeholder="What happens in this step"></div>
+      <div class="auth-field"><label>Inputs</label><input type="text" class="pf-step-inputs" value="${esc(s.inputs || '')}"></div>
+      <div class="auth-field"><label>Outputs</label><input type="text" class="pf-step-outputs" value="${esc(s.outputs || '')}"></div>
+      <div class="auth-field"><label>Required info</label><input type="text" class="pf-step-required" value="${esc(s.required_info || '')}"></div>
+      <div class="auth-field"><label>System / tool</label><input type="text" class="pf-step-system" value="${esc(s.system_tool || '')}"></div>
+      <div class="auth-field"><label>SLA</label><input type="text" class="pf-step-sla" value="${esc(s.sla || '')}"></div>
+      <div class="auth-field"><label>Jira ref</label><input type="text" class="pf-step-jira" value="${esc(s.jira_ref || '')}"></div>
+      <div class="auth-field"><label>Returns to step #</label><input type="number" class="pf-step-returns" value="${s.returns_to != null ? esc(String(s.returns_to)) : ''}" min="1"></div>
+      <div class="auth-field"><label>Related doc URL</label><input type="text" class="pf-step-doc" value="${esc(s.related_doc_url || '')}"></div>
+      <div class="auth-field"><label>Automation tool</label><input type="text" class="pf-step-autotool" value="${esc(s.automation_tool || '')}"></div>
+      <div class="auth-field"><label>Automation URL</label><input type="text" class="pf-step-autourl" value="${esc(s.automation_url || '')}"></div>
+    </div>
+  </div>`;
+}
+function addProcessStepRow(step){
+  document.getElementById('pfStepsList').insertAdjacentHTML('beforeend', pfStepRowHtml(step));
+}
+function pfMoveRow(btn, dir){
+  const row = btn.closest('.pf-row-card') || btn.closest('.pf-inline-row');
+  if(!row) return;
+  const sibling = dir < 0 ? row.previousElementSibling : row.nextElementSibling;
+  if(!sibling) return;
+  if(dir < 0) row.parentElement.insertBefore(row, sibling);
+  else row.parentElement.insertBefore(sibling, row);
+}
+window.addProcessStepRow = addProcessStepRow;
+window.pfMoveRow = pfMoveRow;
+
+function pfValidationRowHtml(text){
+  return `<div class="pf-inline-row"><input type="text" class="pf-validation-text" value="${esc(text || '')}" placeholder="e.g. All hours match the approved timesheet"><button type="button" class="pf-icon-btn" onclick="this.closest('.pf-inline-row').remove()"><i class="ti ti-trash"></i></button></div>`;
+}
+function addProcessValidationRow(text){
+  document.getElementById('pfValidationsList').insertAdjacentHTML('beforeend', pfValidationRowHtml(text));
+}
+window.addProcessValidationRow = addProcessValidationRow;
+
+function pfResourceRowHtml(res){
+  const r = res || {};
+  return `<div class="pf-inline-row">
+    <input type="text" class="pf-resource-label" value="${esc(r.label || '')}" placeholder="Label" style="flex:1">
+    <input type="text" class="pf-resource-url" value="${esc(r.url || '')}" placeholder="https://..." style="flex:2">
+    <input type="text" class="pf-resource-kind" value="${esc(r.kind || 'resource')}" placeholder="kind" style="max-width:110px;flex:none">
+    <button type="button" class="pf-icon-btn" onclick="this.closest('.pf-inline-row').remove()"><i class="ti ti-trash"></i></button>
+  </div>`;
+}
+function addProcessResourceRow(res){
+  document.getElementById('pfResourcesList').insertAdjacentHTML('beforeend', pfResourceRowHtml(res));
+}
+window.addProcessResourceRow = addProcessResourceRow;
+
+function showProcessFormError(message){
+  const el = document.getElementById('pfError');
+  if(!el) return;
+  el.textContent = message || '';
+  el.style.display = message ? 'block' : 'none';
+}
+
+function openProcessForm(id){
+  if(!canManageProcesses()){ showAuthModal('login'); return; }
+  const modal = document.getElementById('processFormModal');
+  if(!modal) return;
+  document.getElementById('processFormTitle').textContent = id ? 'Editar proceso' : 'Nuevo proceso';
+  showProcessFormError('');
+  document.getElementById('pfId').value = '';
+  document.getElementById('pfId').disabled = false;
+  document.getElementById('pfName').value = '';
+  document.getElementById('pfCategory').value = 'other';
+  document.getElementById('pfOwnerRole').value = '';
+  document.getElementById('pfCorresponsableRole').value = '';
+  document.getElementById('pfObjective').value = '';
+  document.getElementById('pfScope').value = '';
+  document.getElementById('pfLastReviewed').value = '';
+  document.getElementById('pfReviewCadence').value = '6';
+  document.getElementById('pfVersion').value = '1.00';
+  document.getElementById('pfStepsList').innerHTML = '';
+  document.getElementById('pfValidationsList').innerHTML = '';
+  document.getElementById('pfResourcesList').innerHTML = '';
+
+  const openModal = () => {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  };
+  const populate = (process) => {
+    if(process){
+      document.getElementById('pfId').value = process.id || '';
+      document.getElementById('pfId').disabled = true;
+      document.getElementById('pfName').value = process.name || '';
+      document.getElementById('pfCategory').value = process.category || 'other';
+      document.getElementById('pfOwnerRole').value = process.owner_role || '';
+      document.getElementById('pfCorresponsableRole').value = process.corresponsable_role || '';
+      document.getElementById('pfObjective').value = process.objective || '';
+      document.getElementById('pfScope').value = process.scope || '';
+      document.getElementById('pfLastReviewed').value = process.last_reviewed || '';
+      document.getElementById('pfReviewCadence').value = process.review_cadence_months ?? 6;
+      document.getElementById('pfVersion').value = process.version || '1.00';
+      (process.steps || []).forEach(s => addProcessStepRow(s));
+      (process.validations || []).forEach(v => addProcessValidationRow(v));
+      (process.resources || []).forEach(r => addProcessResourceRow(r));
+    }
+    if(!document.getElementById('pfStepsList').children.length) addProcessStepRow();
+    openModal();
+  };
+
+  if(id){
+    fetch(`/api/processes?id=${encodeURIComponent(id)}`, {credentials:'same-origin', cache:'no-store'})
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`http ${r.status}`)))
+      .then(json => populate(json.process))
+      .catch(err => {
+        populate(null);
+        showProcessFormError('Could not load that process: ' + err.message);
+      });
+  }else{
+    populate(null);
+  }
+}
+function closeProcessForm(){
+  const modal = document.getElementById('processFormModal');
+  if(!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+window.openProcessForm = openProcessForm;
+window.closeProcessForm = closeProcessForm;
+
+function pfCollectSteps(){
+  return Array.from(document.querySelectorAll('#pfStepsList .pf-row-card')).map((row, i) => {
+    const val = (sel) => (row.querySelector(sel)?.value || '').trim();
+    const returnsRaw = val('.pf-step-returns');
+    return {
+      id: i + 1,
+      role: val('.pf-step-role'),
+      title: val('.pf-step-title'),
+      desc: val('.pf-step-desc'),
+      inputs: val('.pf-step-inputs'),
+      outputs: val('.pf-step-outputs'),
+      required_info: val('.pf-step-required'),
+      system_tool: val('.pf-step-system'),
+      sla: val('.pf-step-sla'),
+      jira_ref: val('.pf-step-jira'),
+      related_doc_url: val('.pf-step-doc'),
+      returns_to: returnsRaw ? Number(returnsRaw) : null,
+      day: val('.pf-step-day') || null,
+      automation_tool: val('.pf-step-autotool') || null,
+      automation_url: val('.pf-step-autourl') || null
+    };
+  }).filter(s => s.title);
+}
+function pfCollectValidations(){
+  return Array.from(document.querySelectorAll('#pfValidationsList .pf-validation-text'))
+    .map(input => input.value.trim())
+    .filter(Boolean);
+}
+function pfCollectResources(){
+  return Array.from(document.querySelectorAll('#pfResourcesList .pf-inline-row')).map(row => ({
+    label: (row.querySelector('.pf-resource-label')?.value || '').trim(),
+    url: (row.querySelector('.pf-resource-url')?.value || '').trim() || null,
+    kind: (row.querySelector('.pf-resource-kind')?.value || '').trim() || 'resource'
+  })).filter(r => r.label);
+}
+
+async function saveProcessForm(){
+  showProcessFormError('');
+  const id = document.getElementById('pfId').value.trim();
+  const name = document.getElementById('pfName').value.trim();
+  if(!id || !/^[a-z0-9-]+$/.test(id)){
+    showProcessFormError('The ID must use only lowercase letters, numbers and hyphens (e.g. new-project-process).');
+    return;
+  }
+  if(!name){
+    showProcessFormError('Name is required.');
+    return;
+  }
+  const payload = {
+    id,
+    name,
+    category: document.getElementById('pfCategory').value,
+    owner_role: document.getElementById('pfOwnerRole').value.trim() || null,
+    corresponsable_role: document.getElementById('pfCorresponsableRole').value.trim() || null,
+    objective: document.getElementById('pfObjective').value.trim() || null,
+    scope: document.getElementById('pfScope').value.trim() || null,
+    last_reviewed: document.getElementById('pfLastReviewed').value || null,
+    review_cadence_months: Number(document.getElementById('pfReviewCadence').value) || 6,
+    version: document.getElementById('pfVersion').value.trim() || '1.00'
+  };
+  const steps = pfCollectSteps();
+  const validations = pfCollectValidations();
+  const resources = pfCollectResources();
+
+  const saveBtn = document.getElementById('pfSaveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving…';
+  try{
+    const jsonOrThrow = async (response) => {
+      if(!response.ok){
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || `http ${response.status}`);
+      }
+      return response.json();
+    };
+    await jsonOrThrow(await fetch('/api/processes', {
+      method: 'POST', credentials: 'same-origin',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    }));
+    await jsonOrThrow(await fetch(`/api/processes?id=${encodeURIComponent(id)}&action=steps`, {
+      method: 'POST', credentials: 'same-origin',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({steps})
+    }));
+    await jsonOrThrow(await fetch(`/api/processes?id=${encodeURIComponent(id)}&action=validations`, {
+      method: 'POST', credentials: 'same-origin',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({validations})
+    }));
+    await jsonOrThrow(await fetch(`/api/processes?id=${encodeURIComponent(id)}&action=resources`, {
+      method: 'POST', credentials: 'same-origin',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({resources})
+    }));
+
+    closeProcessForm();
+    loadProcessManagerList(true);
+  }catch(error){
+    showProcessFormError('Could not save the process: ' + error.message);
+  }finally{
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save process';
+  }
+}
+window.saveProcessForm = saveProcessForm;
+
+
 window.loginFromGate = loginFromGate;
 window.startGoogleSignIn = startGoogleSignIn;
 bootDashboard();
 </script>
+
+<!-- New/Edit process modal -->
+<div class="auth-modal process-modal" id="processFormModal" aria-hidden="true">
+  <div class="auth-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h3 style="margin:0" id="processFormTitle">Nuevo proceso</h3>
+      <button class="btn btn-ghost btn-sm" type="button" onclick="closeProcessForm()">✕</button>
+    </div>
+
+    <div class="pf-section">
+      <div class="pf-section-head"><h4>Basics</h4></div>
+      <div class="pf-grid">
+        <div class="auth-field">
+          <label for="pfId">ID (slug)</label>
+          <input type="text" id="pfId" placeholder="new-project-process">
+        </div>
+        <div class="auth-field">
+          <label for="pfVersion">Version</label>
+          <input type="text" id="pfVersion" value="1.00">
+        </div>
+        <div class="auth-field pf-field-full">
+          <label for="pfName">Name</label>
+          <input type="text" id="pfName" placeholder="New Project Process">
+        </div>
+        <div class="auth-field">
+          <label for="pfCategory">Category</label>
+          <select id="pfCategory">
+            <option value="billing">Billing</option>
+            <option value="delivery">Delivery / Ops</option>
+            <option value="assignment">Assignment</option>
+            <option value="account">Account management</option>
+            <option value="sales">Sales</option>
+            <option value="hr">HR / Recruiting</option>
+            <option value="pm">Project management</option>
+            <option value="reporting">Reporting</option>
+            <option value="other" selected>Other</option>
+          </select>
+        </div>
+        <div class="auth-field">
+          <label for="pfReviewCadence">Review cadence (months)</label>
+          <input type="number" id="pfReviewCadence" value="6" min="1">
+        </div>
+        <div class="auth-field">
+          <label for="pfOwnerRole">Owner role</label>
+          <input type="text" id="pfOwnerRole" placeholder="pmo">
+        </div>
+        <div class="auth-field">
+          <label for="pfCorresponsableRole">Co-responsible role</label>
+          <input type="text" id="pfCorresponsableRole" placeholder="pm">
+        </div>
+        <div class="auth-field">
+          <label for="pfLastReviewed">Last reviewed</label>
+          <input type="date" id="pfLastReviewed">
+        </div>
+        <div class="auth-field pf-field-full">
+          <label for="pfObjective">Objective</label>
+          <textarea id="pfObjective" rows="2" style="background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.6rem .7rem;font:inherit;resize:vertical"></textarea>
+        </div>
+        <div class="auth-field pf-field-full">
+          <label for="pfScope">Scope</label>
+          <textarea id="pfScope" rows="2" style="background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.6rem .7rem;font:inherit;resize:vertical"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="pf-section">
+      <div class="pf-section-head"><h4>Steps</h4></div>
+      <div id="pfStepsList"></div>
+      <button type="button" class="pf-add-btn" onclick="addProcessStepRow()"><i class="ti ti-plus"></i> Add step</button>
+    </div>
+
+    <div class="pf-section">
+      <div class="pf-section-head"><h4>Validations</h4></div>
+      <div id="pfValidationsList"></div>
+      <button type="button" class="pf-add-btn" onclick="addProcessValidationRow()"><i class="ti ti-plus"></i> Add validation</button>
+    </div>
+
+    <div class="pf-section">
+      <div class="pf-section-head"><h4>Resources</h4></div>
+      <div id="pfResourcesList"></div>
+      <button type="button" class="pf-add-btn" onclick="addProcessResourceRow()"><i class="ti ti-plus"></i> Add resource</button>
+    </div>
+
+    <div class="pf-error" id="pfError"></div>
+    <div class="auth-actions">
+      <button class="btn btn-ghost btn-sm" type="button" onclick="closeProcessForm()">Cancel</button>
+      <button class="btn btn-primary btn-sm" type="button" id="pfSaveBtn" onclick="saveProcessForm()">Save process</button>
+    </div>
+  </div>
+</div>
 
 <!-- Assign from bench modal -->
 <div class="auth-modal" id="assignBenchModal" aria-hidden="true">
