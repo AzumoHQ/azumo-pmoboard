@@ -28,8 +28,8 @@ async function main() {
     review_cadence_months: 6,
     version: '1.00'
   });
-  await replaceProcessSteps('billing', BILLING_PROCESS_STEPS);
-  console.log('Seeded Billing Process:', process.id, '-', process.steps.length, 'steps');
+  const withSteps = await replaceProcessSteps('billing', BILLING_PROCESS_STEPS);
+  console.log('Seeded Billing Process:', process.id, '-', withSteps.steps.length, 'steps');
 }
 
 main().catch((error) => {
