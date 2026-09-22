@@ -129,13 +129,20 @@
 .pmo-ov-kpi-sub-tip{position:relative;display:inline-block;cursor:help;border-bottom:1px dotted currentColor;}
 .pmo-ov-kpi-tip-panel{
   display:none;position:absolute;left:0;bottom:calc(100% + 8px);z-index:20;
-  width:220px;max-width:60vw;background:var(--ov-surface);border:1px solid var(--ov-border);
-  border-radius:var(--radius-md);box-shadow:var(--ov-shadow);padding:var(--space-2) var(--space-3);
-  font-size:11.5px;font-weight:500;line-height:1.4;color:var(--ov-text-2);white-space:normal;
+  width:240px;max-width:60vw;background:var(--ov-surface);border:1px solid var(--ov-border);
+  border-radius:var(--radius-md);box-shadow:var(--ov-shadow);padding:var(--space-3);
+  font-size:11.5px;font-weight:500;line-height:1.45;color:var(--ov-text-2);white-space:normal;
+  flex-direction:column;gap:var(--space-2);
 }
 .pmo-ov-kpi-sub-tip:hover .pmo-ov-kpi-tip-panel,
 .pmo-ov-kpi-sub-tip:focus-within .pmo-ov-kpi-tip-panel,
-.pmo-ov-kpi-sub-tip:focus .pmo-ov-kpi-tip-panel{display:block;}
+.pmo-ov-kpi-sub-tip:focus .pmo-ov-kpi-tip-panel{display:flex;}
+.pmo-ov-kpi-tip-title{font-size:11.5px;font-weight:800;color:var(--ov-text-1);}
+.pmo-ov-kpi-tip-body{color:var(--ov-text-2);}
+.pmo-ov-kpi-tip-example{
+  color:var(--ov-text-3);font-weight:500;font-style:italic;
+  padding-top:var(--space-2);border-top:1px solid var(--ov-border);
+}
 .pmo-ov-card-action{
   margin-top:var(--space-3);padding:var(--space-2) var(--space-2);border-radius:var(--radius-pill);border:1px solid var(--neutral-200);
   background:var(--neutral-100);color:var(--ov-good);
