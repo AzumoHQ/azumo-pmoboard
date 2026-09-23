@@ -255,6 +255,27 @@ module.exports = async function adminHandler(req, res) {
       res.status(200).json({ result, ...(await overview()) });
       return;
     }
+    if (action === 'generate-process') {
+      const apiKey = process.env.ANTHROPIC_API_KEY;
+      if (!apiKey) { res.status(503).json({ error: 'ANTHROPIC_API_KEY not set in Vercel env' }); return; }
+      const { nodes = [], edges = [], steps = [] } = body;
+      const graphDesc = steps.map((s,i) => `${i+1}. [${s.node_type}] ${s.description} (role: ${s.role||'sin asignar'})`).join('\n');
+      const connections = edges.map(e => {
+        const fn = nodes.find(n => n.id === e.from), tn = nodes.find(n => n.id === e.to);
+        return fn && tn ? `${fn.label||fn.type} -> ${tn.label||tn.type}` : null;
+      }).filter(Boolean).join(', ');
+      const prompt = `Sos un analista de procesos de negocios en Azumo (empresa de software staff augmentation).\n\nEl usuario dibuj\u00f3 este diagrama:\n${graphDesc}\n\nConexiones: ${connections||'secuencial'}\n\nGenera un proceso de negocio estructurado como JSON puro (sin markdown, sin texto extra):\n{\"name\":\"Nombre del proceso (max 60 chars)\",\"objective\":\"Objetivo en 1-2 oraciones\",\"scope\":\"Alcance en 1 oraci\u00f3n\",\"steps\":[{\"node_type\":\"task|decision|start|end|document|parallelogram|delay|preparation|connector|manual\",\"role\":\"rol responsable\",\"description\":\"actividad concisa (max 100 chars)\"}]}\n\nMant\u00e9 el mismo orden y tipos del diagrama. Para el role us\u00e1 el role_name del nodo (string vac\u00edo si no tiene).`;
+      const aRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+        body: JSON.stringify({ model: 'claude-haiku-4-5', max_tokens: 1500, messages: [{ role: 'user', content: prompt }] })
+      });
+      if (!aRes.ok) { const t = await aRes.text(); res.status(502).json({ error: `Anthropic error: ${t.slice(0,200)}` }); return; }
+      const aJson = await aRes.json();
+      const raw = (aJson.content?.[0]?.text || '').trim().replace(/^```json?\s*/,'').replace(/\s*```$/,'');
+      try { res.status(200).json(JSON.parse(raw)); } catch(e) { res.status(502).json({ error: 'JSON invalido de Anthropic', raw: raw.slice(0,300) }); }
+      return;
+    }
     res.status(400).json({ error: `Unknown action "${action}"` });
   } catch (error) {
     res.status(error.status || 500).json({ error: error.message || 'Unexpected error' });

@@ -277,7 +277,7 @@ body.light .qa-recurring,body.light .qa-checklist-item{background:#FFFFFF}
 .pf-nt-btn{background:var(--surf);border:1px solid var(--brd);color:var(--muted);border-radius:8px;padding:5px 7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.62rem;font-weight:700;min-width:50px;transition:border-color .12s,color .12s,background .12s}
 .pf-nt-btn:hover{border-color:var(--blue-lt);color:var(--txt)}
 .pf-nt-btn.active{border-color:var(--blue-lt);background:rgba(0,102,255,.1);color:var(--blue-lt)}
-.pf-diagram-preview{overflow-x:auto;background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:.6rem;min-height:90px;margin-top:.4rem}.pf-role-wrap{display:flex;align-items:center;gap:6px}.pf-role-avatar{display:flex;align-items:center;gap:5px;padding:2px 8px 2px 3px;background:var(--card);border:1px solid var(--brd);border-radius:20px;font-size:.72rem;color:var(--txt);white-space:nowrap;min-width:0;flex-shrink:0}.pf-av-circle{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#60A5FA);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}.pf-av-name{overflow:hidden;text-overflow:ellipsis;max-width:100px}
+.pf-diagram-preview{overflow-x:auto;background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:.6rem;min-height:90px;margin-top:.4rem}.pf-role-wrap{display:flex;align-items:center;gap:6px}.pf-role-avatar{display:flex;align-items:center;gap:5px;padding:2px 8px 2px 3px;background:var(--card);border:1px solid var(--brd);border-radius:20px;font-size:.72rem;color:var(--txt);white-space:nowrap;min-width:0;flex-shrink:0}.pf-av-circle{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#60A5FA);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}.pf-av-name{overflow:hidden;text-overflow:ellipsis;max-width:100px}.pf-canvas-wrap{border:1px solid var(--brd);border-radius:10px;background:var(--surf);overflow:hidden;position:relative}#pfCanvas{width:100%;height:460px;display:block;user-select:none}.pf-canvas-palette{display:flex;flex-wrap:wrap;gap:4px;padding:.45rem .5rem;border-bottom:1px solid var(--brd);background:var(--card)}.pf-pal-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 7px;border:1px solid var(--brd);border-radius:6px;background:var(--surf);color:var(--txt);cursor:pointer;font-size:.6rem;line-height:1.2;transition:background .15s}.pf-pal-btn:hover{background:var(--hov)}.pf-canvas-toolbar{display:flex;gap:6px;padding:.35rem .5rem;border-top:1px solid var(--brd);background:var(--card);align-items:center}.pf-port{opacity:0;transition:opacity .2s;cursor:crosshair}[data-nid]:hover .pf-port{opacity:.8}
 .pf-error{display:none;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.1);color:#FCA5A5;border-radius:10px;padding:.6rem .75rem;font-size:.78rem;margin-top:.8rem}
 .lineage-item{background:var(--surf);border:1px solid var(--brd);border-radius:12px;padding:.85rem}
 .lineage-item b{display:block;margin-bottom:.25rem}.lineage-item div{color:var(--muted);font-size:.76rem;line-height:1.45}
@@ -10367,6 +10367,211 @@ function pfSetNodeType(btn){
 window.pfSetNodeType = pfSetNodeType;
 
 let _pfPreviewTimer = null;
+
+// ── VISUAL CANVAS EDITOR ─────────────────────────────────────────────────────
+const PF_CANVAS = { nodes: [], edges: [], nextId: 1, sel: null, drag: null, conn: null, svg: null };
+
+function pfCanvasPt(e){ const r=PF_CANVAS.svg.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; }
+
+function pfNodeBBox(n){
+  if(n.type==='start'||n.type==='end'||n.type==='connector') return {x:n.x-24,y:n.y-24,w:48,h:48};
+  if(n.type==='decision') return {x:n.x-52,y:n.y-28,w:104,h:56};
+  return {x:n.x-62,y:n.y-26,w:124,h:52};
+}
+
+function pfPortPos(n,port){
+  if(!n) return {x:0,y:0};
+  const b=pfNodeBBox(n),cx=b.x+b.w/2,cy=b.y+b.h/2;
+  return port==='n'?{x:cx,y:b.y}:port==='s'?{x:cx,y:b.y+b.h}:port==='e'?{x:b.x+b.w,y:cy}:{x:b.x,y:cy};
+}
+
+function pfEdgePath(x1,y1,x2,y2){ const dx=Math.abs(x2-x1)*.5; return `M${x1},${y1} C${x1+dx},${y1} ${x2-dx},${y2} ${x2},${y2}`; }
+
+function pfNodeShapeSVG(n){
+  const b=pfNodeBBox(n),cx=b.x+b.w/2,cy=b.y+b.h/2;
+  const sel=PF_CANVAS.sel===n.id,stroke=sel?'var(--blue)':'var(--brd)',sw=sel?2.5:1.5;
+  let sh='';
+  if(n.type==='start')  sh=`<circle cx="${cx}" cy="${cy}" r="23" fill="rgba(34,197,94,.15)" stroke="#22C55E" stroke-width="${sw}"/>`;
+  else if(n.type==='end') sh=`<circle cx="${cx}" cy="${cy}" r="23" fill="rgba(249,115,22,.1)" stroke="#F97316" stroke-width="${sw}"/><circle cx="${cx}" cy="${cy}" r="14" fill="none" stroke="#F97316" stroke-width="1.5"/>`;
+  else if(n.type==='connector') sh=`<circle cx="${cx}" cy="${cy}" r="23" fill="var(--surf)" stroke="${stroke}" stroke-width="${sw}"/><circle cx="${cx}" cy="${cy}" r="9" fill="${stroke}"/>`;
+  else if(n.type==='decision') sh=`<polygon points="${cx},${b.y} ${b.x+b.w},${cy} ${cx},${b.y+b.h} ${b.x},${cy}" fill="var(--surf)" stroke="${stroke}" stroke-width="${sw}"/>`;
+  else if(n.type==='parallelogram') sh=`<polygon points="${b.x+10},${b.y+b.h} ${b.x+18},${b.y} ${b.x+b.w},${b.y} ${b.x+b.w-8},${b.y+b.h}" fill="var(--surf)" stroke="${stroke}" stroke-width="${sw}"/>`;
+  else sh=`<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="7" fill="var(--surf)" stroke="${stroke}" stroke-width="${sw}"/>`;
+  const lbl=esc(n.label||n.type),role=esc(n.role||'');
+  const ports=['n','s','e','w'].map(p=>{const pp=pfPortPos(n,p);return `<circle data-port="${p}" cx="${pp.x}" cy="${pp.y}" r="6" fill="var(--blue)" stroke="#fff" stroke-width="1.5" class="pf-port"/>`;}).join('');
+  return `<g data-nid="${n.id}" style="cursor:move">${sh}`+
+    `<text x="${cx}" y="${cy+4}" font-size="11" text-anchor="middle" fill="var(--txt)" pointer-events="none" font-weight="600">${lbl}</text>`+
+    (role?`<text x="${cx}" y="${b.y+b.h+13}" font-size="9" text-anchor="middle" fill="var(--muted)" pointer-events="none">${role}</text>`:'')+
+    `${ports}</g>`;
+}
+
+function pfCanvasRender(){
+  const svg=PF_CANVAS.svg; if(!svg) return;
+  const eg=document.getElementById('pfEdges'),ng=document.getElementById('pfNodes');
+  if(!eg||!ng) return;
+  eg.innerHTML=PF_CANVAS.edges.map(e=>{
+    const fn=PF_CANVAS.nodes.find(n=>n.id===e.from),tn=PF_CANVAS.nodes.find(n=>n.id===e.to);
+    if(!fn||!tn) return '';
+    const fp=pfPortPos(fn,e.fp||'s'),tp=pfPortPos(tn,e.tp||'n');
+    return `<path d="${pfEdgePath(fp.x,fp.y,tp.x,tp.y)}" stroke="var(--blue)" stroke-width="1.5" fill="none" marker-end="url(#pfc-arrow)" data-eid="${e.id}" style="cursor:pointer"/>`;
+  }).join('');
+  ng.innerHTML=PF_CANVAS.nodes.map(pfNodeShapeSVG).join('');
+}
+
+function pfCanvasMouseDown(e){
+  const portEl=e.target.closest('[data-port]'),nodeEl=e.target.closest('[data-nid]'),pt=pfCanvasPt(e);
+  if(portEl&&nodeEl){
+    e.preventDefault();
+    PF_CANVAS.conn={fromId:+nodeEl.dataset.nid,fp:portEl.dataset.port};
+    const pp=pfPortPos(PF_CANVAS.nodes.find(n=>n.id===PF_CANVAS.conn.fromId),PF_CANVAS.conn.fp);
+    const line=document.getElementById('pfConnLine');
+    line.setAttribute('d',pfEdgePath(pp.x,pp.y,pt.x,pt.y)); line.style.display='block';
+    return;
+  }
+  if(nodeEl){
+    e.preventDefault();
+    const nid=+nodeEl.dataset.nid;
+    PF_CANVAS.sel=nid;
+    const nd=PF_CANVAS.nodes.find(n=>n.id===nid);
+    PF_CANVAS.drag={id:nid,ox:pt.x-nd.x,oy:pt.y-nd.y};
+    pfCanvasRender();
+    const rs=document.getElementById('pfCanvasNodeRole');
+    if(rs) rs.value=nd.role||'';
+    return;
+  }
+  PF_CANVAS.sel=null; pfCanvasRender();
+}
+
+function pfCanvasMouseMove(e){
+  const pt=pfCanvasPt(e);
+  if(PF_CANVAS.drag){
+    const nd=PF_CANVAS.nodes.find(n=>n.id===PF_CANVAS.drag.id);
+    if(nd){nd.x=Math.round(pt.x-PF_CANVAS.drag.ox);nd.y=Math.round(pt.y-PF_CANVAS.drag.oy);pfCanvasRender();}
+    return;
+  }
+  if(PF_CANVAS.conn){
+    const pp=pfPortPos(PF_CANVAS.nodes.find(n=>n.id===PF_CANVAS.conn.fromId),PF_CANVAS.conn.fp);
+    document.getElementById('pfConnLine').setAttribute('d',pfEdgePath(pp.x,pp.y,pt.x,pt.y));
+  }
+}
+
+function pfCanvasMouseUp(e){
+  if(PF_CANVAS.conn){
+    const portEl=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-port]');
+    const nodeEl=portEl?.closest('[data-nid]');
+    if(nodeEl&&+nodeEl.dataset.nid!==PF_CANVAS.conn.fromId){
+      PF_CANVAS.edges.push({id:PF_CANVAS.nextId++,from:PF_CANVAS.conn.fromId,fp:PF_CANVAS.conn.fp,to:+nodeEl.dataset.nid,tp:portEl.dataset.port});
+      pfCanvasRender();
+    }
+    document.getElementById('pfConnLine').style.display='none';
+    PF_CANVAS.conn=null;
+  }
+  PF_CANVAS.drag=null;
+}
+
+function pfCanvasDblClick(e){
+  const nodeEl=e.target.closest('[data-nid]'); if(!nodeEl) return;
+  const nd=PF_CANVAS.nodes.find(n=>n.id===+nodeEl.dataset.nid); if(!nd) return;
+  const v=prompt('Label:',nd.label||''); if(v!==null){nd.label=v;pfCanvasRender();}
+}
+
+function pfCanvasKeyDown(e){
+  const tag=document.activeElement?.tagName||'';
+  if((e.key==='Delete'||e.key==='Backspace')&&tag!=='INPUT'&&tag!=='TEXTAREA'&&tag!=='SELECT'&&PF_CANVAS.sel){
+    PF_CANVAS.nodes=PF_CANVAS.nodes.filter(n=>n.id!==PF_CANVAS.sel);
+    PF_CANVAS.edges=PF_CANVAS.edges.filter(ed=>ed.from!==PF_CANVAS.sel&&ed.to!==PF_CANVAS.sel);
+    PF_CANVAS.sel=null; pfCanvasRender();
+  }
+}
+
+function pfCanvasPaletteAdd(type){
+  const nt=PF_NODE_TYPES.find(n=>n.value===type)||{label:type};
+  const cols=5,n=PF_CANVAS.nodes.length;
+  PF_CANVAS.nodes.push({id:PF_CANVAS.nextId++,type,x:120+(n%cols)*150,y:100+Math.floor(n/cols)*110,label:nt.label,role:''});
+  pfCanvasRender();
+}
+
+function pfCanvasClear(){
+  if(!PF_CANVAS.nodes.length||confirm('Borrar todo el canvas?')){
+    PF_CANVAS.nodes=[];PF_CANVAS.edges=[];PF_CANVAS.sel=null;pfCanvasRender();
+  }
+}
+
+function pfSerializeCanvas(){
+  const start=PF_CANVAS.nodes.find(n=>n.type==='start');
+  const visited=new Set(),ordered=[];
+  const queue=start?[start.id]:PF_CANVAS.nodes.slice().sort((a,b)=>a.x-b.x).map(n=>n.id);
+  while(queue.length){
+    const nid=queue.shift(); if(visited.has(nid)) continue;
+    visited.add(nid);
+    const nd=PF_CANVAS.nodes.find(n=>n.id===nid); if(nd) ordered.push(nd);
+    PF_CANVAS.edges.filter(e=>e.from===nid).forEach(e=>queue.push(e.to));
+  }
+  PF_CANVAS.nodes.forEach(n=>{if(!visited.has(n.id)) ordered.push(n);});
+  return ordered.map(n=>({node_type:n.type,role:n.role||'',description:n.label||n.type,name:n.label||n.type}));
+}
+
+function pfInitCanvas(){
+  const svg=document.getElementById('pfCanvas'); if(!svg) return;
+  if(PF_CANVAS.svg===svg) return;
+  PF_CANVAS.svg=svg;
+  svg.innerHTML='<defs><marker id="pfc-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="var(--blue)"/></marker></defs><g id="pfEdges"></g><g id="pfNodes"></g><path id="pfConnLine" style="pointer-events:none;display:none" stroke="var(--blue)" stroke-width="1.5" stroke-dasharray="5,3" fill="none" marker-end="url(#pfc-arrow)"/>';
+  svg.addEventListener('mousedown',pfCanvasMouseDown);
+  svg.addEventListener('mousemove',pfCanvasMouseMove);
+  svg.addEventListener('mouseup',pfCanvasMouseUp);
+  svg.addEventListener('mouseleave',pfCanvasMouseUp);
+  svg.addEventListener('dblclick',pfCanvasDblClick);
+  document.addEventListener('keydown',pfCanvasKeyDown);
+  const rs=document.getElementById('pfCanvasNodeRole');
+  if(rs) rs.addEventListener('change',()=>{
+    if(PF_CANVAS.sel){const nd=PF_CANVAS.nodes.find(n=>n.id===PF_CANVAS.sel);if(nd){nd.role=rs.value;pfCanvasRender();}}
+  });
+  pfCanvasRender();
+}
+
+function pfInitCanvasPalette(){
+  const pal=document.getElementById('pfCanvasPalette'); if(!pal||pal.children.length) return;
+  pal.innerHTML=PF_NODE_TYPES.map(nt=>`<button type="button" class="pf-pal-btn" onclick="pfCanvasPaletteAdd('${nt.value}')" title="${nt.label}"><svg viewBox="0 0 36 22" width="30" height="18" aria-hidden="true">${nt.svg}</svg><span>${nt.label}</span></button>`).join('');
+  const rs=document.getElementById('pfCanvasNodeRole');
+  if(rs&&PF_ROLES_PEOPLE.length) rs.innerHTML='<option value="">Rol del nodo seleccionado</option>'+PF_ROLES_PEOPLE.map(r=>`<option value="${esc(r.role_name)}">${esc(r.role_name)}</option>`).join('');
+}
+
+async function pfGenerateFromCanvas(){
+  const steps=pfSerializeCanvas();
+  if(!steps.length){alert('Dibuja al menos un nodo antes de generar.');return;}
+  const btn=document.getElementById('pfGenerateBtn');
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader"></i> Generando...';}
+  try{
+    const res=await fetch('/api/admin?action=generate-process',{
+      method:'POST',credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({nodes:PF_CANVAS.nodes,edges:PF_CANVAS.edges,steps})
+    });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json=await res.json();
+    if(json.error) throw new Error(json.error);
+    const pfName=document.getElementById('pfName');
+    if(json.name&&!pfName.value) pfName.value=json.name;
+    if(json.objective) document.getElementById('pfObjective').value=json.objective;
+    if(json.scope) document.getElementById('pfScope').value=json.scope;
+    document.getElementById('pfStepsList').innerHTML='';
+    (json.steps||steps).forEach(s=>addProcessStepRow(s));
+    pfRefreshDiagramPreview();
+    setTimeout(()=>document.getElementById('pfStepsList').scrollIntoView({behavior:'smooth',block:'start'}),200);
+  }catch(err){
+    document.getElementById('pfError').textContent='Error al generar: '+err.message;
+  }finally{
+    if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-sparkles"></i> Generar proceso';}
+  }
+}
+
+window.pfCanvasPaletteAdd=pfCanvasPaletteAdd;
+window.pfCanvasClear=pfCanvasClear;
+window.pfInitCanvas=pfInitCanvas;
+window.pfInitCanvasPalette=pfInitCanvasPalette;
+window.pfSerializeCanvas=pfSerializeCanvas;
+window.pfGenerateFromCanvas=pfGenerateFromCanvas;
+
 function pfRefreshDiagramPreview(){
   clearTimeout(_pfPreviewTimer);
   _pfPreviewTimer = setTimeout(() => {
@@ -10483,6 +10688,8 @@ function openProcessForm(id){
       stepsList.addEventListener('change', () => pfRefreshDiagramPreview());
     }
     setTimeout(pfRefreshDiagramPreview, 80);
+    pfInitCanvas();
+    pfInitCanvasPalette();
   };
   const populate = (process) => {
     if(process){
@@ -10697,6 +10904,23 @@ bootDashboard();
         <div class="auth-field pf-field-full">
           <label for="pfScope">Scope</label>
           <textarea id="pfScope" rows="2" style="background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.6rem .7rem;font:inherit;resize:vertical"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="pf-section" id="pfCanvasSection">
+      <div class="pf-section-head">
+        <h4>Visual editor</h4>
+        <span style="font-size:.68rem;color:var(--muted)">Click paleta → agregar nodo · Arrastrá para mover · Click en puerto ● para conectar · Doble click para editar label · Supr para borrar</span>
+      </div>
+      <div class="pf-canvas-wrap">
+        <div class="pf-canvas-palette" id="pfCanvasPalette"></div>
+        <svg id="pfCanvas" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="pf-canvas-toolbar">
+          <select id="pfCanvasNodeRole" style="font-size:.75rem;padding:3px 6px;border:1px solid var(--brd);border-radius:6px;background:var(--surf);color:var(--txt);max-width:160px"><option value="">Rol del nodo seleccionado</option></select>
+          <button class="btn btn-ghost btn-sm" type="button" onclick="pfCanvasClear()" style="font-size:.72rem">🗑 Clear</button>
+          <div style="flex:1"></div>
+          <button class="btn btn-primary btn-sm" type="button" onclick="pfGenerateFromCanvas()" id="pfGenerateBtn"><i class="ti ti-sparkles"></i> Generar proceso</button>
         </div>
       </div>
     </div>
