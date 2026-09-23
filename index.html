@@ -228,6 +228,57 @@ body.light .qa-recurring,body.light .qa-checklist-item{background:#FFFFFF}
 .qa-check summary{cursor:pointer;padding:.75rem .9rem;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800;font-size:.82rem}
 .qa-check-body{padding:0 .9rem .9rem;color:var(--muted);font-size:.76rem;line-height:1.45}
 .lineage-list{display:flex;flex-direction:column;gap:8px}
+.proc-diagram{border:1px solid var(--brd);border-radius:10px;background:var(--surf);padding:.6rem .4rem;margin-bottom:.85rem}
+.proc-diagram-svg{width:100%;height:auto;display:block}
+.proc-step-node:hover circle{stroke-width:3}
+.proc-diagram-detail{padding:0 .6rem}
+.proc-step-detail-card{margin-top:.6rem;padding:.6rem .75rem;background:rgba(0,102,255,.06);border:1px solid var(--brd);border-radius:8px;font-size:.8rem;color:var(--txt)}
+.proc-step-detail-card b{display:block;margin-bottom:.25rem;color:var(--blue-lt)}
+.proc-step-detail-card p{margin:0;color:var(--muted);line-height:1.5}
+.proc-health-strip{display:flex;flex-wrap:wrap;gap:14px;font-size:.78rem;color:var(--muted);margin:.6rem 0 1rem;padding:.65rem .9rem;border:1px solid var(--brd);border-radius:var(--r);background:var(--surf)}
+.proc-health-strip span{display:inline-flex;align-items:center;gap:6px}
+.proc-health-dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.proc-health-dot.green{background:#34D399}.proc-health-dot.yellow{background:#FDBA74}.proc-health-dot.red{background:#F87171}
+.proc-report-change{font-size:.72rem;color:var(--blue-lt);text-decoration:none;white-space:nowrap}
+.proc-report-change:hover{text-decoration:underline}
+.proc-week-cal{border:1px solid var(--brd);border-radius:var(--r);background:var(--surf);padding:.85rem 1rem;margin-bottom:1rem}
+.proc-week-cal-head{font-size:.86rem;font-weight:700;color:var(--txt);margin-bottom:.15rem;display:flex;align-items:center;gap:8px}
+.proc-week-cal-note{font-size:.72rem;color:var(--muted);margin-bottom:.7rem}
+.proc-week-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.proc-week-cal-day{border:1px solid var(--brd);border-radius:8px;padding:.5rem .55rem;min-height:64px;background:var(--card)}
+.proc-week-cal-day.today{border-color:var(--blue-lt);background:rgba(0,102,255,.06)}
+.proc-week-cal-day-label{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:.4rem}
+.proc-week-cal-item{font-size:.72rem;line-height:1.35;color:var(--txt);padding:3px 0;border-top:1px dashed var(--brd)}
+.proc-week-cal-item:first-of-type{border-top:0}
+.proc-week-cal-item b{display:block;color:var(--blue-lt);font-weight:700}
+.proc-week-cal-empty{font-size:.7rem;color:var(--muted);font-style:italic}
+@media (max-width:820px){.proc-week-cal-grid{grid-template-columns:repeat(7,minmax(90px,1fr));overflow-x:auto}}
+.proc-toolbar{display:flex;justify-content:flex-end;margin-bottom:.7rem}
+.proc-manager-actions{display:flex;gap:8px;align-items:center;margin-top:.7rem;padding-top:.6rem;border-top:1px dashed var(--brd);flex-wrap:wrap}
+.process-modal .auth-card{width:min(1180px,96vw);max-height:92vh;overflow:hidden;display:flex;flex-direction:column;padding:1.1rem}.pf-split{display:grid;grid-template-columns:420px 1fr;flex:1;min-height:0;overflow:hidden}.pf-split-left{border-right:1px solid var(--brd);display:flex;flex-direction:column;overflow:hidden;background:var(--surf)}.pf-split-right{overflow-y:auto;padding:.9rem 1.1rem}@media(max-width:860px){.pf-split{grid-template-columns:1fr}.pf-split-left{border-right:none;border-bottom:1px solid var(--brd);max-height:320px}.process-modal .auth-card{max-height:95vh}}
+.pf-section{margin-top:1.1rem;padding-top:1rem;border-top:1px solid var(--brd)}
+.pf-section:first-of-type{margin-top:0;padding-top:0;border-top:0}
+.pf-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+.pf-section-head h4{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0}
+.pf-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem .9rem}
+.pf-grid .auth-field{margin-bottom:0}
+.pf-field-full{grid-column:1/-1}
+.pf-row-card{border:1px solid var(--brd);border-radius:10px;background:var(--card);padding:.7rem .8rem;margin-bottom:.6rem}
+.pf-row-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;gap:8px}
+.pf-row-card-head b{font-size:.78rem;color:var(--txt)}
+.pf-row-actions{display:flex;gap:6px}
+.pf-icon-btn{background:none;border:1px solid var(--brd);color:var(--muted);border-radius:7px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:.75rem}
+.pf-icon-btn:hover{color:var(--txt);border-color:var(--blue-lt)}
+.pf-add-btn{background:var(--surf);border:1px dashed var(--brd);color:var(--blue-lt);border-radius:9px;padding:7px 12px;font-size:.78rem;font-weight:700;cursor:pointer;width:100%;text-align:center}
+.pf-add-btn:hover{border-color:var(--blue-lt);background:rgba(0,102,255,.06)}
+.pf-inline-row{display:flex;gap:8px;align-items:center;margin-bottom:.5rem}
+.pf-inline-row input{flex:1;background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:8px;padding:.55rem .7rem;font:inherit}
+.pf-nodetype-picker{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.pf-nt-btn{background:var(--surf);border:1px solid var(--brd);color:var(--muted);border-radius:8px;padding:5px 7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.62rem;font-weight:700;min-width:50px;transition:border-color .12s,color .12s,background .12s}
+.pf-nt-btn:hover{border-color:var(--blue-lt);color:var(--txt)}
+.pf-nt-btn.active{border-color:var(--blue-lt);background:rgba(0,102,255,.1);color:var(--blue-lt)}
+.pf-diagram-preview{overflow-x:auto;background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:.6rem;min-height:90px;margin-top:.4rem}.pf-role-wrap{display:flex;align-items:center;gap:6px}.pf-role-avatar{display:flex;align-items:center;gap:5px;padding:2px 8px 2px 3px;background:var(--card);border:1px solid var(--brd);border-radius:20px;font-size:.72rem;color:var(--txt);white-space:nowrap;min-width:0;flex-shrink:0}.pf-av-circle{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#60A5FA);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}.pf-av-name{overflow:hidden;text-overflow:ellipsis;max-width:100px}.pf-canvas-wrap{border:1px solid var(--brd);border-radius:10px;background:var(--surf);overflow:hidden;position:relative}#pfCanvas{width:100%;flex:1;min-height:200px;display:block;user-select:none}.pf-step-compact{display:flex;align-items:center;gap:.45rem;padding:.42rem .65rem;background:var(--card,#fff);border:1px solid var(--brd);border-radius:9px;margin-bottom:.35rem}.pf-step-num{min-width:1.4rem;height:1.4rem;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;flex-shrink:0}.pf-step-compact .pf-step-title{flex:1;border:none;border-bottom:1px solid transparent;background:transparent;font:inherit;font-size:.84rem;color:var(--txt);padding:.1rem .2rem;outline:none;min-width:0;transition:border-color .15s}.pf-step-compact .pf-step-title:focus{border-bottom-color:var(--blue)}.pf-step-compact .pf-step-title::placeholder{color:var(--muted)}.pf-step-compact .pf-step-role{border:1px solid var(--brd);background:var(--surf);color:var(--txt);font-size:.76rem;padding:.18rem .35rem;border-radius:6px;max-width:118px;min-width:80px}.pf-step-docs-lbl{display:flex;align-items:center;gap:.2rem;font-size:.74rem;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;user-select:none}.pf-step-docs-lbl input{width:13px;height:13px;cursor:pointer;accent-color:var(--blue)}.pf-step-type-mini{display:flex;gap:.18rem;flex-shrink:0}.pf-nt-mini-btn{border:1px solid var(--brd);background:var(--surf);border-radius:5px;padding:.12rem .32rem;font-size:.68rem;cursor:pointer;color:var(--muted);line-height:1.4;transition:background .12s,color .12s,border-color .12s}.pf-nt-mini-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}.pf-swimlane-container{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:flex-start;padding:.5rem}.pf-swimlane-container .proc-diagram-svg{min-width:100%;height:auto}.pf-canvas-palette{display:flex;flex-wrap:wrap;gap:4px;padding:.45rem .5rem;border-bottom:1px solid var(--brd);background:var(--card)}.pf-pal-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 7px;border:1px solid var(--brd);border-radius:6px;background:var(--surf);color:var(--txt);cursor:pointer;font-size:.6rem;line-height:1.2;transition:background .15s}.pf-pal-btn:hover{background:var(--hov)}.pf-canvas-toolbar{display:flex;gap:6px;padding:.35rem .5rem;border-top:1px solid var(--brd);background:var(--card);align-items:center}.pf-port{opacity:0;transition:opacity .2s;cursor:crosshair}[data-nid]:hover .pf-port{opacity:.8}
+.pf-error{display:none;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.1);color:#FCA5A5;border-radius:10px;padding:.6rem .75rem;font-size:.78rem;margin-top:.8rem}
 .lineage-item{background:var(--surf);border:1px solid var(--brd);border-radius:12px;padding:.85rem}
 .lineage-item b{display:block;margin-bottom:.25rem}.lineage-item div{color:var(--muted);font-size:.76rem;line-height:1.45}
 .locked-note{border:1px dashed var(--brd);border-radius:14px;padding:1rem;color:var(--muted);font-size:.82rem;line-height:1.5;background:rgba(0,102,255,.06)}
@@ -361,6 +412,24 @@ main>section.tab-section-active{animation:tabFade .18s ease-out}
 .fc-bar.ok{background:linear-gradient(180deg,#0066FF,#0047B3)}
 .fc-count{font-size:.8rem;font-weight:700;color:var(--txt)}
 .fc-month{font-size:.72rem;color:var(--muted);text-align:center;white-space:nowrap}
+.fc-cap-card{border:1px solid var(--brd);border-radius:var(--r);background:var(--surf);padding:1rem 1.1rem;margin-bottom:1.2rem}
+.fc-cap-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:.4rem;margin-bottom:.15rem}
+.fc-cap-title{font-size:.86rem;font-weight:700;color:var(--txt)}
+.fc-cap-note{font-size:.72rem;color:var(--muted)}
+.fc-cap-legend{display:flex;gap:14px;margin:.5rem 0 .8rem;font-size:.74rem;color:var(--muted)}
+.fc-cap-legend span{display:inline-flex;align-items:center;gap:5px}
+.fc-cap-swatch{width:10px;height:10px;border-radius:3px;display:inline-block}
+.fc-cap-swatch.cap{background:linear-gradient(180deg,#34D399,#059669)}
+.fc-cap-swatch.dem{background:linear-gradient(180deg,#0066FF,#0047B3)}
+.fc-cap-chart{display:flex;align-items:flex-end;gap:10px;height:150px}
+.fc-cap-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.fc-cap-delta{font-size:.72rem;font-weight:700;color:var(--muted);white-space:nowrap}
+.fc-cap-delta.ok{color:#34D399}
+.fc-cap-delta.urgent{color:#F87171}
+.fc-cap-bars{width:100%;display:flex;align-items:flex-end;justify-content:center;gap:4px}
+.fc-cap-bar{width:44%;border-radius:5px 5px 0 0;transition:height .4s ease}
+.fc-cap-bar-capacity{background:linear-gradient(180deg,#34D399,#059669)}
+.fc-cap-bar-demand{background:linear-gradient(180deg,#0066FF,#0047B3)}
 .fc-table-wrap{overflow:auto;max-height:520px}
 .headcount-line{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);padding:1.5rem;margin-top:16px}
 .hc-chart{width:100%;overflow:hidden}
@@ -1302,7 +1371,7 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
   <div class="nav-inner">
     <div class="nav-brand">
       <a href="#" onclick="goTo('overview');return false;" style="text-decoration:none;display:flex"><div class="nav-logo"><img class="nav-wordmark" src="assets/azumo-logo.png" alt="Azumo"/></div></a>
-      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span>V2</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
+      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span>V2.1</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
     </div>
     <div class="nav-links">
       <button class="nav-link" id="overviewNavLink" onclick="goTo('overview')">Overview</button>
@@ -1320,7 +1389,7 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
     <div class="nav-right">
       <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">Dark</button>
       <button class="nav-refresh" data-sync-action onclick="manualSnapshot()">Sync all sources</button>
-      <a class="auth-link" id="adminUsersLink" href="/admin/users" style="display:none">Users</a>
+      <a class="auth-link" id="adminUsersLink" href="/admin/users" style="display:none">Admin</a>
       <a class="auth-link" id="adminViewAsLink" href="/admin/users" style="display:none">View as</a>
       <button class="auth-pill" id="authStatusBtn" onclick="showAuthModal(currentUser ? 'account' : 'login')">Sign in</button>
       <button class="auth-link" id="authLogoutBtn" onclick="logoutUser()" style="display:none">Logout</button>
@@ -2080,6 +2149,19 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
 
   <div class="forecast-wrap">
     <p style="font-size:.82rem;color:var(--muted);margin-bottom:1.2rem">In Progress assignment due dates grouped by month. Each Jira assignment key counts once; overdue rows remain visible until updated.</p>
+
+    <div class="fc-cap-card">
+      <div class="fc-cap-head">
+        <div class="fc-cap-title"><i class="ti ti-scale"></i> Demand vs. Capacity — next 6 months</div>
+        <div class="fc-cap-note">FTE, org-wide (not filtered below)</div>
+      </div>
+      <div class="fc-cap-legend">
+        <span><i class="fc-cap-swatch cap"></i> Capacity available (Bench + freed that month)</span>
+        <span><i class="fc-cap-swatch dem"></i> Committed demand (active assignments + won searches)</span>
+      </div>
+      <div class="fc-cap-chart" id="forecastCapacityChart"></div>
+    </div>
+
     <div class="forecast-filters" aria-label="Forecast filters">
       <div class="filter-field">
         <label for="forecastClientFilter">Client</label>
@@ -2113,6 +2195,83 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
 </section>
 
   <!-- ── HELP / CHANGELOG ───────────────────────── -->
+  <section id="processes">
+    <div class="sec-head">
+      <div class="sec-icon"><i class="ti ti-route"></i></div>
+      <h2>Processes</h2>
+      <div class="sec-tag">1 process · source: Notion</div>
+    </div>
+
+    <div class="proc-toolbar" id="procToolbar" style="display:none">
+      <button class="btn btn-primary btn-sm" type="button" onclick="openProcessForm(null)"><i class="ti ti-plus"></i> Nuevo proceso</button>
+    </div>
+
+    <details class="qa-check" style="margin-bottom:1rem">
+      <summary><span>Process Definition Framework</span><span class="qa-status" style="background:rgba(107,143,191,.14);color:var(--muted)">Goal &amp; methodology</span></summary>
+      <div class="qa-check-body">
+        <p style="margin:0 0 .7rem;font-size:.82rem;color:var(--txt);line-height:1.5">The main objective of the Azumo Process Definition Framework is to centralize and standardize the documentation of all key processes within Azumo — from project management and software development to customer service and HR management.</p>
+        <p style="margin:0 0 1rem;font-size:.82rem;color:var(--txt);line-height:1.5">Its mission is to provide a single source of truth accessible to all employees, promoting transparency, efficiency, and consistency in the execution of tasks — a guide for training new employees and for the continuous improvement of processes.</p>
+        <div class="mc-sub" style="margin-bottom:.6rem">How we get there</div>
+        <div class="lineage-list">
+          <div class="lineage-item"><b>01 · Definition &amp; documentation</b><div>Formalize steps, owners, inputs, outputs, metrics. Store it somewhere accessible — this module.</div></div>
+          <div class="lineage-item"><b>02 · Implementation &amp; monitoring</b><div>Communicate, train, support with the right tooling (Jira, Harvest), monitor performance.</div></div>
+          <div class="lineage-item"><b>03 · Evaluation &amp; improvement</b><div>Analyze the data, adjust the process, automate repetitive tasks, ask for feedback.</div></div>
+          <div class="lineage-item"><b>04 · Continuous cycle</b><div>Not an end state — every process gets re-evaluated and feeds back into step 01.</div></div>
+        </div>
+        <div class="locked-note" style="margin-top:.9rem">💡 Process maturity is not achieved overnight. It requires a long-term commitment to continuous improvement and the active participation of the whole team.</div>
+      </div>
+    </details>
+
+    <div class="tbl-head" style="border:1px solid var(--brd);border-radius:var(--r) var(--r) 0 0;border-bottom:0">
+      <h3><i class="ti ti-receipt-2"></i> Billing &amp; Ops <span class="badge badge-blue">1</span></h3>
+    </div>
+
+    <div class="proc-week-cal">
+      <div class="proc-week-cal-head"><i class="ti ti-calendar-time"></i> Weekly cadence — where each process lands, Monday to Sunday</div>
+      <div class="proc-week-cal-note">Built from each process's own step days (e.g. Billing's Friday time registration, Monday CSM review). A day with nothing shown just means no documented process has a fixed-day step there yet.</div>
+      <div class="proc-week-cal-grid" id="processWeekCalendarGrid"></div>
+    </div>
+
+    <div class="proc-health-strip" id="processHealthStrip"></div>
+
+    <div id="processList" style="border:1px solid var(--brd);border-top:0;border-radius:0 0 var(--r) var(--r);padding:.8rem;background:var(--surf)">
+      <div class="proc-group" data-group="billing">
+
+        <details class="qa-check" open data-cat="billing" data-roles="assignee pm csm pmo admin executive" data-search="billing process time tracking harvest invoice claim csm pm cos chief of staff pablo baio weekly register week time">
+          <summary><span>Billing Process <span class="chip badge-green" style="margin-left:8px">Documented</span> <span class="chip" id="procHealth-billing" style="margin-left:6px"></span></span><span class="qa-status ok">v1.00</span></summary>
+          <div class="qa-check-body">
+            <div id="billingProcessDiagram" class="proc-diagram" data-fallback-img="assets/process-billing-flow.jpg"></div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.9rem">
+              <span class="badge badge-blue">Team</span>
+              <span class="badge badge-blue">PM</span>
+              <span class="badge badge-blue">CSM</span>
+              <span class="badge badge-blue">PMO</span>
+            </div>
+            <p style="margin:0 0 .9rem;font-size:.82rem;color:var(--muted)">Improve the efficiency of the billing process — every role above owns one lane in the flow (Team registers time, PM and CSM review it, PMO/Chief of Staff does the final check before invoicing).</p>
+            <div class="mc-sub" style="margin-bottom:.5rem">Process steps</div>
+            <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
+              <li><b>Time registration</b> — Friday morning. Each team member logs their weekly hours in the time tracking system.</li>
+              <li><b>Initial review by PM</b> — Friday afternoon. The PM checks entries for their contracts for completeness and correctness.</li>
+              <li><b>Time entry adjustment</b> (if needed). If there are discrepancies, the PM requests corrections and the team re-submits — the claim cycle.</li>
+              <li><b>CSM weekly review</b> — Monday morning. The CSM reviews the weekly contract time records for consistency with client expectations.</li>
+              <li><b>CSM feedback loop</b> (if needed). Additional issues trigger the claim process again for clarification.</li>
+              <li><b>Final time register review (PMO / Chief of Staff)</b> — Tuesday morning. Final check of all approved timesheets.</li>
+              <li><b>Invoice issuance.</b> Once every validation is complete, the invoice is generated and sent to the client.</li>
+            </ol>
+            <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;justify-content:space-between">
+              <span>Resources: <a href="https://docs.google.com/spreadsheets/d/1ZrkOk2kOygmjmJmUGnMC28QIJHIuocqz-qJMvHmRzx4/edit?gid=1319034044#gid=1319034044" target="_blank" rel="noopener" style="color:var(--blue-lt)">Billing tracking sheet ↗</a> · Owner for questions: Pablo Baio · v1.00</span>
+              <a class="proc-report-change" href="mailto:federica.gonzalez@azumo.co?subject=Process%20change%20report%3A%20Billing%20Process&amp;body=Process%3A%20Billing%20Process%0AWhat%20changed%3A%20%0AWhy%3A%20%0AReported%20by%20(role)%3A%20"><i class="ti ti-message-report"></i> Report a change</a>
+            </div>
+          </div>
+        </details>
+
+      </div>
+
+      <div id="processManagerGroup"></div>
+    </div>
+    <div id="processEmptyState" style="display:none;text-align:center;color:var(--muted);font-size:.82rem;padding:2rem 0">No processes match that search.</div>
+  </section>
+
   <section id="helpChangelog">
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-help-circle"></i></div>
@@ -2140,6 +2299,18 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
           <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
             <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Aug 2026</span>
             <span><strong>Harvest Weekly</strong> — Mon/Sun billing delta columns; Bench/Internal export in spreadsheet template format</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Aug 2026</span>
+            <span><strong>Role-scoped views</strong> — Harvest Hours Control, Pending Assignments and Due Dates now filter by role (PM/CSM/TL/Assignee), matching Forecast</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Aug 2026</span>
+            <span><strong>Bench count fix</strong> — Bench (FTE) metric now counts people consistently between the Overview card and the detailed bench list</span>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
+            <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Aug 2026</span>
+            <span><strong>Nav &amp; dark mode fixes</strong> — module dropdowns no longer stack on top of each other; fixed low-contrast KPI icons in dark mode</span>
           </div>
           <div style="display:flex;gap:.75rem;align-items:baseline;font-size:.84rem">
             <span style="color:var(--muted);white-space:nowrap;font-size:.75rem">Aug 2026</span>
@@ -2981,6 +3152,7 @@ let openModuleGroup = null;
 function canSeePmoGroup(){ return ['admin','pmo'].includes(effectiveUserRole()); }
 function sectionAllowedForCurrentRole(id){
   if(id === 'helpChangelog') return true;
+  if(id === 'processes') return true;
   const role = effectiveUserRole();
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
@@ -3019,6 +3191,7 @@ const SECTION_ICON_MAP = {
   'newSearchesTriage': 'ti-search',
   'pmoActionCenter': 'ti-alert-triangle',
   'helpChangelog': 'ti-help-circle',
+  'processes': 'ti-route',
 };
 function sectionIcon(id) {
   var cls = SECTION_ICON_MAP[id];
@@ -3068,6 +3241,7 @@ function sidebarNavConfig(){
       {id:'newSearchesTriage', icon:'<i class="ti ti-search"></i>', label:'New Searches'},
       {id:'harvestWeekly', icon:'<i class="ti ti-users"></i>', label:'Logged Harvest Hours'}
     ]},
+    {id:'processes', icon:'<i class="ti ti-route"></i>', label:'Processes'},
     {id:'pmoActionCenter', icon:'<i class="ti ti-alert-triangle"></i>', label:'PMO QA', count: qaCount},
     {id:'helpChangelog', icon:'<i class="ti ti-help-circle"></i>', label:'Help'}
   ];
@@ -3346,6 +3520,344 @@ function renderImpersonationBanner(){
     document.body.classList.remove('impersonating');
   }
 }
+// Process health (RAG) — Green/Amber/Red computed from how long it has been since a process was
+// last reviewed, vs. its review cadence. See Portal de Procesos strategy doc, "Process health — the
+// RAG idea, applied to processes." A process that has never been reviewed (no lastReviewed) is Red —
+// same as a stale one — because an unreviewed draft carries the same risk as an outdated one.
+const PROCESS_HEALTH_META = {
+  billing: {lastReviewed: '2026-07-06', reviewCadenceMonths: 6, owner: 'Pablo Baio'},
+};
+function computeProcessHealth(meta){
+  if(!meta || !meta.lastReviewed) return {level: 'red', label: 'Never reviewed', cls: 'badge-red'};
+  const reviewed = new Date(meta.lastReviewed + 'T00:00:00');
+  if(Number.isNaN(reviewed.getTime())) return {level: 'red', label: 'Never reviewed', cls: 'badge-red'};
+  const cadence = meta.reviewCadenceMonths || 6;
+  const monthsSince = (Date.now() - reviewed.getTime()) / (1000 * 60 * 60 * 24 * 30.44);
+  if(monthsSince <= cadence) return {level: 'green', label: 'Reviewed', cls: 'badge-green'};
+  if(monthsSince <= cadence * 1.5) return {level: 'yellow', label: 'Review due', cls: 'badge-yellow'};
+  return {level: 'red', label: 'Review overdue', cls: 'badge-red'};
+}
+function renderProcessHealthStrip(){
+  const strip = document.getElementById('processHealthStrip');
+  const entries = Object.entries(PROCESS_HEALTH_META);
+  entries.forEach(([id, meta]) => {
+    const health = computeProcessHealth(meta);
+    const badge = document.getElementById(`procHealth-${id}`);
+    if(badge){
+      badge.className = `chip ${health.cls}`;
+      badge.style.marginLeft = '6px';
+      badge.textContent = health.label;
+      badge.title = meta.lastReviewed ? `Last reviewed ${meta.lastReviewed} · cadence every ${meta.reviewCadenceMonths}mo` : 'No review on record';
+    }
+  });
+  if(!strip) return;
+  const counts = {green: 0, yellow: 0, red: 0};
+  entries.forEach(([, meta]) => { counts[computeProcessHealth(meta).level]++; });
+  strip.innerHTML = `
+    <span><i class="proc-health-dot green"></i> ${counts.green} healthy</span>
+    <span><i class="proc-health-dot yellow"></i> ${counts.yellow} review due</span>
+    <span><i class="proc-health-dot red"></i> ${counts.red} overdue / never reviewed</span>
+    <span style="margin-left:auto;color:var(--muted)">Reviewed vs. cadence — see Section guide for the process framework</span>
+  `;
+}
+// Generated process flow diagrams — built from structured step data instead of a hand-drawn/exported
+// image, so the picture can never drift from the documented steps. See the Portal de Procesos
+// strategy doc, "Visual flows: generated, not drawn." Viewer's own role lane is highlighted using the
+// same effectiveUserRole() signal the rest of the board uses for role-scoped views.
+const PROCESS_LANES = [
+  {key:'assignee', label:'Team'},
+  {key:'pm', label:'PM'},
+  {key:'csm', label:'CSM'},
+  {key:'pmo', label:'PMO / COS'},
+];
+const BILLING_PROCESS_STEPS = [
+  {id:1, role:'assignee', title:'Time registration', desc:'Friday morning. Each team member logs their weekly hours in the time tracking system.', day:'Fri', time_of_day:'Morning', icon:'database'},
+  {id:2, role:'pm', title:'Initial review by PM', desc:'Friday afternoon. The PM checks entries for their contracts for completeness and correctness.', day:'Fri', time_of_day:'Afternoon', icon:'document'},
+  {id:3, role:'pm', title:'Time entry adjustment (if needed)', desc:'If there are discrepancies, the PM requests corrections and the team re-submits — the claim cycle.', returns_to:1, node_type:'decision'},
+  {id:4, role:'csm', title:'CSM weekly review', desc:'Monday morning. The CSM reviews the weekly contract time records for consistency with client expectations.', day:'Mon', time_of_day:'Morning', icon:'document'},
+  {id:5, role:'csm', title:'CSM feedback loop (if needed)', desc:'Additional issues trigger the claim process again for clarification.', returns_to:1, node_type:'decision'},
+  {id:6, role:'pmo', title:'Final time register review (PMO / Chief of Staff)', desc:'Tuesday morning. Final check of all approved timesheets.', day:'Tue', time_of_day:'Morning', icon:'document'},
+  {id:7, role:'pmo', title:'Invoice issuance', desc:'Once every validation is complete, the invoice is generated and sent to the client.', icon:'database'},
+];
+// Full day names for the diagram's day/time annotations (day_of_week itself stays the 3-letter
+// key so it keeps matching PROCESS_WEEK_SOURCES / the weekly cadence calendar below).
+const FULL_DAY_LABEL = {Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday'};
+// Weekly cadence calendar — Monday-to-Sunday view of where each process's fixed-day steps land.
+// Answers "on Monday, X happens" across the whole portal, not just inside one process's own diagram.
+// Steps with no fixed day (conditional loops, "once validation is complete") are left out on purpose —
+// forcing every step onto a day would make the calendar lie about processes that don't run on a schedule.
+const PROCESS_WEEK_SOURCES = [
+  {processId: 'billing', processName: 'Billing Process', steps: BILLING_PROCESS_STEPS},
+];
+const WEEK_DAYS = [
+  {key: 'Mon', label: 'Mon'}, {key: 'Tue', label: 'Tue'}, {key: 'Wed', label: 'Wed'},
+  {key: 'Thu', label: 'Thu'}, {key: 'Fri', label: 'Fri'}, {key: 'Sat', label: 'Sat'}, {key: 'Sun', label: 'Sun'},
+];
+function renderProcessWeekCalendar(){
+  const grid = document.getElementById('processWeekCalendarGrid');
+  if(!grid) return;
+  const todayKey = WEEK_DAYS[(new Date().getDay() + 6) % 7].key; // getDay(): 0=Sun -> map to Mon-first index
+  const byDay = Object.fromEntries(WEEK_DAYS.map(d => [d.key, []]));
+  PROCESS_WEEK_SOURCES.forEach(source => {
+    (source.steps || []).forEach(step => {
+      if(step.day && byDay[step.day]) byDay[step.day].push({processName: source.processName, title: step.title});
+    });
+  });
+  grid.innerHTML = WEEK_DAYS.map(d => {
+    const items = byDay[d.key];
+    const body = items.length
+      ? items.map(it => `<div class="proc-week-cal-item"><b>${esc(it.processName)}</b>${esc(it.title)}</div>`).join('')
+      : `<div class="proc-week-cal-empty">—</div>`;
+    return `<div class="proc-week-cal-day ${d.key === todayKey ? 'today' : ''}">
+      <div class="proc-week-cal-day-label">${d.label}</div>
+      ${body}
+    </div>`;
+  }).join('');
+}
+function processLaneKeyForRole(role){
+  if(['pmo','admin'].includes(role)) return 'pmo';
+  if(['pm','csm','assignee'].includes(role)) return role;
+  return '';
+}
+// Loads a process's steps from the new /api/processes backend (see lib/data-store.js),
+// falling back to the built-in constant (e.g. BILLING_PROCESS_STEPS) until the fetch
+// resolves or if it fails — so the diagram never goes blank while migrating a process
+// off its hardcoded JS array. See "Portal de Procesos: Plan de Backend", section E.
+const PROCESS_API_STATE = {};
+function ensureProcessLoadedFromApi(id){
+  if(!PROCESS_API_STATE[id]) PROCESS_API_STATE[id] = {data: null, loading: false, failed: false};
+  const state = PROCESS_API_STATE[id];
+  if(state.data || state.loading || state.failed) return;
+  state.loading = true;
+  fetch(`/api/processes?id=${encodeURIComponent(id)}`, {credentials: 'same-origin'})
+    .then(r => r.ok ? r.json() : Promise.reject(new Error(`http ${r.status}`)))
+    .then(json => {
+      state.data = json.process;
+      state.loading = false;
+      updateRoleSensitiveUi();
+    })
+    .catch(err => {
+      state.loading = false;
+      state.failed = true;
+      console.warn(`Processes API unavailable for "${id}", using built-in steps:`, err.message);
+    });
+}
+function processStepsFor(id, fallbackSteps){
+  const state = PROCESS_API_STATE[id];
+  return (state && state.data && state.data.steps && state.data.steps.length) ? state.data.steps : fallbackSteps;
+}
+// Wraps a step/decision title onto up to 2 short lines for the SVG node text (SVG <text>
+// has no native wrapping). Truncates with an ellipsis if a third line would be needed.
+function pdWrapLines(text, maxChars){
+  const words = String(text || '').split(/\s+/).filter(Boolean);
+  const lines = [];
+  let cur = '';
+  words.forEach(w => {
+    const next = cur ? cur + ' ' + w : w;
+    if(next.length > maxChars && cur){ lines.push(cur); cur = w; }
+    else cur = next;
+  });
+  if(cur) lines.push(cur);
+  if(lines.length > 2){
+    const second = lines[1].length > maxChars - 1 ? lines[1].slice(0, maxChars - 1) : lines[1];
+    return [lines[0], second + '…'];
+  }
+  return lines;
+}
+// Small document / database glyphs drawn in a task node's top-right corner — the "system
+// of record" markers from the Billing_Process.pdf reference (a document icon on review
+// steps, a cylinder/database icon on steps that write to a system).
+function pdIconMarkup(icon, cornerX, cornerY){
+  if(icon === 'document'){
+    return `<g transform="translate(${cornerX - 15},${cornerY + 3})">
+      <rect x="0" y="0" width="11" height="14" rx="1.5" fill="var(--surf)" stroke="var(--muted)" stroke-width="1"/>
+      <line x1="2.5" y1="4" x2="8.5" y2="4" stroke="var(--muted)" stroke-width="1"/>
+      <line x1="2.5" y1="7" x2="8.5" y2="7" stroke="var(--muted)" stroke-width="1"/>
+      <line x1="2.5" y1="10" x2="6.5" y2="10" stroke="var(--muted)" stroke-width="1"/>
+    </g>`;
+  }
+  if(icon === 'database'){
+    return `<g transform="translate(${cornerX - 17},${cornerY + 3})">
+      <path d="M0,3 C0,1.3 3.1,0 7,0 C10.9,0 14,1.3 14,3 L14,11 C14,12.7 10.9,14 7,14 C3.1,14 0,12.7 0,11 Z" fill="var(--surf)" stroke="var(--muted)" stroke-width="1"/>
+      <path d="M0,3 C0,4.7 3.1,6 7,6 C10.9,6 14,4.7 14,3" fill="none" stroke="var(--muted)" stroke-width="1"/>
+    </g>`;
+  }
+  return '';
+}
+// Generated as a BPMN-style swimlane diagram: rounded-rect task boxes, diamond decision
+// points (with a "Sí" label on the forward edge and an unlabeled dashed loop-back, same
+// as the "Ok?" cycles in Billing_Process.pdf), start/end circles, small document/database
+// icons on the steps that call for them, and day/time-of-day badges above timed steps —
+// following the swimlane conventions from the process-mapping design research (see
+// "Portal de Procesos: reglas de diseño" notes) rather than the earlier numbered-circle
+// sketch. Still driven entirely by structured step data, so it can never drift from what's
+// documented.
+function renderProcessDiagram(containerId, steps, lanes = PROCESS_LANES){
+  const el = document.getElementById(containerId);
+  if(!el || !steps.length) return;
+  const activeLaneKey = processLaneKeyForRole(effectiveUserRole());
+
+  const labelW = 118, laneH = 100, laneGap = 10, marginTop = 40;
+  const nodeW = 122, nodeH = 46, stepGapX = 166;
+  const laneY = {};
+  lanes.forEach((l,i) => { laneY[l.key] = marginTop + i * (laneH + laneGap) + laneH / 2; });
+  const H = marginTop + lanes.length * (laneH + laneGap) + 18;
+  const roleY = (node) => (node && laneY[node.role] != null) ? laneY[node.role] : laneY[lanes[0].key];
+
+  // Flow = an implicit Start before the first step and an implicit End after the last one,
+  // unless the author already placed an explicit start/end step via "Node type".
+  const hasStart = steps[0] && steps[0].node_type === 'start';
+  const hasEnd = steps[steps.length - 1] && steps[steps.length - 1].node_type === 'end';
+  const flow = [
+    ...(hasStart ? [] : [{__virtual: 'start', role: steps[0].role}]),
+    ...steps,
+    ...(hasEnd ? [] : [{__virtual: 'end', role: steps[steps.length - 1].role}]),
+  ];
+  const offset = hasStart ? 0 : 1; // shift from a real step's index in `steps` to its index in `flow`
+  const plotW = Math.max(flow.length - 1, 1) * stepGapX;
+  const W = labelW + 70 + plotW + 40;
+  const nodeX = flow.map((_, i) => labelW + 70 + i * stepGapX);
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" class="proc-diagram-svg" role="img" aria-label="Process flow diagram">`;
+  svg += `<defs>
+    <marker id="pdArrow-${containerId}" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--blue-lt)"/></marker>
+    <marker id="pdArrowLoop-${containerId}" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#F97316"/></marker>
+  </defs>`;
+
+  lanes.forEach(l => {
+    const y = laneY[l.key] - laneH / 2;
+    const active = l.key === activeLaneKey;
+    svg += `<rect x="0" y="${y}" width="${W}" height="${laneH}" fill="${active ? 'rgba(0,102,255,.09)' : 'transparent'}" stroke="var(--brd)" stroke-width="1"/>`;
+    svg += `<text x="10" y="${laneY[l.key] + 4}" font-size="12" font-weight="700" fill="${active ? 'var(--blue-lt)' : 'var(--muted)'}">${esc(l.label)}${active ? ' (you)' : ''}</text>`;
+  });
+
+  // Day / time-of-day badges above the relevant column — "Friday Morning", "Monday Morning" etc.
+  steps.forEach((s, i) => {
+    if(!s.day) return;
+    const label = [FULL_DAY_LABEL[s.day] || s.day, s.time_of_day || ''].filter(Boolean).join(' ');
+    const x = nodeX[i + offset];
+    const bx = x - label.length * 2.6 - 12;
+    svg += `<g>
+      <circle cx="${bx}" cy="14" r="6" fill="none" stroke="var(--muted)" stroke-width="1"/>
+      <path d="M${bx},10.5 L${bx},14 L${bx + 3},14" fill="none" stroke="var(--muted)" stroke-width="1"/>
+      <text x="${bx + 10}" y="18" font-size="10" fill="var(--muted)">${esc(label)}</text>
+    </g>`;
+  });
+
+  // Main flow connectors — elbowed between lane rows, "Sí" labeling the edge leaving a decision.
+  for(let i = 0; i < flow.length - 1; i++){
+    const a = flow[i], b = flow[i + 1];
+    const x1 = nodeX[i], y1 = roleY(a), x2 = nodeX[i + 1], y2 = roleY(b);
+    const midx = (x1 + x2) / 2;
+    svg += `<path d="M${x1},${y1} L${midx},${y1} L${midx},${y2} L${x2},${y2}" fill="none" stroke="var(--blue-lt)" stroke-width="2" marker-end="url(#pdArrow-${containerId})" opacity=".55"/>`;
+    if(a.node_type === 'decision') svg += `<text x="${midx + 6}" y="${y1 - 6}" font-size="10" font-weight="700" fill="var(--blue-lt)">Sí</text>`;
+  }
+
+  // Loop-back / rework edges (e.g. the "claim" cycle) — dashed orange arcs under the lanes,
+  // left unlabeled to match the reference diagram.
+  steps.forEach((s, i) => {
+    if(!s.returns_to) return;
+    const targetIdx = steps.findIndex(t => t.id === s.returns_to);
+    if(targetIdx < 0) return;
+    const flowI = i + offset, flowT = targetIdx + offset;
+    const x1 = nodeX[flowI], y1 = roleY(flow[flowI]) + laneH / 2 - 10;
+    const x2 = nodeX[flowT], y2 = roleY(flow[flowT]) + laneH / 2 - 10;
+    const arcY = H - 12;
+    svg += `<path d="M${x1},${y1} C${x1},${arcY} ${x2},${arcY} ${x2},${y2}" fill="none" stroke="#F97316" stroke-width="1.6" stroke-dasharray="5,4" marker-end="url(#pdArrowLoop-${containerId})"/>`;
+  });
+
+  // Nodes: start/end circles, diamond decisions, rounded-rect tasks (with an optional icon).
+  flow.forEach((node, i) => {
+    const x = nodeX[i], y = roleY(node);
+    if(node.__virtual || node.node_type === 'start' || node.node_type === 'end'){
+      const isEnd = node.__virtual === 'end' || node.node_type === 'end';
+      svg += `<g class="proc-step-node">
+        <circle cx="${x}" cy="${y}" r="16" fill="${isEnd ? 'var(--surf)' : 'rgba(34,197,94,.12)'}" stroke="${isEnd ? '#F97316' : '#22C55E'}" stroke-width="2.5"/>
+        ${isEnd ? `<circle cx="${x}" cy="${y}" r="11" fill="none" stroke="#F97316" stroke-width="1.4"/>` : ''}
+        <text x="${x}" y="${y + 28}" font-size="10" font-weight="700" text-anchor="middle" fill="var(--muted)">${isEnd ? 'End' : 'Start'}</text>
+      </g>`;
+      return;
+    }
+    const clickable = !node.__virtual;
+    const onclick = clickable ? ` onclick='toggleProcessStepDetail(${jsArg(containerId)}, ${node.id})' style="cursor:pointer"` : '';
+    if(node.node_type === 'decision'){
+      const hw = 42, hh = 30;
+      const lines = pdWrapLines(node.title, 13);
+      svg += `<g class="proc-step-node"${onclick}>
+        <polygon points="${x},${y - hh} ${x + hw},${y} ${x},${y + hh} ${x - hw},${y}" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        ${lines.map((line, li) => `<text x="${x}" y="${y + 4 + (li - (lines.length - 1) / 2) * 12}" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+      return;
+    }
+    const lines = pdWrapLines(node.title, 15);
+    if(node.node_type === 'document'){
+      const cut = 13;
+      svg += `<g class="proc-step-node"${onclick}>
+        <path d="M${x-nodeW/2},${y-nodeH/2} L${x+nodeW/2-cut},${y-nodeH/2} L${x+nodeW/2},${y-nodeH/2+cut} L${x+nodeW/2},${y+nodeH/2} L${x-nodeW/2},${y+nodeH/2} Z" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        <polyline points="${x+nodeW/2-cut},${y-nodeH/2} ${x+nodeW/2-cut},${y-nodeH/2+cut} ${x+nodeW/2},${y-nodeH/2+cut}" fill="none" stroke="var(--blue-lt)" stroke-width="1.5"/>
+        ${lines.map((line, li) => `<text x="${x}" y="${y+4+(li-(lines.length-1)/2)*12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    } else if(node.node_type === 'parallelogram'){
+      const sk = 12;
+      svg += `<g class="proc-step-node"${onclick}>
+        <polygon points="${x-nodeW/2+sk},${y-nodeH/2} ${x+nodeW/2},${y-nodeH/2} ${x+nodeW/2-sk},${y+nodeH/2} ${x-nodeW/2},${y+nodeH/2}" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        ${lines.map((line, li) => `<text x="${x}" y="${y+4+(li-(lines.length-1)/2)*12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    } else if(node.node_type === 'delay'){
+      const r2 = nodeH/2;
+      svg += `<g class="proc-step-node"${onclick}>
+        <path d="M${x-nodeW/2},${y-nodeH/2} L${x+nodeW/2-r2},${y-nodeH/2} A${r2},${r2} 0 0 1 ${x+nodeW/2-r2},${y+nodeH/2} L${x-nodeW/2},${y+nodeH/2} Z" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        ${lines.map((line, li) => `<text x="${x-r2/4}" y="${y+4+(li-(lines.length-1)/2)*12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    } else if(node.node_type === 'preparation'){
+      const hm = 20;
+      svg += `<g class="proc-step-node"${onclick}>
+        <polygon points="${x-nodeW/2+hm},${y-nodeH/2} ${x+nodeW/2-hm},${y-nodeH/2} ${x+nodeW/2},${y} ${x+nodeW/2-hm},${y+nodeH/2} ${x-nodeW/2+hm},${y+nodeH/2} ${x-nodeW/2},${y}" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        ${lines.map((line, li) => `<text x="${x}" y="${y+4+(li-(lines.length-1)/2)*12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    } else if(node.node_type === 'connector'){
+      svg += `<g class="proc-step-node"${onclick}>
+        <circle cx="${x}" cy="${y}" r="22" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        <circle cx="${x}" cy="${y}" r="15" fill="none" stroke="var(--blue-lt)" stroke-width="1.5"/>
+        ${lines.map((line, li) => `<text x="${x}" y="${y+4+(li-(lines.length-1)/2)*11}" font-size="9" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    } else if(node.node_type === 'manual'){
+      const sl = 10;
+      svg += `<g class="proc-step-node"${onclick}>
+        <polygon points="${x-nodeW/2},${y-nodeH/2+sl} ${x+nodeW/2},${y-nodeH/2} ${x+nodeW/2},${y+nodeH/2} ${x-nodeW/2},${y+nodeH/2}" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        ${lines.map((line, li) => `<text x="${x}" y="${y+5+(li-(lines.length-1)/2)*12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    } else {
+      svg += `<g class="proc-step-node"${onclick}>
+        <rect x="${x - nodeW / 2}" y="${y - nodeH / 2}" width="${nodeW}" height="${nodeH}" rx="9" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        ${pdIconMarkup(node.icon, x + nodeW / 2, y - nodeH / 2)}
+        ${lines.map((line, li) => `<text x="${x}" y="${y + 4 + (li - (lines.length - 1) / 2) * 12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    }
+  });
+  svg += `</svg>`;
+
+  el.innerHTML = svg + `<div class="proc-diagram-detail" id="${containerId}Detail"></div>`;
+  el.dataset.steps = JSON.stringify(steps);
+}
+function toggleProcessStepDetail(containerId, stepId){
+  const el = document.getElementById(containerId);
+  const detailEl = document.getElementById(containerId + 'Detail');
+  if(!el || !detailEl) return;
+  const steps = JSON.parse(el.dataset.steps || '[]');
+  const step = steps.find(s => s.id === stepId);
+  if(detailEl.dataset.active === String(stepId)){
+    detailEl.innerHTML = '';
+    detailEl.dataset.active = '';
+    return;
+  }
+  detailEl.dataset.active = String(stepId);
+  detailEl.innerHTML = step
+    ? `<div class="proc-step-detail-card"><b>${step.id}. ${esc(step.title)}</b><p>${esc(step.desc)}</p></div>`
+    : '';
+}
+window.toggleProcessStepDetail = toggleProcessStepDetail;
+
 function updateRoleSensitiveUi(){
   const canSync = canRunRefresh();
   document.querySelectorAll('[data-sync-action]').forEach(btn => {
@@ -3364,6 +3876,16 @@ function updateRoleSensitiveUi(){
   if(pmoQuick) pmoQuick.style.display = canSeePmoGroup() ? '' : 'none';
   document.body.classList.toggle('role-preview-active', Boolean(requestedPreviewRole() && canPreviewRole()));
   renderImpersonationBanner();
+  if(document.getElementById('processList')) applyProcessFilters();
+  if(document.getElementById('billingProcessDiagram')){
+    ensureProcessLoadedFromApi('billing');
+    renderProcessDiagram('billingProcessDiagram', processStepsFor('billing', BILLING_PROCESS_STEPS));
+  }
+  const procToolbar = document.getElementById('procToolbar');
+  if(procToolbar) procToolbar.style.display = canManageProcesses() ? '' : 'none';
+  if(document.getElementById('processManagerGroup')) loadProcessManagerList();
+  if(document.getElementById('processHealthStrip')) renderProcessHealthStrip();
+  if(document.getElementById('processWeekCalendarGrid')) renderProcessWeekCalendar();
 }
 
 function userInitials(user){
@@ -9430,7 +9952,72 @@ function filteredForecastByMonth(){
       .filter(([, rows]) => rows.length)
   );
 }
+function forecastHorizonMonths(n){
+  const out = [];
+  const now = new Date();
+  for(let i=0;i<n;i++){
+    const d = new Date(now.getFullYear(), now.getMonth()+i, 1);
+    out.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  return out;
+}
+function monthKeyFromDateStr(s){
+  if(!s) return '';
+  const d = new Date(s);
+  if(Number.isNaN(d.getTime())) return '';
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+// Demand vs. Capacity — org-wide 6-month view (Celoxis-inspired; see Portal de Procesos strategy doc).
+// FTE approximation: 1.0 FTE per assignment / won search (positions are treated as full-time roles);
+// bench capacity is weighted by each person's current availability %.
+function computeDemandCapacity(){
+  const months = forecastHorizonMonths(6);
+  const benchFTE = (latest.bench_list || []).reduce((sum, p) => {
+    const av = rowAvailability(p);
+    return sum + (av === null ? 0 : av / 100);
+  }, 0);
+  const forecastRows = Object.values(latest.forecast || {}).flat().filter(Boolean);
+  const wonSearches = ((latest.new_searches_triage || {}).rows || [])
+    .filter(r => /won/i.test(r.status || ''));
+  return months.map(month => {
+    const freed = forecastRows.filter(r => monthKeyFromDateStr(r.due) === month).length;
+    const stillActive = forecastRows.filter(r => {
+      const rk = monthKeyFromDateStr(r.due);
+      return rk && rk >= month;
+    }).length;
+    const startingSearches = wonSearches.filter(r => monthKeyFromDateStr(r.start_date || r.potential_start_date) === month).length;
+    const capacidad = benchFTE + freed;
+    const demanda = stillActive + startingSearches;
+    return {month, capacidad, demanda, delta: capacidad - demanda, freed, stillActive, startingSearches, benchFTE};
+  });
+}
+function renderForecastCapacity(){
+  const wrap = document.getElementById('forecastCapacityChart');
+  if(!wrap) return;
+  const data = computeDemandCapacity();
+  const maxVal = Math.max(1, ...data.flatMap(d => [d.capacidad, d.demanda]));
+  const MAX_H = 110;
+  wrap.innerHTML = data.map(d => {
+    const capH = Math.max(4, (d.capacidad / maxVal) * MAX_H);
+    const demH = Math.max(4, (d.demanda / maxVal) * MAX_H);
+    const mDate = new Date(d.month + '-01T00:00:00');
+    const label = mDate.toLocaleDateString('en-US',{month:'short',year:'2-digit'});
+    const deltaCls = d.delta < -0.05 ? 'urgent' : d.delta > 0.05 ? 'ok' : '';
+    const deltaLabel = `${d.delta > 0 ? '+' : ''}${d.delta.toFixed(1)}`;
+    const capTitle = `Capacity: ${d.capacidad.toFixed(1)} FTE\nBench today: ${d.benchFTE.toFixed(1)} FTE\nFreed in ${label}: ${d.freed} assignment(s)`;
+    const demTitle = `Demand: ${d.demanda.toFixed(1)} FTE\nActive assignments still running: ${d.stillActive}\nWon searches starting: ${d.startingSearches}`;
+    return `<div class="fc-cap-col">
+      <div class="fc-cap-delta ${deltaCls}">${deltaLabel} FTE</div>
+      <div class="fc-cap-bars" style="height:${MAX_H}px">
+        <div class="fc-cap-bar fc-cap-bar-capacity" style="height:${capH}px" title="${esc(capTitle)}"></div>
+        <div class="fc-cap-bar fc-cap-bar-demand" style="height:${demH}px" title="${esc(demTitle)}"></div>
+      </div>
+      <div class="fc-month">${label}</div>
+    </div>`;
+  }).join('');
+}
 function renderForecast(){
+  renderForecastCapacity();
   const fcAll   = latest.forecast || {};
   const source  = latest.forecast_source || 'Jira In Progress due dates';
   const sourceTag = document.getElementById('forecastSourceTag');
@@ -9536,10 +10123,818 @@ async function bootDashboard(){
     updateAuthUi();
   }
 }
+let processSearch = '';
+let processCategory = 'all';
+function applyProcessFilters(){
+  const q = processSearch.trim().toLowerCase();
+  const list = document.getElementById('processList');
+  if(!list) return;
+  let anyVisible = false;
+  list.querySelectorAll('.proc-group').forEach(group => {
+    let groupVisible = false;
+    group.querySelectorAll('.qa-check').forEach(card => {
+      const cat = card.getAttribute('data-cat') || '';
+      const text = (card.getAttribute('data-search') || '') + ' ' + (card.querySelector('summary')?.textContent || '').toLowerCase();
+      const rolesAttr = card.getAttribute('data-roles');
+      const roleOk = !rolesAttr || canSeePmoGroup() || rolesAttr.split(' ').includes(effectiveUserRole());
+      const matchesCat = processCategory === 'all' || processCategory === cat;
+      const matchesQuery = !q || text.toLowerCase().includes(q);
+      const show = roleOk && matchesCat && matchesQuery;
+      card.style.display = show ? '' : 'none';
+      if(show) groupVisible = true;
+    });
+    group.style.display = groupVisible ? '' : 'none';
+    if(groupVisible) anyVisible = true;
+  });
+  const empty = document.getElementById('processEmptyState');
+  if(empty) empty.style.display = anyVisible ? 'none' : 'block';
+}
+function setProcessSearch(value){
+  processSearch = String(value || '');
+  applyProcessFilters();
+}
+
+
+// ===== Processes: manage (create/edit/delete) — Portal de Procesos Fase 2 =====
+// Lets a PMO/admin user create and edit processes directly from the board instead of
+// depending on Notion content that doesn't exist yet (the Notion pages are still empty).
+// Read access matches api/processes.js: any signed-in user sees the list; only PMO/admin
+// (canManageProcesses) get the Nuevo/Editar/Eliminar controls. Billing keeps its own
+// hand-authored card above (renderProcessDiagram); every other process loaded this way
+// renders generically here from /api/processes.
+function canManageProcesses(){
+  return Boolean(effectiveSessionUser()) && ['admin','pmo'].includes(effectiveUserRole());
+}
+
+const PROCESS_MANAGER_STATE = { list: [], loaded: false, loading: false };
+
+const PROCESS_CATEGORY_LABEL = {
+  billing: 'Billing', delivery: 'Delivery / Ops', assignment: 'Assignment',
+  account: 'Account management', sales: 'Sales', hr: 'HR / Recruiting',
+  pm: 'Project management', reporting: 'Reporting', other: 'Other'
+};
+function processCategoryLabel(cat){ return PROCESS_CATEGORY_LABEL[cat] || 'Other'; }
+
+function loadProcessManagerList(force){
+  if(!effectiveSessionUser()) return;
+  if(PROCESS_MANAGER_STATE.loading) return;
+  if(PROCESS_MANAGER_STATE.loaded && !force) return;
+  PROCESS_MANAGER_STATE.loading = true;
+  fetch('/api/processes', {credentials:'same-origin', cache:'no-store'})
+    .then(r => r.ok ? r.json() : Promise.reject(new Error(`http ${r.status}`)))
+    .then(json => (json.processes || []).filter(p => p.id !== 'billing'))
+    .then(list => Promise.all(list.map(p =>
+      fetch(`/api/processes?id=${encodeURIComponent(p.id)}`, {credentials:'same-origin', cache:'no-store'})
+        .then(r => r.ok ? r.json() : {process: p})
+        .then(j => j.process || p)
+        .catch(() => p)
+    )))
+    .then(detailed => {
+      PROCESS_MANAGER_STATE.list = detailed;
+      PROCESS_MANAGER_STATE.loaded = true;
+      PROCESS_MANAGER_STATE.loading = false;
+      renderProcessManagerList();
+    })
+    .catch(err => {
+      PROCESS_MANAGER_STATE.loading = false;
+      console.warn('Could not load processes list:', err.message);
+    });
+}
+
+function renderProcessManagerCard(p){
+  const steps = p.steps || [];
+  const stepsHtml = steps.length
+    ? '<ol style="margin:0 0 .9rem;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">' +
+      steps.map(s => `<li><b>${esc(s.title || '')}</b>${s.role ? ` <span style="color:var(--muted);font-weight:400">(${esc(s.role)}${s.day ? ', ' + esc(s.day) : ''})</span>` : ''}${s.desc ? ' — ' + esc(s.desc) : ''}</li>`).join('') +
+      '</ol>'
+    : '<p style="margin:0 0 .9rem;font-size:.8rem;color:var(--muted);font-style:italic">No steps loaded yet.</p>';
+  const validationsHtml = (p.validations || []).length
+    ? '<div class="mc-sub" style="margin-bottom:.4rem">Validations</div><ul style="margin:0 0 .9rem;padding-left:1.15rem;font-size:.8rem;color:var(--txt);display:flex;flex-direction:column;gap:.3rem">' +
+      (p.validations || []).map(v => `<li>${esc(v)}</li>`).join('') + '</ul>'
+    : '';
+  const resourcesHtml = (p.resources || []).length
+    ? '<div style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.78rem;color:var(--muted);margin-bottom:.7rem">Resources: ' +
+      (p.resources || []).map(r => r.url
+        ? `<a href="${esc(r.url)}" target="_blank" rel="noopener" style="color:var(--blue-lt)">${esc(r.label)} ↗</a>`
+        : `<span>${esc(r.label)}</span>`
+      ).join(' · ') + '</div>'
+    : '';
+  const searchText = [p.name, p.category, p.owner_role, p.corresponsable_role, p.objective].filter(Boolean).join(' ').toLowerCase();
+  const manageActions = canManageProcesses()
+    ? `<button class="btn btn-ghost btn-sm" type="button" onclick="openProcessForm(${jsArg(p.id)})"><i class="ti ti-pencil"></i> Editar</button>
+       <button class="btn btn-ghost btn-sm" type="button" onclick="confirmDeleteProcess(${jsArg(p.id)},${jsArg(p.name)})"><i class="ti ti-trash"></i> Eliminar</button>`
+    : '';
+  return `<div class="proc-group" data-group=${jsArg(p.id)}>
+    <details class="qa-check" data-cat="${esc(p.category || 'other')}" data-roles="assignee pm csm pmo admin executive" data-search="${esc(searchText)}">
+      <summary><span>${esc(p.name)} <span class="chip badge-green" style="margin-left:8px">Documented</span></span><span class="qa-status ok">v${esc(p.version || '1.00')}</span></summary>
+      <div class="qa-check-body">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.9rem">
+          <span class="badge badge-blue">${esc(processCategoryLabel(p.category))}</span>
+          ${p.owner_role ? `<span class="badge badge-blue">Owner: ${esc(p.owner_role)}</span>` : ''}
+          ${p.corresponsable_role ? `<span class="badge badge-blue">Co: ${esc(p.corresponsable_role)}</span>` : ''}
+        </div>
+        ${p.objective ? `<p style="margin:0 0 .7rem;font-size:.82rem;color:var(--txt);line-height:1.5">${esc(p.objective)}</p>` : ''}
+        ${p.scope ? `<p style="margin:0 0 .9rem;font-size:.82rem;color:var(--muted);line-height:1.5"><b style="color:var(--txt)">Scope:</b> ${esc(p.scope)}</p>` : ''}
+        ${steps.length ? `<div class="proc-diagram" id="procDiagram-${esc(p.id)}"></div>` : ''}
+        <div class="mc-sub" style="margin-bottom:.5rem">Process steps</div>
+        ${stepsHtml}
+        ${validationsHtml}
+        ${resourcesHtml}
+        <div class="proc-manager-actions">
+          <span style="font-size:.72rem;color:var(--muted);flex:1">Last reviewed: ${p.last_reviewed ? esc(p.last_reviewed) : '—'} · reviews every ${esc(String(p.review_cadence_months ?? 6))} mo</span>
+          ${manageActions}
+        </div>
+      </div>
+    </details>
+  </div>`;
+}
+
+function renderProcessManagerList(){
+  const host = document.getElementById('processManagerGroup');
+  if(!host) return;
+  if(!PROCESS_MANAGER_STATE.list.length){
+    host.innerHTML = canManageProcesses()
+      ? '<div style="font-size:.78rem;color:var(--muted);padding:.6rem .2rem 1rem">No processes loaded yet — use "Nuevo proceso" above to add the rest of the 13.</div>'
+      : '';
+    applyProcessFilters();
+    return;
+  }
+  host.innerHTML = PROCESS_MANAGER_STATE.list.map(renderProcessManagerCard).join('');
+  PROCESS_MANAGER_STATE.list.forEach(p => {
+    if((p.steps || []).length) renderProcessDiagram(`procDiagram-${p.id}`, p.steps);
+  });
+  applyProcessFilters();
+}
+
+async function confirmDeleteProcess(id, name){
+  if(!canManageProcesses()) return;
+  if(!confirm(`Delete "${name}"? This removes its steps, validations and resources too.`)) return;
+  try{
+    const response = await fetch(`/api/processes?id=${encodeURIComponent(id)}`, {method: 'DELETE', credentials: 'same-origin'});
+    if(!response.ok){
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.error || `http ${response.status}`);
+    }
+    loadProcessManagerList(true);
+  }catch(error){
+    alert('Could not delete the process: ' + error.message);
+  }
+}
+window.confirmDeleteProcess = confirmDeleteProcess;
+
+// --- Nuevo/Editar proceso form ---
+const PF_NODE_TYPES = [
+  {value:'task',         label:'Task',        svg:'<rect x="1" y="3" width="34" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.5"/>'},
+  {value:'decision',     label:'Decision',    svg:'<polygon points="18,1 35,11 18,21 1,11" fill="none" stroke="currentColor" stroke-width="1.5"/>'},
+  {value:'start',        label:'Start',       svg:'<circle cx="18" cy="11" r="9" fill="rgba(34,197,94,.2)" stroke="#22C55E" stroke-width="2"/>'},
+  {value:'end',          label:'End',         svg:'<circle cx="18" cy="11" r="9" fill="none" stroke="#F97316" stroke-width="2"/><circle cx="18" cy="11" r="5.5" fill="none" stroke="#F97316" stroke-width="1.5"/>'},
+  {value:'document',     label:'Document',    svg:'<path d="M1,3 L27,3 L35,11 L35,19 L1,19 Z" fill="none" stroke="currentColor" stroke-width="1.5"/><polyline points="27,3 27,11 35,11" fill="none" stroke="currentColor" stroke-width="1.2"/>'},
+  {value:'parallelogram',label:'Data I/O',    svg:'<polygon points="6,19 10,3 35,3 31,19" fill="none" stroke="currentColor" stroke-width="1.5"/>'},
+  {value:'delay',        label:'Wait',        svg:'<path d="M1,3 L24,3 Q35,11 24,19 L1,19 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>'},
+  {value:'preparation',  label:'Prep',        svg:'<polygon points="18,2 32,6 32,16 18,20 4,16 4,6" fill="none" stroke="currentColor" stroke-width="1.5"/>'},
+  {value:'connector',    label:'Connector',   svg:'<circle cx="18" cy="11" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="11" r="4" fill="currentColor"/>'},
+  {value:'manual',       label:'Manual',      svg:'<polygon points="1,19 1,8 9,3 35,3 35,19" fill="none" stroke="currentColor" stroke-width="1.5"/>'},
+];
+function pfStepRowHtml(step){
+  const s=step||{};
+  const nt=s.node_type||'task';
+  const types=[{v:'task',l:'Tarea'},{v:'decision',l:'Decisión'},{v:'document',l:'Documento'}];
+  return `<div class="pf-step-compact">
+    <span class="pf-step-num">?</span>
+    <input type="text" class="pf-step-title" value="${esc(s.title||'')}" placeholder="Acción…">
+    <select class="pf-step-role" data-init="${esc(s.role||'')}">
+      <option value="">— rol —</option>${s.role?`<option value="${esc(s.role)}" selected>${esc(s.role)}</option>`:''}
+    </select>
+    <label class="pf-step-docs-lbl" title="¿Requiere documentación?">
+      <input type="checkbox" class="pf-step-has-docs"${s.has_docs?' checked':''}> Doc
+    </label>
+    <div class="pf-step-type-mini">
+      ${types.map(t=>`<button type="button" class="pf-nt-mini-btn${nt===t.v?' active':''}" data-nt="${t.v}" onclick="pfMiniSetNt(this)">${t.l}</button>`).join('')}
+    </div>
+    <input type="hidden" class="pf-step-nodetype" value="${esc(nt)}">
+    <div class="pf-row-actions">
+      <button type="button" class="pf-icon-btn" title="Subir" onclick="pfMoveRow(this,-1)"><i class="ti ti-chevron-up"></i></button>
+      <button type="button" class="pf-icon-btn" title="Bajar" onclick="pfMoveRow(this,1)"><i class="ti ti-chevron-down"></i></button>
+      <button type="button" class="pf-icon-btn" title="Eliminar" onclick="this.closest('.pf-step-compact').remove();pfRenumberSteps();pfRefreshDiagramPreview()"><i class="ti ti-trash"></i></button>
+    </div>
+    <div class="pf-step-auto-row"${s.has_auto?' style=\"display:flex\"':''}>
+      <input type="url" class="pf-step-auto-url" value="${esc(s.automation_url||'')}" placeholder="https://… link a la automatización">
+    </div>
+  </div>`;
+}
+function pfMiniSetNt(btn){
+  const row=btn.closest('.pf-step-compact');if(!row)return;
+  row.querySelectorAll('.pf-nt-mini-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const hid=row.querySelector('.pf-step-nodetype');if(hid)hid.value=btn.dataset.nt;
+  pfRefreshDiagramPreview();
+}
+window.pfMiniSetNt=pfMiniSetNt;
+function pfToggleAutoRow(chk){
+  const row=chk.closest('.pf-step-compact');if(!row)return;
+  const sub=row.querySelector('.pf-step-auto-row');if(!sub)return;
+  sub.style.display=chk.checked?'flex':'none';
+  if(!chk.checked){const u=sub.querySelector('.pf-step-auto-url');if(u)u.value='';}
+}
+window.pfToggleAutoRow=pfToggleAutoRow;
+function addProcessStepRow(step){
+  const list=document.getElementById('pfStepsList');
+  list.insertAdjacentHTML('beforeend',pfStepRowHtml(step));
+  const newRow=list.lastElementChild;
+  if(newRow) newRow.querySelectorAll('.pf-step-role').forEach(sel=>pfPopulateRoleSelect(sel));
+  pfRenumberSteps();
+  pfRefreshDiagramPreview();
+}
+function pfRenumberSteps(){
+  document.querySelectorAll('#pfStepsList .pf-step-compact').forEach((row,i)=>{
+    const n=row.querySelector('.pf-step-num');if(n)n.textContent=i+1;
+  });
+}
+window.pfRenumberSteps=pfRenumberSteps;
+function pfMoveRow(btn, dir){
+  const row=btn.closest('.pf-row-card')||btn.closest('.pf-inline-row')||btn.closest('.pf-step-compact');
+  if(!row) return;
+  const sibling=dir<0?row.previousElementSibling:row.nextElementSibling;
+  if(!sibling) return;
+  if(dir<0) row.parentElement.insertBefore(row,sibling);
+  else row.parentElement.insertBefore(sibling,row);
+  pfRenumberSteps();
+  pfRefreshDiagramPreview();
+}
+window.addProcessStepRow = addProcessStepRow;
+window.pfMoveRow = pfMoveRow;
+
+function pfSetNodeType(btn){
+  const card = btn.closest('.pf-row-card');
+  if(!card) return;
+  card.querySelectorAll('.pf-nt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const hidden = card.querySelector('.pf-step-nodetype');
+  if(hidden) hidden.value = btn.dataset.nt;
+  pfRefreshDiagramPreview();
+}
+window.pfSetNodeType = pfSetNodeType;
+
+let _pfPreviewTimer = null;
+
+// ── VISUAL CANVAS EDITOR ─────────────────────────────────────────────────────
+const PF_CANVAS = { nodes: [], edges: [], nextId: 1, sel: null, drag: null, conn: null, svg: null };
+
+function pfCanvasPt(e){ const r=PF_CANVAS.svg.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; }
+
+function pfNodeBBox(n){
+  if(n.type==='start'||n.type==='end'||n.type==='connector') return {x:n.x-24,y:n.y-24,w:48,h:48};
+  if(n.type==='decision') return {x:n.x-52,y:n.y-28,w:104,h:56};
+  return {x:n.x-62,y:n.y-26,w:124,h:52};
+}
+
+function pfPortPos(n,port){
+  if(!n) return {x:0,y:0};
+  const b=pfNodeBBox(n),cx=b.x+b.w/2,cy=b.y+b.h/2;
+  return port==='n'?{x:cx,y:b.y}:port==='s'?{x:cx,y:b.y+b.h}:port==='e'?{x:b.x+b.w,y:cy}:{x:b.x,y:cy};
+}
+
+function pfEdgePath(x1,y1,x2,y2){ const dx=Math.abs(x2-x1)*.5; return `M${x1},${y1} C${x1+dx},${y1} ${x2-dx},${y2} ${x2},${y2}`; }
+
+function pfNodeShapeSVG(n){
+  const b=pfNodeBBox(n),cx=b.x+b.w/2,cy=b.y+b.h/2;
+  const sel=PF_CANVAS.sel===n.id,stroke=sel?'var(--blue)':'var(--brd)',sw=sel?2.5:1.5;
+  let sh='';
+  if(n.type==='start')  sh=`<circle cx="${cx}" cy="${cy}" r="23" fill="rgba(34,197,94,.15)" stroke="#22C55E" stroke-width="${sw}"/>`;
+  else if(n.type==='end') sh=`<circle cx="${cx}" cy="${cy}" r="23" fill="rgba(249,115,22,.1)" stroke="#F97316" stroke-width="${sw}"/><circle cx="${cx}" cy="${cy}" r="14" fill="none" stroke="#F97316" stroke-width="1.5"/>`;
+  else if(n.type==='connector') sh=`<circle cx="${cx}" cy="${cy}" r="23" fill="var(--surf)" stroke="${stroke}" stroke-width="${sw}"/><circle cx="${cx}" cy="${cy}" r="9" fill="${stroke}"/>`;
+  else if(n.type==='decision') sh=`<polygon points="${cx},${b.y} ${b.x+b.w},${cy} ${cx},${b.y+b.h} ${b.x},${cy}" fill="var(--surf)" stroke="${stroke}" stroke-width="${sw}"/>`;
+  else if(n.type==='parallelogram') sh=`<polygon points="${b.x+10},${b.y+b.h} ${b.x+18},${b.y} ${b.x+b.w},${b.y} ${b.x+b.w-8},${b.y+b.h}" fill="var(--surf)" stroke="${stroke}" stroke-width="${sw}"/>`;
+  else sh=`<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="7" fill="var(--surf)" stroke="${stroke}" stroke-width="${sw}"/>`;
+  const lbl=esc(n.label||n.type),role=esc(n.role||'');
+  const ports=['n','s','e','w'].map(p=>{const pp=pfPortPos(n,p);return `<circle data-port="${p}" cx="${pp.x}" cy="${pp.y}" r="6" fill="var(--blue)" stroke="#fff" stroke-width="1.5" class="pf-port"/>`;}).join('');
+  return `<g data-nid="${n.id}" style="cursor:move">${sh}`+
+    `<text x="${cx}" y="${cy+4}" font-size="11" text-anchor="middle" fill="var(--txt)" pointer-events="none" font-weight="600">${lbl}</text>`+
+    (role?`<text x="${cx}" y="${b.y+b.h+13}" font-size="9" text-anchor="middle" fill="var(--muted)" pointer-events="none">${role}</text>`:'')+
+    `${ports}</g>`;
+}
+
+function pfCanvasRender(){
+  const svg=PF_CANVAS.svg; if(!svg) return;
+  const eg=document.getElementById('pfEdges'),ng=document.getElementById('pfNodes');
+  if(!eg||!ng) return;
+  eg.innerHTML=PF_CANVAS.edges.map(e=>{
+    const fn=PF_CANVAS.nodes.find(n=>n.id===e.from),tn=PF_CANVAS.nodes.find(n=>n.id===e.to);
+    if(!fn||!tn) return '';
+    const fp=pfPortPos(fn,e.fp||'s'),tp=pfPortPos(tn,e.tp||'n');
+    return `<path d="${pfEdgePath(fp.x,fp.y,tp.x,tp.y)}" stroke="var(--blue)" stroke-width="1.5" fill="none" marker-end="url(#pfc-arrow)" data-eid="${e.id}" style="cursor:pointer"/>`;
+  }).join('');
+  ng.innerHTML=PF_CANVAS.nodes.map(pfNodeShapeSVG).join('');
+}
+
+function pfCanvasMouseDown(e){
+  const portEl=e.target.closest('[data-port]'),nodeEl=e.target.closest('[data-nid]'),pt=pfCanvasPt(e);
+  if(portEl&&nodeEl){
+    e.preventDefault();
+    PF_CANVAS.conn={fromId:+nodeEl.dataset.nid,fp:portEl.dataset.port};
+    const pp=pfPortPos(PF_CANVAS.nodes.find(n=>n.id===PF_CANVAS.conn.fromId),PF_CANVAS.conn.fp);
+    const line=document.getElementById('pfConnLine');
+    line.setAttribute('d',pfEdgePath(pp.x,pp.y,pt.x,pt.y)); line.style.display='block';
+    return;
+  }
+  if(nodeEl){
+    e.preventDefault();
+    const nid=+nodeEl.dataset.nid;
+    PF_CANVAS.sel=nid;
+    const nd=PF_CANVAS.nodes.find(n=>n.id===nid);
+    PF_CANVAS.drag={id:nid,ox:pt.x-nd.x,oy:pt.y-nd.y};
+    pfCanvasRender();
+    const rs=document.getElementById('pfCanvasNodeRole');
+    if(rs) rs.value=nd.role||'';
+    return;
+  }
+  PF_CANVAS.sel=null; pfCanvasRender();
+}
+
+function pfCanvasMouseMove(e){
+  const pt=pfCanvasPt(e);
+  if(PF_CANVAS.drag){
+    const nd=PF_CANVAS.nodes.find(n=>n.id===PF_CANVAS.drag.id);
+    if(nd){nd.x=Math.round(pt.x-PF_CANVAS.drag.ox);nd.y=Math.round(pt.y-PF_CANVAS.drag.oy);pfCanvasRender();}
+    return;
+  }
+  if(PF_CANVAS.conn){
+    const pp=pfPortPos(PF_CANVAS.nodes.find(n=>n.id===PF_CANVAS.conn.fromId),PF_CANVAS.conn.fp);
+    document.getElementById('pfConnLine').setAttribute('d',pfEdgePath(pp.x,pp.y,pt.x,pt.y));
+  }
+}
+
+function pfCanvasMouseUp(e){
+  if(PF_CANVAS.conn){
+    const portEl=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-port]');
+    const nodeEl=portEl?.closest('[data-nid]');
+    if(nodeEl&&+nodeEl.dataset.nid!==PF_CANVAS.conn.fromId){
+      PF_CANVAS.edges.push({id:PF_CANVAS.nextId++,from:PF_CANVAS.conn.fromId,fp:PF_CANVAS.conn.fp,to:+nodeEl.dataset.nid,tp:portEl.dataset.port});
+      pfCanvasRender();
+    }
+    document.getElementById('pfConnLine').style.display='none';
+    PF_CANVAS.conn=null;
+  }
+  PF_CANVAS.drag=null;
+}
+
+function pfCanvasDblClick(e){
+  const nodeEl=e.target.closest('[data-nid]'); if(!nodeEl) return;
+  const nd=PF_CANVAS.nodes.find(n=>n.id===+nodeEl.dataset.nid); if(!nd) return;
+  const v=prompt('Label:',nd.label||''); if(v!==null){nd.label=v;pfCanvasRender();}
+}
+
+function pfCanvasKeyDown(e){
+  const tag=document.activeElement?.tagName||'';
+  if((e.key==='Delete'||e.key==='Backspace')&&tag!=='INPUT'&&tag!=='TEXTAREA'&&tag!=='SELECT'&&PF_CANVAS.sel){
+    PF_CANVAS.nodes=PF_CANVAS.nodes.filter(n=>n.id!==PF_CANVAS.sel);
+    PF_CANVAS.edges=PF_CANVAS.edges.filter(ed=>ed.from!==PF_CANVAS.sel&&ed.to!==PF_CANVAS.sel);
+    PF_CANVAS.sel=null; pfCanvasRender();
+  }
+}
+
+function pfCanvasPaletteAdd(type){
+  const nt=PF_NODE_TYPES.find(n=>n.value===type)||{label:type};
+  const n=PF_CANVAS.nodes.length,col=n%4,row=Math.floor(n/4);
+  const x=100+col*155+(row%2)*40,y=80+row*110;
+  PF_CANVAS.nodes.push({id:PF_CANVAS.nextId++,type,x,y,label:nt.label,role:''});
+  pfCanvasRender();
+}
+
+function pfCanvasClear(){
+  if(!PF_CANVAS.nodes.length||confirm('Borrar todo el canvas?')){
+    PF_CANVAS.nodes=[];PF_CANVAS.edges=[];PF_CANVAS.sel=null;pfCanvasRender();
+  }
+}
+
+function pfSerializeCanvas(){
+  const start=PF_CANVAS.nodes.find(n=>n.type==='start');
+  const visited=new Set(),ordered=[];
+  const queue=start?[start.id]:PF_CANVAS.nodes.slice().sort((a,b)=>a.x-b.x).map(n=>n.id);
+  while(queue.length){
+    const nid=queue.shift(); if(visited.has(nid)) continue;
+    visited.add(nid);
+    const nd=PF_CANVAS.nodes.find(n=>n.id===nid); if(nd) ordered.push(nd);
+    PF_CANVAS.edges.filter(e=>e.from===nid).forEach(e=>queue.push(e.to));
+  }
+  PF_CANVAS.nodes.forEach(n=>{if(!visited.has(n.id)) ordered.push(n);});
+  return ordered.map(n=>({node_type:n.type,role:n.role||'',title:n.label||n.type,desc:''}));
+}
+
+function pfInitCanvas(){
+  const svg=document.getElementById('pfCanvas'); if(!svg) return;
+  if(PF_CANVAS.svg===svg){ pfCanvasRender(); return; }
+  PF_CANVAS.svg=svg;
+  svg.innerHTML='<defs><marker id="pfc-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="var(--blue)"/></marker></defs><g id="pfEdges"></g><g id="pfNodes"></g><path id="pfConnLine" style="pointer-events:none;display:none" stroke="var(--blue)" stroke-width="1.5" stroke-dasharray="5,3" fill="none" marker-end="url(#pfc-arrow)"/>';
+  svg.addEventListener('mousedown',pfCanvasMouseDown);
+  svg.addEventListener('mousemove',pfCanvasMouseMove);
+  svg.addEventListener('mouseup',pfCanvasMouseUp);
+  svg.addEventListener('mouseleave',pfCanvasMouseUp);
+  svg.addEventListener('dblclick',pfCanvasDblClick);
+  document.addEventListener('keydown',pfCanvasKeyDown);
+  const rs=document.getElementById('pfCanvasNodeRole');
+  if(rs) rs.addEventListener('change',()=>{
+    if(PF_CANVAS.sel){const nd=PF_CANVAS.nodes.find(n=>n.id===PF_CANVAS.sel);if(nd){nd.role=rs.value;pfCanvasRender();}}
+  });
+  pfCanvasRender();
+}
+
+function pfInitCanvasPalette(){
+  const pal=document.getElementById('pfCanvasPalette'); if(!pal||pal.children.length) return;
+  pal.innerHTML=PF_NODE_TYPES.map(nt=>`<button type="button" class="pf-pal-btn" onclick="pfCanvasPaletteAdd('${nt.value}')" title="${nt.label}"><svg viewBox="0 0 36 22" width="30" height="18" aria-hidden="true">${nt.svg}</svg><span>${nt.label}</span></button>`).join('');
+  const rs=document.getElementById('pfCanvasNodeRole');
+  if(rs&&PF_ROLES_PEOPLE.length) rs.innerHTML='<option value="">Rol del nodo seleccionado</option>'+PF_ROLES_PEOPLE.map(r=>`<option value="${esc(r.role_name)}">${esc(r.role_name)}</option>`).join('');
+}
+
+function pfGenerateFromCanvas(){
+  const steps=pfSerializeCanvas();
+  if(!steps.length){alert('Dibujá al menos un nodo antes de generar.');return;}
+  // Populate name from first non-start/end node label (if field is empty)
+  const pfNameEl=document.getElementById('pfName');
+  if(!pfNameEl.value){
+    const firstTask=PF_CANVAS.nodes.find(n=>n.type!=='start'&&n.type!=='end'&&n.label);
+    if(firstTask) pfNameEl.value=firstTask.label;
+  }
+  // Populate steps
+  document.getElementById('pfStepsList').innerHTML='';
+  steps.forEach(s=>addProcessStepRow(s));
+  pfRefreshDiagramPreview();
+  setTimeout(()=>document.getElementById('pfStepsList').scrollIntoView({behavior:'smooth',block:'start'}),200);
+}
+
+window.pfCanvasPaletteAdd=pfCanvasPaletteAdd;
+window.pfCanvasClear=pfCanvasClear;
+window.pfInitCanvas=pfInitCanvas;
+window.pfInitCanvasPalette=pfInitCanvasPalette;
+window.pfSerializeCanvas=pfSerializeCanvas;
+window.pfGenerateFromCanvas=pfGenerateFromCanvas;
+
+function pfRefreshDiagramPreview(){
+  clearTimeout(_pfPreviewTimer);
+  _pfPreviewTimer=setTimeout(pfRenderSwimlanes,320);
+}
+window.pfRefreshDiagramPreview=pfRefreshDiagramPreview;
+function pfRenderSwimlanes(){
+  const container=document.getElementById('pfSwimlane');if(!container)return;
+  const steps=pfCollectSteps();
+  if(!steps.length){
+    container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.84rem;text-align:center;padding:2rem">Agregá pasos para ver<br>el diagrama de swimlanes</div>';
+    return;
+  }
+  const seen=new Set(),lanes=[];
+  steps.forEach(s=>{const r=(s.role||'').trim()||'Sin rol';if(!seen.has(r)){seen.add(r);lanes.push({key:r,label:r});}});
+  const mapped=steps.map(s=>({...s,role:(s.role||'').trim()||'Sin rol'}));
+  renderProcessDiagram('pfSwimlane',mapped,lanes);
+}
+window.pfRenderSwimlanes=pfRenderSwimlanes;
+
+function pfValidationRowHtml(text){
+  return `<div class="pf-inline-row"><input type="text" class="pf-validation-text" value="${esc(text || '')}" placeholder="e.g. All hours match the approved timesheet"><button type="button" class="pf-icon-btn" onclick="this.closest('.pf-inline-row').remove()"><i class="ti ti-trash"></i></button></div>`;
+}
+function addProcessValidationRow(text){
+  document.getElementById('pfValidationsList').insertAdjacentHTML('beforeend', pfValidationRowHtml(text));
+}
+window.addProcessValidationRow = addProcessValidationRow;
+
+function pfResourceRowHtml(res){
+  const r = res || {};
+  return `<div class="pf-inline-row">
+    <input type="text" class="pf-resource-label" value="${esc(r.label || '')}" placeholder="Label" style="flex:1">
+    <input type="text" class="pf-resource-url" value="${esc(r.url || '')}" placeholder="https://..." style="flex:2">
+    <input type="text" class="pf-resource-kind" value="${esc(r.kind || 'resource')}" placeholder="kind" style="max-width:110px;flex:none">
+    <button type="button" class="pf-icon-btn" onclick="this.closest('.pf-inline-row').remove()"><i class="ti ti-trash"></i></button>
+  </div>`;
+}
+function addProcessResourceRow(res){
+  document.getElementById('pfResourcesList').insertAdjacentHTML('beforeend', pfResourceRowHtml(res));
+}
+window.addProcessResourceRow = addProcessResourceRow;
+
+function showProcessFormError(message){
+  const el = document.getElementById('pfError');
+  if(!el) return;
+  el.textContent = message || '';
+  el.style.display = message ? 'block' : 'none';
+}
+
+// Owner / co-responsible suggestions come from the company roles catalog (Admin → Roles,
+// fed by the Jira Position field). Still free text, so a role not in the catalog can be typed.
+let PF_COMPANY_ROLES_LOADED = false;
+let PF_ROLES_PEOPLE = [];
+function loadProcessCompanyRoles(){
+  if(PF_COMPANY_ROLES_LOADED) return;
+  PF_COMPANY_ROLES_LOADED = true;
+  fetch('/api/admin?action=roles-with-people', {credentials:'same-origin', cache:'no-store'})
+    .then(r => r.ok ? r.json() : {roles: []})
+    .then(json => {
+      PF_ROLES_PEOPLE = json.roles || [];
+      // Populate datalist for Owner / Co-responsible free-text fields
+      const list = document.getElementById('pfCompanyRoles');
+      if(list) list.innerHTML = PF_ROLES_PEOPLE.map(r => `<option value="${esc(r.role_name)}"></option>`).join('');
+      // Rebuild all role selects currently in the form
+      document.querySelectorAll('.pf-step-role').forEach(sel => pfPopulateRoleSelect(sel));
+    })
+    .catch(() => { PF_COMPANY_ROLES_LOADED = false; });
+}
+function pfPopulateRoleSelect(sel){
+  const current = sel.value || sel.dataset.init || '';
+  sel.innerHTML = '<option value="">— role —</option>' +
+    PF_ROLES_PEOPLE.map(r => `<option value="${esc(r.role_name)}"${r.role_name === current ? ' selected' : ''}>${esc(r.role_name)}</option>`).join('');
+  pfUpdateRoleAvatar(sel);
+}
+function pfUpdateRoleAvatar(sel){
+  const wrap = sel.closest ? sel.closest('.pf-role-wrap') : null;
+  if(!wrap) return;
+  const chip = wrap.querySelector('.pf-role-avatar');
+  if(!chip) return;
+  const val = sel.value;
+  if(!val){ chip.style.display = 'none'; return; }
+  const found = PF_ROLES_PEOPLE.find(r => r.role_name === val);
+  const person = found && found.person;
+  if(!person){ chip.style.display = 'none'; return; }
+  const parts = (person.name || '').split(' ');
+  const initials = parts.slice(0,2).map(w => (w[0] || '').toUpperCase()).join('');
+  chip.style.display = 'flex';
+  chip.innerHTML = `<div class="pf-av-circle">${initials}</div><span class="pf-av-name">${esc(person.name)}</span>`;
+}
+function openProcessForm(id){
+  if(!canManageProcesses()){ showAuthModal('login'); return; }
+  loadProcessCompanyRoles();
+  const modal = document.getElementById('processFormModal');
+  if(!modal) return;
+  document.getElementById('processFormTitle').textContent = id ? 'Editar proceso' : 'Nuevo proceso';
+  showProcessFormError('');
+  document.getElementById('pfId').value = '';
+  document.getElementById('pfId').disabled = false;
+  document.getElementById('pfName').value = '';
+  document.getElementById('pfCategory').value = 'other';
+  document.getElementById('pfOwnerRole').value = '';
+  document.getElementById('pfCorresponsableRole').value = '';
+  document.getElementById('pfObjective').value = '';
+  document.getElementById('pfScope').value = '';
+  document.getElementById('pfLastReviewed').value = '';
+  document.getElementById('pfVersion').value = '1.00';
+  document.getElementById('pfStepsList').innerHTML = '';
+  document.getElementById('pfValidationsList').innerHTML = '';
+  document.getElementById('pfResourcesList').innerHTML = '';
+
+  const openModal = () => {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    // Delegate input changes inside the steps list to the live preview
+    const stepsList = document.getElementById('pfStepsList');
+    if(stepsList && !stepsList.dataset.pfPreviewWired){
+      stepsList.dataset.pfPreviewWired = '1';
+      stepsList.addEventListener('input', () => pfRefreshDiagramPreview());
+      stepsList.addEventListener('change', () => pfRefreshDiagramPreview());
+    }
+    setTimeout(pfRefreshDiagramPreview, 80);
+    pfRenderSwimlanes();
+  };
+  const populate = (process) => {
+    if(process){
+      document.getElementById('pfId').value = process.id || '';
+      document.getElementById('pfId').disabled = true;
+      document.getElementById('pfName').value = process.name || '';
+      document.getElementById('pfCategory').value = process.category || 'other';
+      document.getElementById('pfOwnerRole').value = process.owner_role || '';
+      document.getElementById('pfCorresponsableRole').value = process.corresponsable_role || '';
+      document.getElementById('pfObjective').value = process.objective || '';
+      document.getElementById('pfScope').value = process.scope || '';
+      document.getElementById('pfLastReviewed').value = process.last_reviewed || '';
+      document.getElementById('pfVersion').value = process.version || '1.00';
+      (process.steps || []).forEach(s => addProcessStepRow(s));
+      (process.validations || []).forEach(v => addProcessValidationRow(v));
+      (process.resources || []).forEach(r => addProcessResourceRow(r));
+    }
+    if(!document.getElementById('pfStepsList').children.length) addProcessStepRow();
+    openModal();
+  };
+
+  if(id){
+    fetch(`/api/processes?id=${encodeURIComponent(id)}`, {credentials:'same-origin', cache:'no-store'})
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`http ${r.status}`)))
+      .then(json => populate(json.process))
+      .catch(err => {
+        populate(null);
+        showProcessFormError('Could not load that process: ' + err.message);
+      });
+  }else{
+    populate(null);
+  }
+}
+function closeProcessForm(){
+  const modal = document.getElementById('processFormModal');
+  if(!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+window.openProcessForm = openProcessForm;
+window.closeProcessForm = closeProcessForm;
+
+function pfCollectSteps(){
+  return Array.from(document.querySelectorAll('#pfStepsList .pf-step-compact')).map((row,i)=>{
+    const val=sel=>(row.querySelector(sel)?.value||'').trim();
+    return {
+      id:i+1,
+      role:val('.pf-step-role'),
+      title:val('.pf-step-title'),
+      desc:'',
+      node_type:val('.pf-step-nodetype')||'task',
+      has_docs:!!(row.querySelector('.pf-step-has-docs')?.checked),
+      inputs:null,outputs:null,required_info:null,system_tool:null,
+      sla:null,jira_ref:null,related_doc_url:null,returns_to:null,
+      day:null,automation_tool:null,automation_url:val('.pf-step-auto-url')||null,has_auto:!!(row.querySelector('.pf-step-has-auto')?.checked),time_of_day:null,icon:null
+    };
+  }).filter(s=>s.title);
+}
+function pfCollectValidations(){
+  return Array.from(document.querySelectorAll('#pfValidationsList .pf-validation-text'))
+    .map(input => input.value.trim())
+    .filter(Boolean);
+}
+function pfCollectResources(){
+  return Array.from(document.querySelectorAll('#pfResourcesList .pf-inline-row')).map(row => ({
+    label: (row.querySelector('.pf-resource-label')?.value || '').trim(),
+    url: (row.querySelector('.pf-resource-url')?.value || '').trim() || null,
+    kind: (row.querySelector('.pf-resource-kind')?.value || '').trim() || 'resource'
+  })).filter(r => r.label);
+}
+
+async function saveProcessForm(){
+  showProcessFormError('');
+  const id = document.getElementById('pfId').value.trim();
+  const name = document.getElementById('pfName').value.trim();
+  if(!id || !/^[a-z0-9-]+$/.test(id)){
+    showProcessFormError('The ID must use only lowercase letters, numbers and hyphens (e.g. new-project-process).');
+    return;
+  }
+  if(!name){
+    showProcessFormError('Name is required.');
+    return;
+  }
+  const payload = {
+    id,
+    name,
+    category: document.getElementById('pfCategory').value,
+    owner_role: document.getElementById('pfOwnerRole').value.trim() || null,
+    corresponsable_role: document.getElementById('pfCorresponsableRole').value.trim() || null,
+    objective: document.getElementById('pfObjective').value.trim() || null,
+    scope: document.getElementById('pfScope').value.trim() || null,
+    last_reviewed: document.getElementById('pfLastReviewed').value || null,
+    version: document.getElementById('pfVersion').value.trim() || '1.00'
+  };
+  const steps = pfCollectSteps();
+  const validations = pfCollectValidations();
+  const resources = pfCollectResources();
+
+  const saveBtn = document.getElementById('pfSaveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving…';
+  try{
+    const jsonOrThrow = async (response) => {
+      if(!response.ok){
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || `http ${response.status}`);
+      }
+      return response.json();
+    };
+    await jsonOrThrow(await fetch('/api/processes', {
+      method: 'POST', credentials: 'same-origin',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    }));
+    await jsonOrThrow(await fetch(`/api/processes?id=${encodeURIComponent(id)}&action=steps`, {
+      method: 'POST', credentials: 'same-origin',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({steps})
+    }));
+    await jsonOrThrow(await fetch(`/api/processes?id=${encodeURIComponent(id)}&action=validations`, {
+      method: 'POST', credentials: 'same-origin',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({validations})
+    }));
+    await jsonOrThrow(await fetch(`/api/processes?id=${encodeURIComponent(id)}&action=resources`, {
+      method: 'POST', credentials: 'same-origin',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({resources})
+    }));
+
+    closeProcessForm();
+    loadProcessManagerList(true);
+  }catch(error){
+    showProcessFormError('Could not save the process: ' + error.message);
+  }finally{
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save process';
+  }
+}
+window.saveProcessForm = saveProcessForm;
+
+
 window.loginFromGate = loginFromGate;
 window.startGoogleSignIn = startGoogleSignIn;
 bootDashboard();
 </script>
+
+<!-- New/Edit process modal -->
+<div class="auth-modal process-modal" id="processFormModal" aria-hidden="true">
+  <div class="auth-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-shrink:0">
+      <h3 style="margin:0" id="processFormTitle">Nuevo proceso</h3>
+      <button class="btn btn-ghost btn-sm" type="button" onclick="closeProcessForm()">✕</button>
+    </div>
+
+    <div class="pf-split">
+      <!-- izquierda: swimlane auto-generado -->
+      <div class="pf-split-left" id="pfCanvasSection">
+        <div class="pf-swimlane-container" id="pfSwimlane">
+          <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.84rem;text-align:center;padding:2rem">Agregá pasos para ver<br>el diagrama de swimlanes</div>
+        </div>
+      </div>
+
+      <!-- derecha: datos escritos -->
+      <div class="pf-split-right">
+        <div class="pf-section" style="padding-top:0;border-top:none;margin-top:0">
+          <div class="pf-section-head"><h4>Basics</h4></div>
+          <div class="pf-grid">
+            <div class="auth-field">
+              <label for="pfId">ID (slug)</label>
+              <input type="text" id="pfId" placeholder="new-project-process">
+            </div>
+            <div class="auth-field">
+              <label for="pfVersion">Version</label>
+              <input type="text" id="pfVersion" value="1.00">
+            </div>
+            <div class="auth-field pf-field-full">
+              <label for="pfName">Name</label>
+              <input type="text" id="pfName" placeholder="New Project Process">
+            </div>
+            <div class="auth-field">
+              <label for="pfCategory">Category</label>
+              <select id="pfCategory">
+                <option value="billing">Billing</option>
+                <option value="delivery">Delivery / Ops</option>
+                <option value="assignment">Assignment</option>
+                <option value="account">Account management</option>
+                <option value="sales">Sales</option>
+                <option value="hr">HR / Recruiting</option>
+                <option value="pm">Project management</option>
+                <option value="reporting">Reporting</option>
+                <option value="other" selected>Other</option>
+              </select>
+            </div>
+            <div class="auth-field">
+              <label for="pfOwnerRole">Owner role</label>
+              <input type="text" id="pfOwnerRole" placeholder="pmo" list="pfCompanyRoles">
+            </div>
+            <div class="auth-field">
+              <label for="pfCorresponsableRole">Co-responsible role</label>
+              <input type="text" id="pfCorresponsableRole" placeholder="pm" list="pfCompanyRoles">
+              <datalist id="pfCompanyRoles"></datalist>
+            </div>
+            <div class="auth-field">
+              <label for="pfLastReviewed">Last reviewed</label>
+              <input type="date" id="pfLastReviewed">
+            </div>
+            <div class="auth-field pf-field-full">
+              <label for="pfObjective">Objective</label>
+              <textarea id="pfObjective" rows="2" style="background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.6rem .7rem;font:inherit;resize:vertical"></textarea>
+            </div>
+            <div class="auth-field pf-field-full">
+              <label for="pfScope">Scope</label>
+              <textarea id="pfScope" rows="2" style="background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.6rem .7rem;font:inherit;resize:vertical"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="pf-section">
+          <div class="pf-section-head"><h4>Steps</h4></div>
+          <div id="pfStepsList"></div>
+          <button type="button" class="pf-add-btn" onclick="addProcessStepRow()"><i class="ti ti-plus"></i> Add step</button>
+        </div>
+
+        <div class="pf-section">
+          <div class="pf-section-head"><h4>Validations</h4></div>
+          <div id="pfValidationsList"></div>
+          <button type="button" class="pf-add-btn" onclick="addProcessValidationRow()"><i class="ti ti-plus"></i> Add validation</button>
+        </div>
+
+        <div class="pf-section">
+          <div class="pf-section-head"><h4>Resources</h4></div>
+          <div id="pfResourcesList"></div>
+          <button type="button" class="pf-add-btn" onclick="addProcessResourceRow()"><i class="ti ti-plus"></i> Add resource</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pf-error" id="pfError" style="flex-shrink:0"></div>
+    <div class="auth-actions" style="flex-shrink:0;margin-top:.7rem">
+      <button class="btn btn-ghost btn-sm" type="button" onclick="closeProcessForm()">Cancel</button>
+      <button class="btn btn-primary btn-sm" type="button" id="pfSaveBtn" onclick="saveProcessForm()">Save process</button>
+    </div>
+  </div>
+</div>
 
 <!-- Assign from bench modal -->
 <div class="auth-modal" id="assignBenchModal" aria-hidden="true">
