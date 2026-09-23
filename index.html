@@ -10536,33 +10536,20 @@ function pfInitCanvasPalette(){
   if(rs&&PF_ROLES_PEOPLE.length) rs.innerHTML='<option value="">Rol del nodo seleccionado</option>'+PF_ROLES_PEOPLE.map(r=>`<option value="${esc(r.role_name)}">${esc(r.role_name)}</option>`).join('');
 }
 
-async function pfGenerateFromCanvas(){
+function pfGenerateFromCanvas(){
   const steps=pfSerializeCanvas();
-  if(!steps.length){alert('Dibuja al menos un nodo antes de generar.');return;}
-  const btn=document.getElementById('pfGenerateBtn');
-  if(btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader"></i> Generando...';}
-  try{
-    const res=await fetch('/api/admin?action=generate-process',{
-      method:'POST',credentials:'same-origin',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({nodes:PF_CANVAS.nodes,edges:PF_CANVAS.edges,steps})
-    });
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json=await res.json();
-    if(json.error) throw new Error(json.error);
-    const pfName=document.getElementById('pfName');
-    if(json.name&&!pfName.value) pfName.value=json.name;
-    if(json.objective) document.getElementById('pfObjective').value=json.objective;
-    if(json.scope) document.getElementById('pfScope').value=json.scope;
-    document.getElementById('pfStepsList').innerHTML='';
-    (json.steps||steps).forEach(s=>addProcessStepRow(s));
-    pfRefreshDiagramPreview();
-    setTimeout(()=>document.getElementById('pfStepsList').scrollIntoView({behavior:'smooth',block:'start'}),200);
-  }catch(err){
-    document.getElementById('pfError').textContent='Error al generar: '+err.message;
-  }finally{
-    if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-sparkles"></i> Generar proceso';}
+  if(!steps.length){alert('Dibujá al menos un nodo antes de generar.');return;}
+  // Populate name from first non-start/end node label (if field is empty)
+  const pfNameEl=document.getElementById('pfName');
+  if(!pfNameEl.value){
+    const firstTask=PF_CANVAS.nodes.find(n=>n.type!=='start'&&n.type!=='end'&&n.label);
+    if(firstTask) pfNameEl.value=firstTask.label;
   }
+  // Populate steps
+  document.getElementById('pfStepsList').innerHTML='';
+  steps.forEach(s=>addProcessStepRow(s));
+  pfRefreshDiagramPreview();
+  setTimeout(()=>document.getElementById('pfStepsList').scrollIntoView({behavior:'smooth',block:'start'}),200);
 }
 
 window.pfCanvasPaletteAdd=pfCanvasPaletteAdd;
@@ -10920,7 +10907,7 @@ bootDashboard();
           <select id="pfCanvasNodeRole" style="font-size:.75rem;padding:3px 6px;border:1px solid var(--brd);border-radius:6px;background:var(--surf);color:var(--txt);max-width:160px"><option value="">Rol del nodo seleccionado</option></select>
           <button class="btn btn-ghost btn-sm" type="button" onclick="pfCanvasClear()" style="font-size:.72rem">🗑 Clear</button>
           <div style="flex:1"></div>
-          <button class="btn btn-primary btn-sm" type="button" onclick="pfGenerateFromCanvas()" id="pfGenerateBtn"><i class="ti ti-sparkles"></i> Generar proceso</button>
+          <button class="btn btn-primary btn-sm" type="button" onclick="pfGenerateFromCanvas()" id="pfGenerateBtn"><i class="ti ti-arrow-right"></i> Volcar al form</button>
         </div>
       </div>
     </div>
