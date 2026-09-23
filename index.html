@@ -273,6 +273,11 @@ body.light .qa-recurring,body.light .qa-checklist-item{background:#FFFFFF}
 .pf-add-btn:hover{border-color:var(--blue-lt);background:rgba(0,102,255,.06)}
 .pf-inline-row{display:flex;gap:8px;align-items:center;margin-bottom:.5rem}
 .pf-inline-row input{flex:1;background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:8px;padding:.55rem .7rem;font:inherit}
+.pf-nodetype-picker{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.pf-nt-btn{background:var(--surf);border:1px solid var(--brd);color:var(--muted);border-radius:8px;padding:5px 7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.62rem;font-weight:700;min-width:50px;transition:border-color .12s,color .12s,background .12s}
+.pf-nt-btn:hover{border-color:var(--blue-lt);color:var(--txt)}
+.pf-nt-btn.active{border-color:var(--blue-lt);background:rgba(0,102,255,.1);color:var(--blue-lt)}
+.pf-diagram-preview{overflow-x:auto;background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:.6rem;min-height:90px;margin-top:.4rem}
 .pf-error{display:none;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.1);color:#FCA5A5;border-radius:10px;padding:.6rem .75rem;font-size:.78rem;margin-top:.8rem}
 .lineage-item{background:var(--surf);border:1px solid var(--brd);border-radius:12px;padding:.85rem}
 .lineage-item b{display:block;margin-bottom:.25rem}.lineage-item div{color:var(--muted);font-size:.76rem;line-height:1.45}
@@ -3785,11 +3790,50 @@ function renderProcessDiagram(containerId, steps, lanes = PROCESS_LANES){
       return;
     }
     const lines = pdWrapLines(node.title, 15);
-    svg += `<g class="proc-step-node"${onclick}>
-      <rect x="${x - nodeW / 2}" y="${y - nodeH / 2}" width="${nodeW}" height="${nodeH}" rx="9" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
-      ${pdIconMarkup(node.icon, x + nodeW / 2, y - nodeH / 2)}
-      ${lines.map((line, li) => `<text x="${x}" y="${y + 4 + (li - (lines.length - 1) / 2) * 12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
-    </g>`;
+    if(node.node_type === 'document'){
+      const cut = 13;
+      svg += `<g class="proc-step-node"${onclick}>
+        <path d="M${x-nodeW/2},${y-nodeH/2} L${x+nodeW/2-cut},${y-nodeH/2} L${x+nodeW/2},${y-nodeH/2+cut} L${x+nodeW/2},${y+nodeH/2} L${x-nodeW/2},${y+nodeH/2} Z" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        <polyline points="${x+nodeW/2-cut},${y-nodeH/2} ${x+nodeW/2-cut},${y-nodeH/2+cut} ${x+nodeW/2},${y-nodeH/2+cut}" fill="none" stroke="var(--blue-lt)" stroke-width="1.5"/>
+        ${lines.map((line, li) => `<text x="${x}" y="${y+4+(li-(lines.length-1)/2)*12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    } else if(node.node_type === 'parallelogram'){
+      const sk = 12;
+      svg += `<g class="proc-step-node"${onclick}>
+        <polygon points="${x-nodeW/2+sk},${y-nodeH/2} ${x+nodeW/2},${y-nodeH/2} ${x+nodeW/2-sk},${y+nodeH/2} ${x-nodeW/2},${y+nodeH/2}" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        ${lines.map((line, li) => `<text x="${x}" y="${y+4+(li-(lines.length-1)/2)*12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    } else if(node.node_type === 'delay'){
+      const r2 = nodeH/2;
+      svg += `<g class="proc-step-node"${onclick}>
+        <path d="M${x-nodeW/2},${y-nodeH/2} L${x+nodeW/2-r2},${y-nodeH/2} A${r2},${r2} 0 0 1 ${x+nodeW/2-r2},${y+nodeH/2} L${x-nodeW/2},${y+nodeH/2} Z" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        ${lines.map((line, li) => `<text x="${x-r2/4}" y="${y+4+(li-(lines.length-1)/2)*12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    } else if(node.node_type === 'preparation'){
+      const hm = 20;
+      svg += `<g class="proc-step-node"${onclick}>
+        <polygon points="${x-nodeW/2+hm},${y-nodeH/2} ${x+nodeW/2-hm},${y-nodeH/2} ${x+nodeW/2},${y} ${x+nodeW/2-hm},${y+nodeH/2} ${x-nodeW/2+hm},${y+nodeH/2} ${x-nodeW/2},${y}" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        ${lines.map((line, li) => `<text x="${x}" y="${y+4+(li-(lines.length-1)/2)*12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    } else if(node.node_type === 'connector'){
+      svg += `<g class="proc-step-node"${onclick}>
+        <circle cx="${x}" cy="${y}" r="22" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        <circle cx="${x}" cy="${y}" r="15" fill="none" stroke="var(--blue-lt)" stroke-width="1.5"/>
+        ${lines.map((line, li) => `<text x="${x}" y="${y+4+(li-(lines.length-1)/2)*11}" font-size="9" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    } else if(node.node_type === 'manual'){
+      const sl = 10;
+      svg += `<g class="proc-step-node"${onclick}>
+        <polygon points="${x-nodeW/2},${y-nodeH/2+sl} ${x+nodeW/2},${y-nodeH/2} ${x+nodeW/2},${y+nodeH/2} ${x-nodeW/2},${y+nodeH/2}" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        ${lines.map((line, li) => `<text x="${x}" y="${y+5+(li-(lines.length-1)/2)*12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    } else {
+      svg += `<g class="proc-step-node"${onclick}>
+        <rect x="${x - nodeW / 2}" y="${y - nodeH / 2}" width="${nodeW}" height="${nodeH}" rx="9" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        ${pdIconMarkup(node.icon, x + nodeW / 2, y - nodeH / 2)}
+        ${lines.map((line, li) => `<text x="${x}" y="${y + 4 + (li - (lines.length - 1) / 2) * 12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+    }
   });
   svg += `</svg>`;
 
@@ -10239,6 +10283,18 @@ async function confirmDeleteProcess(id, name){
 window.confirmDeleteProcess = confirmDeleteProcess;
 
 // --- Nuevo/Editar proceso form ---
+const PF_NODE_TYPES = [
+  {value:'task',         label:'Task',        svg:'<rect x="1" y="3" width="34" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.5"/>'},
+  {value:'decision',     label:'Decision',    svg:'<polygon points="18,1 35,11 18,21 1,11" fill="none" stroke="currentColor" stroke-width="1.5"/>'},
+  {value:'start',        label:'Start',       svg:'<circle cx="18" cy="11" r="9" fill="rgba(34,197,94,.2)" stroke="#22C55E" stroke-width="2"/>'},
+  {value:'end',          label:'End',         svg:'<circle cx="18" cy="11" r="9" fill="none" stroke="#F97316" stroke-width="2"/><circle cx="18" cy="11" r="5.5" fill="none" stroke="#F97316" stroke-width="1.5"/>'},
+  {value:'document',     label:'Document',    svg:'<path d="M1,3 L27,3 L35,11 L35,19 L1,19 Z" fill="none" stroke="currentColor" stroke-width="1.5"/><polyline points="27,3 27,11 35,11" fill="none" stroke="currentColor" stroke-width="1.2"/>'},
+  {value:'parallelogram',label:'Data I/O',    svg:'<polygon points="6,19 10,3 35,3 31,19" fill="none" stroke="currentColor" stroke-width="1.5"/>'},
+  {value:'delay',        label:'Wait',        svg:'<path d="M1,3 L24,3 Q35,11 24,19 L1,19 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>'},
+  {value:'preparation',  label:'Prep',        svg:'<polygon points="18,2 32,6 32,16 18,20 4,16 4,6" fill="none" stroke="currentColor" stroke-width="1.5"/>'},
+  {value:'connector',    label:'Connector',   svg:'<circle cx="18" cy="11" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="11" r="4" fill="currentColor"/>'},
+  {value:'manual',       label:'Manual',      svg:'<polygon points="1,19 1,8 9,3 35,3 35,19" fill="none" stroke="currentColor" stroke-width="1.5"/>'},
+];
 function pfStepRowHtml(step){
   const s = step || {};
   return `<div class="pf-row-card">
@@ -10254,14 +10310,12 @@ function pfStepRowHtml(step){
       <div class="auth-field"><label>Role</label><input type="text" class="pf-step-role" value="${esc(s.role || '')}" placeholder="pm"></div>
       <div class="auth-field"><label>Day of week</label><input type="text" class="pf-step-day" value="${esc(s.day || '')}" placeholder="Mon"></div>
       <div class="auth-field"><label>Time of day</label><input type="text" class="pf-step-timeofday" value="${esc(s.time_of_day || '')}" placeholder="Morning"></div>
-      <div class="auth-field">
-        <label>Node type (diagram shape)</label>
-        <select class="pf-step-nodetype">
-          <option value="task"${(!s.node_type || s.node_type === 'task') ? ' selected' : ''}>Task (rounded box)</option>
-          <option value="decision"${s.node_type === 'decision' ? ' selected' : ''}>Decision (diamond, e.g. "if needed")</option>
-          <option value="start"${s.node_type === 'start' ? ' selected' : ''}>Start (circle)</option>
-          <option value="end"${s.node_type === 'end' ? ' selected' : ''}>End (circle)</option>
-        </select>
+      <div class="auth-field pf-field-full">
+        <label>Shape</label>
+        <div class="pf-nodetype-picker">
+          ${PF_NODE_TYPES.map(nt => `<button type="button" class="pf-nt-btn${(s.node_type || 'task') === nt.value ? ' active' : ''}" data-nt="${nt.value}" onclick="pfSetNodeType(this)" title="${nt.label}"><svg viewBox="0 0 36 22" width="36" height="22" aria-hidden="true">${nt.svg}</svg><span>${nt.label}</span></button>`).join('')}
+        </div>
+        <input type="hidden" class="pf-step-nodetype" value="${esc(s.node_type || 'task')}">
       </div>
       <div class="auth-field">
         <label>Icon</label>
@@ -10288,6 +10342,7 @@ function pfStepRowHtml(step){
 }
 function addProcessStepRow(step){
   document.getElementById('pfStepsList').insertAdjacentHTML('beforeend', pfStepRowHtml(step));
+  pfRefreshDiagramPreview();
 }
 function pfMoveRow(btn, dir){
   const row = btn.closest('.pf-row-card') || btn.closest('.pf-inline-row');
@@ -10299,6 +10354,33 @@ function pfMoveRow(btn, dir){
 }
 window.addProcessStepRow = addProcessStepRow;
 window.pfMoveRow = pfMoveRow;
+
+function pfSetNodeType(btn){
+  const card = btn.closest('.pf-row-card');
+  if(!card) return;
+  card.querySelectorAll('.pf-nt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const hidden = card.querySelector('.pf-step-nodetype');
+  if(hidden) hidden.value = btn.dataset.nt;
+  pfRefreshDiagramPreview();
+}
+window.pfSetNodeType = pfSetNodeType;
+
+let _pfPreviewTimer = null;
+function pfRefreshDiagramPreview(){
+  clearTimeout(_pfPreviewTimer);
+  _pfPreviewTimer = setTimeout(() => {
+    const el = document.getElementById('pfDiagramPreview');
+    if(!el) return;
+    const steps = pfCollectSteps();
+    if(!steps.length){
+      el.innerHTML = '<p style="color:var(--muted);font-size:.8rem;text-align:center;padding:1.2rem 0">Agregá pasos para ver el preview del diagrama</p>';
+      return;
+    }
+    renderProcessDiagram('pfDiagramPreview', steps);
+  }, 320);
+}
+window.pfRefreshDiagramPreview = pfRefreshDiagramPreview;
 
 function pfValidationRowHtml(text){
   return `<div class="pf-inline-row"><input type="text" class="pf-validation-text" value="${esc(text || '')}" placeholder="e.g. All hours match the approved timesheet"><button type="button" class="pf-icon-btn" onclick="this.closest('.pf-inline-row').remove()"><i class="ti ti-trash"></i></button></div>`;
@@ -10368,6 +10450,14 @@ function openProcessForm(id){
   const openModal = () => {
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
+    // Delegate input changes inside the steps list to the live preview
+    const stepsList = document.getElementById('pfStepsList');
+    if(stepsList && !stepsList.dataset.pfPreviewWired){
+      stepsList.dataset.pfPreviewWired = '1';
+      stepsList.addEventListener('input', () => pfRefreshDiagramPreview());
+      stepsList.addEventListener('change', () => pfRefreshDiagramPreview());
+    }
+    setTimeout(pfRefreshDiagramPreview, 80);
   };
   const populate = (process) => {
     if(process){
@@ -10596,6 +10686,16 @@ bootDashboard();
       <div class="pf-section-head"><h4>Steps</h4></div>
       <div id="pfStepsList"></div>
       <button type="button" class="pf-add-btn" onclick="addProcessStepRow()"><i class="ti ti-plus"></i> Add step</button>
+    </div>
+
+    <div class="pf-section">
+      <div class="pf-section-head">
+        <h4>Diagrama preview</h4>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="pfRefreshDiagramPreview()" style="font-size:.7rem;padding:3px 8px">↺ Refresh</button>
+      </div>
+      <div class="pf-diagram-preview" id="pfDiagramPreview">
+        <p style="color:var(--muted);font-size:.8rem;text-align:center;padding:1.2rem 0">Agregá pasos para ver el preview del diagrama</p>
+      </div>
     </div>
 
     <div class="pf-section">
