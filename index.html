@@ -10486,8 +10486,9 @@ function pfCanvasKeyDown(e){
 
 function pfCanvasPaletteAdd(type){
   const nt=PF_NODE_TYPES.find(n=>n.value===type)||{label:type};
-  const cols=5,n=PF_CANVAS.nodes.length;
-  PF_CANVAS.nodes.push({id:PF_CANVAS.nextId++,type,x:120+(n%cols)*150,y:100+Math.floor(n/cols)*110,label:nt.label,role:''});
+  const n=PF_CANVAS.nodes.length,col=n%4,row=Math.floor(n/4);
+  const x=100+col*155+(row%2)*40,y=80+row*110;
+  PF_CANVAS.nodes.push({id:PF_CANVAS.nextId++,type,x,y,label:nt.label,role:''});
   pfCanvasRender();
 }
 
@@ -10508,12 +10509,12 @@ function pfSerializeCanvas(){
     PF_CANVAS.edges.filter(e=>e.from===nid).forEach(e=>queue.push(e.to));
   }
   PF_CANVAS.nodes.forEach(n=>{if(!visited.has(n.id)) ordered.push(n);});
-  return ordered.map(n=>({node_type:n.type,role:n.role||'',description:n.label||n.type,name:n.label||n.type}));
+  return ordered.map(n=>({node_type:n.type,role:n.role||'',title:n.label||n.type,desc:''}));
 }
 
 function pfInitCanvas(){
   const svg=document.getElementById('pfCanvas'); if(!svg) return;
-  if(PF_CANVAS.svg===svg) return;
+  if(PF_CANVAS.svg===svg){ pfCanvasRender(); return; }
   PF_CANVAS.svg=svg;
   svg.innerHTML='<defs><marker id="pfc-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="var(--blue)"/></marker></defs><g id="pfEdges"></g><g id="pfNodes"></g><path id="pfConnLine" style="pointer-events:none;display:none" stroke="var(--blue)" stroke-width="1.5" stroke-dasharray="5,3" fill="none" marker-end="url(#pfc-arrow)"/>';
   svg.addEventListener('mousedown',pfCanvasMouseDown);
