@@ -10341,7 +10341,11 @@ function pfStepRowHtml(step){
   </div>`;
 }
 function addProcessStepRow(step){
-  document.getElementById('pfStepsList').insertAdjacentHTML('beforeend', pfStepRowHtml(step));
+  const list = document.getElementById('pfStepsList');
+  list.insertAdjacentHTML('beforeend', pfStepRowHtml(step));
+  // Populate and show role avatar in the new row
+  const newRow = list.lastElementChild;
+  if(newRow) newRow.querySelectorAll('.pf-step-role').forEach(sel => pfPopulateRoleSelect(sel));
   pfRefreshDiagramPreview();
 }
 function pfMoveRow(btn, dir){
@@ -10620,6 +10624,13 @@ function loadProcessCompanyRoles(){
       if(list) list.innerHTML = PF_ROLES_PEOPLE.map(r => `<option value="${esc(r.role_name)}"></option>`).join('');
       // Rebuild all role selects currently in the form
       document.querySelectorAll('.pf-step-role').forEach(sel => pfPopulateRoleSelect(sel));
+      // Refresh canvas toolbar role select (puede estar vacío si cargó antes del fetch)
+      const cvrs = document.getElementById('pfCanvasNodeRole');
+      if(cvrs){
+        const cur = cvrs.value;
+        cvrs.innerHTML = '<option value="">Rol del nodo seleccionado</option>' +
+          PF_ROLES_PEOPLE.map(r=>`<option value="${esc(r.role_name)}"${r.role_name===cur?' selected':''}>${esc(r.role_name)}</option>`).join('');
+      }
     })
     .catch(() => { PF_COMPANY_ROLES_LOADED = false; });
 }
