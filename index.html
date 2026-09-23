@@ -277,7 +277,7 @@ body.light .qa-recurring,body.light .qa-checklist-item{background:#FFFFFF}
 .pf-nt-btn{background:var(--surf);border:1px solid var(--brd);color:var(--muted);border-radius:8px;padding:5px 7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.62rem;font-weight:700;min-width:50px;transition:border-color .12s,color .12s,background .12s}
 .pf-nt-btn:hover{border-color:var(--blue-lt);color:var(--txt)}
 .pf-nt-btn.active{border-color:var(--blue-lt);background:rgba(0,102,255,.1);color:var(--blue-lt)}
-.pf-diagram-preview{overflow-x:auto;background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:.6rem;min-height:90px;margin-top:.4rem}
+.pf-diagram-preview{overflow-x:auto;background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:.6rem;min-height:90px;margin-top:.4rem}.pf-role-wrap{display:flex;align-items:center;gap:6px}.pf-role-avatar{display:flex;align-items:center;gap:5px;padding:2px 8px 2px 3px;background:var(--card);border:1px solid var(--brd);border-radius:20px;font-size:.72rem;color:var(--txt);white-space:nowrap;min-width:0;flex-shrink:0}.pf-av-circle{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#60A5FA);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}.pf-av-name{overflow:hidden;text-overflow:ellipsis;max-width:100px}
 .pf-error{display:none;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.1);color:#FCA5A5;border-radius:10px;padding:.6rem .75rem;font-size:.78rem;margin-top:.8rem}
 .lineage-item{background:var(--surf);border:1px solid var(--brd);border-radius:12px;padding:.85rem}
 .lineage-item b{display:block;margin-bottom:.25rem}.lineage-item div{color:var(--muted);font-size:.76rem;line-height:1.45}
@@ -10307,7 +10307,7 @@ function pfStepRowHtml(step){
       </div>
     </div>
     <div class="pf-grid">
-      <div class="auth-field"><label>Role</label><input type="text" class="pf-step-role" value="${esc(s.role || '')}" placeholder="pm"></div>
+      <div class="auth-field"><label>Role</label><div class="pf-role-wrap"><select class="pf-step-role" data-init="${esc(s.role || '')}" onchange="pfUpdateRoleAvatar(this)"><option value="">\u2014 role \u2014</option>${s.role ? `<option value="${esc(s.role)}" selected>${esc(s.role)}</option>` : ''}</select><div class="pf-role-avatar" style="display:none"></div></div></div>
       <div class="auth-field"><label>Day of week</label><input type="text" class="pf-step-day" value="${esc(s.day || '')}" placeholder="Mon"></div>
       <div class="auth-field"><label>Time of day</label><input type="text" class="pf-step-timeofday" value="${esc(s.time_of_day || '')}" placeholder="Morning"></div>
       <div class="auth-field pf-field-full">
@@ -10414,16 +10414,42 @@ function showProcessFormError(message){
 // Owner / co-responsible suggestions come from the company roles catalog (Admin → Roles,
 // fed by the Jira Position field). Still free text, so a role not in the catalog can be typed.
 let PF_COMPANY_ROLES_LOADED = false;
+let PF_ROLES_PEOPLE = [];
 function loadProcessCompanyRoles(){
   if(PF_COMPANY_ROLES_LOADED) return;
   PF_COMPANY_ROLES_LOADED = true;
-  fetch('/api/admin?action=roles', {credentials:'same-origin', cache:'no-store'})
+  fetch('/api/admin?action=roles-with-people', {credentials:'same-origin', cache:'no-store'})
     .then(r => r.ok ? r.json() : {roles: []})
     .then(json => {
+      PF_ROLES_PEOPLE = json.roles || [];
+      // Populate datalist for Owner / Co-responsible free-text fields
       const list = document.getElementById('pfCompanyRoles');
-      if(list) list.innerHTML = (json.roles || []).map(r => `<option value="${esc(r.name)}"></option>`).join('');
+      if(list) list.innerHTML = PF_ROLES_PEOPLE.map(r => `<option value="${esc(r.role_name)}"></option>`).join('');
+      // Rebuild all role selects currently in the form
+      document.querySelectorAll('.pf-step-role').forEach(sel => pfPopulateRoleSelect(sel));
     })
     .catch(() => { PF_COMPANY_ROLES_LOADED = false; });
+}
+function pfPopulateRoleSelect(sel){
+  const current = sel.value || sel.dataset.init || '';
+  sel.innerHTML = '<option value="">— role —</option>' +
+    PF_ROLES_PEOPLE.map(r => `<option value="${esc(r.role_name)}"${r.role_name === current ? ' selected' : ''}>${esc(r.role_name)}</option>`).join('');
+  pfUpdateRoleAvatar(sel);
+}
+function pfUpdateRoleAvatar(sel){
+  const wrap = sel.closest ? sel.closest('.pf-role-wrap') : null;
+  if(!wrap) return;
+  const chip = wrap.querySelector('.pf-role-avatar');
+  if(!chip) return;
+  const val = sel.value;
+  if(!val){ chip.style.display = 'none'; return; }
+  const found = PF_ROLES_PEOPLE.find(r => r.role_name === val);
+  const person = found && found.person;
+  if(!person){ chip.style.display = 'none'; return; }
+  const parts = (person.name || '').split(' ');
+  const initials = parts.slice(0,2).map(w => (w[0] || '').toUpperCase()).join('');
+  chip.style.display = 'flex';
+  chip.innerHTML = `<div class="pf-av-circle">${initials}</div><span class="pf-av-name">${esc(person.name)}</span>`;
 }
 function openProcessForm(id){
   if(!canManageProcesses()){ showAuthModal('login'); return; }
@@ -10441,7 +10467,6 @@ function openProcessForm(id){
   document.getElementById('pfObjective').value = '';
   document.getElementById('pfScope').value = '';
   document.getElementById('pfLastReviewed').value = '';
-  document.getElementById('pfReviewCadence').value = '6';
   document.getElementById('pfVersion').value = '1.00';
   document.getElementById('pfStepsList').innerHTML = '';
   document.getElementById('pfValidationsList').innerHTML = '';
@@ -10470,7 +10495,6 @@ function openProcessForm(id){
       document.getElementById('pfObjective').value = process.objective || '';
       document.getElementById('pfScope').value = process.scope || '';
       document.getElementById('pfLastReviewed').value = process.last_reviewed || '';
-      document.getElementById('pfReviewCadence').value = process.review_cadence_months ?? 6;
       document.getElementById('pfVersion').value = process.version || '1.00';
       (process.steps || []).forEach(s => addProcessStepRow(s));
       (process.validations || []).forEach(v => addProcessValidationRow(v));
@@ -10561,7 +10585,6 @@ async function saveProcessForm(){
     objective: document.getElementById('pfObjective').value.trim() || null,
     scope: document.getElementById('pfScope').value.trim() || null,
     last_reviewed: document.getElementById('pfLastReviewed').value || null,
-    review_cadence_months: Number(document.getElementById('pfReviewCadence').value) || 6,
     version: document.getElementById('pfVersion').value.trim() || '1.00'
   };
   const steps = pfCollectSteps();
@@ -10653,10 +10676,6 @@ bootDashboard();
             <option value="reporting">Reporting</option>
             <option value="other" selected>Other</option>
           </select>
-        </div>
-        <div class="auth-field">
-          <label for="pfReviewCadence">Review cadence (months)</label>
-          <input type="number" id="pfReviewCadence" value="6" min="1">
         </div>
         <div class="auth-field">
           <label for="pfOwnerRole">Owner role</label>

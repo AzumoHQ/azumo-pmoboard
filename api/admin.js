@@ -208,6 +208,15 @@ module.exports = async function adminHandler(req, res) {
         res.status(200).json({ roles: await store.listRoles() });
         return;
       }
+      if (action === 'roles-with-people') {
+        const [roles, people] = await Promise.all([store.listRoles(), store.listPeople()]);
+        const rp = roles.map(r => {
+          const person = people.find(p => p.role_name === r.name && p.status !== 'inactive');
+          return { role_name: r.name, person: person ? { name: person.name, email: person.email } : null };
+        });
+        res.status(200).json({ roles: rp });
+        return;
+      }
       res.status(200).json(await overview());
       return;
     }
