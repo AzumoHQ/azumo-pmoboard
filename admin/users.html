@@ -3,269 +3,355 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>User Management — PMO Dashboard</title>
+<title>Admin — PMO Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+/* Skin follows the Project Status dashboard (projectstatusdashboard.vercel.app/admin):
+   dark navy surfaces, teal accent, segmented tabs, pill badges, monospace emails/codes. */
 :root{
-  --bg:#060C1A; --surf:#0D1626; --card:#112035; --brd:#1C3154;
-  --blue:#0066FF; --blue-lt:#3385FF; --txt:#EEF4FF; --muted:#6B8FBF;
-  --green:#10B981; --red:#EF4444; --orange:#F59E0B;
-  --font-sans:"Lato",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --bg:#0B1120; --nav:#111827; --surf:#151D2E; --surf2:#1A2336; --head:#182134; --brd:#26324A;
+  --txt:#E6EBF5; --muted:#8A97AD;
+  --teal:#5EEAD4; --teal-strong:#2DD4BF; --teal-bg:rgba(45,212,191,.12); --teal-brd:rgba(94,234,212,.45);
+  --green:#4ADE80; --green-bg:rgba(74,222,128,.12); --green-brd:rgba(74,222,128,.35);
+  --red:#F87171; --red-bg:rgba(248,113,113,.10); --red-brd:rgba(248,113,113,.45);
+  --amber:#FBBF24; --amber-bg:rgba(251,191,36,.12); --amber-brd:rgba(251,191,36,.40);
+  --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{font-family:var(--font-sans);background:radial-gradient(circle at 20% 0%,rgba(0,102,255,.16),transparent 30%),var(--bg);color:var(--txt);min-height:100vh;letter-spacing:0}
-body.light{
-  --bg:#EBF3FB; --surf:#F4F9FD; --card:#FFFFFF; --brd:#D7D9E0;
-  --blue:#0000FF; --blue-lt:#0000FF; --txt:#15243C; --muted:#566377;
-  --green:#00A861; --red:#C43B66; --orange:#E8A227;
-  background:var(--bg);
-}
-body.impersonating{padding-top:60px}
-a{color:inherit}
-.impersonation-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:1200;background:linear-gradient(90deg,rgba(245,158,11,.98),rgba(249,115,22,.96));color:#2B1700;border-bottom:1px solid rgba(146,64,14,.35);box-shadow:0 12px 34px rgba(0,0,0,.18)}
+body{font-family:var(--font);background:var(--bg);color:var(--txt);min-height:100vh;font-size:15px}
+body.impersonating{padding-top:56px}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+
+.impersonation-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:1200;background:linear-gradient(90deg,#F59E0B,#F97316);color:#2B1700}
 .impersonation-banner.show{display:block}
-.impersonation-banner-inner{max-width:1280px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.impersonation-banner-copy{font-size:.88rem;font-weight:900;letter-spacing:-.01em}
-.impersonation-banner .btn{background:rgba(43,23,0,.08);border-color:rgba(43,23,0,.18);color:#2B1700}
-.impersonation-banner .btn:hover{border-color:rgba(43,23,0,.32)}
-.page{max-width:1280px;margin:0 auto;padding:28px 24px 56px}
-.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:22px}
-.brand{display:flex;align-items:center;gap:14px}
-.brand-badge{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--blue),#7C3AED);display:flex;align-items:center;justify-content:center;font-weight:900}
-.eyebrow{display:inline-flex;align-items:center;padding:6px 10px;border:1px solid rgba(51,133,255,.24);border-radius:999px;background:rgba(0,102,255,.10);color:#AFCBFF;font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
-h1{font-size:clamp(1.8rem,3.5vw,2.7rem);line-height:1.02;letter-spacing:-.04em;margin:0 0 6px}
-.sub{color:var(--muted);font-size:.96rem;max-width:760px;line-height:1.55}
-.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.btn,.field input,.field select{font:inherit}
-.btn{appearance:none;border:1px solid var(--brd);background:var(--card);color:var(--txt);border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.15s ease}
-.btn:hover{transform:translateY(-1px);border-color:rgba(51,133,255,.45)}
-.btn-primary{background:linear-gradient(135deg,var(--blue),#0057D9);border-color:transparent}
-.btn-ghost{background:rgba(255,255,255,.03)}
-.theme-toggle{min-width:74px}
-.btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}
-.meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.85rem}
-.card{background:linear-gradient(180deg,rgba(255,255,255,.03),transparent 35%),var(--card);border:1px solid rgba(107,143,191,.30);border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,.28)}
-.toolbar{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 18px 0}
-.search{flex:1 1 280px;position:relative}
-.search input{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--brd);color:var(--txt);border-radius:14px;padding:13px 14px 13px 42px;outline:none}
-.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;fill:var(--muted)}
-.add-panel{display:none;padding:0 18px 18px}
-.add-panel.open{display:block}
-.add-box{margin-top:14px;background:rgba(255,255,255,.025);border:1px solid var(--brd);border-radius:18px;padding:16px}
-.add-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.impersonation-banner-inner{max-width:1280px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-weight:700;font-size:.88rem}
+
+.topnav{background:var(--nav);border-bottom:1px solid var(--brd)}
+.topnav-inner{max-width:1280px;margin:0 auto;padding:0 28px;height:68px;display:flex;align-items:center;gap:28px}
+.brand{font-weight:700;font-size:1.12rem;letter-spacing:-.01em;white-space:nowrap}
+.navlinks{display:flex;gap:22px;height:100%}
+.navlinks a{display:flex;align-items:center;color:var(--muted);font-weight:500;border-bottom:2px solid transparent;height:100%;padding-top:2px}
+.navlinks a:hover{color:var(--txt)}
+.navlinks a.active{color:var(--txt);border-bottom-color:var(--teal-strong)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.nav-email{color:var(--muted);font-size:.92rem}
+
+.page{max-width:1280px;margin:0 auto;padding:30px 28px 64px}
+.tabs{display:inline-flex;gap:4px;padding:5px;background:var(--surf);border:1px solid var(--brd);border-radius:14px;margin-bottom:28px;flex-wrap:wrap}
+.tab{appearance:none;background:transparent;border:1.5px solid transparent;border-radius:10px;padding:9px 18px;color:var(--muted);font-weight:500;cursor:pointer}
+.tab:hover{color:var(--txt)}
+.tab.active{background:var(--surf2);color:var(--txt);border-color:var(--teal-brd)}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+h1{font-size:2rem;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
+.sub{color:var(--muted);font-size:.98rem;line-height:1.5;max-width:780px}
+
+.card{background:var(--surf);border:1px solid var(--brd);border-radius:18px;overflow:hidden;margin-bottom:22px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 22px}
+.card-title{font-weight:600;font-size:1.1rem}
+.card-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search{background:var(--bg);border:1px solid var(--brd);border-radius:10px;padding:9px 12px;min-width:240px;outline:none}
+.search:focus{border-color:var(--teal-brd)}
+
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:860px}
+thead th{background:var(--head);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:.74rem;font-weight:600;padding:14px 22px;text-align:left;border-top:1px solid var(--brd);border-bottom:1px solid var(--brd);white-space:nowrap}
+thead th.right,td.right{text-align:right}
+tbody td{padding:16px 22px;border-bottom:1px solid var(--brd);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:rgba(148,163,184,.03)}
+.name{font-weight:600}
+.mono{font-family:var(--mono);font-size:.86rem;color:var(--muted)}
+.muted{color:var(--muted)}
+.small{font-size:.8rem}
+.empty{padding:30px 22px;text-align:center;color:var(--muted)}
+
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:.8rem;font-weight:600;border:1px solid var(--brd);color:var(--muted);background:rgba(148,163,184,.06);white-space:nowrap}
+.pill.teal{color:var(--teal);background:var(--teal-bg);border-color:var(--teal-brd)}
+.pill.green{color:var(--green);background:var(--green-bg);border-color:var(--green-brd)}
+.pill.red{color:var(--red);background:var(--red-bg);border-color:var(--red-brd)}
+.pill.amber{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-brd)}
+
+.btn{appearance:none;border:1px solid var(--brd);background:transparent;color:var(--txt);border-radius:10px;padding:8px 16px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn:hover{border-color:#3A4866;background:rgba(148,163,184,.05)}
+.btn-primary{background:var(--teal);border-color:var(--teal);color:#062A26;font-weight:600}
+.btn-primary:hover{background:#7CF0DE;border-color:#7CF0DE}
+.btn-danger{color:var(--red);border-color:var(--red-brd);background:var(--red-bg)}
+.btn-danger:hover{background:rgba(248,113,113,.18);border-color:var(--red)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+
+.select{appearance:none;background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A97AD' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;border:1px solid var(--brd);border-radius:10px;padding:8px 34px 8px 12px;min-width:150px;cursor:pointer;outline:none}
+.select:focus{border-color:var(--teal-brd)}
+.select[disabled]{opacity:.5;cursor:not-allowed}
+.select option{background:var(--surf);color:var(--txt)}
 .field{display:flex;flex-direction:column;gap:6px}
-.field label{font-size:.78rem;color:var(--muted);font-weight:800}
-.field input,.field select{background:rgba(255,255,255,.03);border:1px solid var(--brd);color:var(--txt);border-radius:12px;padding:12px 13px;outline:none}
-.field input::placeholder{color:#7F98BA}
-.field select{appearance:none}
-.add-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:14px}
-.table-wrap{padding:0 18px 18px}
-.table-shell{margin-top:14px;border:1px solid var(--brd);border-radius:18px;overflow:hidden;background:rgba(255,255,255,.02)}
-table{width:100%;border-collapse:collapse;min-width:920px}
-thead th{position:sticky;top:0;z-index:2;background:#152741;color:#AFCBFF;text-transform:uppercase;letter-spacing:.06em;font-size:.72rem;font-weight:900;padding:13px 14px;text-align:left;border-bottom:1px solid var(--brd)}
-tbody td{padding:14px;border-bottom:1px solid rgba(107,143,191,.14);vertical-align:middle}
-tbody tr:nth-child(odd) td{background:rgba(255,255,255,.015)}
-tbody tr:hover td{background:rgba(0,102,255,.05)}
-.user-cell{display:flex;flex-direction:column;gap:3px}
-.user-name{font-weight:850}
-.user-note{font-size:.74rem;color:var(--muted)}
-.email{color:#BCD2F7;font-size:.86rem}
-.role-select{min-width:180px;background:rgba(255,255,255,.03);border:1px solid var(--brd);color:var(--txt);border-radius:12px;padding:10px 12px;font-weight:700}
-.role-select[disabled]{opacity:.55;cursor:not-allowed}
-.action-cell{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.status-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;font-size:.76rem;font-weight:900;border:1px solid transparent}
-.status-pill.active{background:rgba(16,185,129,.14);color:#86EFAC;border-color:rgba(16,185,129,.25)}
-.status-pill.inactive{background:rgba(239,68,68,.14);color:#FCA5A5;border-color:rgba(239,68,68,.26)}
-.toggle-wrap{display:flex;align-items:center;gap:10px}
-.toggle{position:relative;width:52px;height:30px;display:inline-block}
-.toggle input{opacity:0;width:0;height:0}
-.slider{position:absolute;inset:0;border-radius:999px;background:rgba(239,68,68,.25);border:1px solid rgba(239,68,68,.26);transition:.15s ease}
-.slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:#fff;transition:.15s ease}
-.toggle input:checked + .slider{background:rgba(16,185,129,.28);border-color:rgba(16,185,129,.35)}
-.toggle input:checked + .slider:before{transform:translateX(22px)}
-.toggle input:disabled + .slider{opacity:.45;cursor:not-allowed}
-.empty{padding:28px 16px;text-align:center;color:var(--muted)}
-.toast-stack{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:1000}
-.toast{min-width:260px;max-width:360px;padding:14px 16px;border-radius:16px;border:1px solid var(--brd);background:#10233B;box-shadow:0 16px 40px rgba(0,0,0,.28);font-size:.9rem;font-weight:700;animation:toastIn .18s ease}
-.toast.success{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.13);color:#D1FAE5}
-.toast.error{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.13);color:#FECACA}
+.field label{font-size:.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.field input,.field select{background:var(--bg);border:1px solid var(--brd);border-radius:10px;padding:10px 12px;outline:none}
+.field input:focus,.field select:focus{border-color:var(--teal-brd)}
+.add-panel{display:none;padding:0 22px 20px}
+.add-panel.open{display:block}
+.add-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+
+.notice{padding:12px 16px;border-radius:12px;border:1px solid var(--amber-brd);background:var(--amber-bg);color:#FDE68A;font-size:.88rem;line-height:1.45;margin-bottom:18px}
+.notice.ok{border-color:var(--teal-brd);background:var(--teal-bg);color:#CCFBF1}
+.notice code{font-family:var(--mono);font-size:.82rem}
+
+.modal{position:fixed;inset:0;background:rgba(3,7,18,.7);display:none;align-items:center;justify-content:center;z-index:1300;padding:20px}
+.modal.open{display:flex}
+.modal-card{background:var(--surf);border:1px solid var(--brd);border-radius:18px;width:min(560px,100%);padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.modal-card h3{margin:0 0 6px;font-size:1.25rem}
+.modal-grid{display:grid;gap:14px;margin:18px 0}
+.check{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.88rem}
+
+.toast-stack{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:1400}
+.toast{min-width:260px;max-width:420px;padding:12px 16px;border-radius:12px;border:1px solid var(--brd);background:var(--surf2);font-size:.9rem;font-weight:500;box-shadow:0 16px 40px rgba(0,0,0,.35);transition:.3s}
+.toast.success{border-color:var(--teal-brd)}
+.toast.error{border-color:var(--red-brd);color:#FECACA}
+.toast.warn{border-color:var(--amber-brd);color:#FDE68A}
 .loading,.forbidden{display:flex;align-items:center;justify-content:center;min-height:55vh;color:var(--muted)}
-.tag{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(107,143,191,.18);font-size:.72rem;font-weight:800;color:#CFE0FF}
-.count{padding:7px 10px;border-radius:999px;background:rgba(0,102,255,.10);border:1px solid rgba(51,133,255,.24);color:#AFCBFF;font-size:.76rem;font-weight:900}
-body.light .eyebrow,body.light .count{color:#0000FF;background:#EEF0FF;border-color:#D6DBFF}
-body.light .brand-badge{background:#07183B;color:#fff}
-body.light .btn-ghost{background:#fff}
-body.light .card{background:#fff;border-color:#EAEBEE;box-shadow:0 20px 40px rgba(7,24,59,.08)}
-body.light .search input,body.light .field input,body.light .field select,body.light .role-select{background:#F7F8FA;border-color:#D7D9E0;color:#15243C}
-body.light .email{color:#0000D1}
-body.light .table-shell{background:#fff;border-color:#EAEBEE}
-body.light thead th{background:#F7F8FA;color:#566377;border-bottom-color:#EAEBEE}
-body.light tbody td{border-bottom-color:#EAEBEE}
-body.light tbody tr:nth-child(odd) td{background:#FEFEFE}
-body.light tbody tr:hover td{background:#EEF0FF}
-body.light .toast{background:#fff}
-@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@media (max-width: 980px){.add-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width: 640px){.page{padding:20px 14px 42px}.add-grid{grid-template-columns:1fr}.actions{width:100%}.actions .btn{flex:1}.toolbar{padding:14px 14px 0}.add-panel{padding:0 14px 14px}.table-wrap{padding:0 14px 14px}}
+.view{display:none}
+.view.active{display:block}
+@media (max-width:900px){.add-grid{grid-template-columns:1fr 1fr}.nav-email{display:none}}
+@media (max-width:600px){.page{padding:20px 16px 48px}.topnav-inner{padding:0 16px;gap:16px}.add-grid{grid-template-columns:1fr}.search{min-width:0;width:100%}}
 </style>
 </head>
-<body class="light">
-  <div class="impersonation-banner" id="impersonationBanner" aria-live="polite" aria-hidden="true">
+<body>
+  <div class="impersonation-banner" id="impersonationBanner" aria-hidden="true">
     <div class="impersonation-banner-inner">
-      <div class="impersonation-banner-copy" id="impersonationBannerCopy">Viewing as —</div>
-      <button class="btn btn-ghost" type="button" id="impersonationExitBtn">Exit</button>
+      <div id="impersonationBannerCopy">Viewing as —</div>
+      <button class="btn" type="button" id="impersonationExitBtn" style="border-color:rgba(43,23,0,.3)">Exit</button>
     </div>
   </div>
+
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <div class="brand">PMO Board</div>
+      <div class="navlinks">
+        <a href="/">Dashboard</a>
+        <a href="/admin/users" class="active">Admin</a>
+      </div>
+      <div class="nav-right">
+        <span class="nav-email" id="navEmail"></span>
+        <button class="btn" type="button" id="signOutBtn">Sign out</button>
+      </div>
+    </div>
+  </nav>
+
   <div class="page">
     <div id="loadingState" class="loading">Checking administrator access…</div>
+    <div id="forbiddenState" class="forbidden" style="display:none"></div>
 
     <div id="app" style="display:none">
-      <div class="topbar">
-        <div>
-          <div class="eyebrow">PMO Administration</div>
-          <div class="brand">
-            <div class="brand-badge">PMO</div>
-            <div>
-              <h1>User management</h1>
-              <div class="sub">Manage authorized dashboard users, roles, and activation state. The <strong>Administrator</strong> label is stored internally as <code>PMO</code>.</div>
-            </div>
-          </div>
-        </div>
-        <div class="actions">
-          <a class="btn btn-ghost" href="/">← Back to dashboard</a>
-          <button class="btn btn-ghost theme-toggle" type="button" id="themeToggle">Dark</button>
-          <button class="btn btn-primary" type="button" id="toggleAddBtn">+ Add user</button>
-        </div>
+      <div class="tabs" role="tablist">
+        <button class="tab" type="button" data-tab="accounts">Accounts</button>
+        <button class="tab" type="button" data-tab="users">Users</button>
+        <button class="tab" type="button" data-tab="roles">Roles</button>
+        <button class="tab" type="button" data-tab="audit">Audit log</button>
       </div>
+      <div id="adminLoadNotice"></div>
 
-      <div class="card">
-        <div class="toolbar">
-          <div class="search">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4a6 6 0 1 0 3.88 10.58l4.27 4.27 1.42-1.42-4.27-4.27A6 6 0 0 0 10 4Zm0 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"/></svg>
-            <input id="searchInput" type="search" placeholder="Search by name, email, or role" />
-          </div>
-          <div class="meta">
-            <span class="count" id="userCount">0 users</span>
-            <span class="tag" id="adminMeta">Administrator</span>
+      <!-- ===== Accounts ===== -->
+      <section class="view" data-view="accounts">
+        <div class="section-head">
+          <div>
+            <h1>Accounts</h1>
+            <div class="sub">Client accounts (Jira PSA Epics) and their responsables. Editing here writes the change to Jira — no need to go edit the Epic by hand.</div>
           </div>
         </div>
-
-        <div class="add-panel" id="addPanel">
-          <div class="add-box">
-            <div class="add-grid">
-              <div class="field">
-                <label for="newEmail">Email</label>
-                <input id="newEmail" type="email" placeholder="name@azumo.co" />
-              </div>
-              <div class="field">
-                <label for="newFirstName">First name</label>
-                <input id="newFirstName" type="text" placeholder="First name" />
-              </div>
-              <div class="field">
-                <label for="newLastName">Last name</label>
-                <input id="newLastName" type="text" placeholder="Last name" />
-              </div>
-              <div class="field">
-                <label for="newRole">Role</label>
-                <select id="newRole"></select>
-              </div>
-            </div>
-            <div class="add-actions">
-              <button class="btn btn-ghost" type="button" id="cancelAddBtn">Cancel</button>
-              <button class="btn btn-primary" type="button" id="saveAddBtn">Create user</button>
-            </div>
+        <div id="writebackNotice"></div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title" id="accountsCount">0 accounts</div>
+            <div class="card-tools"><input class="search" id="accountsSearch" type="search" placeholder="Search account or person"></div>
           </div>
-        </div>
-
-        <div class="table-wrap">
-          <div class="table-shell">
+          <div class="table-scroll">
             <table>
-              <thead>
-                <tr>
-                  <th style="width:28%">User</th>
-                  <th style="width:24%">Email</th>
-                  <th style="width:18%">Role</th>
-                  <th style="width:10%">Status</th>
-                  <th style="width:12%">Active toggle</th>
-                  <th style="width:8%">View as</th>
-                </tr>
-              </thead>
-              <tbody id="usersTableBody">
-                <tr><td colspan="6" class="empty">Loading users…</td></tr>
-              </tbody>
+              <thead><tr><th>Code</th><th>Name</th><th>PM</th><th>CSM</th><th>TL</th><th>Coverage</th><th class="right">Actions</th></tr></thead>
+              <tbody id="accountsBody"><tr><td colspan="7" class="empty">Loading accounts…</td></tr></tbody>
             </table>
           </div>
         </div>
+      </section>
+
+      <!-- ===== Users ===== -->
+      <section class="view" data-view="users">
+        <div class="section-head">
+          <div>
+            <h1>Users</h1>
+            <div class="sub">Everyone who can sign in to the PMO Board. <b>Access</b> controls what they see; <b>Company role</b> comes from their Jira Position and can be changed here (it's written back to their AA Epic).</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title" id="userCount">0 users</div>
+            <div class="card-tools">
+              <input class="search" id="searchInput" type="search" placeholder="Search by name, email or role">
+              <button class="btn btn-primary" type="button" id="toggleAddBtn">New user</button>
+            </div>
+          </div>
+          <div class="add-panel" id="addPanel">
+            <div class="add-grid">
+              <div class="field"><label for="newEmail">Email</label><input id="newEmail" type="email" placeholder="name@azumo.co"></div>
+              <div class="field"><label for="newFirstName">First name</label><input id="newFirstName" type="text"></div>
+              <div class="field"><label for="newLastName">Last name</label><input id="newLastName" type="text"></div>
+              <div class="field"><label for="newRole">Access</label><select id="newRole"></select></div>
+            </div>
+            <div class="actions" style="margin-top:14px">
+              <button class="btn" type="button" id="cancelAddBtn">Cancel</button>
+              <button class="btn btn-primary" type="button" id="saveAddBtn">Create user</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>User</th><th>Access</th><th>Company role</th><th>Status</th><th>Last seen</th><th class="right">Actions</th></tr></thead>
+              <tbody id="usersTableBody"><tr><td colspan="6" class="empty">Loading users…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Roles ===== -->
+      <section class="view" data-view="roles">
+        <div class="section-head">
+          <div>
+            <h1>Roles</h1>
+            <div class="sub">Company roles, fed by the Jira <b>Position - Assignee</b> field of each AA Epic (one Epic = one employee). Mark which roles can be an account's PM, CSM or TL — those are the options offered as responsables in Accounts.</div>
+          </div>
+          <div class="card-tools">
+            <span class="muted small" id="lastSyncLabel"></span>
+            <button class="btn" type="button" id="syncPeopleBtn">Sync from Jira</button>
+            <button class="btn btn-primary" type="button" id="newRoleBtn">New role</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title" id="rolesCount">0 roles</div></div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Role</th><th>Responsable slot</th><th>People</th><th>Source</th><th class="right">Actions</th></tr></thead>
+              <tbody id="rolesBody"><tr><td colspan="5" class="empty">Loading roles…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title" id="peopleCount">0 people</div>
+            <div class="card-tools">
+              <label class="check"><input type="checkbox" id="hideFreelance"> Hide freelancers</label>
+              <input class="search" id="peopleSearch" type="search" placeholder="Search people or position">
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Person</th><th>Jira Epic</th><th>Jira Position</th><th>Company role</th><th>Freelance</th></tr></thead>
+              <tbody id="peopleBody"><tr><td colspan="5" class="empty">Loading people…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Audit log ===== -->
+      <section class="view" data-view="audit">
+        <div class="section-head">
+          <div>
+            <h1>Audit log</h1>
+            <div class="sub">Every change made from Admin, who made it, and whether it reached Jira.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>When</th><th>Who</th><th>What</th><th>Change</th><th>Jira</th></tr></thead>
+              <tbody id="auditBody"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Account edit modal -->
+  <div class="modal" id="accountModal" aria-hidden="true">
+    <div class="modal-card">
+      <h3 id="accountModalTitle">Edit account</h3>
+      <div class="sub small" id="accountModalSub"></div>
+      <div class="modal-grid">
+        <div class="field"><label for="accPm">PM</label><select id="accPm"></select></div>
+        <div class="field"><label for="accCsm">CSM</label><select id="accCsm"></select></div>
+        <div class="field"><label for="accTl">TL</label><select id="accTl"></select></div>
+        <label class="check"><input type="checkbox" id="accShowAll"> Show everyone, not only people whose role is marked for that slot</label>
+      </div>
+      <div id="accountModalNote" class="muted small" style="margin-bottom:16px"></div>
+      <div class="actions">
+        <button class="btn" type="button" id="accCancel">Cancel</button>
+        <button class="btn btn-primary" type="button" id="accSave">Save to Jira</button>
       </div>
     </div>
+  </div>
 
-    <div id="forbiddenState" class="forbidden" style="display:none"></div>
+  <!-- Role modal -->
+  <div class="modal" id="roleModal" aria-hidden="true">
+    <div class="modal-card">
+      <h3 id="roleModalTitle">New role</h3>
+      <div class="modal-grid">
+        <div class="field"><label for="roleName">Role name</label><input id="roleName" type="text" placeholder="e.g. Customer Success Manager"></div>
+        <div class="field"><label for="roleSlot">Can be an account's</label>
+          <select id="roleSlot"><option value="">— not a responsable —</option><option value="PM">PM</option><option value="CSM">CSM</option><option value="TL">TL</option></select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" type="button" id="roleCancel">Cancel</button>
+        <button class="btn btn-primary" type="button" id="roleSave">Save role</button>
+      </div>
+    </div>
   </div>
 
   <div class="toast-stack" id="toastStack"></div>
 
 <script>
-const THEME_KEY = 'pmo_dashboard_theme';
-function applyTheme(theme){
-  const normalized = theme === 'dark' ? 'dark' : 'light';
-  const light = normalized === 'light';
-  document.body.classList.toggle('light', light);
-  document.body.classList.toggle('dark', !light);
-  const btn = document.getElementById('themeToggle');
-  if(btn){
-    btn.textContent = light ? 'Dark' : 'Light';
-    btn.setAttribute('aria-label', light ? 'Switch to dark view' : 'Switch to light view');
-    btn.setAttribute('aria-pressed', light ? 'false' : 'true');
-  }
-}
-function toggleTheme(){
-  const next = document.body.classList.contains('light') ? 'dark' : 'light';
-  localStorage.setItem(THEME_KEY, next);
-  applyTheme(next);
-}
-applyTheme(localStorage.getItem(THEME_KEY) || 'light');
-
-const ROLE_OPTIONS = ['PMO','Executive','CSM','PM','TL','HR','Assignee'];
+const ACCESS_ROLES = ['PMO','Executive','CSM','PM','TL','HR','Assignee'];
+const TABS = ['accounts','users','roles','audit'];
 let currentUser = null;
 let impersonatedUser = null;
 let allUsers = [];
-let filteredUsers = [];
 let searchTerm = '';
+const ADMIN = { loaded:false, writeback:false, roles:[], people:[], accounts:[], audit:[], snapshotDate:null };
+let editingAccountKey = null;
+let editingRoleId = null;
 
-function displayRole(role=''){
-  return String(role || '') === 'PMO' ? 'Administrator' : String(role || '');
-}
+// ---------- helpers ----------
 function esc(value=''){
-  return String(value ?? '').replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  return String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+function displayRole(role=''){ return String(role || '') === 'PMO' ? 'Admin' : String(role || ''); }
 function fullName(user){
   const first = String(user?.first_name || '').trim();
   const last = String(user?.last_name || '').trim();
   return `${first} ${last}`.trim() || String(user?.name || user?.email || '—');
 }
-function isSelf(user){
-  return String(user?.email || '').trim().toLowerCase() === String(currentUser?.email || '').trim().toLowerCase();
+function lower(v){ return String(v || '').trim().toLowerCase(); }
+function isSelf(user){ return lower(user?.email) === lower(currentUser?.email); }
+function isCurrentlyImpersonated(user){ return lower(user?.email) === lower(impersonatedUser?.email); }
+function fmtDate(value){
+  if(!value) return '—';
+  const d = new Date(value);
+  return isNaN(d) ? String(value) : d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
 }
-function isCurrentlyImpersonated(user){
-  return String(user?.email || '').trim().toLowerCase() === String(impersonatedUser?.email || '').trim().toLowerCase();
+// Snapshot dates are plain calendar dates stored at UTC midnight; format them in UTC so
+// Argentina (UTC-3) doesn't show the previous day.
+function fmtDateUTC(value){
+  if(!value) return '—';
+  const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(String(value)) ? `${value}T00:00:00Z` : value);
+  return isNaN(d) ? String(value) : d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric', timeZone:'UTC'});
 }
-function renderImpersonationBanner(){
-  const banner = document.getElementById('impersonationBanner');
-  const copy = document.getElementById('impersonationBannerCopy');
-  if(!banner || !copy) return;
-  if(impersonatedUser){
-    copy.innerHTML = `Viewing as <strong>${esc(fullName(impersonatedUser))}</strong> (${esc(displayRole(impersonatedUser.role || ''))}) — temporary administrator preview`;
-    banner.classList.add('show');
-    banner.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('impersonating');
-  }else{
-    banner.classList.remove('show');
-    banner.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('impersonating');
-  }
+function fmtDateTime(value){
+  if(!value) return '—';
+  const d = new Date(value);
+  return isNaN(d) ? String(value) : d.toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
 }
 function toast(message, type='success'){
   const stack = document.getElementById('toastStack');
@@ -273,18 +359,70 @@ function toast(message, type='success'){
   el.className = `toast ${type}`;
   el.textContent = message;
   stack.appendChild(el);
-  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(6px)'; }, 2600);
-  setTimeout(() => el.remove(), 3000);
+  setTimeout(() => { el.style.opacity = '0'; }, 3600);
+  setTimeout(() => el.remove(), 4000);
 }
-function setLoading(message='Checking administrator access…'){
-  document.getElementById('loadingState').textContent = message;
-  document.getElementById('loadingState').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('forbiddenState').style.display = 'none';
+async function api(url, options={}){
+  const response = await fetch(url, { credentials:'same-origin', cache:'no-store', ...options,
+    headers: options.body ? {'Content-Type':'application/json'} : undefined });
+  const result = await response.json().catch(() => ({}));
+  if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+  return result;
+}
+function adminPost(action, body){
+  return api(`/api/admin?action=${encodeURIComponent(action)}`, { method:'POST', body: JSON.stringify(body || {}) });
+}
+function applyAdminData(data){
+  ADMIN.loaded = true;
+  ADMIN.writeback = Boolean(data.writeback_enabled);
+  ADMIN.roles = data.roles || [];
+  ADMIN.people = data.people || [];
+  ADMIN.accounts = data.accounts || [];
+  ADMIN.audit = data.audit || [];
+  ADMIN.snapshotDate = data.accounts_snapshot_date || null;
+  renderAll();
+}
+function personForUser(user){
+  const email = lower(user.email);
+  return ADMIN.people.find((p) => lower(p.email) === email) || null;
+}
+function peopleForRole(roleId){
+  return ADMIN.people.filter((p) => Number(p.role_effective_id) === Number(roleId));
+}
+function jiraPill(status){
+  const map = { written:['teal','Written'], failed:['red','Failed'], skipped:['amber','Skipped'], local:['','Local only'], read:['','Read'] };
+  const [cls, label] = map[status] || ['', status || '—'];
+  return `<span class="pill ${cls}">${esc(label)}</span>`;
+}
+
+// ---------- tabs ----------
+function currentTab(){
+  const hash = location.hash.replace('#','');
+  return TABS.includes(hash) ? hash : 'users';
+}
+function showTab(tab){
+  document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.view').forEach((v) => v.classList.toggle('active', v.dataset.view === tab));
+}
+document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () => { location.hash = b.dataset.tab; }));
+window.addEventListener('hashchange', () => showTab(currentTab()));
+
+// ---------- impersonation / session ----------
+function renderImpersonationBanner(){
+  const banner = document.getElementById('impersonationBanner');
+  const copy = document.getElementById('impersonationBannerCopy');
+  if(impersonatedUser){
+    copy.innerHTML = `Viewing as <strong>${esc(fullName(impersonatedUser))}</strong> (${esc(displayRole(impersonatedUser.role || ''))}) — temporary administrator preview`;
+    banner.classList.add('show'); banner.setAttribute('aria-hidden','false');
+    document.body.classList.add('impersonating');
+  }else{
+    banner.classList.remove('show'); banner.setAttribute('aria-hidden','true');
+    document.body.classList.remove('impersonating');
+  }
 }
 function showForbidden(message){
   const box = document.getElementById('forbiddenState');
-  box.innerHTML = `<div class="card" style="padding:24px;max-width:560px;margin:0 auto"><div class="eyebrow">Access blocked</div><h1 style="font-size:2rem;margin:0 0 10px">Administrator access required</h1><div class="sub" style="margin-bottom:18px">${esc(message)}</div><a class="btn btn-primary" href="/">Back to dashboard</a></div>`;
+  box.innerHTML = `<div class="card" style="padding:28px;max-width:560px"><h1 style="font-size:1.6rem">Administrator access required</h1><div class="sub" style="margin-bottom:18px">${esc(message)}</div><a class="btn btn-primary" href="/">Back to dashboard</a></div>`;
   document.getElementById('loadingState').style.display = 'none';
   document.getElementById('app').style.display = 'none';
   box.style.display = 'flex';
@@ -294,183 +432,119 @@ function showApp(){
   document.getElementById('forbiddenState').style.display = 'none';
   document.getElementById('app').style.display = 'block';
 }
-function populateRoleSelect(select, selectedRole){
-  select.innerHTML = ROLE_OPTIONS.map(role => `<option value="${role}" ${role === selectedRole ? 'selected' : ''}>${esc(displayRole(role))}</option>`).join('');
-}
-function filterUsers(){
-  const term = searchTerm.trim().toLowerCase();
-  filteredUsers = !term ? [...allUsers] : allUsers.filter((user) => {
-    const haystack = [fullName(user), user.email, user.role, displayRole(user.role)].join(' ').toLowerCase();
-    return haystack.includes(term);
-  });
-  renderTable();
-}
-function renderTable(){
-  const tbody = document.getElementById('usersTableBody');
-  document.getElementById('userCount').textContent = `${filteredUsers.length} user${filteredUsers.length === 1 ? '' : 's'}`;
-  if(!filteredUsers.length){
-    tbody.innerHTML = '<tr><td colspan="6" class="empty">No users match this search.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = filteredUsers.map((user) => {
-    const self = isSelf(user);
-    const impersonatingThisUser = isCurrentlyImpersonated(user);
-    const canViewAs = !self && user.active !== false && user.role !== 'PMO';
-    return `<tr data-email="${esc(user.email)}">
-      <td>
-        <div class="user-cell">
-          <span class="user-name">${esc(fullName(user))}</span>
-          <span class="user-note">${self ? 'Current administrator session' : impersonatingThisUser ? 'Current view-as target' : 'Managed access user'}</span>
-        </div>
-      </td>
-      <td><span class="email">${esc(user.email || '—')}</span></td>
-      <td>
-        <select class="role-select" data-role-email="${esc(user.email)}" ${self ? 'disabled title="You cannot change your own role"' : ''}>
-          ${ROLE_OPTIONS.map((role) => `<option value="${role}" ${role === user.role ? 'selected' : ''}>${esc(displayRole(role))}</option>`).join('')}
-        </select>
-      </td>
-      <td><span class="status-pill ${user.active === false ? 'inactive' : 'active'}">${user.active === false ? 'Inactive' : 'Active'}</span></td>
-      <td>
-        <div class="toggle-wrap">
-          <label class="toggle" title="${self ? 'Self deactivation is disabled to avoid lockout.' : 'Toggle active state'}">
-            <input type="checkbox" data-active-email="${esc(user.email)}" ${user.active === false ? '' : 'checked'} ${self ? 'disabled' : ''}/>
-            <span class="slider"></span>
-          </label>
-          <span class="user-note">${user.active === false ? 'Off' : 'On'}</span>
-        </div>
-      </td>
-      <td>
-        <div class="action-cell">
-          <button class="btn btn-ghost" type="button" data-view-as-email="${esc(user.email)}" ${canViewAs ? '' : 'disabled'}>${impersonatingThisUser ? 'Viewing as' : 'View as'}</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-
-  tbody.querySelectorAll('[data-role-email]').forEach((select) => {
-    select.addEventListener('change', async (event) => {
-      const email = event.target.getAttribute('data-role-email');
-      const role = event.target.value;
-      await patchUser(email, { role }, event.target);
-    });
-  });
-  tbody.querySelectorAll('[data-active-email]').forEach((input) => {
-    input.addEventListener('change', async (event) => {
-      const email = event.target.getAttribute('data-active-email');
-      const is_active = Boolean(event.target.checked);
-      await patchUser(email, { is_active }, event.target);
-    });
-  });
-  tbody.querySelectorAll('[data-view-as-email]').forEach((button) => {
-    button.addEventListener('click', async (event) => {
-      const email = event.currentTarget.getAttribute('data-view-as-email');
-      await viewAsUser(email, event.currentTarget);
-    });
-  });
-}
-async function patchUser(email, patch, control){
-  const previous = allUsers.find((user) => String(user.email).toLowerCase() === String(email).toLowerCase());
-  if(!previous) return;
-  const prevRole = previous.role;
-  const prevActive = previous.active !== false;
-  if(control) control.disabled = true;
-  try{
-    const response = await fetch('/api/users', {
-      method:'PATCH',
-      credentials:'same-origin',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ email, ...patch })
-    });
-    const result = await response.json().catch(() => ({}));
-    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
-    allUsers = result.users || allUsers;
-    filterUsers();
-    if(patch.role !== undefined) toast(`${fullName(previous)} is now ${displayRole(patch.role)}.`);
-    else toast(`${fullName(previous)} is now ${patch.is_active ? 'active' : 'inactive'}.`);
-  }catch(error){
-    if(control instanceof HTMLSelectElement) control.value = prevRole;
-    if(control instanceof HTMLInputElement) control.checked = prevActive;
-    toast(error.message || 'Could not save the change.', 'error');
-  }finally{
-    if(control) control.disabled = false;
-  }
-}
-async function loadUsers(){
-  const response = await fetch('/api/users', { credentials:'same-origin', cache:'no-store' });
-  const result = await response.json().catch(() => ({}));
-  if(response.status === 403){
-    showForbidden('Only users with the Administrator / PMO role can manage dashboard access.');
-    return;
-  }
-  if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
-  allUsers = Array.isArray(result.users) ? result.users : [];
-  filterUsers();
-}
 async function loadSession(){
-  const response = await fetch('/api/auth', { credentials:'same-origin', cache:'no-store' });
-  const result = await response.json().catch(() => ({}));
+  const result = await fetch('/api/auth', { credentials:'same-origin', cache:'no-store' }).then((r) => r.json()).catch(() => ({}));
   currentUser = result.user || null;
   impersonatedUser = result?.impersonation?.active ? (result.impersonation.user || null) : null;
-  if(!currentUser){
-    window.location.replace('/');
-    return false;
-  }
-  if(currentUser.role !== 'PMO'){
-    showForbidden('Only PMO administrators can open User Management.');
-    return false;
-  }
-  document.getElementById('adminMeta').textContent = `${fullName(currentUser)} · Administrator`;
+  if(!currentUser){ window.location.replace('/'); return false; }
+  if(currentUser.role !== 'PMO'){ showForbidden('Only PMO administrators can open Admin.'); return false; }
+  document.getElementById('navEmail').textContent = currentUser.email || '';
   renderImpersonationBanner();
   return true;
 }
 async function viewAsUser(email, button){
-  if(!email) return;
   if(button){ button.disabled = true; button.textContent = 'Opening…'; }
   try{
-    const response = await fetch(`/api/auth?action=impersonate&email=${encodeURIComponent(email)}`, {
-      credentials:'same-origin',
-      cache:'no-store'
-    });
-    const result = await response.json().catch(() => ({}));
-    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    await api(`/api/auth?action=impersonate&email=${encodeURIComponent(email)}`);
     window.location.assign('/');
   }catch(error){
     toast(error.message || 'Could not start View as.', 'error');
-    if(button){
-      button.disabled = false;
-      button.textContent = 'View as';
-    }
+    if(button){ button.disabled = false; button.textContent = 'View as'; }
   }
 }
 async function stopImpersonation(){
   try{
-    const response = await fetch('/api/auth?action=stop-impersonation', {
-      credentials:'same-origin',
-      cache:'no-store'
-    });
-    const result = await response.json().catch(() => ({}));
-    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    await api('/api/auth?action=stop-impersonation');
     impersonatedUser = null;
     renderImpersonationBanner();
     await loadUsers();
     toast('Returned to your Administrator session.');
-  }catch(error){
-    toast(error.message || 'Could not stop View as.', 'error');
-  }
+  }catch(error){ toast(error.message || 'Could not stop View as.', 'error'); }
 }
-function resetAddForm(){
-  document.getElementById('newEmail').value = '';
-  document.getElementById('newFirstName').value = '';
-  document.getElementById('newLastName').value = '';
-  document.getElementById('newRole').value = 'Executive';
+async function signOut(){
+  try{ await fetch('/api/auth?action=logout', {method:'POST', credentials:'same-origin'}); }catch(e){}
+  window.location.assign('/');
+}
+
+// ---------- Users ----------
+function companyRoleCell(user){
+  if(!ADMIN.loaded) return '<span class="muted small">—</span>';
+  const person = personForUser(user);
+  const jiraPos = person?.jira_position || '';
+  const override = person?.role_source === 'override' ? Number(person.role_id) : '';
+  const jiraLabel = jiraPos ? `From Jira: ${jiraPos}` : (person ? 'From Jira: (empty)' : 'No Jira Epic matched');
+  const options = [`<option value="">${esc(jiraLabel)}</option>`]
+    .concat(ADMIN.roles.map((r) => `<option value="${r.id}" ${Number(r.id) === override ? 'selected' : ''}>${esc(r.name)}</option>`));
+  const pending = person?.differs_from_jira ? ' <span class="pill amber" title="Saved in the board, not yet in Jira">Pending Jira</span>' : '';
+  return `<select class="select" data-company-role-email="${esc(user.email)}">${options.join('')}</select>${pending}`;
+}
+function renderUsers(){
+  const term = lower(searchTerm);
+  const list = !term ? allUsers : allUsers.filter((u) => {
+    const person = personForUser(u);
+    return [fullName(u), u.email, u.role, displayRole(u.role), person?.role_name].join(' ').toLowerCase().includes(term);
+  });
+  document.getElementById('userCount').textContent = `${list.length} user${list.length === 1 ? '' : 's'}`;
+  const tbody = document.getElementById('usersTableBody');
+  if(!list.length){ tbody.innerHTML = '<tr><td colspan="6" class="empty">No users match this search.</td></tr>'; return; }
+  tbody.innerHTML = list.map((user) => {
+    const self = isSelf(user);
+    const active = user.active !== false;
+    const viewing = isCurrentlyImpersonated(user);
+    const canViewAs = !self && active && user.role !== 'PMO';
+    const accessOptions = ACCESS_ROLES.map((r) => `<option value="${r}" ${r === user.role ? 'selected' : ''}>${esc(displayRole(r))}</option>`).join('');
+    return `<tr>
+      <td><div class="name">${esc(fullName(user))}</div><div class="mono">${esc(user.email || '—')}</div></td>
+      <td><select class="select" data-role-email="${esc(user.email)}" ${self ? 'disabled title="You cannot change your own access"' : ''} style="min-width:130px">${accessOptions}</select></td>
+      <td>${companyRoleCell(user)}</td>
+      <td><span class="pill ${active ? 'green' : 'red'}">${active ? 'Active' : 'Disabled'}</span></td>
+      <td class="muted">${fmtDate(user.last_login_at)}</td>
+      <td class="right"><div class="actions">
+        <button class="btn" type="button" data-view-as-email="${esc(user.email)}" ${canViewAs ? '' : 'disabled'}>${viewing ? 'Viewing as' : 'View as'}</button>
+        <button class="btn ${active ? 'btn-danger' : ''}" type="button" data-active-email="${esc(user.email)}" data-next-active="${active ? 'false' : 'true'}" ${self ? 'disabled title="Self deactivation is disabled to avoid lockout"' : ''}>${active ? 'Disable' : 'Enable'}</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+
+  tbody.querySelectorAll('[data-role-email]').forEach((el) => el.addEventListener('change', (e) => patchUser(e.target.dataset.roleEmail, { role: e.target.value }, e.target)));
+  tbody.querySelectorAll('[data-active-email]').forEach((el) => el.addEventListener('click', (e) => patchUser(e.currentTarget.dataset.activeEmail, { is_active: e.currentTarget.dataset.nextActive === 'true' }, e.currentTarget)));
+  tbody.querySelectorAll('[data-view-as-email]').forEach((el) => el.addEventListener('click', (e) => viewAsUser(e.currentTarget.dataset.viewAsEmail, e.currentTarget)));
+  tbody.querySelectorAll('[data-company-role-email]').forEach((el) => el.addEventListener('change', (e) => {
+    const user = allUsers.find((u) => lower(u.email) === lower(e.target.dataset.companyRoleEmail));
+    const person = user ? personForUser(user) : null;
+    savePersonRole({ epic_key: person?.jira_epic_key, email: user?.email, name: user ? fullName(user) : '', role_id: e.target.value || null }, e.target);
+  }));
+}
+async function patchUser(email, patch, control){
+  const previous = allUsers.find((u) => lower(u.email) === lower(email));
+  if(!previous) return;
+  if(control) control.disabled = true;
+  try{
+    const result = await api('/api/users', { method:'PATCH', body: JSON.stringify({ email, ...patch }) });
+    allUsers = result.users || allUsers;
+    renderUsers();
+    if(patch.role !== undefined) toast(`${fullName(previous)} now has ${displayRole(patch.role)} access.`);
+    else toast(`${fullName(previous)} is now ${patch.is_active ? 'active' : 'disabled'}.`);
+  }catch(error){
+    toast(error.message || 'Could not save the change.', 'error');
+    renderUsers();
+  }finally{ if(control) control.disabled = false; }
+}
+async function loadUsers(){
+  const response = await fetch('/api/users', { credentials:'same-origin', cache:'no-store' });
+  const result = await response.json().catch(() => ({}));
+  if(response.status === 403){ showForbidden('Only users with the Administrator / PMO role can manage dashboard access.'); return; }
+  if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+  allUsers = Array.isArray(result.users) ? result.users : [];
+  renderUsers();
 }
 function toggleAddPanel(force){
   const panel = document.getElementById('addPanel');
   const open = typeof force === 'boolean' ? force : !panel.classList.contains('open');
   panel.classList.toggle('open', open);
-  document.getElementById('toggleAddBtn').textContent = open ? 'Close form' : '+ Add user';
+  document.getElementById('toggleAddBtn').textContent = open ? 'Close' : 'New user';
   if(open) setTimeout(() => document.getElementById('newEmail').focus(), 20);
-  else resetAddForm();
+  else ['newEmail','newFirstName','newLastName'].forEach((id) => { document.getElementById(id).value = ''; });
 }
 async function createUser(){
   const btn = document.getElementById('saveAddBtn');
@@ -481,60 +555,298 @@ async function createUser(){
     role: document.getElementById('newRole').value,
     is_active: true
   };
-  if(!payload.email || !payload.first_name || !payload.last_name){
-    toast('Email, first name, and last name are required.', 'error');
-    return;
-  }
-  if(!payload.email.toLowerCase().endsWith('@azumo.co')){
-    toast('Only @azumo.co emails are allowed.', 'error');
-    return;
-  }
-  btn.disabled = true;
-  btn.textContent = 'Creating…';
+  if(!payload.email || !payload.first_name || !payload.last_name){ toast('Email, first name and last name are required.', 'error'); return; }
+  if(!lower(payload.email).endsWith('@azumo.co')){ toast('Only @azumo.co emails are allowed.', 'error'); return; }
+  btn.disabled = true; btn.textContent = 'Creating…';
   try{
-    const response = await fetch('/api/users', {
-      method:'POST',
-      credentials:'same-origin',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
-    });
-    const result = await response.json().catch(() => ({}));
-    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    const result = await api('/api/users', { method:'POST', body: JSON.stringify(payload) });
     allUsers = result.users || allUsers;
-    searchTerm = '';
-    document.getElementById('searchInput').value = '';
-    filterUsers();
+    renderUsers();
     toggleAddPanel(false);
-    toast(`${payload.first_name} ${payload.last_name} added as ${displayRole(payload.role)}.`);
+    toast(`${payload.first_name} ${payload.last_name} added with ${displayRole(payload.role)} access.`);
+  }catch(error){ toast(error.message || 'Could not create the user.', 'error'); }
+  finally{ btn.disabled = false; btn.textContent = 'Create user'; }
+}
+
+// ---------- company role (Users + People) ----------
+async function savePersonRole(body, control){
+  if(control) control.disabled = true;
+  try{
+    const data = await adminPost('person-role', { ...body, write_jira: true });
+    applyAdminData(data);
+    const status = data.result?.jira_status;
+    if(status === 'written') toast('Company role saved and written to Jira.');
+    else if(status === 'skipped') toast('Company role saved in the board. Jira write-back is off, so Jira was not changed.', 'warn');
+    else if(status === 'failed') toast(`Saved in the board, but Jira rejected it: ${data.result.detail || ''}`, 'error');
+    else toast('Company role saved.');
   }catch(error){
-    toast(error.message || 'Could not create the user.', 'error');
-  }finally{
-    btn.disabled = false;
-    btn.textContent = 'Create user';
+    toast(error.message || 'Could not save the company role.', 'error');
+    renderAll();
+  }finally{ if(control) control.disabled = false; }
+}
+
+// ---------- Roles + People ----------
+function renderRoles(){
+  document.getElementById('rolesCount').textContent = `${ADMIN.roles.length} role${ADMIN.roles.length === 1 ? '' : 's'}`;
+  const lastSync = ADMIN.people.map((p) => p.synced_at).filter(Boolean).sort().pop();
+  document.getElementById('lastSyncLabel').textContent = lastSync ? `Last sync ${fmtDateTime(lastSync)}` : 'Never synced';
+  const tbody = document.getElementById('rolesBody');
+  if(!ADMIN.roles.length){
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">No roles yet. Click <b>Sync from Jira</b> to import every Position from the AA Epics.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = ADMIN.roles.map((r) => {
+    const holders = peopleForRole(r.id);
+    const names = holders.slice(0, 4).map((p) => p.name).join(', ') + (holders.length > 4 ? ` +${holders.length - 4}` : '');
+    const slotOptions = ['', 'PM', 'CSM', 'TL'].map((s) => `<option value="${s}" ${String(r.coverage_slot || '') === s ? 'selected' : ''}>${s || '— not a responsable —'}</option>`).join('');
+    return `<tr>
+      <td class="name">${esc(r.name)}</td>
+      <td><select class="select" data-role-slot="${r.id}">${slotOptions}</select></td>
+      <td><div>${holders.length}</div><div class="muted small">${esc(names)}</div></td>
+      <td><span class="pill ${r.source === 'jira' ? 'teal' : ''}">${r.source === 'jira' ? 'Jira' : 'Manual'}</span></td>
+      <td class="right"><div class="actions">
+        <button class="btn" type="button" data-role-edit="${r.id}">Rename</button>
+        <button class="btn btn-danger" type="button" data-role-delete="${r.id}">Delete</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  tbody.querySelectorAll('[data-role-slot]').forEach((el) => el.addEventListener('change', async (e) => {
+    const role = ADMIN.roles.find((r) => Number(r.id) === Number(e.target.dataset.roleSlot));
+    try{
+      applyAdminData(await adminPost('role-save', { id: role.id, name: role.name, coverage_slot: e.target.value }));
+      toast(`${role.name}: ${e.target.value ? `can be an account's ${e.target.value}` : 'not a responsable'}.`);
+    }catch(error){ toast(error.message, 'error'); renderRoles(); }
+  }));
+  tbody.querySelectorAll('[data-role-edit]').forEach((el) => el.addEventListener('click', (e) => openRoleModal(Number(e.currentTarget.dataset.roleEdit))));
+  tbody.querySelectorAll('[data-role-delete]').forEach((el) => el.addEventListener('click', async (e) => {
+    const role = ADMIN.roles.find((r) => Number(r.id) === Number(e.currentTarget.dataset.roleDelete));
+    if(!role || !confirm(`Delete the role "${role.name}"? People who had it as an override go back to their Jira Position. Jira is not changed.`)) return;
+    try{ applyAdminData(await adminPost('role-delete', { id: role.id, name: role.name })); toast(`Deleted ${role.name}.`); }
+    catch(error){ toast(error.message, 'error'); }
+  }));
+}
+function renderPeople(){
+  const term = lower(document.getElementById('peopleSearch').value);
+  const hideFreelance = document.getElementById('hideFreelance').checked;
+  const list = ADMIN.people.filter((p) => {
+    if(String(p.jira_epic_key).startsWith('manual:') && !p.role_id) return false;
+    if(hideFreelance && lower(p.freelance) === 'yes') return false;
+    return !term || [p.name, p.email, p.jira_position, p.role_name, p.jira_epic_key].join(' ').toLowerCase().includes(term);
+  });
+  document.getElementById('peopleCount').textContent = `${list.length} ${list.length === 1 ? 'person' : 'people'} from Jira`;
+  const tbody = document.getElementById('peopleBody');
+  if(!list.length){ tbody.innerHTML = '<tr><td colspan="5" class="empty">No people yet — run <b>Sync from Jira</b>.</td></tr>'; return; }
+  tbody.innerHTML = list.map((p) => {
+    const manual = String(p.jira_epic_key).startsWith('manual:');
+    const override = p.role_source === 'override' ? Number(p.role_id) : '';
+    const options = [`<option value="">${esc(p.jira_position ? `From Jira: ${p.jira_position}` : 'From Jira: (empty)')}</option>`]
+      .concat(ADMIN.roles.map((r) => `<option value="${r.id}" ${Number(r.id) === override ? 'selected' : ''}>${esc(r.name)}</option>`)).join('');
+    return `<tr>
+      <td><div class="name">${esc(p.name)}</div><div class="mono">${esc(p.email || 'no email matched')}</div></td>
+      <td class="mono">${manual ? '—' : esc(p.jira_epic_key)}</td>
+      <td>${p.jira_position ? esc(p.jira_position) : '<span class="muted">—</span>'}</td>
+      <td><select class="select" data-person-role="${esc(p.jira_epic_key)}">${options}</select>${p.differs_from_jira ? ' <span class="pill amber">Pending Jira</span>' : ''}</td>
+      <td>${lower(p.freelance) === 'yes' ? '<span class="pill">Yes</span>' : '<span class="muted">No</span>'}</td>
+    </tr>`;
+  }).join('');
+  tbody.querySelectorAll('[data-person-role]').forEach((el) => el.addEventListener('change', (e) => {
+    savePersonRole({ epic_key: e.target.dataset.personRole, role_id: e.target.value || null }, e.target);
+  }));
+}
+function openRoleModal(roleId){
+  editingRoleId = roleId || null;
+  const role = roleId ? ADMIN.roles.find((r) => Number(r.id) === Number(roleId)) : null;
+  document.getElementById('roleModalTitle').textContent = role ? 'Rename role' : 'New role';
+  document.getElementById('roleName').value = role?.name || '';
+  document.getElementById('roleSlot').value = role?.coverage_slot || '';
+  openModal('roleModal');
+  setTimeout(() => document.getElementById('roleName').focus(), 20);
+}
+async function saveRole(){
+  const name = document.getElementById('roleName').value.trim();
+  if(!name){ toast('Role name is required.', 'error'); return; }
+  try{
+    applyAdminData(await adminPost('role-save', { id: editingRoleId, name, coverage_slot: document.getElementById('roleSlot').value }));
+    closeModal('roleModal');
+    toast(`Saved ${name}.`);
+  }catch(error){ toast(error.message, 'error'); }
+}
+async function syncPeople(){
+  const btn = document.getElementById('syncPeopleBtn');
+  btn.disabled = true; btn.textContent = 'Syncing…';
+  try{
+    const data = await adminPost('sync-people');
+    applyAdminData(data);
+    const r = data.result || {};
+    toast(`Synced ${r.people || 0} people · ${r.positions || 0} positions · ${r.roles_created || 0} new roles.`);
+  }catch(error){ toast(error.message || 'Could not sync from Jira.', 'error'); }
+  finally{ btn.disabled = false; btn.textContent = 'Sync from Jira'; }
+}
+
+// ---------- Accounts ----------
+function renderWritebackNotice(){
+  const box = document.getElementById('writebackNotice');
+  box.innerHTML = ADMIN.writeback
+    ? '<div class="notice ok">Jira write-back is <b>on</b>: saving an account updates its PSA Epic in Jira right away, and every change is recorded in the Audit log.</div>'
+    : '<div class="notice">Jira write-back is <b>off</b>, so accounts are read-only for now. Setting <code>JIRA_WRITEBACK_ENABLED=true</code> in Vercel turns it on (the Jira token also needs edit permission on the PSA project).</div>';
+}
+function coverageCell(row, slot){
+  const name = row[`${slot}_assigned`];
+  return name ? esc(name) : '<span class="muted">—</span>';
+}
+function renderAccounts(){
+  const term = lower(document.getElementById('accountsSearch').value);
+  const list = ADMIN.accounts.filter((a) => !term || [a.key, a.client, a.pm_assigned, a.csm_assigned, a.tl_assigned].join(' ').toLowerCase().includes(term))
+    .sort((a, b) => String(a.client).localeCompare(String(b.client)));
+  document.getElementById('accountsCount').textContent = `${list.length} account${list.length === 1 ? '' : 's'}${ADMIN.snapshotDate ? ` · snapshot ${fmtDateUTC(ADMIN.snapshotDate)}` : ''}`;
+  const tbody = document.getElementById('accountsBody');
+  if(!list.length){ tbody.innerHTML = '<tr><td colspan="7" class="empty">No accounts in the latest snapshot.</td></tr>'; return; }
+  tbody.innerHTML = list.map((a) => {
+    const missing = Array.isArray(a.missing) ? a.missing : [];
+    const coverage = missing.length ? `<span class="pill amber">Missing ${esc(missing.join(', '))}</span>` : '<span class="pill green">Complete</span>';
+    return `<tr>
+      <td class="mono">${esc(a.key)}</td>
+      <td class="name">${esc(a.client)}</td>
+      <td>${coverageCell(a, 'pm')}</td>
+      <td>${coverageCell(a, 'csm')}</td>
+      <td>${coverageCell(a, 'tl')}</td>
+      <td>${coverage}</td>
+      <td class="right"><button class="btn" type="button" data-account-edit="${esc(a.key)}" ${ADMIN.writeback ? '' : 'disabled title="Jira write-back is off"'}>Edit</button></td>
+    </tr>`;
+  }).join('');
+  tbody.querySelectorAll('[data-account-edit]').forEach((el) => el.addEventListener('click', (e) => openAccountModal(e.currentTarget.dataset.accountEdit)));
+}
+// Options for one responsable slot: people whose company role is marked for that slot
+// (Roles tab), plus whoever holds it today so the current value never disappears.
+function slotOptions(slot, currentEmail, currentName, showAll){
+  const pool = ADMIN.people.filter((p) => p.email && (showAll || p.coverage_slot === slot.toUpperCase()));
+  const seen = new Set();
+  const opts = ['<option value="">— none —</option>'];
+  if(currentEmail && !pool.some((p) => lower(p.email) === lower(currentEmail))){
+    opts.push(`<option value="${esc(currentEmail)}" selected>${esc(currentName || currentEmail)} (current)</option>`);
+    seen.add(lower(currentEmail));
+  }
+  pool.slice().sort((a, b) => a.name.localeCompare(b.name)).forEach((p) => {
+    if(seen.has(lower(p.email))) return;
+    seen.add(lower(p.email));
+    opts.push(`<option value="${esc(p.email)}" ${lower(p.email) === lower(currentEmail) ? 'selected' : ''}>${esc(p.name)}${p.role_name ? ` · ${esc(p.role_name)}` : ''}</option>`);
+  });
+  return opts.join('');
+}
+function fillAccountSelects(){
+  const a = ADMIN.accounts.find((row) => row.key === editingAccountKey);
+  if(!a) return;
+  const showAll = document.getElementById('accShowAll').checked;
+  document.getElementById('accPm').innerHTML = slotOptions('pm', a.pm_assigned_email, a.pm_assigned, showAll);
+  document.getElementById('accCsm').innerHTML = slotOptions('csm', a.csm_assigned_email, a.csm_assigned, showAll);
+  document.getElementById('accTl').innerHTML = slotOptions('tl', a.tl_assigned_email, a.tl_assigned, showAll);
+  const slotsMissing = ['PM','CSM','TL'].filter((s) => !ADMIN.roles.some((r) => r.coverage_slot === s));
+  document.getElementById('accountModalNote').innerHTML = slotsMissing.length
+    ? `No role is marked as ${esc(slotsMissing.join(' / '))} yet — set it in the Roles tab, or tick “Show everyone”.`
+    : `Saving updates <b>${esc(a.key)}</b> in Jira and records it in the Audit log.`;
+}
+function openAccountModal(key){
+  const a = ADMIN.accounts.find((row) => row.key === key);
+  if(!a) return;
+  editingAccountKey = key;
+  document.getElementById('accountModalTitle').textContent = a.client;
+  document.getElementById('accountModalSub').innerHTML = `<span class="mono">${esc(a.key)}</span> · PSA Epic`;
+  document.getElementById('accShowAll').checked = false;
+  fillAccountSelects();
+  openModal('accountModal');
+}
+async function saveAccount(){
+  const a = ADMIN.accounts.find((row) => row.key === editingAccountKey);
+  if(!a) return;
+  const body = {
+    key: a.key,
+    pm_email: document.getElementById('accPm').value,
+    csm_email: document.getElementById('accCsm').value,
+    tl_email: document.getElementById('accTl').value
+  };
+  const btn = document.getElementById('accSave');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try{
+    const data = await adminPost('account-update', body);
+    applyAdminData(data);
+    closeModal('accountModal');
+    const n = data.result?.changed || 0;
+    toast(n ? `${a.client}: ${n} change${n === 1 ? '' : 's'} written to Jira.` : 'Nothing changed.');
+  }catch(error){ toast(error.message || 'Could not save the account.', 'error'); }
+  finally{ btn.disabled = false; btn.textContent = 'Save to Jira'; }
+}
+
+// ---------- Audit ----------
+function renderAudit(){
+  const tbody = document.getElementById('auditBody');
+  if(!ADMIN.audit.length){ tbody.innerHTML = '<tr><td colspan="5" class="empty">No changes recorded yet.</td></tr>'; return; }
+  tbody.innerHTML = ADMIN.audit.map((row) => {
+    const change = row.old_value || row.new_value
+      ? `${row.old_value ? `<span class="muted">${esc(row.old_value)}</span> → ` : ''}${esc(row.new_value || '')}`
+      : '—';
+    return `<tr>
+      <td class="muted" style="white-space:nowrap">${fmtDateTime(row.at)}</td>
+      <td class="mono">${esc(row.actor_email || '—')}</td>
+      <td><div>${esc(row.entity)}${row.field ? ` · ${esc(row.field)}` : ''}</div><div class="mono small">${esc(row.entity_key || '')}</div>${row.detail ? `<div class="muted small">${esc(row.detail)}</div>` : ''}</td>
+      <td>${change}</td>
+      <td>${jiraPill(row.jira_status)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ---------- modals ----------
+function openModal(id){ const m = document.getElementById(id); m.classList.add('open'); m.setAttribute('aria-hidden','false'); }
+function closeModal(id){ const m = document.getElementById(id); m.classList.remove('open'); m.setAttribute('aria-hidden','true'); }
+document.querySelectorAll('.modal').forEach((m) => m.addEventListener('click', (e) => { if(e.target === m) closeModal(m.id); }));
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') document.querySelectorAll('.modal.open').forEach((m) => closeModal(m.id)); });
+
+function renderAll(){
+  renderUsers();
+  if(!ADMIN.loaded) return;
+  renderWritebackNotice();
+  renderAccounts();
+  renderRoles();
+  renderPeople();
+  renderAudit();
+}
+async function loadAdmin(){
+  try{
+    applyAdminData(await api('/api/admin'));
+    document.getElementById('adminLoadNotice').innerHTML = '';
+  }catch(error){
+    // Users keeps working even if the new admin API isn't reachable yet.
+    document.getElementById('adminLoadNotice').innerHTML = `<div class="notice">Accounts / Roles / Audit could not load: ${esc(error.message)}. Users still works.</div>`;
+    ['accountsBody','rolesBody','peopleBody','auditBody'].forEach((id) => {
+      document.getElementById(id).innerHTML = '<tr><td colspan="7" class="empty">Not available.</td></tr>';
+    });
   }
 }
 async function boot(){
-  setLoading();
-  populateRoleSelect(document.getElementById('newRole'), 'Executive');
+  document.getElementById('newRole').innerHTML = ACCESS_ROLES.map((r) => `<option value="${r}" ${r === 'Executive' ? 'selected' : ''}>${esc(displayRole(r))}</option>`).join('');
   const allowed = await loadSession();
   if(!allowed) return;
   showApp();
-  await loadUsers();
+  showTab(currentTab());
+  await Promise.all([loadUsers(), loadAdmin()]);
 }
 
-document.getElementById('searchInput').addEventListener('input', (event) => {
-  searchTerm = event.target.value || '';
-  filterUsers();
-});
+document.getElementById('searchInput').addEventListener('input', (e) => { searchTerm = e.target.value || ''; renderUsers(); });
+document.getElementById('accountsSearch').addEventListener('input', renderAccounts);
+document.getElementById('peopleSearch').addEventListener('input', renderPeople);
+document.getElementById('hideFreelance').addEventListener('change', renderPeople);
 document.getElementById('impersonationExitBtn').addEventListener('click', stopImpersonation);
-document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+document.getElementById('signOutBtn').addEventListener('click', signOut);
 document.getElementById('toggleAddBtn').addEventListener('click', () => toggleAddPanel());
 document.getElementById('cancelAddBtn').addEventListener('click', () => toggleAddPanel(false));
 document.getElementById('saveAddBtn').addEventListener('click', createUser);
-boot().catch((error) => {
-  console.error(error);
-  showForbidden(error.message || 'Could not load User Management.');
-});
+document.getElementById('syncPeopleBtn').addEventListener('click', syncPeople);
+document.getElementById('newRoleBtn').addEventListener('click', () => openRoleModal(null));
+document.getElementById('roleSave').addEventListener('click', saveRole);
+document.getElementById('roleCancel').addEventListener('click', () => closeModal('roleModal'));
+document.getElementById('accShowAll').addEventListener('change', fillAccountSelects);
+document.getElementById('accSave').addEventListener('click', saveAccount);
+document.getElementById('accCancel').addEventListener('click', () => closeModal('accountModal'));
+boot().catch((error) => { console.error(error); showForbidden(error.message || 'Could not load Admin.'); });
 </script>
 </body>
 </html>

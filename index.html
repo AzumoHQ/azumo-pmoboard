@@ -1384,7 +1384,7 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
     <div class="nav-right">
       <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">Dark</button>
       <button class="nav-refresh" data-sync-action onclick="manualSnapshot()">Sync all sources</button>
-      <a class="auth-link" id="adminUsersLink" href="/admin/users" style="display:none">Users</a>
+      <a class="auth-link" id="adminUsersLink" href="/admin/users" style="display:none">Admin</a>
       <a class="auth-link" id="adminViewAsLink" href="/admin/users" style="display:none">View as</a>
       <button class="auth-pill" id="authStatusBtn" onclick="showAuthModal(currentUser ? 'account' : 'login')">Sign in</button>
       <button class="auth-link" id="authLogoutBtn" onclick="logoutUser()" style="display:none">Logout</button>
@@ -10329,8 +10329,23 @@ function showProcessFormError(message){
   el.style.display = message ? 'block' : 'none';
 }
 
+// Owner / co-responsible suggestions come from the company roles catalog (Admin → Roles,
+// fed by the Jira Position field). Still free text, so a role not in the catalog can be typed.
+let PF_COMPANY_ROLES_LOADED = false;
+function loadProcessCompanyRoles(){
+  if(PF_COMPANY_ROLES_LOADED) return;
+  PF_COMPANY_ROLES_LOADED = true;
+  fetch('/api/admin?action=roles', {credentials:'same-origin', cache:'no-store'})
+    .then(r => r.ok ? r.json() : {roles: []})
+    .then(json => {
+      const list = document.getElementById('pfCompanyRoles');
+      if(list) list.innerHTML = (json.roles || []).map(r => `<option value="${esc(r.name)}"></option>`).join('');
+    })
+    .catch(() => { PF_COMPANY_ROLES_LOADED = false; });
+}
 function openProcessForm(id){
   if(!canManageProcesses()){ showAuthModal('login'); return; }
+  loadProcessCompanyRoles();
   const modal = document.getElementById('processFormModal');
   if(!modal) return;
   document.getElementById('processFormTitle').textContent = id ? 'Editar proceso' : 'Nuevo proceso';
@@ -10555,11 +10570,12 @@ bootDashboard();
         </div>
         <div class="auth-field">
           <label for="pfOwnerRole">Owner role</label>
-          <input type="text" id="pfOwnerRole" placeholder="pmo">
+          <input type="text" id="pfOwnerRole" placeholder="pmo" list="pfCompanyRoles">
         </div>
         <div class="auth-field">
           <label for="pfCorresponsableRole">Co-responsible role</label>
-          <input type="text" id="pfCorresponsableRole" placeholder="pm">
+          <input type="text" id="pfCorresponsableRole" placeholder="pm" list="pfCompanyRoles">
+          <datalist id="pfCompanyRoles"></datalist>
         </div>
         <div class="auth-field">
           <label for="pfLastReviewed">Last reviewed</label>

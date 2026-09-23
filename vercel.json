@@ -19,6 +19,10 @@
     {
       "source": "/pmo-dashboard.html",
       "destination": "/"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin/users.html"
     }
   ],
   "crons": [
