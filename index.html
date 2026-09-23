@@ -3566,14 +3566,17 @@ const PROCESS_LANES = [
   {key:'pmo', label:'PMO / COS'},
 ];
 const BILLING_PROCESS_STEPS = [
-  {id:1, role:'assignee', title:'Time registration', desc:'Friday morning. Each team member logs their weekly hours in the time tracking system.', day:'Fri'},
-  {id:2, role:'pm', title:'Initial review by PM', desc:'Friday afternoon. The PM checks entries for their contracts for completeness and correctness.', day:'Fri'},
-  {id:3, role:'pm', title:'Time entry adjustment (if needed)', desc:'If there are discrepancies, the PM requests corrections and the team re-submits — the claim cycle.', returns_to:1},
-  {id:4, role:'csm', title:'CSM weekly review', desc:'Monday morning. The CSM reviews the weekly contract time records for consistency with client expectations.', day:'Mon'},
-  {id:5, role:'csm', title:'CSM feedback loop (if needed)', desc:'Additional issues trigger the claim process again for clarification.', returns_to:1},
-  {id:6, role:'pmo', title:'Final time register review (PMO / Chief of Staff)', desc:'Tuesday morning. Final check of all approved timesheets.', day:'Tue'},
-  {id:7, role:'pmo', title:'Invoice issuance', desc:'Once every validation is complete, the invoice is generated and sent to the client.'},
+  {id:1, role:'assignee', title:'Time registration', desc:'Friday morning. Each team member logs their weekly hours in the time tracking system.', day:'Fri', time_of_day:'Morning', icon:'database'},
+  {id:2, role:'pm', title:'Initial review by PM', desc:'Friday afternoon. The PM checks entries for their contracts for completeness and correctness.', day:'Fri', time_of_day:'Afternoon', icon:'document'},
+  {id:3, role:'pm', title:'Time entry adjustment (if needed)', desc:'If there are discrepancies, the PM requests corrections and the team re-submits — the claim cycle.', returns_to:1, node_type:'decision'},
+  {id:4, role:'csm', title:'CSM weekly review', desc:'Monday morning. The CSM reviews the weekly contract time records for consistency with client expectations.', day:'Mon', time_of_day:'Morning', icon:'document'},
+  {id:5, role:'csm', title:'CSM feedback loop (if needed)', desc:'Additional issues trigger the claim process again for clarification.', returns_to:1, node_type:'decision'},
+  {id:6, role:'pmo', title:'Final time register review (PMO / Chief of Staff)', desc:'Tuesday morning. Final check of all approved timesheets.', day:'Tue', time_of_day:'Morning', icon:'document'},
+  {id:7, role:'pmo', title:'Invoice issuance', desc:'Once every validation is complete, the invoice is generated and sent to the client.', icon:'database'},
 ];
+// Full day names for the diagram's day/time annotations (day_of_week itself stays the 3-letter
+// key so it keeps matching PROCESS_WEEK_SOURCES / the weekly cadence calendar below).
+const FULL_DAY_LABEL = {Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday'};
 // Weekly cadence calendar — Monday-to-Sunday view of where each process's fixed-day steps land.
 // Answers "on Monday, X happens" across the whole portal, not just inside one process's own diagram.
 // Steps with no fixed day (conditional loops, "once validation is complete") are left out on purpose —
@@ -3638,16 +3641,77 @@ function processStepsFor(id, fallbackSteps){
   const state = PROCESS_API_STATE[id];
   return (state && state.data && state.data.steps && state.data.steps.length) ? state.data.steps : fallbackSteps;
 }
+// Wraps a step/decision title onto up to 2 short lines for the SVG node text (SVG <text>
+// has no native wrapping). Truncates with an ellipsis if a third line would be needed.
+function pdWrapLines(text, maxChars){
+  const words = String(text || '').split(/\s+/).filter(Boolean);
+  const lines = [];
+  let cur = '';
+  words.forEach(w => {
+    const next = cur ? cur + ' ' + w : w;
+    if(next.length > maxChars && cur){ lines.push(cur); cur = w; }
+    else cur = next;
+  });
+  if(cur) lines.push(cur);
+  if(lines.length > 2){
+    const second = lines[1].length > maxChars - 1 ? lines[1].slice(0, maxChars - 1) : lines[1];
+    return [lines[0], second + '…'];
+  }
+  return lines;
+}
+// Small document / database glyphs drawn in a task node's top-right corner — the "system
+// of record" markers from the Billing_Process.pdf reference (a document icon on review
+// steps, a cylinder/database icon on steps that write to a system).
+function pdIconMarkup(icon, cornerX, cornerY){
+  if(icon === 'document'){
+    return `<g transform="translate(${cornerX - 15},${cornerY + 3})">
+      <rect x="0" y="0" width="11" height="14" rx="1.5" fill="var(--surf)" stroke="var(--muted)" stroke-width="1"/>
+      <line x1="2.5" y1="4" x2="8.5" y2="4" stroke="var(--muted)" stroke-width="1"/>
+      <line x1="2.5" y1="7" x2="8.5" y2="7" stroke="var(--muted)" stroke-width="1"/>
+      <line x1="2.5" y1="10" x2="6.5" y2="10" stroke="var(--muted)" stroke-width="1"/>
+    </g>`;
+  }
+  if(icon === 'database'){
+    return `<g transform="translate(${cornerX - 17},${cornerY + 3})">
+      <path d="M0,3 C0,1.3 3.1,0 7,0 C10.9,0 14,1.3 14,3 L14,11 C14,12.7 10.9,14 7,14 C3.1,14 0,12.7 0,11 Z" fill="var(--surf)" stroke="var(--muted)" stroke-width="1"/>
+      <path d="M0,3 C0,4.7 3.1,6 7,6 C10.9,6 14,4.7 14,3" fill="none" stroke="var(--muted)" stroke-width="1"/>
+    </g>`;
+  }
+  return '';
+}
+// Generated as a BPMN-style swimlane diagram: rounded-rect task boxes, diamond decision
+// points (with a "Sí" label on the forward edge and an unlabeled dashed loop-back, same
+// as the "Ok?" cycles in Billing_Process.pdf), start/end circles, small document/database
+// icons on the steps that call for them, and day/time-of-day badges above timed steps —
+// following the swimlane conventions from the process-mapping design research (see
+// "Portal de Procesos: reglas de diseño" notes) rather than the earlier numbered-circle
+// sketch. Still driven entirely by structured step data, so it can never drift from what's
+// documented.
 function renderProcessDiagram(containerId, steps, lanes = PROCESS_LANES){
   const el = document.getElementById(containerId);
   if(!el || !steps.length) return;
   const activeLaneKey = processLaneKeyForRole(effectiveUserRole());
-  const W = 900, laneH = 64, laneGap = 8, marginTop = 16, labelW = 118;
-  const plotW = W - labelW - 60;
+
+  const labelW = 118, laneH = 100, laneGap = 10, marginTop = 40;
+  const nodeW = 122, nodeH = 46, stepGapX = 166;
   const laneY = {};
   lanes.forEach((l,i) => { laneY[l.key] = marginTop + i * (laneH + laneGap) + laneH / 2; });
-  const H = marginTop + lanes.length * (laneH + laneGap) + 56;
-  const stepX = steps.map((s,i) => labelW + 30 + (steps.length > 1 ? (i / (steps.length - 1)) * (plotW - 20) : 0));
+  const H = marginTop + lanes.length * (laneH + laneGap) + 18;
+  const roleY = (node) => (node && laneY[node.role] != null) ? laneY[node.role] : laneY[lanes[0].key];
+
+  // Flow = an implicit Start before the first step and an implicit End after the last one,
+  // unless the author already placed an explicit start/end step via "Node type".
+  const hasStart = steps[0] && steps[0].node_type === 'start';
+  const hasEnd = steps[steps.length - 1] && steps[steps.length - 1].node_type === 'end';
+  const flow = [
+    ...(hasStart ? [] : [{__virtual: 'start', role: steps[0].role}]),
+    ...steps,
+    ...(hasEnd ? [] : [{__virtual: 'end', role: steps[steps.length - 1].role}]),
+  ];
+  const offset = hasStart ? 0 : 1; // shift from a real step's index in `steps` to its index in `flow`
+  const plotW = Math.max(flow.length - 1, 1) * stepGapX;
+  const W = labelW + 70 + plotW + 40;
+  const nodeX = flow.map((_, i) => labelW + 70 + i * stepGapX);
 
   let svg = `<svg viewBox="0 0 ${W} ${H}" class="proc-diagram-svg" role="img" aria-label="Process flow diagram">`;
   svg += `<defs>
@@ -3662,28 +3726,69 @@ function renderProcessDiagram(containerId, steps, lanes = PROCESS_LANES){
     svg += `<text x="10" y="${laneY[l.key] + 4}" font-size="12" font-weight="700" fill="${active ? 'var(--blue-lt)' : 'var(--muted)'}">${esc(l.label)}${active ? ' (you)' : ''}</text>`;
   });
 
-  for(let i = 0; i < steps.length - 1; i++){
-    const a = steps[i], b = steps[i+1];
-    const x1 = stepX[i], y1 = laneY[a.role], x2 = stepX[i+1], y2 = laneY[b.role];
+  // Day / time-of-day badges above the relevant column — "Friday Morning", "Monday Morning" etc.
+  steps.forEach((s, i) => {
+    if(!s.day) return;
+    const label = [FULL_DAY_LABEL[s.day] || s.day, s.time_of_day || ''].filter(Boolean).join(' ');
+    const x = nodeX[i + offset];
+    const bx = x - label.length * 2.6 - 12;
+    svg += `<g>
+      <circle cx="${bx}" cy="14" r="6" fill="none" stroke="var(--muted)" stroke-width="1"/>
+      <path d="M${bx},10.5 L${bx},14 L${bx + 3},14" fill="none" stroke="var(--muted)" stroke-width="1"/>
+      <text x="${bx + 10}" y="18" font-size="10" fill="var(--muted)">${esc(label)}</text>
+    </g>`;
+  });
+
+  // Main flow connectors — elbowed between lane rows, "Sí" labeling the edge leaving a decision.
+  for(let i = 0; i < flow.length - 1; i++){
+    const a = flow[i], b = flow[i + 1];
+    const x1 = nodeX[i], y1 = roleY(a), x2 = nodeX[i + 1], y2 = roleY(b);
     const midx = (x1 + x2) / 2;
     svg += `<path d="M${x1},${y1} L${midx},${y1} L${midx},${y2} L${x2},${y2}" fill="none" stroke="var(--blue-lt)" stroke-width="2" marker-end="url(#pdArrow-${containerId})" opacity=".55"/>`;
+    if(a.node_type === 'decision') svg += `<text x="${midx + 6}" y="${y1 - 6}" font-size="10" font-weight="700" fill="var(--blue-lt)">Sí</text>`;
   }
 
-  steps.forEach((s,i) => {
+  // Loop-back / rework edges (e.g. the "claim" cycle) — dashed orange arcs under the lanes,
+  // left unlabeled to match the reference diagram.
+  steps.forEach((s, i) => {
     if(!s.returns_to) return;
     const targetIdx = steps.findIndex(t => t.id === s.returns_to);
     if(targetIdx < 0) return;
-    const x1 = stepX[i], y1 = laneY[s.role] + laneH / 2 - 8;
-    const x2 = stepX[targetIdx], y2 = laneY[steps[targetIdx].role] + laneH / 2 - 8;
-    const arcY = H - 14;
+    const flowI = i + offset, flowT = targetIdx + offset;
+    const x1 = nodeX[flowI], y1 = roleY(flow[flowI]) + laneH / 2 - 10;
+    const x2 = nodeX[flowT], y2 = roleY(flow[flowT]) + laneH / 2 - 10;
+    const arcY = H - 12;
     svg += `<path d="M${x1},${y1} C${x1},${arcY} ${x2},${arcY} ${x2},${y2}" fill="none" stroke="#F97316" stroke-width="1.6" stroke-dasharray="5,4" marker-end="url(#pdArrowLoop-${containerId})"/>`;
   });
 
-  steps.forEach((s,i) => {
-    const x = stepX[i], y = laneY[s.role];
-    svg += `<g class="proc-step-node" style="cursor:pointer" onclick='toggleProcessStepDetail(${jsArg(containerId)}, ${s.id})'>
-      <circle cx="${x}" cy="${y}" r="15" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
-      <text x="${x}" y="${y + 4}" font-size="12" font-weight="700" text-anchor="middle" fill="var(--blue-lt)">${s.id}</text>
+  // Nodes: start/end circles, diamond decisions, rounded-rect tasks (with an optional icon).
+  flow.forEach((node, i) => {
+    const x = nodeX[i], y = roleY(node);
+    if(node.__virtual || node.node_type === 'start' || node.node_type === 'end'){
+      const isEnd = node.__virtual === 'end' || node.node_type === 'end';
+      svg += `<g class="proc-step-node">
+        <circle cx="${x}" cy="${y}" r="16" fill="${isEnd ? 'var(--surf)' : 'rgba(34,197,94,.12)'}" stroke="${isEnd ? '#F97316' : '#22C55E'}" stroke-width="2.5"/>
+        ${isEnd ? `<circle cx="${x}" cy="${y}" r="11" fill="none" stroke="#F97316" stroke-width="1.4"/>` : ''}
+        <text x="${x}" y="${y + laneH / 2 + 16}" font-size="10" font-weight="700" text-anchor="middle" fill="var(--muted)">${isEnd ? 'End' : 'Start'}</text>
+      </g>`;
+      return;
+    }
+    const clickable = !node.__virtual;
+    const onclick = clickable ? ` onclick='toggleProcessStepDetail(${jsArg(containerId)}, ${node.id})' style="cursor:pointer"` : '';
+    if(node.node_type === 'decision'){
+      const hw = 42, hh = 30;
+      const lines = pdWrapLines(node.title, 13);
+      svg += `<g class="proc-step-node"${onclick}>
+        <polygon points="${x},${y - hh} ${x + hw},${y} ${x},${y + hh} ${x - hw},${y}" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+        ${lines.map((line, li) => `<text x="${x}" y="${y + 4 + (li - (lines.length - 1) / 2) * 12}" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
+      </g>`;
+      return;
+    }
+    const lines = pdWrapLines(node.title, 15);
+    svg += `<g class="proc-step-node"${onclick}>
+      <rect x="${x - nodeW / 2}" y="${y - nodeH / 2}" width="${nodeW}" height="${nodeH}" rx="9" fill="var(--surf)" stroke="var(--blue-lt)" stroke-width="2"/>
+      ${pdIconMarkup(node.icon, x + nodeW / 2, y - nodeH / 2)}
+      ${lines.map((line, li) => `<text x="${x}" y="${y + 4 + (li - (lines.length - 1) / 2) * 12}" font-size="10" font-weight="600" text-anchor="middle" fill="var(--txt)">${esc(line)}</text>`).join('')}
     </g>`;
   });
   svg += `</svg>`;
@@ -10086,6 +10191,7 @@ function renderProcessManagerCard(p){
         </div>
         ${p.objective ? `<p style="margin:0 0 .7rem;font-size:.82rem;color:var(--txt);line-height:1.5">${esc(p.objective)}</p>` : ''}
         ${p.scope ? `<p style="margin:0 0 .9rem;font-size:.82rem;color:var(--muted);line-height:1.5"><b style="color:var(--txt)">Scope:</b> ${esc(p.scope)}</p>` : ''}
+        ${steps.length ? `<div class="proc-diagram" id="procDiagram-${esc(p.id)}"></div>` : ''}
         <div class="mc-sub" style="margin-bottom:.5rem">Process steps</div>
         ${stepsHtml}
         ${validationsHtml}
@@ -10110,6 +10216,9 @@ function renderProcessManagerList(){
     return;
   }
   host.innerHTML = PROCESS_MANAGER_STATE.list.map(renderProcessManagerCard).join('');
+  PROCESS_MANAGER_STATE.list.forEach(p => {
+    if((p.steps || []).length) renderProcessDiagram(`procDiagram-${p.id}`, p.steps);
+  });
   applyProcessFilters();
 }
 
@@ -10144,6 +10253,24 @@ function pfStepRowHtml(step){
     <div class="pf-grid">
       <div class="auth-field"><label>Role</label><input type="text" class="pf-step-role" value="${esc(s.role || '')}" placeholder="pm"></div>
       <div class="auth-field"><label>Day of week</label><input type="text" class="pf-step-day" value="${esc(s.day || '')}" placeholder="Mon"></div>
+      <div class="auth-field"><label>Time of day</label><input type="text" class="pf-step-timeofday" value="${esc(s.time_of_day || '')}" placeholder="Morning"></div>
+      <div class="auth-field">
+        <label>Node type (diagram shape)</label>
+        <select class="pf-step-nodetype">
+          <option value="task"${(!s.node_type || s.node_type === 'task') ? ' selected' : ''}>Task (rounded box)</option>
+          <option value="decision"${s.node_type === 'decision' ? ' selected' : ''}>Decision (diamond, e.g. "if needed")</option>
+          <option value="start"${s.node_type === 'start' ? ' selected' : ''}>Start (circle)</option>
+          <option value="end"${s.node_type === 'end' ? ' selected' : ''}>End (circle)</option>
+        </select>
+      </div>
+      <div class="auth-field">
+        <label>Icon</label>
+        <select class="pf-step-icon">
+          <option value=""${!s.icon ? ' selected' : ''}>None</option>
+          <option value="document"${s.icon === 'document' ? ' selected' : ''}>Document (review/record)</option>
+          <option value="database"${s.icon === 'database' ? ' selected' : ''}>Database (writes to a system)</option>
+        </select>
+      </div>
       <div class="auth-field pf-field-full"><label>Title</label><input type="text" class="pf-step-title" value="${esc(s.title || '')}" placeholder="Time registration"></div>
       <div class="auth-field pf-field-full"><label>Description</label><input type="text" class="pf-step-desc" value="${esc(s.desc || '')}" placeholder="What happens in this step"></div>
       <div class="auth-field"><label>Inputs</label><input type="text" class="pf-step-inputs" value="${esc(s.inputs || '')}"></div>
@@ -10288,7 +10415,10 @@ function pfCollectSteps(){
       returns_to: returnsRaw ? Number(returnsRaw) : null,
       day: val('.pf-step-day') || null,
       automation_tool: val('.pf-step-autotool') || null,
-      automation_url: val('.pf-step-autourl') || null
+      automation_url: val('.pf-step-autourl') || null,
+      node_type: (row.querySelector('.pf-step-nodetype')?.value || 'task'),
+      icon: (row.querySelector('.pf-step-icon')?.value || null) || null,
+      time_of_day: val('.pf-step-timeofday') || null
     };
   }).filter(s => s.title);
 }
