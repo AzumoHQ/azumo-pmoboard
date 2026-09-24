@@ -1872,7 +1872,7 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
         <h3 style="font-size:.95rem;margin-bottom:.25rem">Last reported status per project</h3>
         <div class="mc-sub">Projects with no report in 30+ days are flagged as stale.</div>
       </div>
-      <div class="btn-row">
+      <div class="harvest-hours-controls hh-filter-row" style="flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem">
         <div class="filter-field">
           <label for="psaProjectStatusFilter">View</label>
           <select id="psaProjectStatusFilter" onchange="setPsaProjectStatusFilter(this.value)">
@@ -1881,6 +1881,44 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
             <option value="all">All</option>
           </select>
         </div>
+        <div class="filter-field">
+          <label for="psaSearch">Search</label>
+          <input type="search" id="psaSearch" placeholder="Project name…" oninput="psaSetSearch(this.value)" style="border:1px solid var(--brd);border-radius:7px;padding:.32rem .6rem;background:var(--surf);color:var(--txt);font:inherit;font-size:.82rem;outline:none;width:160px">
+        </div>
+        <div class="filter-field">
+          <label>PM</label>
+          <div class="hh-ms-wrap" id="psPmWrap">
+            <button type="button" class="hh-ms-btn" id="psPmBtn" onclick="psToggleDrop('Pm',event)">
+              <span id="psPmBtnLabel">All PMs</span>
+              <span class="hh-ms-caret">&#9662;</span>
+            </button>
+            <div class="hh-ms-panel" id="psPmPanel" style="display:none">
+              <div class="hh-ms-head">
+                <button type="button" onclick="psSelectAllDrop('Pm')">Select All</button>
+                <button type="button" onclick="psClearDrop('Pm')">Clear All</button>
+              </div>
+              <input class="hh-ms-search" type="text" placeholder="Search PMs…" oninput="psSearchDrop(this,'Pm')">
+              <div id="psPmOptions"></div>
+            </div>
+          </div>
+        </div>
+        <div class="filter-field">
+          <label>Status</label>
+          <div class="hh-ms-wrap" id="psStatusWrap">
+            <button type="button" class="hh-ms-btn" id="psStatusBtn" onclick="psToggleDrop('Status',event)">
+              <span id="psStatusBtnLabel">All statuses</span>
+              <span class="hh-ms-caret">&#9662;</span>
+            </button>
+            <div class="hh-ms-panel" id="psStatusPanel" style="display:none">
+              <div class="hh-ms-head">
+                <button type="button" onclick="psSelectAllDrop('Status')">Select All</button>
+                <button type="button" onclick="psClearDrop('Status')">Clear All</button>
+              </div>
+              <div id="psStatusOptions"></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="psaClearFilters()">Clear filters</button>
         <button class="btn btn-ghost btn-sm" onclick="loadPsaProjectStatus(true)">Refresh</button>
       </div>
     </div>
@@ -1889,7 +1927,7 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
     <div id="psaProjectStatusError" style="display:none;padding:1rem;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:12px;color:#991B1B;margin-bottom:1rem"></div>
     <div class="fc-table-wrap" id="psaProjectStatusTableWrap" style="display:none">
       <table>
-        <thead><tr><th>Project</th><th>PM Assigned</th><th>Last Report</th><th>Days Since</th><th>Status</th><th>Link</th></tr></thead>
+        <thead><tr><th onclick="psaSort('name')" style="cursor:pointer;user-select:none">Project <span id="psaSortName"></span></th><th onclick="psaSort('pm')" style="cursor:pointer;user-select:none">PM Assigned <span id="psaSortPm"></span></th><th onclick="psaSort('date')" style="cursor:pointer;user-select:none">Last Report <span id="psaSortDate"></span></th><th onclick="psaSort('days')" style="cursor:pointer;user-select:none">Days Since <span id="psaSortDays">&#9650;</span></th><th onclick="psaSort('status')" style="cursor:pointer;user-select:none">Status <span id="psaSortStatus"></span></th><th>Link</th></tr></thead>
         <tbody id="psaProjectStatusTbody"></tbody>
       </table>
     </div>
@@ -9318,6 +9356,9 @@ function accountCoverageRows(){
 let psaProjectStatusData = null;
 let psaProjectStatusLoaded = false;
 let psaProjectStatusFilter = 'current';
+let psaSearch = '';
+let psSortCol = 'days';
+let psSortDir = 'asc';
 
 function setPsaProjectStatusFilter(value){
   psaProjectStatusFilter = value;
@@ -9357,11 +9398,52 @@ function psaProjectJiraUrl(epicKey){
 
 function renderPsaProjectStatusModule(){
   const allRows = psaProjectStatusData || [];
-  const rows = psaProjectStatusFilter === 'all'
+  // View filter (Current / Former / All)
+  let rows = psaProjectStatusFilter === 'all'
     ? allRows
     : psaProjectStatusFilter === 'former'
       ? allRows.filter(r => r.isClosed)
       : allRows.filter(r => !r.isClosed);
+
+  // Populate dropdowns (preserves checked state)
+  const pmOpts = [...new Set(rows.map(r => r.pmAssigned?.name || '—').filter(v => v !== '—'))].sort();
+  const stOpts = [...new Set(rows.map(r => r.lastReport?.projectStatus || '—'))].sort();
+  psPopulateDrop('Pm', pmOpts);
+  psPopulateDrop('Status', stOpts);
+
+  // Search filter
+  const q = psaSearch.trim().toLowerCase();
+  if(q) rows = rows.filter(r => (r.epicName || r.epicKey || '').toLowerCase().includes(q));
+
+  // Multi-select filters
+  rows = rows.filter(r => {
+    if(!psPassesFilter('Pm', r.pmAssigned?.name || '—')) return false;
+    if(!psPassesFilter('Status', r.lastReport?.projectStatus || '—')) return false;
+    return true;
+  });
+
+  // Sort
+  const SORT_FNS = {
+    name: r => (r.epicName || r.epicKey || '').toLowerCase(),
+    pm:   r => (r.pmAssigned?.name || '').toLowerCase(),
+    date: r => r.lastReport?.date || '',
+    days: r => r.daysSinceLastReport ?? 9999,
+    status: r => (r.lastReport?.projectStatus || '').toLowerCase()
+  };
+  const fn = SORT_FNS[psSortCol] || SORT_FNS.days;
+  rows = [...rows].sort((a, b) => {
+    const av = fn(a), bv = fn(b);
+    const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+    return psSortDir === 'asc' ? cmp : -cmp;
+  });
+
+  // Update sort indicators in headers
+  const COLS = ['name','pm','date','days','status'];
+  COLS.forEach(c => {
+    const el = document.getElementById('psaSort' + c.charAt(0).toUpperCase() + c.slice(1));
+    if(el) el.textContent = c === psSortCol ? (psSortDir === 'asc' ? '\u25b2' : '\u25bc') : '';
+  });
+
   const tableWrap = document.getElementById('psaProjectStatusTableWrap');
   const tbody = document.getElementById('psaProjectStatusTbody');
   const cards = document.getElementById('psaProjectStatusSummaryCards');
@@ -9371,8 +9453,9 @@ function renderPsaProjectStatusModule(){
   const total = rows.length;
 
   if(cards){
+    const allCount = (psaProjectStatusData || []).length;
     cards.innerHTML = [
-      `<div class="action-card"><div class="action-label">Projects tracked</div><div class="action-value">${total}</div><div class="action-copy">Active + closed PSA projects</div></div>`,
+      `<div class="action-card"><div class="action-label">Projects tracked</div><div class="action-value">${allCount}</div><div class="action-copy">Active + closed PSA projects</div></div>`,
       `<div class="action-card ${staleCount ? 'warning' : 'ok'}"><div class="action-label">Missing recent report</div><div class="action-value">${staleCount}</div><div class="action-copy">30+ days without a report</div></div>`
     ].join('');
   }
@@ -9385,17 +9468,92 @@ function renderPsaProjectStatusModule(){
     const statusLabel = row.lastReport?.projectStatus || '—';
     const staleBadge = row.stale
       ? `<span class="badge badge-red">${lastDate ? `${days}d ago` : 'No report'}</span>`
-      : `<span class="badge badge-green">${days != null ? `${days}d ago` : '—'}</span>`;
+      : `<span class="badge badge-green">${days != null ? `${days}d ago` : '\u2014'}</span>`;
     return `<tr>
       <td style="font-weight:900">${esc(row.epicName || row.epicKey)}</td>
       <td>${esc(pmName)}</td>
-      <td>${esc(lastDate || '—')}</td>
+      <td>${esc(lastDate || '\u2014')}</td>
       <td>${staleBadge}</td>
       <td>${esc(statusLabel)}</td>
       <td><a class="btn btn-ghost btn-sm" href="${psaProjectJiraUrl(row.epicKey)}" target="_blank" rel="noopener noreferrer">Open in Jira</a></td>
     </tr>`;
   }).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No projects found.</td></tr>';
 }
+// --- Project Status multi-select + sort helpers ---
+const PS_DROP_LABELS = {Pm:'PMs',Status:'statuses'};
+function psPassesFilter(cap, value){
+  const els = [...document.querySelectorAll(`#ps${cap}Options input[type=checkbox]`)];
+  if(!els.length) return true;
+  const sel = els.filter(i => i.checked);
+  if(!sel.length || sel.length === els.length) return true;
+  return sel.some(i => i.value === value);
+}
+function psPopulateDrop(cap, opts){
+  const optsEl = document.getElementById(`ps${cap}Options`);
+  if(!optsEl) return;
+  const prev = new Map([...optsEl.querySelectorAll('input[type=checkbox]')].map(i => [i.value, i.checked]));
+  optsEl.innerHTML = opts.map(v =>
+    `<label class="hh-ms-option"><input type="checkbox" value="${esc(v)}" onchange="psDropChange('${cap}')"${(prev.has(v) ? prev.get(v) : true) ? ' checked' : ''}> ${esc(v)}</label>`
+  ).join('');
+  psUpdateBtn(cap);
+}
+function psUpdateBtn(cap){
+  const els = [...document.querySelectorAll(`#ps${cap}Options input[type=checkbox]`)];
+  const sel = els.filter(i => i.checked);
+  const lbl = document.getElementById(`ps${cap}BtnLabel`);
+  if(!lbl) return;
+  if(!els.length || sel.length === els.length || !sel.length){
+    lbl.textContent = `All ${PS_DROP_LABELS[cap] || cap.toLowerCase()}`;
+    return;
+  }
+  lbl.textContent = sel.length === 1 ? sel[0].value : `${sel.length} ${PS_DROP_LABELS[cap] || cap.toLowerCase()}`;
+}
+function psDropChange(cap){ psUpdateBtn(cap); renderPsaProjectStatusModule(); }
+function psToggleDrop(cap, e){
+  if(e) e.stopPropagation();
+  const panel = document.getElementById(`ps${cap}Panel`);
+  if(!panel) return;
+  const opening = panel.style.display === 'none';
+  ['Pm','Status'].forEach(k => { const p = document.getElementById(`ps${k}Panel`); if(p) p.style.display = 'none'; });
+  if(opening) panel.style.display = 'block';
+}
+function psSelectAllDrop(cap){
+  document.querySelectorAll(`#ps${cap}Options input[type=checkbox]`).forEach(i => i.checked = true);
+  psUpdateBtn(cap); renderPsaProjectStatusModule();
+}
+function psClearDrop(cap){
+  document.querySelectorAll(`#ps${cap}Options input[type=checkbox]`).forEach(i => i.checked = false);
+  psUpdateBtn(cap); renderPsaProjectStatusModule();
+}
+function psSearchDrop(input, cap){
+  const q = input.value.toLowerCase();
+  document.querySelectorAll(`#ps${cap}Options .hh-ms-option`).forEach(opt => {
+    opt.style.display = opt.textContent.trim().toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+function psaSetSearch(val){ psaSearch = val; renderPsaProjectStatusModule(); }
+function psaClearFilters(){
+  psaSearch = '';
+  const el = document.getElementById('psaSearch'); if(el) el.value = '';
+  ['Pm','Status'].forEach(cap => {
+    document.querySelectorAll(`#ps${cap}Options input[type=checkbox]`).forEach(i => i.checked = true);
+    psUpdateBtn(cap);
+  });
+  renderPsaProjectStatusModule();
+}
+function psaSort(col){
+  if(psSortCol === col){ psSortDir = psSortDir === 'asc' ? 'desc' : 'asc'; }
+  else { psSortCol = col; psSortDir = col === 'days' ? 'asc' : 'asc'; }
+  renderPsaProjectStatusModule();
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest?.('.hh-ms-wrap[id^="ps"]')){
+    ['Pm','Status'].forEach(k => { const p = document.getElementById(`ps${k}Panel`); if(p) p.style.display = 'none'; });
+  }
+}, true);
+window.psToggleDrop = psToggleDrop; window.psSelectAllDrop = psSelectAllDrop;
+window.psClearDrop = psClearDrop; window.psDropChange = psDropChange; window.psSearchDrop = psSearchDrop;
+window.psaSetSearch = psaSetSearch; window.psaClearFilters = psaClearFilters; window.psaSort = psaSort;
 
 const INFO_HUB_COVERAGE = [
   {client:'Screenwave Media', csm:'Lenin Salazar', responsable:'Pablo Bizzotto', pm:'Desi Pepermans', start:'2025-03-25', status:'Active', tl:'Gaspar Pollano'},
