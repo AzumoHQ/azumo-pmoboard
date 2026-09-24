@@ -2199,11 +2199,11 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-route"></i></div>
       <h2>Processes</h2>
-      <div class="sec-tag">1 process · source: Notion</div>
+      <div class="sec-tag">Process Portal</div>
     </div>
 
     <div class="proc-toolbar" id="procToolbar" style="display:none">
-      <button class="btn btn-primary btn-sm" type="button" onclick="openProcessForm(null)"><i class="ti ti-plus"></i> Nuevo proceso</button>
+      <button class="btn btn-primary btn-sm" type="button" onclick="openProcessForm(null)"><i class="ti ti-plus"></i> New process</button>
     </div>
 
     <details class="qa-check" style="margin-bottom:1rem">
@@ -2228,7 +2228,7 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
 
     <div class="proc-week-cal">
       <div class="proc-week-cal-head"><i class="ti ti-calendar-time"></i> Weekly cadence — where each process lands, Monday to Sunday</div>
-      <div class="proc-week-cal-note">Built from each process's own step days (e.g. Billing's Friday time registration, Monday CSM review). A day with nothing shown just means no documented process has a fixed-day step there yet.</div>
+      <div class="proc-week-cal-note">Fixed-day steps from every documented process.</div>
       <div class="proc-week-cal-grid" id="processWeekCalendarGrid"></div>
     </div>
 
@@ -3563,7 +3563,7 @@ function renderProcessHealthStrip(){
     <span><i class="proc-health-dot green"></i> ${counts.green} healthy</span>
     <span><i class="proc-health-dot yellow"></i> ${counts.yellow} review due</span>
     <span><i class="proc-health-dot red"></i> ${counts.red} overdue / never reviewed</span>
-    <span style="margin-left:auto;color:var(--muted)">Reviewed vs. cadence — see Section guide for the process framework</span>
+    <span style="margin-left:auto;color:var(--muted)">Last review vs. review cadence</span>
   `;
 }
 // Generated process flow diagrams — built from structured step data instead of a hand-drawn/exported
@@ -3784,7 +3784,7 @@ function renderProcessDiagram(containerId, steps, lanes = PROCESS_LANES){
     const x1 = nodeX[i], y1 = roleY(a), x2 = nodeX[i + 1], y2 = roleY(b);
     const midx = (x1 + x2) / 2;
     svg += `<path d="M${x1},${y1} L${midx},${y1} L${midx},${y2} L${x2},${y2}" fill="none" stroke="var(--blue-lt)" stroke-width="2" marker-end="url(#pdArrow-${containerId})" opacity=".55"/>`;
-    if(a.node_type === 'decision') svg += `<text x="${midx + 6}" y="${y1 - 6}" font-size="10" font-weight="700" fill="var(--blue-lt)">Sí</text>`;
+    if(a.node_type === 'decision') svg += `<text x="${midx + 6}" y="${y1 - 6}" font-size="10" font-weight="700" fill="var(--blue-lt)">Yes</text>`;
   }
 
   // Loop-back / rework edges (e.g. the "claim" cycle) — dashed orange arcs under the lanes,
@@ -10255,8 +10255,8 @@ function renderProcessManagerCard(p){
     : '';
   const searchText = [p.name, p.category, p.owner_role, p.corresponsable_role, p.objective].filter(Boolean).join(' ').toLowerCase();
   const manageActions = canManageProcesses()
-    ? `<button class="btn btn-ghost btn-sm" type="button" onclick="openProcessForm(${jsArg(p.id)})"><i class="ti ti-pencil"></i> Editar</button>
-       <button class="btn btn-ghost btn-sm" type="button" onclick="confirmDeleteProcess(${jsArg(p.id)},${jsArg(p.name)})"><i class="ti ti-trash"></i> Eliminar</button>`
+    ? `<button class="btn btn-ghost btn-sm" type="button" onclick="openProcessForm(${jsArg(p.id)})"><i class="ti ti-pencil"></i> Edit</button>
+       <button class="btn btn-ghost btn-sm" type="button" onclick="confirmDeleteProcess(${jsArg(p.id)},${jsArg(p.name)})"><i class="ti ti-trash"></i> Delete</button>`
     : '';
   return `<div class="proc-group" data-group=${jsArg(p.id)}>
     <details class="qa-check" data-cat="${esc(p.category || 'other')}" data-roles="assignee pm csm pmo admin executive" data-search="${esc(searchText)}">
@@ -10288,7 +10288,7 @@ function renderProcessManagerList(){
   if(!host) return;
   if(!PROCESS_MANAGER_STATE.list.length){
     host.innerHTML = canManageProcesses()
-      ? '<div style="font-size:.78rem;color:var(--muted);padding:.6rem .2rem 1rem">No processes loaded yet — use "Nuevo proceso" above to add the rest of the 13.</div>'
+      ? '<div style="font-size:.78rem;color:var(--muted);padding:.6rem .2rem 1rem">No other processes documented yet.</div>'
       : '';
     applyProcessFilters();
     return;
@@ -10335,20 +10335,20 @@ const PF_NODE_TYPES = [
 function pfStepRowHtml(step){
   const s=step||{};
   const nt=s.node_type||'task';
-  const types=[{v:'task',l:'Tarea'},{v:'decision',l:'Decisión'},{v:'document',l:'Documento'}];
+  const types=[{v:'task',l:'Task'},{v:'decision',l:'Decision'},{v:'document',l:'Document'}];
   return `<div class="pf-step-compact" data-desc="${esc(s.desc||'')}" data-icon="${esc(s.icon||'')}" data-returns="${esc(s.returns_to!=null?String(s.returns_to):'')}">
     <span class="pf-step-num">?</span>
-    <input type="text" class="pf-step-title" value="${esc(s.title||'')}" placeholder="Acción…">
+    <input type="text" class="pf-step-title" value="${esc(s.title||'')}" placeholder="Action…">
     <select class="pf-step-role" data-init="${esc(s.role||'')}">
-      <option value="">— rol —</option>${s.role?`<option value="${esc(s.role)}" selected>${esc(s.role)}</option>`:''}
+      <option value="">— role —</option>${s.role?`<option value="${esc(s.role)}" selected>${esc(s.role)}</option>`:''}
     </select>
-    <label class="pf-step-docs-lbl" title="¿Requiere documentación?">
+    <label class="pf-step-docs-lbl" title="Requires documentation">
       <input type="checkbox" class="pf-step-has-docs"${s.has_docs?' checked':''}> Doc
     </label>
-    <label class="pf-step-auto-lbl" title="¿Tiene automatización?">
+    <label class="pf-step-auto-lbl" title="Has an automation">
       <input type="checkbox" class="pf-step-has-auto"${s.has_auto?' checked':''} onchange="pfToggleAutoRow(this)"> ⚡
     </label>
-    <label class="pf-step-eventual-lbl" title="Paso eventual — no tiene día/horario fijo">
+    <label class="pf-step-eventual-lbl" title="Occasional step — no fixed day or time">
       <input type="checkbox" class="pf-step-is-eventual"${s.is_eventual?' checked':''} onchange="pfToggleEventual(this)"> Eventual
     </label>
     <div class="pf-step-type-mini">
@@ -10356,21 +10356,21 @@ function pfStepRowHtml(step){
     </div>
     <input type="hidden" class="pf-step-nodetype" value="${esc(nt)}">
     <div class="pf-row-actions">
-      <button type="button" class="pf-icon-btn" title="Subir" onclick="pfMoveRow(this,-1)"><i class="ti ti-chevron-up"></i></button>
-      <button type="button" class="pf-icon-btn" title="Bajar" onclick="pfMoveRow(this,1)"><i class="ti ti-chevron-down"></i></button>
-      <button type="button" class="pf-icon-btn" title="Eliminar" onclick="this.closest('.pf-step-compact').remove();pfRenumberSteps();pfRefreshDiagramPreview()"><i class="ti ti-trash"></i></button>
+      <button type="button" class="pf-icon-btn" title="Move up" onclick="pfMoveRow(this,-1)"><i class="ti ti-chevron-up"></i></button>
+      <button type="button" class="pf-icon-btn" title="Move down" onclick="pfMoveRow(this,1)"><i class="ti ti-chevron-down"></i></button>
+      <button type="button" class="pf-icon-btn" title="Remove" onclick="this.closest('.pf-step-compact').remove();pfRenumberSteps();pfRefreshDiagramPreview()"><i class="ti ti-trash"></i></button>
     </div>
     <div class="pf-step-auto-row"${s.has_auto?' style=\"display:flex\"':''}>
-      <input type="url" class="pf-step-auto-url" value="${esc(s.automation_url||'')}" placeholder="https://… link a la automatización">
+      <input type="url" class="pf-step-auto-url" value="${esc(s.automation_url||'')}" placeholder="https://… automation link">
     </div>
     <div class="pf-step-schedule-row"${s.is_eventual?' style=\"display:none\"':''}>
       <select class="pf-step-day">
-        <option value="">— día —</option>
-        ${['Mon','Tue','Wed','Thu','Fri'].map((d,i)=>`<option value="${d}"${s.day===d?' selected':''}>${['Lun','Mar','Mié','Jue','Vie'][i]}</option>`).join('')}
+        <option value="">— day —</option>
+        ${['Mon','Tue','Wed','Thu','Fri'].map((d,i)=>`<option value="${d}"${s.day===d?' selected':''}>${['Mon','Tue','Wed','Thu','Fri'][i]}</option>`).join('')}
       </select>
       <select class="pf-step-time">
-        <option value="">— horario —</option>
-        ${[['Morning','Mañana'],['Afternoon','Tarde'],['Evening','Noche']].map(([v,l])=>`<option value="${v}"${s.time_of_day===v?' selected':''}>${l}</option>`).join('')}
+        <option value="">— time —</option>
+        ${[['Morning','Morning'],['Afternoon','Afternoon'],['Evening','Evening']].map(([v,l])=>`<option value="${v}"${s.time_of_day===v?' selected':''}>${l}</option>`).join('')}
       </select>
     </div>
   </div>`;
@@ -10611,7 +10611,7 @@ function pfInitCanvasPalette(){
 
 function pfGenerateFromCanvas(){
   const steps=pfSerializeCanvas();
-  if(!steps.length){alert('Dibujá al menos un nodo antes de generar.');return;}
+  if(!steps.length){alert('Draw at least one node before generating.');return;}
   // Populate name from first non-start/end node label (if field is empty)
   const pfNameEl=document.getElementById('pfName');
   if(!pfNameEl.value){
@@ -10641,7 +10641,7 @@ function pfRenderSwimlanes(){
   const container=document.getElementById('pfSwimlane');if(!container)return;
   const steps=pfCollectSteps();
   if(!steps.length){
-    container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.84rem;text-align:center;padding:2rem">Agregá pasos para ver<br>el diagrama de swimlanes</div>';
+    container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.84rem;text-align:center;padding:2rem">Add steps to generate<br>the swimlane diagram</div>';
     return;
   }
   const d=processLanesFromSteps(steps);
@@ -10724,7 +10724,7 @@ function openProcessForm(id){
   loadProcessCompanyRoles();
   const modal = document.getElementById('processFormModal');
   if(!modal) return;
-  document.getElementById('processFormTitle').textContent = id ? 'Editar proceso' : 'Nuevo proceso';
+  document.getElementById('processFormTitle').textContent = id ? 'Edit process' : 'New process';
   showProcessFormError('');
   document.getElementById('pfId').value = '';
   document.getElementById('pfId').disabled = false;
@@ -10927,7 +10927,7 @@ bootDashboard();
 <div class="auth-modal process-modal" id="processFormModal" aria-hidden="true">
   <div class="auth-card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-shrink:0">
-      <h3 style="margin:0" id="processFormTitle">Nuevo proceso</h3>
+      <h3 style="margin:0" id="processFormTitle">New process</h3>
       <div style="display:flex;gap:.4rem;align-items:center">
         <button class="btn btn-ghost btn-sm" type="button" id="pfLoadExampleBtn" onclick="pfLoadBillingExample()" title="Fill the form with the Billing Process as a reference example"><i class="ti ti-template"></i> Load Billing example</button>
         <button class="btn btn-ghost btn-sm" type="button" onclick="closeProcessForm()">✕</button>
@@ -10938,7 +10938,7 @@ bootDashboard();
       <!-- izquierda: swimlane auto-generado -->
       <div class="pf-split-left" id="pfCanvasSection">
         <div class="pf-swimlane-container" id="pfSwimlane">
-          <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.84rem;text-align:center;padding:2rem">Agregá pasos para ver<br>el diagrama de swimlanes</div>
+          <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.84rem;text-align:center;padding:2rem">Add steps to generate<br>the swimlane diagram</div>
         </div>
       </div>
 
