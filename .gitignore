@@ -12,3 +12,10 @@ activity_feed_patch2.py
 overview_pm_patch.py
 scripts/audit-design-system.js
 web/
+
+# Scripts de patch de un solo uso (ver skill azumo-pmoboard) — no se versionan
+patch_*.py
+fix_*.py
+resolve_conflicts.py
+ship.sh
+.DS_Store
