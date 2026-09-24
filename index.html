@@ -3150,7 +3150,13 @@ let dueDatesUrgencyFilter = null; // 'overdue'|'soon'|'mid'|'far'
 const PMO_ONLY_SECTIONS = new Set(['pmoActionCenter','dueDates','pendingAssignments']);
 let openModuleGroup = null;
 function canSeePmoGroup(){ return ['admin','pmo'].includes(effectiveUserRole()); }
+// Preview-only modules: hidden on the production hosts, visible on Vercel preview
+// deployments (development branch) and localhost, so they can keep evolving before launch.
+const PMO_PRODUCTION_HOSTS = new Set(['pmoboard.it.azumo.com','pmoboard.vercel.app']);
+const IS_PMO_PRODUCTION = PMO_PRODUCTION_HOSTS.has(location.hostname);
+const PREVIEW_ONLY_SECTIONS = new Set(['processes','helpChangelog']);
 function sectionAllowedForCurrentRole(id){
+  if(IS_PMO_PRODUCTION && PREVIEW_ONLY_SECTIONS.has(id)) return false;
   if(id === 'helpChangelog') return true;
   if(id === 'processes') return true;
   const role = effectiveUserRole();
