@@ -3570,6 +3570,34 @@ const PROCESS_LANES = [
   {key:'csm', label:'CSM'},
   {key:'pmo', label:'PMO / COS'},
 ];
+// Saved processes store free-text roles (company role catalog: "PM", "CSM", "Team"...), not the
+// canonical lane keys. Normalize known aliases onto the canonical lanes (so the viewer's own lane
+// still highlights) and give any other role its own lane, ordered by first appearance in the flow.
+const PROCESS_ROLE_ALIASES = {
+  assignee:['assignee','team','team member','team members','developer','developers','engineer','engineers'],
+  pm:['pm','project manager','project managers'],
+  csm:['csm','customer success','customer success manager','customer success managers'],
+  pmo:['pmo','cos','pmo / cos','pmo/cos','chief of staff','admin'],
+};
+function processLaneKeyForStepRole(role){
+  const r = String(role || '').trim().toLowerCase();
+  if(!r) return '__none';
+  for(const [key, aliases] of Object.entries(PROCESS_ROLE_ALIASES)) if(aliases.includes(r)) return key;
+  return String(role).trim();
+}
+function processLanesFromSteps(steps){
+  const lanes = [], seen = new Set();
+  const mapped = (steps || []).map(s => {
+    const key = processLaneKeyForStepRole(s.role);
+    if(!seen.has(key)){
+      seen.add(key);
+      const canon = PROCESS_LANES.find(l => l.key === key);
+      lanes.push({key, label: canon ? canon.label : (key === '__none' ? 'Unassigned' : key)});
+    }
+    return {...s, role: key};
+  });
+  return {lanes: lanes.length ? lanes : PROCESS_LANES, steps: mapped};
+}
 const BILLING_PROCESS_STEPS = [
   {id:1, role:'assignee', title:'Time registration', desc:'Friday morning. Each team member logs their weekly hours in the time tracking system.', day:'Fri', time_of_day:'Morning', icon:'database'},
   {id:2, role:'pm', title:'Initial review by PM', desc:'Friday afternoon. The PM checks entries for their contracts for completeness and correctness.', day:'Fri', time_of_day:'Afternoon', icon:'document'},
@@ -10261,7 +10289,10 @@ function renderProcessManagerList(){
   }
   host.innerHTML = PROCESS_MANAGER_STATE.list.map(renderProcessManagerCard).join('');
   PROCESS_MANAGER_STATE.list.forEach(p => {
-    if((p.steps || []).length) renderProcessDiagram(`procDiagram-${p.id}`, p.steps);
+    if((p.steps || []).length){
+      const d = processLanesFromSteps(p.steps);
+      renderProcessDiagram(`procDiagram-${p.id}`, d.steps, d.lanes);
+    }
   });
   applyProcessFilters();
 }
@@ -10299,7 +10330,7 @@ function pfStepRowHtml(step){
   const s=step||{};
   const nt=s.node_type||'task';
   const types=[{v:'task',l:'Tarea'},{v:'decision',l:'Decisión'},{v:'document',l:'Documento'}];
-  return `<div class="pf-step-compact">
+  return `<div class="pf-step-compact" data-desc="${esc(s.desc||'')}" data-icon="${esc(s.icon||'')}" data-returns="${esc(s.returns_to!=null?String(s.returns_to):'')}">
     <span class="pf-step-num">?</span>
     <input type="text" class="pf-step-title" value="${esc(s.title||'')}" placeholder="Acción…">
     <select class="pf-step-role" data-init="${esc(s.role||'')}">
@@ -10607,10 +10638,8 @@ function pfRenderSwimlanes(){
     container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.84rem;text-align:center;padding:2rem">Agregá pasos para ver<br>el diagrama de swimlanes</div>';
     return;
   }
-  const seen=new Set(),lanes=[];
-  steps.forEach(s=>{const r=(s.role||'').trim()||'Sin rol';if(!seen.has(r)){seen.add(r);lanes.push({key:r,label:r});}});
-  const mapped=steps.map(s=>({...s,role:(s.role||'').trim()||'Sin rol'}));
-  renderProcessDiagram('pfSwimlane',mapped,lanes);
+  const d=processLanesFromSteps(steps);
+  renderProcessDiagram('pfSwimlane',d.steps,d.lanes);
 }
 window.pfRenderSwimlanes=pfRenderSwimlanes;
 
@@ -10665,7 +10694,8 @@ function loadProcessCompanyRoles(){
 function pfPopulateRoleSelect(sel){
   const current = sel.value || sel.dataset.init || '';
   sel.innerHTML = '<option value="">— role —</option>' +
-    PF_ROLES_PEOPLE.map(r => `<option value="${esc(r.role_name)}"${r.role_name === current ? ' selected' : ''}>${esc(r.role_name)}</option>`).join('');
+    PF_ROLES_PEOPLE.map(r => `<option value="${esc(r.role_name)}"${r.role_name === current ? ' selected' : ''}>${esc(r.role_name)}</option>`).join('') +
+    (current && !PF_ROLES_PEOPLE.some(r => r.role_name === current) ? `<option value="${esc(current)}" selected>${esc(current)}</option>` : '');
   pfUpdateRoleAvatar(sel);
 }
 function pfUpdateRoleAvatar(sel){
@@ -10758,6 +10788,30 @@ function closeProcessForm(){
 window.openProcessForm = openProcessForm;
 window.closeProcessForm = closeProcessForm;
 
+// Reference example: the Billing Process exactly as documented today (BILLING_PROCESS_STEPS),
+// with human-readable roles so the lanes resolve the same way a hand-built process would.
+function pfLoadBillingExample(){
+  const roleLabel = {assignee:'Team', pm:'PM', csm:'CSM', pmo:'PMO / COS'};
+  const idEl = document.getElementById('pfId');
+  if(!idEl.disabled) idEl.value = 'billing-process-example';
+  document.getElementById('pfName').value = 'Billing Process (example)';
+  document.getElementById('pfCategory').value = 'billing';
+  document.getElementById('pfVersion').value = '1.00';
+  document.getElementById('pfOwnerRole').value = 'PMO / COS';
+  document.getElementById('pfCorresponsableRole').value = 'PM';
+  document.getElementById('pfObjective').value = 'Improve the efficiency of the billing process — every role owns one lane in the flow (Team registers time, PM and CSM review it, PMO/Chief of Staff does the final check before invoicing).';
+  document.getElementById('pfScope').value = 'Time registration - Invoice issuance';
+  document.getElementById('pfStepsList').innerHTML = '';
+  document.getElementById('pfValidationsList').innerHTML = '';
+  document.getElementById('pfResourcesList').innerHTML = '';
+  BILLING_PROCESS_STEPS.forEach(s => addProcessStepRow({
+    ...s, role: roleLabel[s.role] || s.role, has_docs: s.icon === 'document', is_eventual: !s.day
+  }));
+  addProcessResourceRow({label:'Billing tracking sheet', url:'https://docs.google.com/spreadsheets/d/1ZrkOk2kOygmjmJmUGnMC28QIJHIuocqz-qJMvHmRzx4/edit?gid=1319034044#gid=1319034044', kind:'sheet'});
+  pfRenderSwimlanes();
+}
+window.pfLoadBillingExample = pfLoadBillingExample;
+
 function pfCollectSteps(){
   return Array.from(document.querySelectorAll('#pfStepsList .pf-step-compact')).map((row,i)=>{
     const val=sel=>(row.querySelector(sel)?.value||'').trim();
@@ -10765,12 +10819,12 @@ function pfCollectSteps(){
       id:i+1,
       role:val('.pf-step-role'),
       title:val('.pf-step-title'),
-      desc:'',
+      desc:row.dataset.desc||'',
       node_type:val('.pf-step-nodetype')||'task',
       has_docs:!!(row.querySelector('.pf-step-has-docs')?.checked),
       inputs:null,outputs:null,required_info:null,system_tool:null,
-      sla:null,jira_ref:null,related_doc_url:null,returns_to:null,
-      day:val('.pf-step-day')||null,automation_tool:null,automation_url:val('.pf-step-auto-url')||null,has_auto:!!(row.querySelector('.pf-step-has-auto')?.checked),is_eventual:!!(row.querySelector('.pf-step-is-eventual')?.checked),time_of_day:val('.pf-step-time')||null,icon:null
+      sla:null,jira_ref:null,related_doc_url:null,returns_to:row.dataset.returns?Number(row.dataset.returns):null,
+      day:val('.pf-step-day')||null,automation_tool:null,automation_url:val('.pf-step-auto-url')||null,has_auto:!!(row.querySelector('.pf-step-has-auto')?.checked),is_eventual:!!(row.querySelector('.pf-step-is-eventual')?.checked),time_of_day:val('.pf-step-time')||null,icon:row.dataset.icon||(row.querySelector('.pf-step-has-docs')?.checked?'document':null)
     };
   }).filter(s=>s.title);
 }
@@ -10868,7 +10922,10 @@ bootDashboard();
   <div class="auth-card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-shrink:0">
       <h3 style="margin:0" id="processFormTitle">Nuevo proceso</h3>
-      <button class="btn btn-ghost btn-sm" type="button" onclick="closeProcessForm()">✕</button>
+      <div style="display:flex;gap:.4rem;align-items:center">
+        <button class="btn btn-ghost btn-sm" type="button" id="pfLoadExampleBtn" onclick="pfLoadBillingExample()" title="Fill the form with the Billing Process as a reference example"><i class="ti ti-template"></i> Load Billing example</button>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="closeProcessForm()">✕</button>
+      </div>
     </div>
 
     <div class="pf-split">
