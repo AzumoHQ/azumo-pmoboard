@@ -1867,60 +1867,73 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
     <div class="sec-tag">Live from Jira PSA reports</div>
   </div>
   <div class="qa-wrap">
-    <div class="qa-toolbar">
+    <div class="qa-toolbar" style="margin-bottom:.5rem">
       <div>
         <h3 style="font-size:.95rem;margin-bottom:.25rem">Last reported status per project</h3>
         <div class="mc-sub">Projects with no report in 30+ days are flagged as stale.</div>
       </div>
-      <div class="harvest-hours-controls hh-filter-row" style="flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem">
-        <div class="filter-field">
-          <label for="psaProjectStatusFilter">View</label>
-          <select id="psaProjectStatusFilter" onchange="setPsaProjectStatusFilter(this.value)">
-            <option value="current">Current</option>
-            <option value="former">Former (closed)</option>
-            <option value="all">All</option>
-          </select>
-        </div>
-        <div class="filter-field">
-          <label for="psaSearch">Search</label>
-          <input type="search" id="psaSearch" placeholder="Project name…" oninput="psaSetSearch(this.value)" style="border:1px solid var(--brd);border-radius:7px;padding:.32rem .6rem;background:var(--surf);color:var(--txt);font:inherit;font-size:.82rem;outline:none;width:160px">
-        </div>
-        <div class="filter-field">
-          <label>PM</label>
-          <div class="hh-ms-wrap" id="psPmWrap">
-            <button type="button" class="hh-ms-btn" id="psPmBtn" onclick="psToggleDrop('Pm',event)">
-              <span id="psPmBtnLabel">All PMs</span>
-              <span class="hh-ms-caret">&#9662;</span>
-            </button>
-            <div class="hh-ms-panel" id="psPmPanel" style="display:none">
-              <div class="hh-ms-head">
-                <button type="button" onclick="psSelectAllDrop('Pm')">Select All</button>
-                <button type="button" onclick="psClearDrop('Pm')">Clear All</button>
-              </div>
-              <input class="hh-ms-search" type="text" placeholder="Search PMs…" oninput="psSearchDrop(this,'Pm')">
-              <div id="psPmOptions"></div>
-            </div>
-          </div>
-        </div>
-        <div class="filter-field">
-          <label>Status</label>
-          <div class="hh-ms-wrap" id="psStatusWrap">
-            <button type="button" class="hh-ms-btn" id="psStatusBtn" onclick="psToggleDrop('Status',event)">
-              <span id="psStatusBtnLabel">All statuses</span>
-              <span class="hh-ms-caret">&#9662;</span>
-            </button>
-            <div class="hh-ms-panel" id="psStatusPanel" style="display:none">
-              <div class="hh-ms-head">
-                <button type="button" onclick="psSelectAllDrop('Status')">Select All</button>
-                <button type="button" onclick="psClearDrop('Status')">Clear All</button>
-              </div>
-              <div id="psStatusOptions"></div>
-            </div>
-          </div>
-        </div>
-        <button class="btn btn-ghost btn-sm" type="button" onclick="psaClearFilters()">Clear filters</button>
-        <button class="btn btn-ghost btn-sm" onclick="loadPsaProjectStatus(true)">Refresh</button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:.5rem;padding:.6rem 0 .75rem;margin-bottom:.5rem;border-bottom:1px solid var(--brd)">
+      <div class="filter-field" style="min-width:unset">
+        <label for="psaProjectStatusFilter">View</label>
+        <select id="psaProjectStatusFilter" onchange="setPsaProjectStatusFilter(this.value)">
+          <option value="current">Current</option>
+          <option value="former">Former (closed)</option>
+          <option value="all">All</option>
+        </select>
       </div>
+      <div class="filter-field" style="min-width:unset">
+        <label>Project</label>
+        <div class="hh-ms-wrap" id="psProjectWrap">
+          <button type="button" class="hh-ms-btn" id="psProjectBtn" onclick="psToggleDrop('Project',event)">
+            <span id="psProjectBtnLabel">All projects</span>
+            <span class="hh-ms-caret">&#9662;</span>
+          </button>
+          <div class="hh-ms-panel" id="psProjectPanel" style="display:none">
+            <div class="hh-ms-head">
+              <button type="button" onclick="psSelectAllDrop('Project')">Select All</button>
+              <button type="button" onclick="psClearDrop('Project')">Clear All</button>
+            </div>
+            <input class="hh-ms-search" type="text" placeholder="Search projects…" oninput="psSearchDrop(this,'Project')">
+            <div id="psProjectOptions"></div>
+          </div>
+        </div>
+      </div>
+      <div class="filter-field" style="min-width:unset">
+        <label>PM</label>
+        <div class="hh-ms-wrap" id="psPmWrap">
+          <button type="button" class="hh-ms-btn" id="psPmBtn" onclick="psToggleDrop('Pm',event)">
+            <span id="psPmBtnLabel">All PMs</span>
+            <span class="hh-ms-caret">&#9662;</span>
+          </button>
+          <div class="hh-ms-panel" id="psPmPanel" style="display:none">
+            <div class="hh-ms-head">
+              <button type="button" onclick="psSelectAllDrop('Pm')">Select All</button>
+              <button type="button" onclick="psClearDrop('Pm')">Clear All</button>
+            </div>
+            <input class="hh-ms-search" type="text" placeholder="Search PMs…" oninput="psSearchDrop(this,'Pm')">
+            <div id="psPmOptions"></div>
+          </div>
+        </div>
+      </div>
+      <div class="filter-field" style="min-width:unset">
+        <label>Status</label>
+        <div class="hh-ms-wrap" id="psStatusWrap">
+          <button type="button" class="hh-ms-btn" id="psStatusBtn" onclick="psToggleDrop('Status',event)">
+            <span id="psStatusBtnLabel">All statuses</span>
+            <span class="hh-ms-caret">&#9662;</span>
+          </button>
+          <div class="hh-ms-panel" id="psStatusPanel" style="display:none">
+            <div class="hh-ms-head">
+              <button type="button" onclick="psSelectAllDrop('Status')">Select All</button>
+              <button type="button" onclick="psClearDrop('Status')">Clear All</button>
+            </div>
+            <div id="psStatusOptions"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" type="button" onclick="psaClearFilters()">Clear filters</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadPsaProjectStatus(true)">Refresh</button>
     </div>
     <div class="action-summary" id="psaProjectStatusSummaryCards"></div>
     <div id="psaProjectStatusLoading" style="padding:2rem;text-align:center;color:var(--muted)">Loading project reports from Jira…</div>
@@ -9356,7 +9369,6 @@ function accountCoverageRows(){
 let psaProjectStatusData = null;
 let psaProjectStatusLoaded = false;
 let psaProjectStatusFilter = 'current';
-let psaSearch = '';
 let psSortCol = 'days';
 let psSortDir = 'asc';
 
@@ -9406,17 +9418,16 @@ function renderPsaProjectStatusModule(){
       : allRows.filter(r => !r.isClosed);
 
   // Populate dropdowns (preserves checked state)
+  const projOpts = [...new Set(rows.map(r => r.epicName || r.epicKey || '—').filter(v => v !== '—'))].sort();
   const pmOpts = [...new Set(rows.map(r => r.pmAssigned?.name || '—').filter(v => v !== '—'))].sort();
   const stOpts = [...new Set(rows.map(r => r.lastReport?.projectStatus || '—'))].sort();
+  psPopulateDrop('Project', projOpts);
   psPopulateDrop('Pm', pmOpts);
   psPopulateDrop('Status', stOpts);
 
-  // Search filter
-  const q = psaSearch.trim().toLowerCase();
-  if(q) rows = rows.filter(r => (r.epicName || r.epicKey || '').toLowerCase().includes(q));
-
-  // Multi-select filters
+  // Multi-select filters (Project, PM, Status)
   rows = rows.filter(r => {
+    if(!psPassesFilter('Project', r.epicName || r.epicKey || '—')) return false;
     if(!psPassesFilter('Pm', r.pmAssigned?.name || '—')) return false;
     if(!psPassesFilter('Status', r.lastReport?.projectStatus || '—')) return false;
     return true;
@@ -9480,7 +9491,7 @@ function renderPsaProjectStatusModule(){
   }).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No projects found.</td></tr>';
 }
 // --- Project Status multi-select + sort helpers ---
-const PS_DROP_LABELS = {Pm:'PMs',Status:'statuses'};
+const PS_DROP_LABELS = {Project:'projects',Pm:'PMs',Status:'statuses'};
 function psPassesFilter(cap, value){
   const els = [...document.querySelectorAll(`#ps${cap}Options input[type=checkbox]`)];
   if(!els.length) return true;
@@ -9514,7 +9525,7 @@ function psToggleDrop(cap, e){
   const panel = document.getElementById(`ps${cap}Panel`);
   if(!panel) return;
   const opening = panel.style.display === 'none';
-  ['Pm','Status'].forEach(k => { const p = document.getElementById(`ps${k}Panel`); if(p) p.style.display = 'none'; });
+  ['Project','Pm','Status'].forEach(k => { const p = document.getElementById(`ps${k}Panel`); if(p) p.style.display = 'none'; });
   if(opening) panel.style.display = 'block';
 }
 function psSelectAllDrop(cap){
@@ -9531,11 +9542,8 @@ function psSearchDrop(input, cap){
     opt.style.display = opt.textContent.trim().toLowerCase().includes(q) ? '' : 'none';
   });
 }
-function psaSetSearch(val){ psaSearch = val; renderPsaProjectStatusModule(); }
 function psaClearFilters(){
-  psaSearch = '';
-  const el = document.getElementById('psaSearch'); if(el) el.value = '';
-  ['Pm','Status'].forEach(cap => {
+  ['Project','Pm','Status'].forEach(cap => {
     document.querySelectorAll(`#ps${cap}Options input[type=checkbox]`).forEach(i => i.checked = true);
     psUpdateBtn(cap);
   });
@@ -9548,12 +9556,12 @@ function psaSort(col){
 }
 document.addEventListener('click', function(e){
   if(!e.target.closest?.('.hh-ms-wrap[id^="ps"]')){
-    ['Pm','Status'].forEach(k => { const p = document.getElementById(`ps${k}Panel`); if(p) p.style.display = 'none'; });
+    ['Project','Pm','Status'].forEach(k => { const p = document.getElementById(`ps${k}Panel`); if(p) p.style.display = 'none'; });
   }
 }, true);
 window.psToggleDrop = psToggleDrop; window.psSelectAllDrop = psSelectAllDrop;
 window.psClearDrop = psClearDrop; window.psDropChange = psDropChange; window.psSearchDrop = psSearchDrop;
-window.psaSetSearch = psaSetSearch; window.psaClearFilters = psaClearFilters; window.psaSort = psaSort;
+window.psaClearFilters = psaClearFilters; window.psaSort = psaSort;
 
 const INFO_HUB_COVERAGE = [
   {client:'Screenwave Media', csm:'Lenin Salazar', responsable:'Pablo Bizzotto', pm:'Desi Pepermans', start:'2025-03-25', status:'Active', tl:'Gaspar Pollano'},
