@@ -10913,11 +10913,13 @@ bootDashboard();
             <div class="auth-field">
               <label for="pfOwnerRole">Owner role</label>
               <input type="text" id="pfOwnerRole" placeholder="pmo" list="pfCompanyRoles">
+              <span class="pf-field-hint">Contact information for support or inquiries.</span>
             </div>
             <div class="auth-field">
               <label for="pfCorresponsableRole">Co-responsible role</label>
               <input type="text" id="pfCorresponsableRole" placeholder="pm" list="pfCompanyRoles">
               <datalist id="pfCompanyRoles"></datalist>
+              <span class="pf-field-hint">Identify the people or roles involved in the process and their specific responsibilities at each stage.</span>
             </div>
             <div class="auth-field">
               <label for="pfLastReviewed">Last reviewed</label>
@@ -10925,12 +10927,12 @@ bootDashboard();
             </div>
             <div class="auth-field pf-field-full">
               <label for="pfObjective">Objective</label>
-              <span class="pf-field-hint">Describí el propósito del proceso y qué resultado final se espera lograr con su ejecución.</span>
+              <span class="pf-field-hint">Describe the purpose of the process and what is to be achieved by its execution. What is the expected final result?</span>
               <textarea id="pfObjective" rows="2" style="background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.6rem .7rem;font:inherit;resize:vertical"></textarea>
             </div>
             <div class="auth-field pf-field-full">
               <label for="pfScope">Scope</label>
-              <span class="pf-field-hint">Definí los límites del proceso: dónde empieza y termina, qué actividades incluye y qué queda afuera.</span>
+              <span class="pf-field-hint">Define the boundaries of the process. Where does it begin and end? What activities does it include and what does it not?</span>
               <textarea id="pfScope" rows="2" style="background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.6rem .7rem;font:inherit;resize:vertical"></textarea>
             </div>
           </div>
@@ -10938,18 +10940,21 @@ bootDashboard();
 
         <div class="pf-section">
           <div class="pf-section-head"><h4>Steps</h4></div>
+          <p class="pf-field-hint" style="margin:.1rem 0 .5rem">Describe in detail each step of the process in sequential order. Include role, type, automation, and schedule when applicable.</p>
           <div id="pfStepsList"></div>
           <button type="button" class="pf-add-btn" onclick="addProcessStepRow()"><i class="ti ti-plus"></i> Add step</button>
         </div>
 
         <div class="pf-section">
           <div class="pf-section-head"><h4>Validations</h4></div>
+          <p class="pf-field-hint" style="margin:.1rem 0 .5rem">Define the key metrics that will be used to measure process performance. Indicate how data will be collected and analyzed.</p>
           <div id="pfValidationsList"></div>
           <button type="button" class="pf-add-btn" onclick="addProcessValidationRow()"><i class="ti ti-plus"></i> Add validation</button>
         </div>
 
         <div class="pf-section">
           <div class="pf-section-head"><h4>Resources</h4></div>
+          <p class="pf-field-hint" style="margin:.1rem 0 .5rem">Links, documents, templates, or tools referenced by this process.</p>
           <div id="pfResourcesList"></div>
           <button type="button" class="pf-add-btn" onclick="addProcessResourceRow()"><i class="ti ti-plus"></i> Add resource</button>
         </div>
