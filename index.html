@@ -1917,7 +1917,7 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
         </div>
       </div>
       <div class="filter-field" style="min-width:unset">
-        <label>Status</label>
+        <label>Status (Project)</label>
         <div class="hh-ms-wrap" id="psStatusWrap">
           <button type="button" class="hh-ms-btn" id="psStatusBtn" onclick="psToggleDrop('Status',event)">
             <span id="psStatusBtnLabel">All statuses</span>
@@ -9408,6 +9408,21 @@ function psaProjectJiraUrl(epicKey){
   return jiraIssueUrl(epicKey) || '#';
 }
 
+function psaStatusChip(label, value){
+  const v = (value || '').toLowerCase();
+  const cls = v === 'green' ? 'badge-green' : v === 'yellow' ? 'badge-yellow' : v === 'red' ? 'badge-red' : '';
+  const text = value || '\u2014';
+  return `<span class="badge ${cls}" style="margin:1px 3px 1px 0;min-height:auto;padding:1px 7px" title="${esc(label)}: ${esc(text)}">${esc(label[0])}</span>`;
+}
+function psaStatusChips(lastReport){
+  if(!lastReport) return '\u2014';
+  return [
+    psaStatusChip('Project', lastReport.projectStatus),
+    psaStatusChip('Team', lastReport.teamStatus),
+    psaStatusChip('Client', lastReport.clientStatus),
+    psaStatusChip('Budget', lastReport.budgetStatus)
+  ].join('');
+}
 function renderPsaProjectStatusModule(){
   const allRows = psaProjectStatusData || [];
   // View filter (Current / Former / All)
@@ -9476,7 +9491,6 @@ function renderPsaProjectStatusModule(){
     const pmName = row.pmAssigned?.name || '—';
     const lastDate = row.lastReport?.date || null;
     const days = row.daysSinceLastReport;
-    const statusLabel = row.lastReport?.projectStatus || '—';
     const staleBadge = row.stale
       ? `<span class="badge badge-red">${lastDate ? `${days}d ago` : 'No report'}</span>`
       : `<span class="badge badge-green">${days != null ? `${days}d ago` : '\u2014'}</span>`;
@@ -9485,7 +9499,7 @@ function renderPsaProjectStatusModule(){
       <td>${esc(pmName)}</td>
       <td>${esc(lastDate || '\u2014')}</td>
       <td>${staleBadge}</td>
-      <td>${esc(statusLabel)}</td>
+      <td>${psaStatusChips(row.lastReport)}</td>
       <td><a class="btn btn-ghost btn-sm" href="${psaProjectJiraUrl(row.epicKey)}" target="_blank" rel="noopener noreferrer">Open in Jira</a></td>
     </tr>`;
   }).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No projects found.</td></tr>';
