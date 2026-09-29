@@ -2346,38 +2346,6 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
     </div>
 
     <div id="processList" style="border:1px solid var(--brd);border-top:0;border-radius:0 0 var(--r) var(--r);padding:.8rem;background:var(--surf)">
-      <div class="proc-group" data-group="billing">
-
-        <details class="qa-check" open data-cat="billing" data-roles="assignee pm csm pmo admin executive" data-search="billing process time tracking harvest invoice claim csm pm cos chief of staff pablo baio weekly register week time">
-          <summary><span>Billing Process <span class="chip badge-green" style="margin-left:8px">Documented</span> <span class="chip" id="procHealth-billing" style="margin-left:6px"></span></span><span class="qa-status ok">v1.00</span></summary>
-          <div class="qa-check-body">
-            <div id="billingProcessDiagram" class="proc-diagram" data-fallback-img="assets/process-billing-flow.jpg"></div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.9rem">
-              <span class="badge badge-blue">Team</span>
-              <span class="badge badge-blue">PM</span>
-              <span class="badge badge-blue">CSM</span>
-              <span class="badge badge-blue">PMO</span>
-            </div>
-            <p style="margin:0 0 .9rem;font-size:.82rem;color:var(--muted)">Improve the efficiency of the billing process — every role above owns one lane in the flow (Team registers time, PM and CSM review it, PMO/Chief of Staff does the final check before invoicing).</p>
-            <div class="mc-sub" style="margin-bottom:.5rem">Process steps</div>
-            <ol style="margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">
-              <li><b>Time registration</b> — Friday morning. Each team member logs their weekly hours in the time tracking system.</li>
-              <li><b>Initial review by PM</b> — Friday afternoon. The PM checks entries for their contracts for completeness and correctness.</li>
-              <li><b>Time entry adjustment</b> (if needed). If there are discrepancies, the PM requests corrections and the team re-submits — the claim cycle.</li>
-              <li><b>CSM weekly review</b> — Monday morning. The CSM reviews the weekly contract time records for consistency with client expectations.</li>
-              <li><b>CSM feedback loop</b> (if needed). Additional issues trigger the claim process again for clarification.</li>
-              <li><b>Final time register review (PMO / Chief of Staff)</b> — Tuesday morning. Final check of all approved timesheets.</li>
-              <li><b>Invoice issuance.</b> Once every validation is complete, the invoice is generated and sent to the client.</li>
-            </ol>
-            <div style="margin-top:.8rem;padding-top:.6rem;border-top:1px dashed var(--brd);font-size:.74rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;justify-content:space-between">
-              <span>Resources: <a href="https://docs.google.com/spreadsheets/d/1ZrkOk2kOygmjmJmUGnMC28QIJHIuocqz-qJMvHmRzx4/edit?gid=1319034044#gid=1319034044" target="_blank" rel="noopener" style="color:var(--blue-lt)">Billing tracking sheet ↗</a> · Owner for questions: Pablo Baio · v1.00</span>
-              <a class="proc-report-change" href="mailto:federica.gonzalez@azumo.co?subject=Process%20change%20report%3A%20Billing%20Process&amp;body=Process%3A%20Billing%20Process%0AWhat%20changed%3A%20%0AWhy%3A%20%0AReported%20by%20(role)%3A%20"><i class="ti ti-message-report"></i> Report a change</a>
-            </div>
-          </div>
-        </details>
-
-      </div>
-
       <div id="processManagerGroup"></div>
     </div>
     <div id="processEmptyState" style="display:none;text-align:center;color:var(--muted);font-size:.82rem;padding:2rem 0">No processes match that search.</div>
@@ -3638,9 +3606,7 @@ function renderImpersonationBanner(){
 // last reviewed, vs. its review cadence. See Portal de Procesos strategy doc, "Process health — the
 // RAG idea, applied to processes." A process that has never been reviewed (no lastReviewed) is Red —
 // same as a stale one — because an unreviewed draft carries the same risk as an outdated one.
-const PROCESS_HEALTH_META = {
-  billing: {lastReviewed: '2026-07-06', reviewCadenceMonths: 6, owner: 'Pablo Baio'},
-};
+// Health is computed from each saved process's last_reviewed + review_cadence_months.
 function computeProcessHealth(meta){
   if(!meta || !meta.lastReviewed) return {level: 'red', label: 'Never reviewed', cls: 'badge-red'};
   const reviewed = new Date(meta.lastReviewed + 'T00:00:00');
@@ -3653,7 +3619,7 @@ function computeProcessHealth(meta){
 }
 function renderProcessHealthStrip(){
   const strip = document.getElementById('processHealthStrip');
-  const entries = Object.entries(PROCESS_HEALTH_META);
+  const entries = (PROCESS_MANAGER_STATE.list || []).map(p => [p.id, {lastReviewed: p.last_reviewed, reviewCadenceMonths: p.review_cadence_months}]);
   entries.forEach(([id, meta]) => {
     const health = computeProcessHealth(meta);
     const badge = document.getElementById(`procHealth-${id}`);
@@ -3730,9 +3696,7 @@ const FULL_DAY_LABEL = {Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thurs
 // Answers "on Monday, X happens" across the whole portal, not just inside one process's own diagram.
 // Steps with no fixed day (conditional loops, "once validation is complete") are left out on purpose —
 // forcing every step onto a day would make the calendar lie about processes that don't run on a schedule.
-const PROCESS_WEEK_SOURCES = [
-  {processId: 'billing', processName: 'Billing Process', steps: BILLING_PROCESS_STEPS},
-];
+const PROCESS_WEEK_SOURCES = []; // all processes now come from /api/processes
 const WEEK_DAYS = [
   {key: 'Mon', label: 'Mon'}, {key: 'Tue', label: 'Tue'}, {key: 'Wed', label: 'Wed'},
   {key: 'Thu', label: 'Thu'}, {key: 'Fri', label: 'Fri'}, {key: 'Sat', label: 'Sat'}, {key: 'Sun', label: 'Sun'},
@@ -3750,6 +3714,9 @@ function renderProcessWeekCalendar(){
       if(step.day && byDay[step.day]) byDay[step.day].push({processName: source.processName, title: step.title});
     });
   });
+  // Nothing scheduled anywhere -> hide the whole calendar instead of showing seven empty boxes.
+  const calWrap = grid.closest('.proc-week-cal');
+  if(calWrap) calWrap.style.display = WEEK_DAYS.some(d => byDay[d.key].length) ? '' : 'none';
   // Empty days collapse to a narrow column so the eye goes straight to the days that matter.
   grid.style.gridTemplateColumns = WEEK_DAYS.map(d => byDay[d.key].length ? 'minmax(130px,1fr)' : '46px').join(' ');
   grid.innerHTML = WEEK_DAYS.map(d => {
@@ -4048,10 +4015,6 @@ function updateRoleSensitiveUi(){
   document.body.classList.toggle('role-preview-active', Boolean(requestedPreviewRole() && canPreviewRole()));
   renderImpersonationBanner();
   if(document.getElementById('processList')) applyProcessFilters();
-  if(document.getElementById('billingProcessDiagram')){
-    ensureProcessLoadedFromApi('billing');
-    renderProcessDiagram('billingProcessDiagram', processStepsFor('billing', BILLING_PROCESS_STEPS));
-  }
   const procToolbar = document.getElementById('procToolbar');
   if(procToolbar) procToolbar.style.display = canManageProcesses() ? '' : 'none';
   if(document.getElementById('processManagerGroup')) loadProcessManagerList();
@@ -10491,7 +10454,7 @@ function applyProcessFilters(){
     if(groupVisible) anyVisible = true;
   });
   const empty = document.getElementById('processEmptyState');
-  if(empty) empty.style.display = anyVisible ? 'none' : 'block';
+  if(empty) empty.style.display = (anyVisible || !PROCESS_MANAGER_STATE.list.length) ? 'none' : 'block';
 }
 function setProcessSearch(value){
   processSearch = String(value || '');
@@ -10526,7 +10489,7 @@ function loadProcessManagerList(force){
   PROCESS_MANAGER_STATE.loading = true;
   fetch('/api/processes', {credentials:'same-origin', cache:'no-store'})
     .then(r => r.ok ? r.json() : Promise.reject(new Error(`http ${r.status}`)))
-    .then(json => (json.processes || []).filter(p => p.id !== 'billing'))
+    .then(json => json.processes || [])
     .then(list => Promise.all(list.map(p =>
       fetch(`/api/processes?id=${encodeURIComponent(p.id)}`, {credentials:'same-origin', cache:'no-store'})
         .then(r => r.ok ? r.json() : {process: p})
@@ -10570,7 +10533,7 @@ function renderProcessManagerCard(p){
     : '';
   return `<div class="proc-group" data-group=${jsArg(p.id)}>
     <details class="qa-check" data-cat="${esc(p.category || 'other')}" data-roles="assignee pm csm pmo admin executive" data-search="${esc(searchText)}">
-      <summary><span>${esc(p.name)} <span class="chip badge-green" style="margin-left:8px">Documented</span></span><span class="qa-status ok">v${esc(p.version || '1.00')}</span></summary>
+      <summary><span>${esc(p.name)} <span class="chip badge-green" style="margin-left:8px">Documented</span> ${(() => { const h = computeProcessHealth({lastReviewed: p.last_reviewed, reviewCadenceMonths: p.review_cadence_months}); return `<span class="chip ${h.cls}" style="margin-left:6px" title="${p.last_reviewed ? 'Last reviewed ' + esc(p.last_reviewed) + ' · every ' + esc(String(p.review_cadence_months ?? 6)) + ' mo' : 'No review on record'}">${h.label}</span>`; })()}</span><span class="qa-status ok">v${esc(p.version || '1.00')}</span></summary>
       <div class="qa-check-body">
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.9rem">
           ${PROCESS_FREQUENCY_LABEL[p.frequency] ? `<span class="badge badge-blue">↻ ${esc(PROCESS_FREQUENCY_LABEL[p.frequency])}</span>` : ''}
@@ -10600,15 +10563,20 @@ function renderProcessManagerList(){
   if(!host) return;
   if(!PROCESS_MANAGER_STATE.list.length){
     host.innerHTML = canManageProcesses()
-      ? '<div style="font-size:.78rem;color:var(--muted);padding:.6rem .2rem 1rem">No other processes documented yet.</div>'
-      : '';
+      ? '<div style="font-size:.82rem;color:var(--muted);padding:1.2rem .4rem;text-align:center">No processes documented yet. Use <b>New process</b> to document the first one.</div>'
+      : '<div style="font-size:.82rem;color:var(--muted);padding:1.2rem .4rem;text-align:center">No processes documented yet.</div>';
+    const emptyCount = document.getElementById('processListCount');
+    if(emptyCount) emptyCount.textContent = '0 processes';
+    renderProcessWeekCalendar();
+    renderProcessHealthStrip();
     applyProcessFilters();
     return;
   }
   host.innerHTML = PROCESS_MANAGER_STATE.list.map(renderProcessManagerCard).join('');
   const countEl = document.getElementById('processListCount');
-  if(countEl){ const n = 1 + PROCESS_MANAGER_STATE.list.length; countEl.textContent = `${n} process${n === 1 ? '' : 'es'}`; }
+  if(countEl){ const n = PROCESS_MANAGER_STATE.list.length; countEl.textContent = `${n} process${n === 1 ? '' : 'es'}`; }
   renderProcessWeekCalendar();
+  renderProcessHealthStrip();
   PROCESS_MANAGER_STATE.list.forEach(p => {
     if((p.steps || []).length){
       const d = processLanesFromSteps(p.steps);
