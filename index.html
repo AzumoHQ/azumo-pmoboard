@@ -289,6 +289,10 @@ body.light .qa-recurring,body.light .qa-checklist-item{background:#FFFFFF}
 .pf-row-actions{display:flex;gap:6px}
 .pf-icon-btn{background:none;border:1px solid var(--brd);color:var(--muted);border-radius:7px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:.75rem}
 .pf-icon-btn:hover{color:var(--txt);border-color:var(--blue-lt)}
+.pf-icon-btn .ti::before{font-family:'Material Symbols Outlined';font-style:normal;font-weight:normal;font-size:1.05rem;line-height:1;font-variation-settings:'opsz' 24,'wght' 400,'GRAD' 0,'FILL' 0}
+.pf-icon-btn .ti-chevron-up::before{content:'expand_less'}
+.pf-icon-btn .ti-chevron-down::before{content:'expand_more'}
+.pf-icon-btn .ti-trash::before{content:'delete'}
 .pf-add-btn{background:var(--surf);border:1px dashed var(--brd);color:var(--blue-lt);border-radius:9px;padding:7px 12px;font-size:.78rem;font-weight:700;cursor:pointer;width:100%;text-align:center}
 .pf-add-btn:hover{border-color:var(--blue-lt);background:rgba(0,102,255,.06)}
 .pf-inline-row{display:flex;gap:8px;align-items:center;margin-bottom:.5rem}
@@ -3677,7 +3681,7 @@ const BILLING_PROCESS_STEPS = [
 ];
 // Full day names for the diagram's day/time annotations (day_of_week itself stays the 3-letter
 // key so it keeps matching PROCESS_WEEK_SOURCES / the weekly cadence calendar below).
-const FULL_DAY_LABEL = {Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday'};
+const FULL_DAY_LABEL = {Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday', Daily:'Everyday'};
 // Weekly cadence calendar — Monday-to-Sunday view of where each process's fixed-day steps land.
 // Answers "on Monday, X happens" across the whole portal, not just inside one process's own diagram.
 // Steps with no fixed day (conditional loops, "once validation is complete") are left out on purpose —
@@ -3697,7 +3701,8 @@ function renderProcessWeekCalendar(){
   try{ boardSources = (PROCESS_MANAGER_STATE.list || []).filter(p => processFrequencyHasSchedule(p.frequency)).map(p => ({processName: p.name, steps: p.steps || []})); }catch(e){ boardSources = []; }
   [...PROCESS_WEEK_SOURCES, ...boardSources].forEach(source => {
     (source.steps || []).forEach(step => {
-      if(step.day && byDay[step.day]) byDay[step.day].push({processName: source.processName, title: step.title});
+      if(step.day === 'Daily') ['Mon','Tue','Wed','Thu','Fri'].forEach(k => { if(byDay[k]) byDay[k].push({processName: source.processName, title: step.title}); });
+      else if(step.day && byDay[step.day]) byDay[step.day].push({processName: source.processName, title: step.title});
     });
   });
   // Nothing scheduled anywhere -> hide the whole calendar instead of showing seven empty boxes.
@@ -10481,7 +10486,7 @@ function renderProcessManagerCard(p){
   const steps = p.steps || [];
   const stepsHtml = steps.length
     ? '<ol style="margin:0 0 .9rem;padding-left:1.15rem;display:flex;flex-direction:column;gap:.5rem">' +
-      steps.map(s => `<li><b>${esc(s.title || '')}</b>${s.role ? ` <span style="color:var(--muted);font-weight:400">(${esc(s.role)}${s.day ? ', ' + esc(s.day) : ''})</span>` : ''}${s.desc ? ' — ' + esc(s.desc) : ''}${processBranchText(s, steps)}${(s.form_url || s.automation_url) ? `<span class="proc-step-links">${s.form_url ? `<a href="${esc(s.form_url)}" target="_blank" rel="noopener">📝 Form ↗</a>` : ''}${s.automation_url ? `<a href="${esc(s.automation_url)}" target="_blank" rel="noopener">⚡ Automation ↗</a>` : ''}</span>` : ''}</li>`).join('') +
+      steps.map(s => `<li><b>${esc(s.title || '')}</b>${s.role ? ` <span style="color:var(--muted);font-weight:400">(${esc(s.role)}${s.day ? ', ' + esc(s.day === 'Daily' ? 'Everyday' : s.day) : ''})</span>` : ''}${s.desc ? ' — ' + esc(s.desc) : ''}${processBranchText(s, steps)}${(s.form_url || s.automation_url) ? `<span class="proc-step-links">${s.form_url ? `<a href="${esc(s.form_url)}" target="_blank" rel="noopener">📝 Form ↗</a>` : ''}${s.automation_url ? `<a href="${esc(s.automation_url)}" target="_blank" rel="noopener">⚡ Automation ↗</a>` : ''}</span>` : ''}</li>`).join('') +
       '</ol>'
     : '<p style="margin:0 0 .9rem;font-size:.8rem;color:var(--muted);font-style:italic">No steps loaded yet.</p>';
   const validationsHtml = (p.validations || []).length
@@ -10643,6 +10648,7 @@ function pfStepRowHtml(step){
     <div class="pf-step-schedule-row">
       <select class="pf-step-day">
         <option value="">— day —</option>
+        <option value="Daily"${s.day==='Daily'?' selected':''}>Everyday</option>
         ${['Mon','Tue','Wed','Thu','Fri'].map((d,i)=>`<option value="${d}"${s.day===d?' selected':''}>${['Mon','Tue','Wed','Thu','Fri'][i]}</option>`).join('')}
       </select>
       <select class="pf-step-time">
