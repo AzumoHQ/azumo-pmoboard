@@ -2503,6 +2503,14 @@ async function loadDashboardData(){
 }
 
 function initDashboard(){
+  // Warn loudly when the API served the static pmo-data.json backup instead of the database.
+  if(PMO && PMO.data_source === 'file-fallback' && !document.getElementById('dataFallbackBanner')){
+    const bar = document.createElement('div');
+    bar.id = 'dataFallbackBanner';
+    bar.style.cssText = 'background:#b42318;color:#fff;padding:.6rem 1rem;font-size:.85rem;text-align:center;position:sticky;top:0;z-index:9999';
+    bar.textContent = 'Datos de respaldo (pmo-data.json): no se pudo leer la base de datos. La informacion mostrada puede estar desactualizada. ' + (PMO.data_error || '');
+    document.body.prepend(bar);
+  }
   if(!PMO.snapshots || !PMO.snapshots.length){
     document.getElementById('lastRefreshMeta').textContent = 'No data available';
     document.getElementById('lastRefreshTag').textContent  = 'No data available';
