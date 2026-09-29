@@ -2290,8 +2290,8 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
   <section id="processes">
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-route"></i></div>
-      <h2>Processes</h2>
-      <div class="sec-tag">Process Portal</div>
+      <h2>Process Portal</h2>
+      <div class="sec-tag">Admin only</div>
     </div>
 
     <div class="proc-toolbar" id="procToolbar" style="display:none">
@@ -3223,11 +3223,11 @@ function canSeePmoGroup(){ return ['admin','pmo'].includes(effectiveUserRole());
 // deployments (development branch) and localhost, so they can keep evolving before launch.
 const PMO_PRODUCTION_HOSTS = new Set(['pmoboard.it.azumo.com','pmoboard.vercel.app']);
 const IS_PMO_PRODUCTION = PMO_PRODUCTION_HOSTS.has(location.hostname);
-const PREVIEW_ONLY_SECTIONS = new Set(['processes','helpChangelog']);
+const PREVIEW_ONLY_SECTIONS = new Set(['helpChangelog']);
 function sectionAllowedForCurrentRole(id){
   if(IS_PMO_PRODUCTION && PREVIEW_ONLY_SECTIONS.has(id)) return false;
   if(id === 'helpChangelog') return true;
-  if(id === 'processes') return true;
+  if(id === 'processes') return canSeePmoGroup(); // Process Portal: administrators only
   const role = effectiveUserRole();
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
@@ -3313,7 +3313,7 @@ function sidebarNavConfig(){
       {id:'newSearchesTriage', icon:'<i class="ti ti-search"></i>', label:'New Searches'},
       {id:'harvestWeekly', icon:'<i class="ti ti-users"></i>', label:'Logged Harvest Hours'}
     ]},
-    {id:'processes', icon:'<i class="ti ti-route"></i>', label:'Processes'},
+    {id:'processes', icon:'<i class="ti ti-route"></i>', label:'Process Portal'},
     {id:'pmoActionCenter', icon:'<i class="ti ti-alert-triangle"></i>', label:'PMO QA', count: qaCount},
     {id:'helpChangelog', icon:'<i class="ti ti-help-circle"></i>', label:'Help'}
   ];
