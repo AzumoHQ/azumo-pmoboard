@@ -11207,41 +11207,6 @@ function closeProcessForm(){
 window.openProcessForm = openProcessForm;
 window.closeProcessForm = closeProcessForm;
 
-// Reference example: the Billing Process exactly as documented today (BILLING_PROCESS_STEPS),
-// with human-readable roles so the lanes resolve the same way a hand-built process would.
-function pfLoadBillingExample(){
-  const roleLabel = {assignee:'Team', pm:'PM', csm:'CSM', pmo:'PMO / COS'};
-  const idEl = document.getElementById('pfId');
-  if(!idEl.disabled) idEl.value = 'billing-process-example';
-  document.getElementById('pfName').value = 'Billing Process (example)';
-  document.getElementById('pfCategory').value = 'billing';
-  document.getElementById('pfVersion').value = '1.00';
-  document.getElementById('pfOwnerRole').value = 'PMO / COS';
-  document.getElementById('pfCorresponsableRole').value = 'PM';
-  document.getElementById('pfObjective').value = 'Improve the efficiency of the billing process — every role owns one lane in the flow (Team registers time, PM and CSM review it, PMO/Chief of Staff does the final check before invoicing).';
-  document.getElementById('pfScope').value = 'Time registration - Invoice issuance';
-  document.getElementById('pfFrequency').value = 'weekly';
-  pfApplyFrequency();
-  document.getElementById('pfTrigger').value = 'End of the working week — every Friday, team members register the week\'s hours in Harvest.';
-  document.getElementById('pfRolesList').innerHTML = '';
-  [
-    {role:'Team', responsibilities:'Register all hours in Harvest by Friday EOD, with the right project and task.'},
-    {role:'PM', responsibilities:'Review the team\'s entries on Friday and request adjustments when something is off.'},
-    {role:'CSM', responsibilities:'Weekly review on Monday; flags client-side issues before invoicing.'},
-    {role:'PMO / COS', responsibilities:'Final time register review on Tuesday and sign-off for invoicing.'}
-  ].forEach(r => addProcessRoleRow(r));
-  document.getElementById('pfStepsList').innerHTML = '';
-  document.getElementById('pfValidationsList').innerHTML = '';
-  document.getElementById('pfResourcesList').innerHTML = '';
-  BILLING_PROCESS_STEPS.forEach(s => addProcessStepRow({
-    ...s, role: roleLabel[s.role] || s.role, has_docs: s.icon === 'document'
-  }));
-  pfSyncBranches(true);
-  addProcessResourceRow({label:'Billing tracking sheet', url:'https://docs.google.com/spreadsheets/d/1ZrkOk2kOygmjmJmUGnMC28QIJHIuocqz-qJMvHmRzx4/edit?gid=1319034044#gid=1319034044', kind:'sheet'});
-  pfRenderSwimlanes();
-}
-window.pfLoadBillingExample = pfLoadBillingExample;
-
 function pfCollectSteps(forDiagram){
   const withSchedule = processFrequencyHasSchedule(document.getElementById('pfFrequency')?.value || '');
   const allRows = Array.from(document.querySelectorAll('#pfStepsList .pf-step-compact'));
@@ -11373,7 +11338,6 @@ bootDashboard();
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-shrink:0">
       <h3 style="margin:0" id="processFormTitle">New process</h3>
       <div style="display:flex;gap:.4rem;align-items:center">
-        <button class="btn btn-ghost btn-sm" type="button" id="pfLoadExampleBtn" onclick="pfLoadBillingExample()" title="Fill the form with the Billing Process as a reference example"><i class="ti ti-template"></i> Load Billing example</button>
         <button class="btn btn-ghost btn-sm" type="button" onclick="closeProcessForm()">✕</button>
       </div>
     </div>
