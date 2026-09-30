@@ -2482,7 +2482,18 @@ async function loadDashboardData(){
   }
   if(location.protocol !== 'file:'){
     try {
-      const response = await fetch('/api/dashboard', {cache:'no-store', credentials:'same-origin'});
+      let response = await fetch('/api/dashboard', {cache:'no-store', credentials:'same-origin'});
+      // The database can be waking up (cold start): retry transient 5xx before giving up.
+      for(let attempt = 1; attempt <= 3 && response.status >= 500; attempt++){
+        await new Promise(r => setTimeout(r, 1200 * attempt));
+        response = await fetch('/api/dashboard', {cache:'no-store', credentials:'same-origin'});
+      }
+      if(!response.ok && response.status !== 401 && response.status !== 403){
+        let detail = '';
+        try { detail = (await response.json()).message || ''; } catch(_) {}
+        PMO.data_source = 'file-fallback';
+        PMO.data_error = `API /api/dashboard respondio ${response.status}. ${detail}`.trim();
+      }
       if(response.status === 401 || response.status === 403){
         currentUser = null;
         impersonatedUser = null;
@@ -2497,6 +2508,7 @@ async function loadDashboardData(){
         }
       }
     } catch (error) {
+      PMO.data_source = 'file-fallback'; PMO.data_error = 'No se pudo conectar con /api/dashboard: ' + error.message;
       console.info('Dashboard data unavailable:', error.message);
     }
     await loadServiceHealth();
