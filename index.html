@@ -307,6 +307,13 @@ body.light .qa-recurring,body.light .qa-checklist-item{background:#FFFFFF}
 .pf-step-form-lbl{display:flex;align-items:center;gap:.2rem;font-size:.74rem;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;user-select:none}
 .pf-step-form-lbl input{width:13px;height:13px;cursor:pointer;accent-color:#10b981}
 .pf-step-form-row{display:none;padding:.2rem .2rem .2rem 1.9rem}
+.pf-related-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.45rem}
+.pf-related-row .pf-select{padding:.5rem .7rem;font-size:.84rem}
+.pf-related-row .pf-rel-proc{flex:1;min-width:0}
+.proc-related{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin:0 0 .9rem;font-size:.8rem}
+.proc-related .proc-rel-label{color:var(--muted);font-weight:700}
+.proc-related a{cursor:pointer;color:var(--blue-lt);border:1px solid var(--brd);border-radius:999px;padding:1px 10px;text-decoration:none;background:var(--surf)}
+.proc-related a:hover{background:var(--hov)}
 .pf-step-branch-row{display:none;flex-wrap:wrap;gap:.5rem .9rem;align-items:center;padding:.3rem .2rem .3rem 1.9rem}
 #pfStepsList .pf-step-compact.is-decision .pf-step-branch-row{display:flex}
 #pfStepsList .pf-step-compact.is-decision{border-left:3px solid var(--blue-lt)}
@@ -3864,7 +3871,7 @@ function renderProcessDiagram(containerId, steps, lanes = PROCESS_LANES, opts = 
   ];
   const offset = hasStart ? 0 : 1; // shift from a real step's index in `steps` to its index in `flow`
   const plotW = Math.max(flow.length - 1, 1) * stepGapX;
-  const W = labelW + 70 + plotW + 40;
+  const W = labelW + 70 + plotW + 70;
   const nodeX = flow.map((_, i) => labelW + 70 + i * stepGapX);
 
   let svg = `<svg viewBox="0 0 ${W} ${H}" class="proc-diagram-svg" role="img" aria-label="Process flow diagram">`;
@@ -3959,6 +3966,10 @@ function renderProcessDiagram(containerId, steps, lanes = PROCESS_LANES, opts = 
         <text x="${x}" y="${y + 28}" font-size="10" font-weight="700" text-anchor="middle" fill="var(--muted)">${isEnd ? 'End' : (PROCESS_FREQUENCY_LABEL[opts.frequency] ? 'Start · ' + PROCESS_FREQUENCY_LABEL[opts.frequency] : 'Start')}</text>
         ${!isEnd && triggerText ? `<title>Trigger: ${esc(triggerText)}</title>` + wrapLabel(triggerText, 24, 2).map((line, li) =>
           `<text x="${x}" y="${y + 40 + li * 10}" font-size="8.5" text-anchor="middle" fill="var(--txt)">${li === 0 ? '⚡ ' : ''}${esc(line)}</text>`).join('') : ''}
+        ${!isEnd && (opts.prevNames || []).length ? wrapLabel('← From: ' + opts.prevNames.join(', '), 26, 2).map((line, li) =>
+          `<text x="${x}" y="${y + 40 + (triggerText ? 22 : 0) + li * 10}" font-size="8.5" font-weight="700" text-anchor="middle" fill="var(--blue-lt)">${esc(line)}</text>`).join('') : ''}
+        ${isEnd && (opts.nextNames || []).length ? wrapLabel('→ Next: ' + opts.nextNames.join(', '), 26, 2).map((line, li) =>
+          `<text x="${x}" y="${y + 40 + li * 10}" font-size="8.5" font-weight="700" text-anchor="middle" fill="var(--blue-lt)">${esc(line)}</text>`).join('') : ''}
       </g>`;
       return;
     }
@@ -10587,6 +10598,7 @@ function renderProcessManagerCard(p){
         ${p.objective ? `<p style="margin:0 0 .7rem;font-size:.82rem;color:var(--txt);line-height:1.5">${esc(p.objective)}</p>` : ''}
         ${p.scope ? `<p style="margin:0 0 .5rem;font-size:.82rem;color:var(--muted);line-height:1.5"><b style="color:var(--txt)">Scope:</b> ${esc(p.scope)}</p>` : ''}
         ${p.trigger_event ? `<p style="margin:0 0 .9rem;font-size:.82rem;color:var(--muted);line-height:1.5"><b style="color:var(--txt)">Trigger:</b> ${esc(p.trigger_event)}</p>` : ''}
+        ${processRelatedHtml(processRelations(p, PROCESS_MANAGER_STATE.list))}
         ${(p.roles_responsibilities || []).length ? `<div class="mc-sub" style="margin-bottom:.4rem">Roles &amp; responsibilities</div><dl style="margin:0 0 .9rem;display:grid;grid-template-columns:max-content 1fr;gap:.35rem .9rem;font-size:.8rem;line-height:1.45">${(p.roles_responsibilities || []).map(r => `<dt style="font-weight:700;color:var(--txt)">${esc(r.role || '')}</dt><dd style="margin:0;color:var(--txt)">${esc(r.responsibilities || '')}</dd>`).join('')}</dl>` : ''}
         ${steps.length ? `<div class="proc-diagram" id="procDiagram-${esc(p.id)}"></div>` : ''}
         <div class="mc-sub" style="margin-bottom:.5rem">Process steps</div>
@@ -10624,13 +10636,81 @@ function renderProcessManagerList(){
   PROCESS_MANAGER_STATE.list.forEach(p => {
     if((p.steps || []).length){
       const d = processLanesFromSteps(p.steps);
-      renderProcessDiagram(`procDiagram-${p.id}`, d.steps, d.lanes, {trigger: p.trigger_event || '', frequency: p.frequency || ''});
+      const rel = processRelations(p, PROCESS_MANAGER_STATE.list);
+      renderProcessDiagram(`procDiagram-${p.id}`, d.steps, d.lanes, {trigger: p.trigger_event || '', frequency: p.frequency || '', prevNames: rel.prev.map(x => x.name), nextNames: rel.next.map(x => x.name)});
     }
   });
   applyProcessFilters();
 }
 
 // "If yes → step 4 · If no → End" text for decision steps in the process card.
+// Related processes: each process stores only its own declarations ({id, relation}); the other
+// direction is derived from the rest of the list, so declaring "A -> next: B" also shows A on B.
+function processRelations(p, list){
+  const all = list || [];
+  const byId = new Map(all.map(x => [x.id, x]));
+  const prev = new Map(), next = new Map();
+  (p.related_processes || []).forEach(r => {
+    const t = byId.get(r.id); if(!t) return;
+    (r.relation === 'previous' ? prev : next).set(t.id, t.name);
+  });
+  all.forEach(q => {
+    if(q.id === p.id) return;
+    (q.related_processes || []).forEach(r => {
+      if(r.id !== p.id) return;
+      // q says "p is my next" => q is p's previous, and vice versa
+      (r.relation === 'next' ? prev : next).set(q.id, q.name);
+    });
+  });
+  return {
+    prev: Array.from(prev, ([id, name]) => ({id, name})),
+    next: Array.from(next, ([id, name]) => ({id, name}))
+  };
+}
+function processRelatedHtml(rel){
+  if(!rel.prev.length && !rel.next.length) return '';
+  const chip = x => `<a data-pid="${esc(x.id)}" onclick="pfGoToProcess(this.dataset.pid)">${esc(x.name)}</a>`;
+  return `<div class="proc-related">${rel.prev.length ? `<span class="proc-rel-label">← Previous</span>${rel.prev.map(chip).join('')}` : ''}${rel.next.length ? `<span class="proc-rel-label"${rel.prev.length ? ' style="margin-left:.6rem"' : ''}>Next →</span>${rel.next.map(chip).join('')}` : ''}</div>`;
+}
+function pfGoToProcess(id){
+  const group = Array.from(document.querySelectorAll('.proc-group')).find(g => g.getAttribute('data-group') === id);
+  if(!group) return;
+  const d = group.querySelector('details'); if(d) d.open = true;
+  group.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+window.pfGoToProcess = pfGoToProcess;
+function pfRelatedRowHtml(r){
+  const x = r || {};
+  const cur = (document.getElementById('pfId')?.value || '').trim();
+  const opts = (PROCESS_MANAGER_STATE.list || []).filter(p => p.id !== cur)
+    .map(p => `<option value="${esc(p.id)}"${p.id === x.id ? ' selected' : ''}>${esc(p.name)}</option>`).join('');
+  return `<div class="pf-related-row">
+    <select class="pf-select pf-rel-kind" onchange="pfRefreshDiagramPreview()">
+      <option value="previous"${x.relation === 'previous' ? ' selected' : ''}>Previous process</option>
+      <option value="next"${x.relation !== 'previous' ? ' selected' : ''}>Next process</option>
+    </select>
+    <select class="pf-select pf-rel-proc" onchange="pfRefreshDiagramPreview()"><option value="">— select a process —</option>${opts}</select>
+    <button type="button" class="pf-icon-btn" title="Remove" onclick="this.closest('.pf-related-row').remove();pfRefreshDiagramPreview()"><i class="ti ti-trash"></i></button>
+  </div>`;
+}
+function addProcessRelatedRow(r){
+  document.getElementById('pfRelatedList').insertAdjacentHTML('beforeend', pfRelatedRowHtml(r));
+}
+window.addProcessRelatedRow = addProcessRelatedRow;
+function pfCollectRelated(){
+  return Array.from(document.querySelectorAll('#pfRelatedList .pf-related-row')).map(row => ({
+    id: row.querySelector('.pf-rel-proc')?.value || '',
+    relation: row.querySelector('.pf-rel-kind')?.value === 'previous' ? 'previous' : 'next'
+  })).filter(r => r.id);
+}
+function pfRelatedNames(){
+  const byId = new Map((PROCESS_MANAGER_STATE.list || []).map(p => [p.id, p.name]));
+  const rel = pfCollectRelated();
+  return {
+    prevNames: rel.filter(r => r.relation === 'previous').map(r => byId.get(r.id)).filter(Boolean),
+    nextNames: rel.filter(r => r.relation === 'next').map(r => byId.get(r.id)).filter(Boolean)
+  };
+}
 function processBranchText(s, steps){
   if(!s || s.node_type !== 'decision' || (s.yes_to == null && s.returns_to == null)) return '';
   const ref = t => {
@@ -11040,7 +11120,7 @@ function pfRenderSwimlanes(){
     return;
   }
   const d=processLanesFromSteps(steps);
-  renderProcessDiagram('pfSwimlane',d.steps,d.lanes,{trigger:(document.getElementById('pfTrigger')?.value||''),frequency:(document.getElementById('pfFrequency')?.value||'')});
+  renderProcessDiagram('pfSwimlane',d.steps,d.lanes,Object.assign({trigger:(document.getElementById('pfTrigger')?.value||''),frequency:(document.getElementById('pfFrequency')?.value||'')},pfRelatedNames()));
   pfApplySwimlaneZoom();
 }
 window.pfRenderSwimlanes=pfRenderSwimlanes;
@@ -11151,6 +11231,7 @@ function openProcessForm(id){
   document.getElementById('pfTrigger').value = '';
   document.getElementById('pfFrequency').value = '';
   document.getElementById('pfRolesList').innerHTML = '';
+  document.getElementById('pfRelatedList').innerHTML = '';
   document.getElementById('pfLastReviewed').value = '';
   document.getElementById('pfVersion').value = '1.00';
   document.getElementById('pfStepsList').innerHTML = '';
@@ -11194,6 +11275,7 @@ function openProcessForm(id){
       document.getElementById('pfTrigger').value = process.trigger_event || '';
       document.getElementById('pfFrequency').value = process.frequency || '';
       (process.roles_responsibilities || []).forEach(r => addProcessRoleRow(r));
+      (process.related_processes || []).forEach(r => addProcessRelatedRow(r));
       document.getElementById('pfLastReviewed').value = process.last_reviewed || '';
       document.getElementById('pfVersion').value = process.version || '1.00';
       (process.steps || []).forEach(s => addProcessStepRow(s));
@@ -11297,6 +11379,7 @@ async function saveProcessForm(){
     trigger_event: document.getElementById('pfTrigger').value.trim() || null,
     frequency: document.getElementById('pfFrequency').value || null,
     roles_responsibilities: pfCollectRoles(),
+    related_processes: pfCollectRelated(),
     last_reviewed: document.getElementById('pfLastReviewed').value || null,
     version: document.getElementById('pfVersion').value.trim() || '1.00'
   };
@@ -11458,6 +11541,13 @@ bootDashboard();
           <p class="pf-field-hint" style="margin:.1rem 0 .5rem">Who takes part in the process and what each role is accountable for at each stage.</p>
           <div id="pfRolesList"></div>
           <button type="button" class="pf-add-btn" onclick="addProcessRoleRow()"><i class="ti ti-plus"></i> Add role</button>
+        </div>
+
+        <div class="pf-section">
+          <div class="pf-section-head"><h4>Related processes</h4></div>
+          <p class="pf-field-hint" style="margin:.1rem 0 .5rem">Processes that hand off to this one, or that this one hands off to. The link shows up on both processes.</p>
+          <div id="pfRelatedList"></div>
+          <button type="button" class="pf-add-btn" onclick="addProcessRelatedRow()"><i class="ti ti-plus"></i> Add related process</button>
         </div>
 
         <div class="pf-section">
