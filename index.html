@@ -9878,6 +9878,7 @@ function renderAccountCoverageModule(){
   if(missingLink) missingLink.href = accountCoverageMissingUrl();
 
   let rows = accountCoverageRows();
+  const rows0 = rows.slice();
   const total = rows.length;
   const missingRowsAll = rows.filter(row => !row.complete);
   const completeRowsAll = rows.filter(row => row.complete);
@@ -9916,10 +9917,17 @@ function renderAccountCoverageModule(){
     [row.pm_assigned, row.csm_assigned, row.tl_assigned].some(v => v && !roster.has(normalizeIdentity(v)))
   ) : [];
 
+  // Clients tracked = accounts whose PSA epic is In Progress. Rows that are not counted
+  // (Backlog epics, clients with assignments but no epic) are explained in the card.
+  const inProgressRows = rows0.filter(row => String(row.epic_status || '').toLowerCase() === 'in progress');
+  const ipWithPeople = inProgressRows.filter(row => (row.assignees || []).length).length;
+  const ipNoPeople = inProgressRows.length - ipWithPeople;
+  const notCounted = rows0.length - inProgressRows.length;
+  const trackedBreakdown = `In Progress epics · ${ipWithPeople} with people · ${ipNoPeople} without people` + (notCounted ? ` · ${notCounted} not counted (Backlog / no epic)` : '');
   const cards = document.getElementById('accountCoverageSummaryCards');
   if(cards){
     cards.innerHTML = [
-      `<div class="action-card"><div class="action-label">Clients tracked</div><div class="action-value">${total}</div><div class="action-copy">Active Jira clients + PSA coverage records</div></div>`,
+      `<div class="action-card"><div class="action-label">Clients tracked</div><div class="action-value">${inProgressRows.length}</div><div class="action-copy">${esc(trackedBreakdown)}</div></div>`,
       `<div class="action-card ${missingRowsAll.length ? 'warning' : 'ok'}"><div class="action-label">Missing coverage</div><div class="action-value">${missingRowsAll.length}</div><div class="action-copy">Need PM, CSM, or TL assigned</div></div>`,
       `<div class="action-card ${inactiveRows.length ? 'critical' : 'ok'}"><div class="action-label">Inactive assignees</div><div class="action-value">${inactiveRows.length}</div><div class="action-copy">PM/CSM/TL not found in current Jira data</div></div>`,
       `<div class="action-card ok"><div class="action-label">Complete</div><div class="action-value">${completeRowsAll.length}</div><div class="action-copy">PM + CSM + TL populated</div></div>`
