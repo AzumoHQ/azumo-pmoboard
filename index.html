@@ -9919,11 +9919,12 @@ function renderAccountCoverageModule(){
 
   // Clients tracked = accounts whose PSA epic is In Progress. Rows that are not counted
   // (Backlog epics, clients with assignments but no epic) are explained in the card.
-  const inProgressRows = rows0.filter(row => String(row.epic_status || '').toLowerCase() === 'in progress');
+  const inProgressRows = rows0.filter(row => !isInternalCapacityRow(row) && String(row.epic_status || '').toLowerCase() === 'in progress');
   const ipWithPeople = inProgressRows.filter(row => (row.assignees || []).length).length;
   const ipNoPeople = inProgressRows.length - ipWithPeople;
-  const notCounted = rows0.length - inProgressRows.length;
-  const trackedBreakdown = `In Progress epics · ${ipWithPeople} with people · ${ipNoPeople} without people` + (notCounted ? ` · ${notCounted} not counted (Backlog / no epic)` : '');
+  const internalRows = rows0.filter(row => isInternalCapacityRow(row)).length;
+  const notCounted = rows0.length - inProgressRows.length - internalRows;
+  const trackedBreakdown = `In Progress epics · ${ipWithPeople} with people · ${ipNoPeople} without people` + (notCounted ? ` · ${notCounted} not counted (Backlog / no epic)` : '') + (internalRows ? ` · ${internalRows} internal (Azumo) excluded` : '');
   const cards = document.getElementById('accountCoverageSummaryCards');
   if(cards){
     cards.innerHTML = [
