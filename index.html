@@ -1418,6 +1418,20 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
 /* Compact header (desktop). Overrides only — remove this block to go back to the previous header. */
 .nav-config{position:relative}
 .nav-inner:has(.nav-config[open]){overflow:visible!important}
+/* Brand: Azumo wordmark only + "PMO Board" in Azumo blue */
+.nav-logo{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;min-width:0!important}
+.nav-title{color:#0000FF!important}
+/* One-row header (tabs moved into the nav by script on wide screens) */
+body.nav-merged nav .nav-inner{max-width:none!important;width:100%!important;box-sizing:border-box!important;padding:0 24px!important;overflow:visible!important;gap:10px!important}
+body.nav-merged .nav-brand{flex:0 0 auto}
+body.nav-merged nav .side-index{position:static!important;flex:1 1 auto!important;width:auto!important;min-width:0!important;margin:0!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;overflow:visible!important;border-radius:0!important}
+body.nav-merged nav #moduleIndexLinks{flex-wrap:nowrap!important;gap:2px!important}
+body.nav-merged nav .side-index .sidebar-item{min-height:30px!important;padding:0 7px!important;font-size:.76rem!important}
+body.nav-merged nav .nav-right{gap:8px!important}
+/* 'Sync all sources' reads 'Sync' in the one-row header (same button) */
+body.nav-merged nav .nav-refresh{font-size:0!important;padding:6px 12px!important}
+body.nav-merged nav .nav-refresh::after{content:'Sync';font-size:.8rem;font-weight:700}
+body.nav-merged .nav-links{display:none!important}
 .nav-config>summary{list-style:none;display:inline-flex;align-items:center;gap:5px;cursor:pointer;border:1px solid var(--brd);background:var(--card);color:var(--txt);border-radius:8px;padding:5px 10px;font-size:.78rem;font-weight:700;user-select:none}
 .nav-config>summary::-webkit-details-marker{display:none}
 .nav-config-menu{position:absolute;right:0;top:calc(100% + 6px);min-width:150px;display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:6px;background:var(--card,#fff);border:1px solid var(--brd);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);z-index:300}
@@ -1434,6 +1448,27 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
 }
 </style>
 <script>
+// One-row header: on wide screens, move the module tabs into the top bar next to "PMO Board".
+document.addEventListener('DOMContentLoaded',function(){
+  try{
+    if(window.innerWidth < 900) return;
+    var tabs=document.getElementById('layoutSidebar'), inner=document.querySelector('nav .nav-inner'), brand=inner&&inner.querySelector('.nav-brand');
+    if(!tabs||!inner||!brand) return;
+    var home=tabs.nextElementSibling;
+    brand.insertAdjacentElement('afterend', tabs);
+    document.body.classList.add('nav-merged');
+    // If it doesn't fit on one row at this window size, put the tabs back where they were.
+    setTimeout(function(){
+      var links=document.getElementById('moduleIndexLinks'), right=inner.querySelector('.nav-right');
+      var last=links&&links.lastElementChild;
+      var overlaps=(last&&right&&last.getBoundingClientRect().right > right.getBoundingClientRect().left - 8) || inner.scrollWidth > inner.clientWidth + 2;
+      if(overlaps){
+        document.body.classList.remove('nav-merged');
+        if(home&&home.parentNode) home.parentNode.insertBefore(tabs, home);
+      }
+    }, 600);
+  }catch(e){}
+});
 // Close the Settings dropdown when clicking outside it or pressing Escape.
 document.addEventListener('click',function(e){var d=document.getElementById('navConfig');if(d&&d.open&&!d.contains(e.target))d.open=false;});
 document.addEventListener('keydown',function(e){var d=document.getElementById('navConfig');if(e.key==='Escape'&&d)d.open=false;});
