@@ -326,6 +326,26 @@ details.proc-week-cal[open] .proc-week-cal-chev{transform:rotate(180deg)}
 .pf-diagram-preview{overflow-x:auto;background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:.6rem;min-height:90px;margin-top:.4rem}.pf-role-wrap{display:flex;align-items:center;gap:6px}.pf-role-avatar{display:flex;align-items:center;gap:5px;padding:2px 8px 2px 3px;background:var(--card);border:1px solid var(--brd);border-radius:20px;font-size:.72rem;color:var(--txt);white-space:nowrap;min-width:0;flex-shrink:0}.pf-av-circle{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#60A5FA);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}.pf-av-name{overflow:hidden;text-overflow:ellipsis;max-width:100px}.pf-canvas-wrap{border:1px solid var(--brd);border-radius:10px;background:var(--surf);overflow:hidden;position:relative}#pfCanvas{width:100%;flex:1;min-height:200px;display:block;user-select:none}.pf-step-compact{display:flex;align-items:center;gap:.45rem;padding:.42rem .65rem;background:var(--card,#fff);border:1px solid var(--brd);border-radius:9px;margin-bottom:.35rem}.pf-step-num{min-width:1.4rem;height:1.4rem;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;flex-shrink:0}.pf-step-compact .pf-step-title{flex:1;border:none;border-bottom:1px solid transparent;background:transparent;font:inherit;font-size:.84rem;color:var(--txt);padding:.1rem .2rem;outline:none;min-width:0;transition:border-color .15s}.pf-step-compact .pf-step-title:focus{border-bottom-color:var(--blue)}.pf-step-compact .pf-step-title::placeholder{color:var(--muted)}.pf-step-compact .pf-step-role{border:1px solid var(--brd);background:var(--surf);color:var(--txt);font-size:.76rem;padding:.18rem .35rem;border-radius:6px;max-width:118px;min-width:80px}.pf-step-docs-lbl{display:flex;align-items:center;gap:.2rem;font-size:.74rem;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;user-select:none}.pf-step-docs-lbl input{width:13px;height:13px;cursor:pointer;accent-color:var(--blue)}.pf-step-type-mini{display:flex;gap:.18rem;flex-shrink:0}.pf-nt-mini-btn{border:1px solid var(--brd);background:var(--surf);border-radius:5px;padding:.12rem .32rem;font-size:.68rem;cursor:pointer;color:var(--muted);line-height:1.4;transition:background .12s,color .12s,border-color .12s}.pf-nt-mini-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}.pf-step-auto-lbl{display:flex;align-items:center;gap:.2rem;font-size:.74rem;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;user-select:none}.pf-step-auto-lbl input{width:13px;height:13px;cursor:pointer;accent-color:#f59e0b}.pf-step-auto-row{display:none;flex:0 0 100%;padding:.2rem .2rem .2rem 1.85rem}.pf-step-auto-row input{width:100%;border:none;border-bottom:1px solid var(--brd);background:transparent;font:inherit;font-size:.78rem;color:var(--txt);padding:.1rem .2rem;outline:none}.pf-step-auto-row input:focus{border-bottom-color:#f59e0b}.pf-step-auto-row input::placeholder{color:var(--muted)}
 .pf-step-form-lbl{display:flex;align-items:center;gap:.2rem;font-size:.74rem;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;user-select:none}
 .pf-step-form-lbl input{width:13px;height:13px;cursor:pointer;accent-color:#10b981}
+/* Clean form: guidance lives in "Process Definition Framework", not under each field */
+.pf-split-right .pf-field-hint{display:none!important}
+/* Step options as compact toggle chips (filled when on), pushed to the right of the row */
+#pfStepsList .pf-step-docs-lbl{margin-left:auto}
+#pfStepsList .pf-step-docs-lbl,#pfStepsList .pf-step-auto-lbl,#pfStepsList .pf-step-form-lbl{border:1px solid var(--brd);border-radius:999px;padding:.08rem .5rem;font-size:.7rem;background:transparent;transition:background .12s,border-color .12s,color .12s}
+#pfStepsList .pf-step-docs-lbl input,#pfStepsList .pf-step-auto-lbl input,#pfStepsList .pf-step-form-lbl input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+#pfStepsList .pf-step-docs-lbl:has(input:checked){background:rgba(0,102,255,.1);border-color:var(--blue);color:var(--blue)}
+#pfStepsList .pf-step-auto-lbl:has(input:checked){background:#FEF3C7;border-color:#D97706;color:#92400E}
+#pfStepsList .pf-step-form-lbl:has(input:checked){background:rgba(16,185,129,.12);border-color:#10b981;color:#047857}
+#pfStepsList .pf-step-docs-lbl:has(input:focus-visible),#pfStepsList .pf-step-auto-lbl:has(input:focus-visible),#pfStepsList .pf-step-form-lbl:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:1px}
+/* Node type as one segmented control */
+#pfStepsList .pf-step-type-mini{gap:0}
+#pfStepsList .pf-nt-mini-btn{border-radius:0;margin-left:-1px}
+#pfStepsList .pf-nt-mini-btn:first-child{border-radius:6px 0 0 6px;margin-left:0}
+#pfStepsList .pf-nt-mini-btn:last-child{border-radius:0 6px 6px 0}
+/* Description: one quiet line, grows while editing */
+#pfStepsList .pf-step-desc{min-height:1.9rem;border-color:transparent;background:transparent}
+#pfStepsList .pf-step-desc:hover{border-color:var(--brd)}
+#pfStepsList .pf-step-desc:focus{min-height:3.6rem;border-color:var(--blue);background:var(--surf);outline:none}
+#pfStepsList .pf-step-auto-row input,#pfStepsList .pf-step-form-row input{font-size:.76rem}
 .pf-step-form-row{display:none;padding:.2rem .2rem .2rem 1.9rem}
 .pf-related-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.45rem}
 .pf-related-row .pf-select{padding:.5rem .7rem;font-size:.84rem}
@@ -2311,6 +2331,24 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
           <div class="lineage-item"><b>04 · Continuous cycle</b><div>Not an end state — every process gets re-evaluated and feeds back into step 01.</div></div>
         </div>
         <div class="locked-note" style="margin-top:.9rem">💡 Process maturity is not achieved overnight. It requires a long-term commitment to continuous improvement and the active participation of the whole team.</div>
+
+        <!-- Writing guide: the single place for documentation standards (the form itself stays clean). BPMN + Diátaxis. -->
+        <div class="mc-sub" style="margin:1.1rem 0 .6rem">How to document a process</div>
+        <div class="lineage-list">
+          <div class="lineage-item"><b>Name</b><div>The outcome, as a verb phrase: <i>Assign a person to a project</i>.</div></div>
+          <div class="lineage-item"><b>Owner &amp; co-responsible role</b><div>Owner: accountable end to end. Co-responsible: shares accountability, backs up the owner and notifies PMO of any change. Always roles, never names.</div></div>
+          <div class="lineage-item"><b>Objective</b><div>Why the process exists and its expected result. No steps here.</div></div>
+          <div class="lineage-item"><b>Scope</b><div><i>Starts when</i> · <i>Ends when</i> · <i>Includes</i> · <i>Does not include</i>.</div></div>
+          <div class="lineage-item"><b>Trigger</b><div>The start event: <i>SOW signed</i>, <i>Epic moves to Hired</i>, <i>Every Friday EOD</i>.</div></div>
+          <div class="lineage-item"><b>Roles &amp; responsibilities</b><div><i>[Role] — [verb] [object] [when]</i>. Each role is a lane; a system that acts on its own (e.g. Jira) gets its own lane.</div></div>
+          <div class="lineage-item"><b>Steps</b><div>Action verb + object + where: <i>Create the Epic in Azumo Assignments</i>. One action per step. Description (optional): <i>When · Input · Do · Output</i>. Actions only — the “why” goes in Objective.</div></div>
+          <div class="lineage-item"><b>Decisions</b><div>A yes/no question: <i>Does the Epic already exist?</i> Set where both Yes and No go.</div></div>
+          <div class="lineage-item"><b>⚡ Automated · 🔗 Link · 📄 Doc</b><div>Mark ⚡ when a system does the step (don't write “automatically”). Use 🔗 for the tool or file used in the step. Use 📄 when the step produces or needs a document.</div></div>
+          <div class="lineage-item"><b>Validations</b><div>Checks that prove the process worked, ideally measurable: <i>Epic is in “Started”</i>, <i>Hours match the timesheet</i>.</div></div>
+          <div class="lineage-item"><b>Resources</b><div><i>[Tool] – [what it is]</i>: <i>Jira – Azumo Assignments board</i>.</div></div>
+          <div class="lineage-item"><b>Related processes</b><div>Link hand-offs (previous / next) instead of repeating another process's steps.</div></div>
+          <div class="lineage-item"><b>Before publishing</b><div>For each block ask: does it tell someone what to <i>do</i>, or what to <i>know</i>? Actions go in Steps; facts in Roles, Validations and Resources; reasons in Objective.</div></div>
+        </div>
       </div>
     </details>
 
@@ -10801,14 +10839,14 @@ function pfStepRowHtml(step){
   return `<div class="pf-step-compact${nt==='decision'?' is-decision':''}" data-icon="${esc(s.icon||'')}" data-yes-pending="${esc(s.yes_to!=null?String(s.yes_to):'')}" data-no-pending="${esc(s.returns_to!=null?String(s.returns_to):'')}">
     <div class="pf-step-line1">
       <span class="pf-step-num">?</span>
-      <input type="text" class="pf-step-title" value="${esc(s.title||'')}" placeholder="Action verb + object + where — e.g. Create the Epic in Azumo Assignments" title="Write each step as: Action verb (imperative) + object + where (system / location). One action per step.">
+      <input type="text" class="pf-step-title" value="${esc(s.title||'')}" placeholder="Step name">
       <div class="pf-row-actions">
         <button type="button" class="pf-icon-btn" title="Move up" onclick="pfMoveRow(this,-1)"><i class="ti ti-chevron-up"></i></button>
         <button type="button" class="pf-icon-btn" title="Move down" onclick="pfMoveRow(this,1)"><i class="ti ti-chevron-down"></i></button>
         <button type="button" class="pf-icon-btn" title="Remove" onclick="this.closest('.pf-step-compact').remove();pfRenumberSteps();pfRefreshDiagramPreview()"><i class="ti ti-trash"></i></button>
       </div>
     </div>
-    <textarea class="pf-step-desc" rows="2" placeholder="When: trigger · Input: what you need · Do: how, in which tool · Output: done when… — e.g. When the PM form arrives · Input: assignment form · Do: create the Epic in Jira with name + role · Output: Epic exists in 'Started'">${esc(s.desc||'')}</textarea>
+    <textarea class="pf-step-desc" rows="1" placeholder="Description (optional)">${esc(s.desc||'')}</textarea>
     <div class="pf-step-line2">
       <select class="pf-step-role" data-init="${esc(s.role||'')}">
         <option value="">— role —</option>${s.role?`<option value="${esc(s.role)}" selected>${esc(s.role)}</option>`:''}
@@ -10817,14 +10855,14 @@ function pfStepRowHtml(step){
         ${types.map(t=>`<button type="button" class="pf-nt-mini-btn${nt===t.v?' active':''}" data-nt="${t.v}" onclick="pfMiniSetNt(this)">${t.l}</button>`).join('')}
       </div>
       <input type="hidden" class="pf-step-nodetype" value="${esc(nt)}">
-      <label class="pf-step-docs-lbl" title="Requires documentation">
-        <input type="checkbox" class="pf-step-has-docs"${s.has_docs?' checked':''}> Doc
+      <label class="pf-step-docs-lbl">
+        <input type="checkbox" class="pf-step-has-docs"${s.has_docs?' checked':''}><span>📄 Doc</span>
       </label>
-      <label class="pf-step-auto-lbl" title="Done by a system (Jira automation, Zapier…), not a person. Shows a ⚡ badge — no need to write 'automatically' in the title.">
-        <input type="checkbox" class="pf-step-has-auto"${(s.has_auto||s.automation_url)?' checked':''} onchange="pfToggleAutoRow(this)"> ⚡ Automated
+      <label class="pf-step-auto-lbl">
+        <input type="checkbox" class="pf-step-has-auto"${(s.has_auto||s.automation_url)?' checked':''} onchange="pfToggleAutoRow(this)"><span>⚡ Automated</span>
       </label>
-      <label class="pf-step-form-lbl" title="Add a link used in this step (doc, sheet, Jira board, form…)">
-        <input type="checkbox" class="pf-step-has-form"${s.form_url?' checked':''} onchange="pfToggleFormRow(this)"> 🔗 Link
+      <label class="pf-step-form-lbl">
+        <input type="checkbox" class="pf-step-has-form"${s.form_url?' checked':''} onchange="pfToggleFormRow(this)"><span>🔗 Link</span>
       </label>
     </div>
     <div class="pf-step-branch-row">
@@ -10832,10 +10870,10 @@ function pfStepRowHtml(step){
       <label><span class="pf-br-no">✖ If no →</span><select class="pf-step-no"></select></label>
     </div>
     <div class="pf-step-auto-row"${(s.has_auto||s.automation_url)?' style=\"display:flex\"':''}>
-      <input type="url" class="pf-step-auto-url" value="${esc(s.automation_url||'')}" placeholder="https://… automation link">
+      <input type="url" class="pf-step-auto-url" value="${esc(s.automation_url||'')}" placeholder="Automation link (optional)">
     </div>
     <div class="pf-step-form-row"${s.form_url?' style=\"display:flex\"':''}>
-      <input type="url" class="pf-step-form-url" value="${esc(s.form_url||'')}" placeholder="https://… link used in this step (Google Doc/Sheet, Jira board, form, Harvest…)">
+      <input type="url" class="pf-step-form-url" value="${esc(s.form_url||'')}" placeholder="Link">
     </div>
     <div class="pf-step-schedule-row">
       <select class="pf-step-day">
@@ -11168,13 +11206,13 @@ function pfRenderSwimlanes(){
 window.pfRenderSwimlanes=pfRenderSwimlanes;
 
 function pfValidationRowHtml(text){
-  return `<div class="pf-inline-row"><input type="text" class="pf-validation-text" value="${esc(text || '')}" placeholder="e.g. All hours match the approved timesheet"><button type="button" class="pf-icon-btn" onclick="this.closest('.pf-inline-row').remove()"><i class="ti ti-trash"></i></button></div>`;
+  return `<div class="pf-inline-row"><input type="text" class="pf-validation-text" value="${esc(text || '')}" placeholder="Validation"><button type="button" class="pf-icon-btn" onclick="this.closest('.pf-inline-row').remove()"><i class="ti ti-trash"></i></button></div>`;
 }
 function pfRoleRowHtml(r){
   const x = r || {};
   return `<div class="pf-role-row">
-    <input type="text" class="pf-rr-role" list="pfCompanyRoles" value="${esc(x.role || '')}" placeholder="Role — e.g. CSM">
-    <textarea class="pf-rr-resp" rows="2" placeholder="Responsibilities — e.g. Owns the client relationship; joins the kickoff…">${esc(x.responsibilities || '')}</textarea>
+    <input type="text" class="pf-rr-role" list="pfCompanyRoles" value="${esc(x.role || '')}" placeholder="Role">
+    <textarea class="pf-rr-resp" rows="2" placeholder="Responsibilities">${esc(x.responsibilities || '')}</textarea>
     <button type="button" class="pf-icon-btn" title="Remove" onclick="this.closest('.pf-role-row').remove()"><i class="ti ti-trash"></i></button>
   </div>`;
 }
@@ -11511,11 +11549,11 @@ bootDashboard();
           <div class="pf-grid">
             <div class="auth-field pf-field-full">
               <label for="pfName">Name</label>
-              <input type="text" id="pfName" placeholder="New Project Process">
+              <input type="text" id="pfName" placeholder="Process name">
             </div>
             <div class="auth-field">
               <label for="pfId">ID (slug)</label>
-              <input type="text" id="pfId" placeholder="new-project-process">
+              <input type="text" id="pfId" placeholder="process-slug">
             </div>
             <div class="auth-field">
               <label for="pfVersion">Version</label>
@@ -11523,12 +11561,12 @@ bootDashboard();
             </div>
             <div class="auth-field">
               <label for="pfOwnerRole">Owner role</label>
-              <input type="text" id="pfOwnerRole" placeholder="PMO" list="pfCompanyRoles">
+              <input type="text" id="pfOwnerRole" placeholder="Role" list="pfCompanyRoles">
               <span class="pf-field-hint">Accountable for the process end to end.</span>
             </div>
             <div class="auth-field">
               <label for="pfCorresponsableRole">Co-responsible role</label>
-              <input type="text" id="pfCorresponsableRole" placeholder="PM" list="pfCompanyRoles">
+              <input type="text" id="pfCorresponsableRole" placeholder="Role" list="pfCompanyRoles">
               <datalist id="pfCompanyRoles"></datalist>
               <span class="pf-field-hint">Shares accountability and backs up the owner.</span>
             </div>
