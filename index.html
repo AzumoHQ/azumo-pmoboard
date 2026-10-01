@@ -327,7 +327,12 @@ details.proc-week-cal[open] .proc-week-cal-chev{transform:rotate(180deg)}
 .pf-step-form-lbl{display:flex;align-items:center;gap:.2rem;font-size:.74rem;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;user-select:none}
 .pf-step-form-lbl input{width:13px;height:13px;cursor:pointer;accent-color:#10b981}
 /* Clean form: guidance lives in "Process Definition Framework", not under each field */
-.pf-split-right .pf-field-hint{display:none!important}
+/* Field descriptions: hidden until you hover the field (or type in it), floating to the right of the label */
+.pf-split-right .auth-field,.pf-split-right .pf-section{position:relative}
+.pf-split-right .pf-field-hint{position:absolute;top:0;right:0;max-width:62%;margin:0!important;padding:.15rem .5rem;border-radius:6px;background:var(--card);border:1px solid var(--brd);box-shadow:0 2px 8px rgba(0,0,0,.08);font-size:.72rem;line-height:1.35;text-align:right;z-index:2;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s}
+.pf-split-right .pf-section>.pf-field-hint{top:1rem}
+.pf-split-right .auth-field:hover>.pf-field-hint,.pf-split-right .auth-field:focus-within>.pf-field-hint,
+.pf-split-right .pf-section-head:hover+.pf-field-hint{opacity:1;visibility:visible}
 /* Step options as compact toggle chips (filled when on), pushed to the right of the row */
 #pfStepsList .pf-step-docs-lbl{margin-left:auto}
 #pfStepsList .pf-step-docs-lbl,#pfStepsList .pf-step-auto-lbl,#pfStepsList .pf-step-form-lbl{border:1px solid var(--brd);border-radius:999px;padding:.08rem .5rem;font-size:.7rem;background:transparent;transition:background .12s,border-color .12s,color .12s}
@@ -11610,7 +11615,7 @@ bootDashboard();
             </div>
             <div class="auth-field pf-field-full">
               <label for="pfTrigger">Trigger</label>
-              <span class="pf-field-hint">The event that starts the process — e.g. "SOW signed", "New hire accepts the offer", "Every Friday EOD".</span>
+              <span class="pf-field-hint">The event that starts the process.</span>
               <textarea id="pfTrigger" rows="2" class="pf-textarea" oninput="pfRefreshDiagramPreview()"></textarea>
             </div>
           </div>
