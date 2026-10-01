@@ -2065,7 +2065,7 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
     </div>
     <div class="fc-table-wrap">
       <table>
-        <thead><tr><th>Client</th><th>Status</th><th>PM Assigned</th><th>CSM Assigned</th><th>TL Assigned</th><th>Accounts Coverage</th><th>Assignees</th><th>Link</th></tr></thead>
+        <thead><tr><th>Client</th><th>Status</th><th>PM Assigned</th><th>CSM Assigned</th><th>TL Assigned</th><th>Accounts Coverage</th><th>Link</th></tr></thead>
         <tbody id="accountCoverageTbody"></tbody>
       </table>
     </div>
@@ -9993,7 +9993,15 @@ function renderAccountCoverageModule(){
   const missingLink = document.getElementById('accountCoverageMissingLink');
   if(missingLink) missingLink.href = accountCoverageMissingUrl();
 
-  let rows = accountCoverageRows();
+  // Straight from the Jira PSA JQL: one row per epic, nothing derived from other sources.
+  let rows = (latest.account_coverage || []).map(cov => ({
+    client: cov.client || '',
+    epic_status: cov.status || '',
+    coverage: cov,
+    missing: cov.missing || [],
+    complete: Boolean(cov.complete),
+    assignees: []
+  })).sort((a,b) => a.client.localeCompare(b.client));
   const rows0 = rows.slice();
   const total = rows.length;
   const missingRowsAll = rows.filter(row => !row.complete);
@@ -10007,8 +10015,7 @@ function renderAccountCoverageModule(){
       row.epic_status,
       row.coverage.pm_assigned,
       row.coverage.csm_assigned,
-      row.coverage.tl_assigned,
-      row.assignees.join(' ')
+      row.coverage.tl_assigned
     ].join(' ').toLowerCase().includes(search));
   }
   if(accountCoverageStatusFilter) rows = rows.filter(row => row.epic_status === accountCoverageStatusFilter);
@@ -10033,14 +10040,11 @@ function renderAccountCoverageModule(){
     ['pm','csm','tl'].some(r => row[`${r}_assigned`] && row[`${r}_assigned_active`] === false)
   );
 
-  // Clients tracked = accounts whose PSA epic is In Progress. Rows that are not counted
-  // (Backlog epics, clients with assignments but no epic) are explained in the card.
-  const inProgressRows = rows0.filter(row => !isInternalCapacityRow(row) && String(row.epic_status || '').toLowerCase() === 'in progress');
-  const ipWithPeople = inProgressRows.filter(row => (row.assignees || []).length).length;
-  const ipNoPeople = inProgressRows.length - ipWithPeople;
-  const internalRows = rows0.filter(row => isInternalCapacityRow(row)).length;
-  const notCounted = rows0.length - inProgressRows.length - internalRows;
-  const trackedBreakdown = `In Progress epics · ${ipWithPeople} with people · ${ipNoPeople} without people` + (notCounted ? ` · ${notCounted} not counted (Backlog / no epic)` : '') + (internalRows ? ` · ${internalRows} internal (Azumo) excluded` : '');
+  // Clients tracked = PSA epics In Progress, as returned by the JQL.
+  const inProgressRows = rows0.filter(row => String(row.epic_status || '').toLowerCase() === 'in progress');
+  const otherCounts = [...countBy(rows0.filter(row => !inProgressRows.includes(row)), row => row.epic_status || 'No status').entries()]
+    .map(([status, n]) => `${n} ${status}`).join(' · ');
+  const trackedBreakdown = `PSA epics In Progress (Jira JQL)` + (otherCounts ? ` · not counted: ${otherCounts}` : '');
   const cards = document.getElementById('accountCoverageSummaryCards');
   if(cards){
     cards.innerHTML = [
@@ -10067,7 +10071,6 @@ function renderAccountCoverageModule(){
   if(!tbody) return;
   tbody.innerHTML = rows.map(row => {
     const coverage = row.coverage;
-    const assignees = row.assignees || [];
     return `<tr>
       <td style="font-weight:900">${esc(row.client || '—')}</td>
       <td>${statusChip(row.epic_status || 'Unknown')}</td>
@@ -10075,10 +10078,9 @@ function renderAccountCoverageModule(){
       <td>${coverageBadge(coverage.csm_assigned, coverage.csm_assigned_active)}</td>
       <td>${coverageBadge(coverage.tl_assigned, coverage.tl_assigned_active)}</td>
       <td>${row.complete ? '<span class="badge badge-green">Complete</span>' : `<span class="badge badge-red">Missing ${esc(row.missing.join(' / '))}</span>`}</td>
-      <td class="ops-people">${esc(assignees.slice(0,8).join(', ') || '—')}${assignees.length > 8 ? ` +${assignees.length - 8} more` : ''}</td>
-      <td>${accountCoverageLink(coverage, coverage.key ? 'Open in Jira' : 'Find in Jira')}</td>
+      <td>${accountCoverageLink(coverage, 'Open in Jira')}</td>
     </tr>`;
-  }).join('') || '<tr><td colspan="8" style="text-align:center;padding:1rem;color:var(--muted)">No account coverage rows match the selected filters.</td></tr>';
+  }).join('') || '<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--muted)">No account coverage rows match the selected filters.</td></tr>';
 }
 window.setAccountCoverageSearch = setAccountCoverageSearch;
 window.setAccountCoverageFilter = setAccountCoverageFilter;
