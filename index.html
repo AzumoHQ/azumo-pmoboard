@@ -246,6 +246,13 @@ body.light .qa-recurring,body.light .qa-checklist-item{background:#FFFFFF}
 .proc-week-cal{border:1px solid var(--brd);border-radius:var(--r);background:var(--surf);padding:.85rem 1rem;margin-bottom:1rem}
 .proc-week-cal-head{font-size:.86rem;font-weight:700;color:var(--txt);margin-bottom:.15rem;display:flex;align-items:center;gap:8px}
 .proc-week-cal-note{font-size:.72rem;color:var(--muted);margin-bottom:.7rem}
+/* Weekly cadence as a toggle: header is the clickable summary, chevron rotates when open */
+details.proc-week-cal>summary{list-style:none;cursor:pointer;user-select:none;margin-bottom:0}
+details.proc-week-cal>summary::-webkit-details-marker{display:none}
+details.proc-week-cal[open]>summary{margin-bottom:.15rem}
+.proc-week-cal-chev{margin-left:auto;color:var(--muted);transition:transform .15s}
+details.proc-week-cal[open] .proc-week-cal-chev{transform:rotate(180deg)}
+.proc-week-cal-count{font-size:.72rem;font-weight:600;color:var(--muted)}
 .proc-week-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
 .proc-week-cal-day{border:1px solid var(--brd);border-radius:8px;padding:.5rem .55rem;min-height:64px;background:var(--card)}
 .proc-week-cal-day.today{border-color:var(--blue-lt);background:rgba(0,102,255,.06)}
@@ -2294,11 +2301,11 @@ details.client-devs[open] summary::before{transform:rotate(90deg)}
       </div>
     </details>
 
-    <div class="proc-week-cal">
-      <div class="proc-week-cal-head"><i class="ti ti-calendar-time"></i> Weekly cadence</div>
+    <details class="proc-week-cal" id="processWeekCal" ontoggle="try{localStorage.setItem('pmo.procWeekCalOpen',this.open?'1':'0')}catch(e){}">
+      <summary class="proc-week-cal-head"><i class="ti ti-calendar-time"></i> Weekly cadence <span class="proc-week-cal-count" id="processWeekCalCount"></span><i class="ti ti-chevron-down proc-week-cal-chev"></i></summary>
       <div class="proc-week-cal-note">Fixed-day steps across all documented processes. Days with nothing scheduled are collapsed.</div>
       <div class="proc-week-cal-grid" id="processWeekCalendarGrid"></div>
-    </div>
+    </details>
 
     <div class="proc-health-strip" id="processHealthStrip" title="Last review vs. review cadence"></div>
 
@@ -3737,6 +3744,14 @@ function renderProcessWeekCalendar(){
   // Nothing scheduled anywhere -> hide the whole calendar instead of showing seven empty boxes.
   const calWrap = grid.closest('.proc-week-cal');
   if(calWrap) calWrap.style.display = WEEK_DAYS.some(d => byDay[d.key].length) ? '' : 'none';
+  // Toggle: collapsed by default, remembers the last state in this browser; header shows the step count.
+  const calCount = document.getElementById('processWeekCalCount');
+  if(calCount){ const n = WEEK_DAYS.reduce((a, d) => a + byDay[d.key].length, 0); calCount.textContent = `· ${n} scheduled step${n === 1 ? '' : 's'}`; }
+  if(calWrap && !calWrap.dataset.init){
+    calWrap.dataset.init = '1';
+    let saved = null; try{ saved = localStorage.getItem('pmo.procWeekCalOpen'); }catch(e){}
+    calWrap.open = saved === '1';
+  }
   // Empty days collapse to a narrow column so the eye goes straight to the days that matter.
   grid.style.gridTemplateColumns = WEEK_DAYS.map(d => byDay[d.key].length ? 'minmax(130px,1fr)' : '46px').join(' ');
   grid.innerHTML = WEEK_DAYS.map(d => {
