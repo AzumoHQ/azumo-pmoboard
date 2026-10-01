@@ -1432,6 +1432,21 @@ body.nav-merged nav .nav-right{gap:8px!important}
 body.nav-merged nav .nav-refresh{font-size:0!important;padding:6px 12px!important}
 body.nav-merged nav .nav-refresh::after{content:'Sync';font-size:.8rem;font-weight:700}
 body.nav-merged .nav-links{display:none!important}
+/* azumo.com style: logo only, plain nav, blue accents */
+.nav-brand-copy{display:none!important}
+.nav-wordmark{width:96px!important}
+nav{background:#fff!important;border-bottom:1px solid rgba(16,24,40,.08)!important;box-shadow:none!important}
+body.nav-merged nav .nav-inner{height:56px!important}
+body.nav-merged nav .side-index .sidebar-item,
+body.nav-merged nav .side-index .sidebar-item:hover,
+body.nav-merged nav .side-index .sidebar-item.active{background:transparent!important;border:0!important;box-shadow:none!important;transform:none!important;border-radius:0!important}
+body.nav-merged nav .side-index .sidebar-item{color:#1a1f36!important;font-weight:600!important;font-size:.84rem!important;padding:0 12px!important;min-height:56px!important;position:relative!important}
+body.nav-merged nav .side-index .sidebar-item:hover,
+body.nav-merged nav .side-index .sidebar-item.active{color:#0000FF!important}
+body.nav-merged nav .side-index .sidebar-item.active::after{content:'';position:absolute;left:12px;right:12px;bottom:0;height:2px;border-radius:2px;background:#0000FF}
+body.nav-merged nav .module-menu-panel .sidebar-item{min-height:34px!important;border-radius:8px!important}
+body.nav-merged nav .module-menu-panel .sidebar-item.active::after{display:none}
+body.nav-merged nav .nav-refresh{background:#0000FF!important;border:0!important;color:#fff!important;border-radius:8px!important;box-shadow:none!important}
 .nav-config>summary{list-style:none;display:inline-flex;align-items:center;gap:5px;cursor:pointer;border:1px solid var(--brd);background:var(--card);color:var(--txt);border-radius:8px;padding:5px 10px;font-size:.78rem;font-weight:700;user-select:none}
 .nav-config>summary::-webkit-details-marker{display:none}
 .nav-config-menu{position:absolute;right:0;top:calc(100% + 6px);min-width:150px;display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:6px;background:var(--card,#fff);border:1px solid var(--brd);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);z-index:300}
@@ -1540,6 +1555,7 @@ document.addEventListener('keydown',function(e){var d=document.getElementById('n
           <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">Dark</button>
           <a class="auth-link" id="adminUsersLink" href="/admin/users" style="display:none">Admin</a>
           <a class="auth-link" id="adminViewAsLink" href="/admin/users" style="display:none">View as</a>
+          <a class="auth-link" href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a>
           <button class="auth-link" id="authLogoutBtn" onclick="logoutUser()" style="display:none">Logout</button>
         </div>
       </details>
