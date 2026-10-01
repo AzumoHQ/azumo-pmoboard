@@ -9488,17 +9488,15 @@ function knownActiveRoster(){
   (latest?.pending_list||[]).forEach(addRow);
   return fallback;
 }
+// PM names come straight from Jira; no Harvest roster filtering.
 function activePmName(name){
-  if(!name) return '';
-  const roster = knownActiveRoster();
-  if(roster.size && !roster.has(normalizeIdentity(name))) return '';
-  return name;
+  return name || '';
 }
-function coverageBadge(value){
+// Account Coverage uses Jira only: a PM/CSM/TL is inactive only when their Jira account is deactivated.
+function coverageBadge(value, active){
   if(!value) return '<span class="badge badge-red">Missing</span>';
-  const roster = knownActiveRoster();
-  if(roster.size > 0 && !roster.has(normalizeIdentity(value))){
-    return `<span class="badge badge-red" title="${esc(value)} — not in Harvest active users">Missing</span>`;
+  if(active === false){
+    return `<span class="badge badge-red" title="${esc(value)} — inactive Jira user">Inactive</span>`;
   }
   return esc(value);
 }
@@ -9518,9 +9516,9 @@ function accountCoverageLink(coverage, label='Complete in Jira'){
 }
 function coverageCell(coverage){
   return `<div class="coverage-cell">
-    <b>PM:</b> ${coverageBadge(coverage.pm_assigned)}<br/>
-    <b>CSM:</b> ${coverageBadge(coverage.csm_assigned)}<br/>
-    <b>TL:</b> ${coverageBadge(coverage.tl_assigned)}<br/>
+    <b>PM:</b> ${coverageBadge(coverage.pm_assigned, coverage.pm_assigned_active)}<br/>
+    <b>CSM:</b> ${coverageBadge(coverage.csm_assigned, coverage.csm_assigned_active)}<br/>
+    <b>TL:</b> ${coverageBadge(coverage.tl_assigned, coverage.tl_assigned_active)}<br/>
     ${accountCoverageLink(coverage)}
   </div>`;
 }
@@ -10031,9 +10029,9 @@ function renderAccountCoverageModule(){
   });
 
   const roster = knownActiveRoster();
-  const inactiveRows = roster.size ? (latest.account_coverage||[]).filter(row =>
-    [row.pm_assigned, row.csm_assigned, row.tl_assigned].some(v => v && !roster.has(normalizeIdentity(v)))
-  ) : [];
+  const inactiveRows = (latest.account_coverage||[]).filter(row =>
+    ['pm','csm','tl'].some(r => row[`${r}_assigned`] && row[`${r}_assigned_active`] === false)
+  );
 
   // Clients tracked = accounts whose PSA epic is In Progress. Rows that are not counted
   // (Backlog epics, clients with assignments but no epic) are explained in the card.
@@ -10048,7 +10046,7 @@ function renderAccountCoverageModule(){
     cards.innerHTML = [
       `<div class="action-card"><div class="action-label">Clients tracked</div><div class="action-value">${inProgressRows.length}</div><div class="action-copy">${esc(trackedBreakdown)}</div></div>`,
       `<div class="action-card ${missingRowsAll.length ? 'warning' : 'ok'}"><div class="action-label">Missing coverage</div><div class="action-value">${missingRowsAll.length}</div><div class="action-copy">Need PM, CSM, or TL assigned</div></div>`,
-      `<div class="action-card ${inactiveRows.length ? 'critical' : 'ok'}"><div class="action-label">Inactive assignees</div><div class="action-value">${inactiveRows.length}</div><div class="action-copy">PM/CSM/TL not found in current Jira data</div></div>`,
+      `<div class="action-card ${inactiveRows.length ? 'critical' : 'ok'}"><div class="action-label">Inactive assignees</div><div class="action-value">${inactiveRows.length}</div><div class="action-copy">PM/CSM/TL deactivated in Jira</div></div>`,
       `<div class="action-card ok"><div class="action-label">Complete</div><div class="action-value">${completeRowsAll.length}</div><div class="action-copy">PM + CSM + TL populated</div></div>`
     ].join('');
   }
@@ -10073,9 +10071,9 @@ function renderAccountCoverageModule(){
     return `<tr>
       <td style="font-weight:900">${esc(row.client || '—')}</td>
       <td>${statusChip(row.epic_status || 'Unknown')}</td>
-      <td>${coverageBadge(coverage.pm_assigned)}</td>
-      <td>${coverageBadge(coverage.csm_assigned)}</td>
-      <td>${coverageBadge(coverage.tl_assigned)}</td>
+      <td>${coverageBadge(coverage.pm_assigned, coverage.pm_assigned_active)}</td>
+      <td>${coverageBadge(coverage.csm_assigned, coverage.csm_assigned_active)}</td>
+      <td>${coverageBadge(coverage.tl_assigned, coverage.tl_assigned_active)}</td>
       <td>${row.complete ? '<span class="badge badge-green">Complete</span>' : `<span class="badge badge-red">Missing ${esc(row.missing.join(' / '))}</span>`}</td>
       <td class="ops-people">${esc(assignees.slice(0,8).join(', ') || '—')}${assignees.length > 8 ? ` +${assignees.length - 8} more` : ''}</td>
       <td>${accountCoverageLink(coverage, coverage.key ? 'Open in Jira' : 'Find in Jira')}</td>
