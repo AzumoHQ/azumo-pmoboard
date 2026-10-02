@@ -2619,6 +2619,8 @@ let qaChecklistReviews = {};
 let qaChecklistReviewsLoaded = false;
 let qaChecklistReviewsPromise = null;
 let harvestHoursReportData = [];
+// Filas exactamente como se ven en la tabla de Harvest Hours Control (las usan los exports)
+let harvestHoursVisibleRows = [];
 let harvestHoursQAData = [];
 let internalProjectsExpanded = true;
 
@@ -7721,6 +7723,7 @@ function renderHarvestHoursReport(){
     if(a.complete !== b.complete) return a.complete ? 1 : -1;
     return (a.pct - b.pct) || a.name.localeCompare(b.name);
   });
+  harvestHoursVisibleRows = sorted; // los exports copian esto, sin filtros propios
 
   tbody.innerHTML = sorted.map((row, idx) => {
     const color = row.complete ? "var(--success)" : row.pct >= 50 ? "var(--warning)" : "var(--danger)";
@@ -8169,7 +8172,7 @@ function hhCsvCell(value){
 function exportHarvestHoursCSV(){
   const from = document.getElementById("hhDateFrom")?.value || "";
   const to = document.getElementById("hhDateTo")?.value || "";
-  const rows = [["Name","Client","Hours loaded","Days filled","Description","Jira %","Percent complete","Status"]].concat(harvestHoursReportData.map(row => [row.name,row.client || "",row.hours,row.daysFilled || 0,row.missingDescription ? "Empty" : "OK",(row.jiraPct === null || row.jiraPct === undefined) ? "—" : `${row.jiraPct}%`,`${row.pct}%`,row.complete ? "Complete" : row.pct >= 50 ? "Partial" : "Incomplete"]));
+  const rows = [["Name","Client","Hours loaded","Days filled","Description","Jira %","Percent complete","Status"]].concat(harvestHoursVisibleRows.map(row => [row.name,(row.clients && row.clients.length ? row.clients.join(", ") : ""),row.hours,row.daysFilled || 0,row.missingDescription ? "Empty" : "OK",(row.jiraPct === null || row.jiraPct === undefined) ? "—" : `${row.jiraPct}%`,`${row.pct}%`,row.complete ? "Complete" : row.pct >= 50 ? "Partial" : "Incomplete"]));
   const csv = rows.map(row => row.map(hhCsvCell).join(",")).join("\n");
   const link = document.createElement("a");
   link.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8;"}));
@@ -8178,9 +8181,9 @@ function exportHarvestHoursCSV(){
 }
 async function copyHarvestHoursTSV(){
   const rows = [['Name','Client','Hours','Days filled','Jira %','%','Status']].concat(
-    harvestHoursReportData.map(row => [
+    harvestHoursVisibleRows.map(row => [
       row.name,
-      row.client || '',
+      (row.clients && row.clients.length ? row.clients.join(', ') : ''),
       row.hours,
       row.daysFilled || 0,
       row.jiraPct != null ? row.jiraPct + '%' : '—',
@@ -8198,8 +8201,8 @@ async function copyHarvestHoursTSV(){
   }
 }
 async function copyHarvestHoursSlack(){
-  const incomplete = harvestHoursReportData.filter(row => !row.complete);
-  const noDescription = harvestHoursReportData.filter(row => row.missingDescription);
+  const incomplete = harvestHoursVisibleRows.filter(row => !row.complete);
+  const noDescription = harvestHoursVisibleRows.filter(row => row.missingDescription);
   const text = harvestHoursBillingHubNames(incomplete, noDescription);
   try{
     await navigator.clipboard.writeText(text);
