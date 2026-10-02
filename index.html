@@ -7442,7 +7442,7 @@ function harvestHoursBillingHubNames(incomplete, noDescriptionRows=[]){
   if(noDescriptionNames.length){
     sections.push(`Empty\n${noDescriptionNames.map(name => `• ${name}`).join("\n")}`);
   }
-  if(!sections.length) return "All active users are complete in Harvest and all descriptions are filled.";
+  if(!sections.length) return "All active users are complete in Harvest.";
   return sections.join("\n\n");
 }
 function harvestHoursStatusTag(row){
@@ -8202,8 +8202,8 @@ async function copyHarvestHoursTSV(){
 }
 async function copyHarvestHoursSlack(){
   const incomplete = harvestHoursVisibleRows.filter(row => !row.complete);
-  const noDescription = harvestHoursVisibleRows.filter(row => row.missingDescription);
-  const text = harvestHoursBillingHubNames(incomplete, noDescription);
+  // Ya no se copia la seccion "Empty": solo nombres incompletos agrupados por cliente
+  const text = harvestHoursBillingHubNames(incomplete);
   try{
     await navigator.clipboard.writeText(text);
     const el = document.getElementById("hhCopyConfirm");
