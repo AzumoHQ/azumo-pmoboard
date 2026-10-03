@@ -58,14 +58,16 @@ module.exports = async function processesHandler(req, res) {
     if (req.method === 'GET') {
       if (id) {
         const process = await getProcessDetail(id);
-        if (!process) {
+        if (!process || (process.status === 'draft' && !access.write)) {
           res.status(404).json({ error: 'Process not found' });
           return;
         }
         res.status(200).json({ process });
         return;
       }
-      res.status(200).json({ processes: await getProcesses() });
+      const all = await getProcesses();
+      // Drafts are visible to PMO/admin only.
+      res.status(200).json({ processes: access.write ? all : all.filter((p) => p.status !== 'draft') });
       return;
     }
 
