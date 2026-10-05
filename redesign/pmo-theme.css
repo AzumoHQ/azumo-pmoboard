@@ -477,7 +477,7 @@ html body.light tr:hover td{background:var(--row-hover) !important}
 html body tbody tr:nth-child(even) td{background-color:transparent}
 
 /* ---------- 11. Inputs / filters / dropdowns ---------- */
-html body :is(input[type="text"],input[type="search"],input[type="email"],input[type="password"],input[type="date"],input[type="number"],input:not([type]),select,textarea),
+html body :is(input[type="text"],input[type="search"],input[type="email"],input[type="password"],input[type="date"],input[type="number"],input[type="url"],input:not([type]),select,textarea),
 html body .auth-field input,
 html body .hw-date-input,
 html body .bench-sort-control select{
@@ -769,6 +769,109 @@ html body .nav-config-menu .theme-toggle,html body nav .theme-toggle{display:non
 html body td.lf-num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
 html body td.lf-dash{color:var(--faint) !important}
 
+
+/* ---------- 26. Process Portal pages (redesign/process-portal.js) ---------- */
+#processes.pp-on > .proc-toolbar,
+#processes.pp-on > .proc-list-head,
+#processes.pp-on > #processList,
+#processes.pp-on > #processEmptyState{display:none !important}
+#processes.pp-detail-open > details.qa-check,
+#processes.pp-detail-open > .proc-health-strip,
+#processes.pp-detail-open > .proc-week-strip,
+#processes.pp-detail-open > .sec-head .sec-tag{display:none !important}
+#ppRoot{display:flex;flex-direction:column;gap:var(--gap);margin-bottom:var(--gap)}
+.pp-pill.is-pos{--tone:var(--pos)}
+.pp-pill.is-neg{--tone:var(--neg)}
+.pp-pill:is(.is-pos,.is-neg){background:color-mix(in srgb,var(--tone) 15%,transparent);border-color:color-mix(in srgb,var(--tone) 40%,transparent)}
+.pp-toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+html body .pp-input{height:var(--control-h);padding:0 12px;width:100%;box-sizing:border-box;font-size:13px}
+html body textarea.pp-input,html body .pp-area{height:auto;padding:8px 12px;line-height:1.5;resize:vertical}
+html body .pp-search{max-width:360px}
+html body .pp-add{margin-top:8px;border-style:dashed !important;background:transparent !important}
+.pp-r{text-align:right !important}
+.pp-row-link{cursor:pointer}
+.pp-row-link.is-sel td{background:var(--row-hover) !important}
+.pp-row-link.is-sel td:first-child{box-shadow:inset 3px 0 0 var(--brand)}
+.pp-crumbs{font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.pp-link{border:0;background:none;padding:0;color:var(--brand);font:inherit;cursor:pointer}
+.pp-link:hover{text-decoration:underline}
+.pp-title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pp-title{margin:0;font-family:var(--font-display);font-size:22px;font-weight:600;line-height:1.2;color:var(--ink)}
+html body input.pp-title-input.pp-title-input{font-family:var(--font-display) !important;font-size:22px !important;font-weight:600;line-height:1.2;color:var(--ink) !important;
+  background:transparent !important;border:1px solid transparent !important;border-radius:var(--radius-control) !important;padding:2px 6px;margin-left:-7px;min-width:280px;max-width:640px;width:auto}
+html body input.pp-title-input.pp-title-input:hover{border-color:var(--border) !important}
+html body input.pp-title-input.pp-title-input:focus{border-color:var(--brand) !important}
+.pp-save{border:0;background:none;padding:0;font:inherit;font-size:11.5px;color:var(--faint);white-space:nowrap}
+.pp-save.is-error{color:var(--neg);cursor:pointer;text-decoration:underline}
+.pp-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pp-flow-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pp-seg button{font-size:12.5px}
+.pp-facts{display:flex;flex-direction:column;gap:6px;margin-top:12px;font-size:13px;color:var(--ink-soft)}
+.pp-facts>div{display:flex;gap:10px;align-items:baseline}
+.pp-facts .pp-label{min-width:84px}
+.pp-facts a{color:var(--brand)}
+.pp-split-tight{margin-top:12px !important;padding-top:0 !important;border-top:0 !important}
+.pp-field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.pp-field+.pp-field{margin-top:0}
+.pp-card-body>.pp-field{margin-top:12px}
+.pp-li-t{flex:1;min-width:0}
+.pp-x{border:0;background:none;color:var(--faint);cursor:pointer;font-size:14px;line-height:1;padding:0 2px;border-radius:4px}
+.pp-x:hover{color:var(--neg)}
+.pp-scope li{align-items:baseline}
+.pp-person{color:var(--muted);font-weight:400}
+.pp-role-row.is-clickable{cursor:pointer}
+.pp-role-row.is-editing{align-items:flex-start;background:var(--row-hover)}
+.pp-role-edit{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.pp-role-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pp-role-edit-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pp-role-edit-actions .btn.is-on{border-color:var(--brand) !important;color:var(--brand) !important}
+.pp-grow{flex:1}
+.pp-add-row{padding-top:12px !important}
+.pp-warn-t{color:var(--forecast)}
+/* flow */
+.pp-flow-scroll{overflow-x:auto;border-top:1px solid var(--border)}
+.pp-flow-lanes{position:relative}
+.pp-lane{position:absolute;left:0;right:0;border-bottom:1px solid var(--border)}
+.pp-lane:last-of-type{border-bottom:0}
+.pp-lane-label{position:absolute;left:0;top:0;bottom:0;padding:0 14px;display:flex;flex-direction:column;justify-content:center;
+  background:var(--surface);border-right:1px solid var(--border)}
+.pp-lane-role{font-size:13px;font-weight:600;color:var(--ink)}
+.pp-lane-person{font-size:12px;color:var(--muted)}
+.pp-wires{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.pp-wires text{font-family:var(--font-sans)}
+.pp-node{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;cursor:pointer;box-sizing:border-box;
+  padding:8px 11px;border-radius:var(--radius-control);background:var(--surface-2);border:1px solid var(--border-strong);color:var(--ink);font:inherit;transition:border-color .15s}
+.pp-node:hover{border-color:var(--muted)}
+.pp-node.is-ctl{border-color:var(--forecast)}
+.pp-node.is-sel,html body .pp-node:focus-visible{border-color:var(--brand) !important;box-shadow:0 0 0 1px var(--brand) !important;outline:none}
+.pp-node-top{display:flex;align-items:center;gap:6px;width:100%}
+.pp-node-num{font-size:10.5px;color:var(--muted)}
+.pp-node-top .pp-pill{margin-left:auto;padding:0 7px;font-size:10px}
+.pp-auto{font-size:11px}
+.pp-node-title{font-size:13px;font-weight:500;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.pp-node-meta{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pp-flow-linear{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:18px;border-top:1px solid var(--border)}
+.pp-flow-linear .pp-node{width:172px;min-height:74px}
+.pp-arrow{color:var(--muted)}
+/* step editor */
+.pp-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 14px}
+.pp-span2{grid-column:span 2}
+.pp-check{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);grid-column:span 2}
+.pp-check input{width:15px;height:15px;accent-color:var(--brand)}
+.pp-editor{border-color:var(--brand) !important}
+/* dialog */
+.pp-scrim{position:fixed;inset:0;z-index:50;background:var(--scrim);display:flex;align-items:center;justify-content:center;padding:16px}
+.pp-dialog{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-dialog);box-shadow:var(--shadow-card);padding:20px;display:flex;flex-direction:column;gap:12px}
+.pp-dialog-title{font-size:14px;font-weight:600;color:var(--ink)}
+.pp-dialog-body{font-size:12.5px;color:var(--muted);line-height:1.6}
+.pp-dialog-actions{display:flex;justify-content:flex-end;gap:8px}
+@media (max-width:900px){.pp-form{grid-template-columns:1fr 1fr}.pp-role-edit-grid{grid-template-columns:1fr}}
+@media print{
+  nav,.side-index,footer,.lf-preview-badge,.pp-actions,.pp-flow-tools,.pp-add,.pp-x,#processes>:not(#ppRoot):not(.sec-head):not(.lf-page-sub),.pp-editor,.pp-save{display:none !important}
+  html body,html body .pp-card,html body .pp-kpi{box-shadow:none !important}
+  .pp-flow-scroll{overflow:visible}
+}
+.pp-roles .pp-empty{padding-top:14px}
 
 /* ---------- 0. Colores del board con fallback (generado por el patch) ---------- */
 html body{

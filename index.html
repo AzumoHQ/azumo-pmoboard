@@ -1514,7 +1514,8 @@ document.addEventListener('keydown',function(e){var d=document.getElementById('n
   document.documentElement.classList.add('lf');
   document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">'
     + '<link rel="stylesheet" href="redesign/pmo-theme.css">'
-    + '<script src="redesign/pmo-theme.js" defer><\/script>');
+    + '<script src="redesign/pmo-theme.js" defer><\/script>'
+    + '<script src="redesign/process-portal.js" defer><\/script>');
 })();
 </script>
 </head>
@@ -11172,6 +11173,11 @@ function renderProcessManagerCard(p){
 }
 
 function renderProcessManagerList(){
+  // THEME preview: Process Portal pages (redesign/process-portal.js). Sin preview, sigue igual.
+  if(window.PMO_LF && window.ProcessPortal && window.ProcessPortal.onList()){
+    try{ renderProcessWeekCalendar(); renderProcessHealthStrip(); }catch(e){}
+    return;
+  }
   const host = document.getElementById('processManagerGroup');
   if(!host) return;
   if(!PROCESS_MANAGER_STATE.list.length){
