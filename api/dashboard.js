@@ -95,6 +95,10 @@ module.exports = async function dashboardHandler(req, res) {
     }
 
     if (!Array.isArray(data.snapshots) || !data.snapshots.length) {
+      if (data.data_source === 'file-fallback' && data.data_error) {
+        sendError(res, 503, `Database read failed: ${data.data_error}`);
+        return;
+      }
       sendError(res, 404, 'No dashboard snapshots are available.');
       return;
     }
