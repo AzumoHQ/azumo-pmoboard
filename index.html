@@ -3888,7 +3888,7 @@ function renderProcessWeekCalendar(){
   const byDay = Object.fromEntries(WEEK_DAYS.map(d => [d.key, []]));
   // Processes created from the board (/api/processes) also land on the calendar.
   let boardSources = [];
-  try{ boardSources = (PROCESS_MANAGER_STATE.list || []).filter(p => processFrequencyHasSchedule(p.frequency)).map(p => ({processName: p.name, steps: p.steps || []})); }catch(e){ boardSources = []; }
+  try{ boardSources = (PROCESS_MANAGER_STATE.list || []).filter(p => p.status !== 'draft' && processFrequencyHasSchedule(p.frequency)).map(p => ({processName: p.name, steps: p.steps || []})); }catch(e){ boardSources = []; }
   [...PROCESS_WEEK_SOURCES, ...boardSources].forEach(source => {
     (source.steps || []).forEach(step => {
       if(step.day === 'Daily') ['Mon','Tue','Wed','Thu','Fri'].forEach(k => { if(byDay[k]) byDay[k].push({processName: source.processName, title: step.title}); });
@@ -10975,7 +10975,7 @@ function renderProcessManagerCard(p){
     : '';
   return `<div class="proc-group" data-group=${jsArg(p.id)}>
     <details class="qa-check" data-cat="${esc(p.category || 'other')}" data-roles="assignee pm csm pmo admin executive" data-search="${esc(searchText)}">
-      <summary><span>${esc(p.name)} <span class="chip badge-green" style="margin-left:8px">Documented</span> ${(() => { const h = computeProcessHealth({lastReviewed: p.last_reviewed, reviewCadenceMonths: p.review_cadence_months}); return `<span class="chip ${h.cls}" style="margin-left:6px" title="${p.last_reviewed ? 'Last reviewed ' + esc(p.last_reviewed) + ' · every ' + esc(String(p.review_cadence_months ?? 6)) + ' mo' : 'No review on record'}">${h.label}</span>`; })()}</span><span class="qa-status ok">v${esc(p.version || '1.00')}</span></summary>
+      <summary><span>${esc(p.name)} ${p.status === 'draft' ? '<span class="chip badge-yellow" style="margin-left:8px" title="Draft — only PMO/admin can see it until it is published">Draft</span>' : '<span class="chip badge-green" style="margin-left:8px">Documented</span>'} ${(() => { const h = computeProcessHealth({lastReviewed: p.last_reviewed, reviewCadenceMonths: p.review_cadence_months}); return `<span class="chip ${h.cls}" style="margin-left:6px" title="${p.last_reviewed ? 'Last reviewed ' + esc(p.last_reviewed) + ' · every ' + esc(String(p.review_cadence_months ?? 6)) + ' mo' : 'No review on record'}">${h.label}</span>`; })()}</span><span class="qa-status ok">v${esc(p.version || '1.00')}</span></summary>
       <div class="qa-check-body">
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.9rem">
           ${PROCESS_FREQUENCY_LABEL[p.frequency] ? `<span class="badge badge-blue">↻ ${esc(PROCESS_FREQUENCY_LABEL[p.frequency])}</span>` : ''}
@@ -11017,7 +11017,10 @@ function renderProcessManagerList(){
   }
   host.innerHTML = PROCESS_MANAGER_STATE.list.map(renderProcessManagerCard).join('');
   const countEl = document.getElementById('processListCount');
-  if(countEl){ const n = PROCESS_MANAGER_STATE.list.length; countEl.textContent = `${n} process${n === 1 ? '' : 'es'}`; }
+  if(countEl){
+    const n = PROCESS_MANAGER_STATE.list.length, dr = PROCESS_MANAGER_STATE.list.filter(p => p.status === 'draft').length;
+    countEl.textContent = `${n} process${n === 1 ? '' : 'es'}` + (dr ? ` · ${dr} draft${dr === 1 ? '' : 's'}` : '');
+  }
   renderProcessWeekCalendar();
   renderProcessHealthStrip();
   PROCESS_MANAGER_STATE.list.forEach(p => {
@@ -11660,6 +11663,8 @@ function openProcessForm(id){
   document.getElementById('pfRelatedList').innerHTML = '';
   document.getElementById('pfLastReviewed').value = '';
   document.getElementById('pfVersion').value = '1.00';
+  window._pfStatus = ''; // new process: not saved yet
+  pfUpdateStatusButtons();
   document.getElementById('pfStepsList').innerHTML = '';
   document.getElementById('pfValidationsList').innerHTML = '';
   document.getElementById('pfResourcesList').innerHTML = '';
@@ -11698,6 +11703,8 @@ function openProcessForm(id){
       document.getElementById('pfId').disabled = true;
       document.getElementById('pfName').value = process.name || '';
       document.getElementById('pfCategory').value = process.category || 'other';
+      window._pfStatus = process.status === 'draft' ? 'draft' : 'published';
+      pfUpdateStatusButtons();
       document.getElementById('pfOwnerRole').value = process.owner_role || '';
       document.getElementById('pfCorresponsableRole').value = process.corresponsable_role || '';
       document.getElementById('pfObjective').value = process.objective || '';
@@ -11731,6 +11738,16 @@ function openProcessForm(id){
     populate(null);
   }
 }
+// Draft / publish buttons follow the status the process had when the form was opened.
+function pfUpdateStatusButtons(){
+  const s = window._pfStatus || '';
+  const d = document.getElementById('pfDraftBtn'), p = document.getElementById('pfSaveBtn');
+  if(d){ d.disabled = false; d.textContent = s === 'published' ? 'Unpublish (save as draft)' : 'Save as draft'; }
+  if(p){ p.disabled = false; p.textContent = s === 'published' ? 'Save changes' : 'Publish'; }
+  const t = document.getElementById('processFormTitle');
+  if(t) t.textContent = (t.textContent || '').replace(/ \(draft\)$/, '') + (s === 'draft' ? ' (draft)' : '');
+}
+window.pfUpdateStatusButtons = pfUpdateStatusButtons;
 function closeProcessForm(){
   const modal = document.getElementById('processFormModal');
   if(!modal) return;
@@ -11786,7 +11803,8 @@ function pfCollectResources(){
   })).filter(r => r.label);
 }
 
-async function saveProcessForm(){
+async function saveProcessForm(targetStatus){
+  const status = targetStatus === 'draft' ? 'draft' : 'published';
   showProcessFormError('');
   const id = document.getElementById('pfId').value.trim();
   const name = document.getElementById('pfName').value.trim();
@@ -11811,15 +11829,17 @@ async function saveProcessForm(){
     roles_responsibilities: pfCollectRoles(),
     related_processes: pfCollectRelated(),
     last_reviewed: document.getElementById('pfLastReviewed').value || null,
-    version: document.getElementById('pfVersion').value.trim() || '1.00'
+    version: document.getElementById('pfVersion').value.trim() || '1.00',
+    status
   };
   const steps = pfCollectSteps();
   const validations = pfCollectValidations();
   const resources = pfCollectResources();
 
-  const saveBtn = document.getElementById('pfSaveBtn');
+  const saveBtn = document.getElementById('pfSaveBtn'), draftBtn = document.getElementById('pfDraftBtn');
   saveBtn.disabled = true;
-  saveBtn.textContent = 'Saving…';
+  if(draftBtn) draftBtn.disabled = true;
+  (status === 'draft' && draftBtn ? draftBtn : saveBtn).textContent = 'Saving…';
   try{
     const jsonOrThrow = async (response) => {
       if(!response.ok){
@@ -11854,8 +11874,7 @@ async function saveProcessForm(){
   }catch(error){
     showProcessFormError('Could not save the process: ' + error.message);
   }finally{
-    saveBtn.disabled = false;
-    saveBtn.textContent = 'Save process';
+    pfUpdateStatusButtons();
   }
 }
 window.saveProcessForm = saveProcessForm;
@@ -12010,7 +12029,8 @@ bootDashboard();
     <div class="pf-error" id="pfError" style="flex-shrink:0"></div>
     <div class="auth-actions" style="flex-shrink:0;margin-top:.7rem">
       <button class="btn btn-ghost btn-sm" type="button" onclick="closeProcessForm()">Cancel</button>
-      <button class="btn btn-primary btn-sm" type="button" id="pfSaveBtn" onclick="saveProcessForm()">Save process</button>
+      <button class="btn btn-ghost btn-sm" type="button" id="pfDraftBtn" onclick="saveProcessForm('draft')" title="Only PMO/admin can see drafts">Save as draft</button>
+      <button class="btn btn-primary btn-sm" type="button" id="pfSaveBtn" onclick="saveProcessForm('published')">Publish</button>
     </div>
   </div>
 </div>
