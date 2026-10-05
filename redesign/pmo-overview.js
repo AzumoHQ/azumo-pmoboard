@@ -341,12 +341,16 @@
     return '<div class="pmo-ov-popover" role="dialog" aria-label="Active clients">' +
       '<div class="pmo-ov-popover-title">Active clients</div>' +
       (rows.length ? '<div class="pmo-ov-popover-list">' +
+        // Column header once, instead of repeating "Resources:" / "PM:" on every row
+        '<div class="pmo-ov-popover-row is-client is-head" aria-hidden="true">' +
+          '<div>Client</div><div>Resources</div><div>PM</div><div class="pmo-ov-popover-head-num">SOWs</div>' +
+        '</div>' +
         visible.map(function (row) {
           var pms = row.projectManagers.length ? row.projectManagers.join(', ') : '—';
           return '<div class="pmo-ov-popover-row is-client">' +
             '<div class="pmo-ov-popover-name"><button type="button" class="pmo-ov-client-link" data-pmo-client="' + esc(row.client) + '">' + esc(row.client) + '</button></div>' +
-            '<div class="pmo-ov-popover-muted">Resources: ' + row.resources + '</div>' +
-            '<div class="pmo-ov-popover-muted">PM: ' + esc(pms) + '</div>' +
+            '<div class="pmo-ov-popover-muted pmo-ov-popover-num" title="Resources">' + row.resources + '</div>' +
+            '<div class="pmo-ov-popover-muted" title="PM">' + esc(pms) + '</div>' +
             '<div class="pmo-ov-popover-pct">' + row.sows + '</div>' +
           '</div>';
         }).join('') +

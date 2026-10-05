@@ -1,4 +1,4 @@
-/* PMO Board — Deep-Slate / Teal preview: small DOM additions the look & feel needs.
+/* PMO Board — Deep-Slate / Azumo Blue preview: small DOM additions the look & feel needs.
    Only runs when the preview is on (window.PMO_LF). It never changes data, it only adds:
    page subtitles, the logo tile, the Dark/Light segmented control, the "Preview" badge,
    and mono numbers in table cells. */

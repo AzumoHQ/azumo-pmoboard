@@ -1,5 +1,5 @@
 /* ============================================================
-   PMO Board — Look & Feel "Deep-Slate / Teal" (dark + light)
+   PMO Board — Look & Feel "Deep-Slate / Azumo Blue" (dark + light)
    Final theme layer. Loaded LAST in <head> so it wins over the
    inline <style> and the redesign/*.css files.
 
@@ -34,9 +34,10 @@ html body:not(.light){
   --ink-soft:#BCC8DA;
   --muted:#8493AB !important;
   --faint:#5E6C82;
-  --brand:#2DD4BF;
-  --brand-2:#5FE3D2;
-  --on-brand:#0A0F1A;
+  --brand:#6F7CFF;      /* Azumo blue, aclarado para leerse sobre fondo oscuro */
+  --brand-2:#3848FF;    /* fondo del botón primario */
+  --on-brand:#FFFFFF;
+  --on-tone:#0A0F1A;    /* texto sobre pos / neg / forecast sólidos */
   --chrome:rgba(10,15,26,.95);
   --pos:#34D399;
   --neg:#F87171;
@@ -61,9 +62,10 @@ html body.light{
   --ink-soft:#334155;
   --muted:#5B6A80 !important;
   --faint:#7D8AA0;
-  --brand:#0D9488;
-  --brand-2:#2DD4BF;
-  --on-brand:#0A0F1A;
+  --brand:#0000FF;      /* Azumo blue (Azumo Design Tokens: highlight-blue) */
+  --brand-2:#0000FF;
+  --on-brand:#FFFFFF;
+  --on-tone:#0A0F1A;
   --chrome:rgba(255,255,255,.92);
   --pos:#059669;
   --neg:#DC2626;
@@ -767,8 +769,6 @@ html body .nav-config-menu .theme-toggle,html body nav .theme-toggle{display:non
 html body td.lf-num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
 html body td.lf-dash{color:var(--faint) !important}
 
-/* ---------- 25. eazyBI embeds: dark canvas in dark mode ---------- */
-html body:not(.light) :is(.az-eazybi-frame,.report-embed-frame,.delivery-report-frame){filter:invert(.9) hue-rotate(180deg);background:#FFFFFF !important}
 
 /* ---------- 0. Colores del board con fallback (generado por el patch) ---------- */
 html body{
@@ -889,7 +889,7 @@ html body{
   --lf-neg-a7:color-mix(in srgb,var(--neg) 7%,transparent);
   --lf-neg-a8:color-mix(in srgb,var(--neg) 8%,transparent);
   --lf-neg-t10:color-mix(in srgb,var(--neg) 10%,var(--surface));
-  --lf-on-brand:var(--on-brand);
+  --lf-on-tone:var(--on-tone);
   --lf-pos:var(--pos);
   --lf-pos-a10:color-mix(in srgb,var(--pos) 10%,transparent);
   --lf-pos-a12:color-mix(in srgb,var(--pos) 12%,transparent);
