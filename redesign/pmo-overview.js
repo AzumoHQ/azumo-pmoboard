@@ -320,7 +320,7 @@
 
   function renderBenchDetail(snapshot) {
     var rows = benchDetailRows(snapshot);
-    var visible = rows.slice(0, 12);
+    var visible = rows;
     return '<div class="pmo-ov-popover" role="dialog" aria-label="Active bench people">' +
       '<div class="pmo-ov-popover-title">Active Bench people</div>' +
       (rows.length ? '<div class="pmo-ov-popover-list">' +
@@ -331,14 +331,13 @@
             '<div class="pmo-ov-popover-pct">' + pct(row.availability) + '</div>' +
           '</div>';
         }).join('') +
-        (rows.length > visible.length ? '<button type="button" class="pmo-ov-popover-more is-action" data-pmo-open-bench>+' + (rows.length - visible.length) + ' more</button>' : '') +
       '</div>' : '<div class="pmo-ov-popover-empty">No active bench people in the current snapshot.</div>') +
     '</div>';
   }
 
   function renderClientsDetail(snapshot) {
     var rows = clientDetailRows(snapshot);
-    var visible = rows.slice(0, 14);
+    var visible = rows;
     return '<div class="pmo-ov-popover" role="dialog" aria-label="Active clients">' +
       '<div class="pmo-ov-popover-title">Active clients</div>' +
       (rows.length ? '<div class="pmo-ov-popover-list">' +
@@ -351,7 +350,6 @@
             '<div class="pmo-ov-popover-pct">' + row.sows + '</div>' +
           '</div>';
         }).join('') +
-        (rows.length > visible.length ? '<button type="button" class="pmo-ov-popover-more is-action" data-pmo-open-clients>+' + (rows.length - visible.length) + ' more clients</button>' : '') +
       '</div>' : '<div class="pmo-ov-popover-empty">No active external clients in the current snapshot.</div>') +
     '</div>';
   }
@@ -479,7 +477,7 @@
     });
     var clientData = Object.keys(byClient).map(function(c) {
       return { client: c, count: byClient[c].size };
-    }).sort(function(a,b){ return b.count - a.count; }).slice(0, 8);
+    }).sort(function(a,b){ return b.count - a.count; });
     var maxC = clientData.length ? clientData[0].count : 1;
 
     var BAR = 160;
@@ -547,7 +545,7 @@
       + '<div class="pmo-ov-chart-panel">'
       +   '<div class="pmo-ov-chart-title">' + e(roleLabel) + '</div>'
       +   '<div class="pmo-ov-chart-sub">Assignees per client · Click → Operating Views</div>'
-      +   clientHtml
+      +   '<div style="max-height:320px;overflow-y:auto">' + clientHtml + '</div>'
       + '</div>'
       + '</div>';
 
@@ -590,7 +588,7 @@
           var rptColor = daysSince === null ? '#94A3B8' : daysSince <= 14 ? '#10B981' : daysSince <= 30 ? '#F59E0B' : '#EF4444';
           var rptLabel = daysSince === null ? 'No report' : daysSince + 'd ago';
 
-          var assigneeList = (proj.assignments || []).slice(0, 6).map(function(a) {
+          var assigneeList = (proj.assignments || []).map(function(a) {
             return '<li style="font-size:.75rem;color:var(--ov-text-2);padding:2px 0">'
               + esc(a.name || '—')
               + (a.position ? ' <span style="color:var(--ov-text-3)">(' + esc(a.position) + ')</span>' : '')
