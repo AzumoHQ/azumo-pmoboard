@@ -460,11 +460,11 @@
       else                 bk.far.push(r);
     });
     var dueData = [
-      { label: 'Overdue',  count: bk.overdue.length,  color: '#EF4444', dest: 'dueDates' },
-      { label: '≤30d', count: bk.soon.length,     color: '#F59E0B', dest: 'dueDates' },
-      { label: '31–60d',count: bk.mid.length,     color: '#0066FF', dest: 'dueDates' },
-      { label: '>60d',     count: bk.far.length,      color: '#10B981', dest: 'dueDates' },
-      { label: 'Pending',  count: bk.pending.length,  color: '#94A3B8', dest: 'pendingAssignments' }
+      { label: 'Overdue',  count: bk.overdue.length,  color: lfc('#EF4444'), dest: 'dueDates' },
+      { label: '≤30d', count: bk.soon.length,     color: lfc('#F59E0B'), dest: 'dueDates' },
+      { label: '31–60d',count: bk.mid.length,     color: lfc('#0066FF'), dest: 'dueDates' },
+      { label: '>60d',     count: bk.far.length,      color: lfc('#10B981'), dest: 'dueDates' },
+      { label: 'Pending',  count: bk.pending.length,  color: lfc('#94A3B8'), dest: 'pendingAssignments' }
     ].filter(function(b) { return b.count > 0; });
     var totalDue = dueData.reduce(function(s,b){ return s + b.count; }, 0);
 
@@ -527,7 +527,7 @@
             + ' style="cursor:pointer">'
             + '<span class="pmo-ov-chart-lbl" title="' + e(b.client) + '">' + e(truncate(b.client,22)) + '</span>'
             + '<span class="pmo-ov-chart-bar-wrap">'
-            +   '<span class="pmo-ov-chart-bar" style="width:' + Math.round((b.count/maxC)*BAR) + 'px;background:#0066FF"></span>'
+            +   '<span class="pmo-ov-chart-bar" style="width:' + Math.round((b.count/maxC)*BAR) + 'px;background:' + lfc('#0066FF') + '"></span>'
             + '</span>'
             + '<span class="pmo-ov-chart-count">' + b.count + ' people</span>'
             + '</div>';
@@ -585,7 +585,7 @@
           var billing = proj.billingPct !== null ? proj.billingPct + '%' : '—';
           var lastRpt = proj.lastReport && proj.lastReport.date ? proj.lastReport.date.slice(0, 10) : null;
           var daysSince = lastRpt ? Math.floor((Date.now() - new Date(lastRpt)) / 86400000) : null;
-          var rptColor = daysSince === null ? '#94A3B8' : daysSince <= 14 ? '#10B981' : daysSince <= 30 ? '#F59E0B' : '#EF4444';
+          var rptColor = daysSince === null ? lfc('#94A3B8') : daysSince <= 14 ? lfc('#10B981') : daysSince <= 30 ? lfc('#F59E0B') : lfc('#EF4444');
           var rptLabel = daysSince === null ? 'No report' : daysSince + 'd ago';
 
           var assigneeList = (proj.assignments || []).map(function(a) {
