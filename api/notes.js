@@ -1,4 +1,4 @@
-const { addNote, deleteNote, getNotes } = require('../lib/data-store');
+const { addNote, deleteNote, getNotes, getBenchPm, setBenchPm } = require('../lib/data-store');
 const { createPmoActionIssue } = require('../lib/jira-client');
 const { canRefresh, getSessionUser } = require('../lib/auth');
 
@@ -41,7 +41,7 @@ module.exports = async function notesHandler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      res.status(200).json({ notes: await getNotes() });
+      res.status(200).json({ notes: await getNotes(), bench_pm: await getBenchPm() });
       return;
     }
 
@@ -51,6 +51,13 @@ module.exports = async function notesHandler(req, res) {
         return;
       }
       const note = await readJson(req);
+
+      // Bench PM: solo PMO escribe (access.write ya exige canRefresh); todos leen via GET.
+      if (note.type === 'bench_pm') {
+        const saved = await setBenchPm(note.name);
+        res.status(200).json({ bench_pm: saved });
+        return;
+      }
 
       if (note.type === 'jira_action_ticket') {
         const ticket = await createPmoActionIssue(note.action || {});
