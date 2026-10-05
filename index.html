@@ -9579,8 +9579,24 @@ function knownActiveRoster(){
   return fallback;
 }
 // PM names come straight from Jira; no Harvest roster filtering.
+// The only exclusion: PMs whose Jira account is deactivated (project_manager_active === false
+// on assignment rows, or pm_assigned_active === false on Account Coverage).
+let _inactivePmCache = null, _inactivePmSource = null;
+function inactivePmNames(){
+  if(_inactivePmSource === latest && _inactivePmCache) return _inactivePmCache;
+  const out = new Set();
+  (latest?.assignment_rows || []).forEach(row => {
+    if(row && row.project_manager && row.project_manager_active === false) out.add(normalizeIdentity(row.project_manager));
+  });
+  (latest?.account_coverage || []).forEach(row => {
+    if(row && row.pm_assigned && row.pm_assigned_active === false) out.add(normalizeIdentity(row.pm_assigned));
+  });
+  _inactivePmSource = latest; _inactivePmCache = out;
+  return out;
+}
 function activePmName(name){
-  return name || '';
+  if(!name) return '';
+  return inactivePmNames().has(normalizeIdentity(name)) ? '' : name;
 }
 // Account Coverage uses Jira only: a PM/CSM/TL is inactive only when their Jira account is deactivated.
 function coverageBadge(value, active){
