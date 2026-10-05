@@ -597,7 +597,7 @@ function renderRoles(){
   }
   tbody.innerHTML = ADMIN.roles.map((r) => {
     const holders = peopleForRole(r.id);
-    const names = holders.slice(0, 4).map((p) => p.name).join(', ') + (holders.length > 4 ? ` +${holders.length - 4}` : '');
+    const names = holders.map((p) => p.name).join(', ');
     const slotOptions = ['', 'PM', 'CSM', 'TL'].map((s) => `<option value="${s}" ${String(r.coverage_slot || '') === s ? 'selected' : ''}>${s || '— not a responsable —'}</option>`).join('');
     return `<tr>
       <td class="name">${esc(r.name)}</td>
