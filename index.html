@@ -11559,9 +11559,9 @@ function pfValidationRowHtml(text){
 function pfRoleRowHtml(r){
   const x = r || {};
   return `<div class="pf-role-row">
-    <input type="text" class="pf-rr-role" list="pfCompanyRoles" value="${esc(x.role || '')}" placeholder="Role">
+    <input type="text" class="pf-rr-role" list="pfCompanyRoles" value="${esc(x.role || '')}" placeholder="Role" onchange="pfRefreshStepRoleOptions()">
     <textarea class="pf-rr-resp" rows="2" placeholder="Responsibilities">${esc(x.responsibilities || '')}</textarea>
-    <button type="button" class="pf-icon-btn" title="Remove" onclick="this.closest('.pf-role-row').remove()"><i class="ti ti-trash"></i></button>
+    <button type="button" class="pf-icon-btn" title="Remove" onclick="this.closest('.pf-role-row').remove();pfRefreshStepRoleOptions()"><i class="ti ti-trash"></i></button>
   </div>`;
 }
 function addProcessRoleRow(r){
@@ -11614,18 +11614,38 @@ function loadProcessCompanyRoles(){
       // Populate datalist for Owner / Co-responsible free-text fields
       const list = document.getElementById('pfCompanyRoles');
       if(list) list.innerHTML = PF_ROLES_PEOPLE.map(r => `<option value="${esc(r.role_name)}"></option>`).join('');
-      // Rebuild all role selects currently in the form
-      document.querySelectorAll('.pf-step-role').forEach(sel => pfPopulateRoleSelect(sel));
+      // Step dropdowns follow Roles & responsibilities; refresh so the people avatars resolve
+      pfRefreshStepRoleOptions();
     })
     .catch(() => { PF_COMPANY_ROLES_LOADED = false; });
 }
+// Roles typed in the "Roles & responsibilities" section (distinct, in order).
+function pfRrRoles(){
+  const seen = new Set(), out = [];
+  document.querySelectorAll('#pfRolesList .pf-rr-role').forEach(i => {
+    const v = (i.value || '').trim();
+    if(v && !seen.has(v.toLowerCase())){ seen.add(v.toLowerCase()); out.push(v); }
+  });
+  return out;
+}
+// A step can only pick roles defined in Roles & responsibilities. A saved role that is no longer
+// there stays selected (flagged) so nothing is lost silently.
 function pfPopulateRoleSelect(sel){
-  const current = sel.value || sel.dataset.init || '';
-  sel.innerHTML = '<option value="">— role —</option>' +
-    PF_ROLES_PEOPLE.map(r => `<option value="${esc(r.role_name)}"${r.role_name === current ? ' selected' : ''}>${esc(r.role_name)}</option>`).join('') +
-    (current && !PF_ROLES_PEOPLE.some(r => r.role_name === current) ? `<option value="${esc(current)}" selected>${esc(current)}</option>` : '');
+  const current = sel.options.length ? sel.value : (sel.dataset.init || '');
+  const roles = pfRrRoles();
+  const known = roles.some(r => r.toLowerCase() === String(current).toLowerCase());
+  const match = known ? roles.find(r => r.toLowerCase() === String(current).toLowerCase()) : current;
+  sel.innerHTML = `<option value="">${roles.length ? '— role —' : '— add roles in Roles & responsibilities —'}</option>` +
+    roles.map(r => `<option value="${esc(r)}"${r === match ? ' selected' : ''}>${esc(r)}</option>`).join('') +
+    (current && !known ? `<option value="${esc(current)}" selected>${esc(current)} (not in Roles &amp; responsibilities)</option>` : '');
+  sel.dataset.init = '';
   pfUpdateRoleAvatar(sel);
 }
+function pfRefreshStepRoleOptions(){
+  document.querySelectorAll('#pfStepsList .pf-step-role').forEach(sel => pfPopulateRoleSelect(sel));
+  if(typeof pfRefreshDiagramPreview === 'function') pfRefreshDiagramPreview();
+}
+window.pfRefreshStepRoleOptions = pfRefreshStepRoleOptions;
 function pfUpdateRoleAvatar(sel){
   const wrap = sel.closest ? sel.closest('.pf-role-wrap') : null;
   if(!wrap) return;
