@@ -1002,6 +1002,7 @@ html body{
   --lf-neg-a8:color-mix(in srgb,var(--neg) 8%,transparent);
   --lf-neg-t10:color-mix(in srgb,var(--neg) 10%,var(--surface));
   --lf-on-tone:var(--on-tone);
+  --lf-on-brand:var(--on-brand);   /* texto sobre azul Azumo */
   --lf-pos:var(--pos);
   --lf-pos-a10:color-mix(in srgb,var(--pos) 10%,transparent);
   --lf-pos-a12:color-mix(in srgb,var(--pos) 12%,transparent);
