@@ -1,4 +1,4 @@
-const { getPsaProjectReports } = require('../lib/jira-client');
+const { getPsaProjectReports, getPsaStatusReportMeta, createPsaStatusReport, getPsaEpic } = require('../lib/jira-client');
 const { getSessionUser } = require('../lib/auth');
 
 const STALE_DAYS_THRESHOLD = 30;
@@ -17,8 +17,100 @@ function normalizeEmail(value) {
   return String(value || '').trim().toLowerCase();
 }
 
+function readJson(req) {
+  if (req.body && typeof req.body === 'object') return Promise.resolve(req.body);
+  return new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', (chunk) => { body += chunk; });
+    req.on('end', () => {
+      if (!body) { resolve({}); return; }
+      try { resolve(JSON.parse(body)); } catch (error) { reject(error); }
+    });
+    req.on('error', reject);
+  });
+}
+
+const PSA_REPORT_TEXT_KEYS = [
+  'projectIssues', 'projectActionPlan',
+  'teamIssues', 'teamActionPlan',
+  'clientIssues', 'clientActionPlan',
+  'budgetActionPlan', 'comments'
+];
+
+// POST /api/psa-reports → creates a "Project Status" ticket in Jira PSA
+async function handleCreateReport(req, res, user) {
+  let body;
+  try {
+    body = await readJson(req);
+  } catch (error) {
+    res.status(400).json({ error: 'Invalid JSON body' });
+    return;
+  }
+
+  let meta;
+  try {
+    meta = await getPsaStatusReportMeta();
+  } catch (error) {
+    console.error('psa-reports meta failed:', error.message);
+    res.status(502).json({ error: 'Could not read the PSA form options from Jira' });
+    return;
+  }
+  const opts = meta.options || {};
+  const pick = (key) => String(body[key] || '').trim();
+  const errors = [];
+
+  const epic = await getPsaEpic(body.epicKey);
+  if (!epic) errors.push('Project (PSA epic) is required');
+  if (epic && user.role === 'PM' && epic.pmEmail !== normalizeEmail(user.email)) {
+    res.status(403).json({ error: 'You can only report on projects where you are the PM assigned' });
+    return;
+  }
+
+  const report = {
+    epicKey: epic?.key,
+    epicName: epic?.name,
+    summary: pick('summary'),
+    date: pick('date'),
+    reportType: pick('reportType'),
+    projectStatus: pick('projectStatus'),
+    teamStatus: pick('teamStatus'),
+    clientStatus: pick('clientStatus'),
+    budgetStatus: pick('budgetStatus'),
+    budgetReportUrl: pick('budgetReportUrl'),
+    projectNames: (Array.isArray(body.projectNames) ? body.projectNames : []).map((v) => String(v || '').trim()).filter(Boolean)
+  };
+  PSA_REPORT_TEXT_KEYS.forEach((key) => { report[key] = String(body[key] || '').slice(0, 30000); });
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(report.date)) errors.push('Date is required');
+  const oneOf = (key, label) => {
+    if (!(opts[key] || []).includes(report[key])) errors.push(`${label} is required`);
+  };
+  oneOf('reportType', 'Report type');
+  oneOf('projectStatus', 'Project status');
+  oneOf('teamStatus', 'Team status');
+  oneOf('clientStatus', 'Client status');
+  oneOf('budgetStatus', 'Budget status');
+  if (!report.projectNames.length) errors.push('At least one Project name is required');
+  const unknownNames = report.projectNames.filter((name) => !(opts.projectNames || []).includes(name));
+  if (unknownNames.length) errors.push(`Unknown Project name: ${unknownNames.join(', ')}`);
+  if (report.budgetReportUrl && !/^https?:\/\//i.test(report.budgetReportUrl)) errors.push('Budget report link must start with http(s)://');
+
+  if (errors.length) {
+    res.status(400).json({ error: errors.join(' · ') });
+    return;
+  }
+
+  try {
+    const ticket = await createPsaStatusReport(report, { email: user.email, name: user.name });
+    res.status(201).json({ ok: true, ticket });
+  } catch (error) {
+    console.error('psa-reports create failed:', error.message);
+    res.status(502).json({ error: `Jira rejected the report: ${error.message.slice(0, 400)}` });
+  }
+}
+
 module.exports = async function psaReportsHandler(req, res) {
-  if (req.method !== 'GET') {
+  if (req.method !== 'GET' && req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
@@ -38,6 +130,21 @@ module.exports = async function psaReportsHandler(req, res) {
 
   if (!ALLOWED_ROLES.includes(user.role)) {
     res.status(403).json({ error: 'Not authorized to view project reports' });
+    return;
+  }
+
+  if (req.method === 'POST') {
+    await handleCreateReport(req, res, user);
+    return;
+  }
+
+  if (req.query && req.query.meta) {
+    try {
+      res.status(200).json(await getPsaStatusReportMeta());
+    } catch (error) {
+      console.error('psa-reports meta failed:', error.message);
+      res.status(502).json({ error: 'Could not read the PSA form options from Jira' });
+    }
     return;
   }
 

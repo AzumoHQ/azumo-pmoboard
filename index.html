@@ -78,6 +78,24 @@ nav{position:sticky;top:0;z-index:200;background:var(--lf-surface-2,rgba(6,12,26
 .auth-field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,102,255,.15)}
 .auth-field select,.client-proj-table select,.client-proj-table input{background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.6rem .75rem;font:inherit;outline:none}
 .auth-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:1rem;flex-wrap:wrap}
+/* PSA status report form (mirror of Jira form 51) */
+.psa-form{width:min(780px,100%);max-height:92vh;overflow-y:auto}
+.psa-form .auth-field select,.psa-form .auth-field textarea{background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:10px;padding:.65rem .8rem;font:inherit;outline:none;width:100%}
+.psa-form .auth-field textarea{resize:vertical;min-height:58px}
+.psa-form .auth-field select:focus,.psa-form .auth-field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,102,255,.15)}
+.psa-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+@media(max-width:640px){.psa-grid{grid-template-columns:1fr}}
+.psa-dim{border:1px solid var(--brd);border-radius:14px;padding:.85rem .9rem .1rem;margin-bottom:.85rem}
+.psa-dim-title{font-size:.82rem;font-weight:900;margin-bottom:.6rem}
+.psa-rag{display:flex;gap:8px;flex-wrap:wrap}
+.psa-rag label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--brd);border-radius:999px;padding:5px 12px;font-size:.78rem;font-weight:800;text-transform:none;letter-spacing:0;color:var(--txt);cursor:pointer}
+.psa-rag input{accent-color:var(--blue)}
+.psa-rag-dot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+.psa-rag-dot.green{background:#10B981}.psa-rag-dot.yellow{background:#F59E0B}.psa-rag-dot.red{background:#EF4444}
+.psa-names{max-height:170px;overflow-y:auto;border:1px solid var(--brd);border-radius:10px;padding:.4rem .6rem;display:grid;grid-template-columns:1fr 1fr;gap:2px 12px}
+@media(max-width:640px){.psa-names{grid-template-columns:1fr}}
+.psa-names label{display:flex;align-items:center;gap:6px;font-size:.78rem;text-transform:none;letter-spacing:0;color:var(--txt);font-weight:600;cursor:pointer;padding:2px 0}
+.psa-req{color:#EF4444}
 .auth-error{display:none;border:1px solid var(--lf-neg-a35,rgba(239,68,68,.35));background:var(--lf-neg-a10,rgba(239,68,68,.1));color:var(--lf-neg,#FCA5A5);border-radius:10px;padding:.7rem .8rem;font-size:.8rem;margin:.75rem 0}
 .auth-success{display:none;border:1px solid var(--lf-pos-a35,rgba(16,185,129,.35));background:var(--lf-pos-a10,rgba(16,185,129,.1));color:var(--lf-pos,#6EE7B7);border-radius:10px;padding:.7rem .8rem;font-size:.8rem;margin:.75rem 0}
 .auth-gate{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;padding:1rem;background:radial-gradient(circle at 20% 0%,var(--lf-brand-a22,rgba(0,102,255,.22)),transparent 34%),radial-gradient(circle at 78% 12%,var(--lf-margin-a18,rgba(124,58,237,.18)),transparent 30%),var(--bg)}.auth-gate-card{width:min(460px,100%);background:linear-gradient(180deg,var(--lf-ink-a3_5,rgba(255,255,255,.035)),transparent 42%),var(--card);border:1px solid var(--lf-muted-a38,rgba(107,143,191,.38));border-radius:24px;box-shadow:0 30px 100px rgba(0,0,0,.48);padding:1.55rem}.auth-gate-logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--lf-margin,#7C3AED));display:flex;align-items:center;justify-content:center;color:var(--lf-on-brand,#fff);font-weight:950;margin-bottom:1rem}.auth-gate-card h1{font-size:1.35rem;letter-spacing:-.03em;margin-bottom:.35rem}.auth-gate-copy{color:var(--muted);font-size:.84rem;line-height:1.5;margin-bottom:1.05rem}.auth-gate-foot{font-size:.72rem;color:var(--muted);margin-top:.9rem;line-height:1.4}.auth-provider-block{display:grid;gap:.8rem}.auth-provider-row{display:flex;align-items:center;justify-content:center;gap:.6rem}.auth-provider-icon{font-size:1rem;line-height:1}.auth-gate .btn{width:100%;justify-content:center}.auth-locked nav,.auth-locked .hero,.auth-locked .side-index,.auth-locked main,.auth-locked footer{display:none!important}.auth-ready #authGate{display:none!important}body.light .auth-gate{background:radial-gradient(circle at 20% 0%,var(--lf-brand-a12,rgba(0,102,255,.12)),transparent 34%),radial-gradient(circle at 78% 12%,var(--lf-margin-a10,rgba(124,58,237,.10)),transparent 30%),var(--bg)}
@@ -1662,6 +1680,52 @@ if(window.PMO_LF){ try{
   </div>
 </div>
 
+<!-- PSA status report — same fields as Jira PSA form 51 -->
+<div class="auth-modal" id="psaReportModal" aria-hidden="true">
+  <div class="auth-card psa-form">
+    <h3>New project status report</h3>
+    <p>Same fields as the Jira PSA status form. Submitting creates a <b>Project Status</b> ticket under the project's epic in Jira PSA.</p>
+    <div class="psa-grid">
+      <div class="auth-field">
+        <label for="psaRptEpic">Project <span class="psa-req">*</span></label>
+        <select id="psaRptEpic" onchange="psaReportEpicChanged()"></select>
+      </div>
+      <div class="auth-field">
+        <label for="psaRptSummary">Report title</label>
+        <input id="psaRptSummary" type="text" maxlength="240" placeholder="Defaults to the project name"/>
+      </div>
+      <div class="auth-field">
+        <label for="psaRptDate">Date <span class="psa-req">*</span></label>
+        <input id="psaRptDate" type="date"/>
+      </div>
+      <div class="auth-field">
+        <label for="psaRptType">Report type <span class="psa-req">*</span></label>
+        <select id="psaRptType"></select>
+      </div>
+    </div>
+    <div class="auth-field">
+      <label for="psaRptNamesSearch">Project name(s) <span class="psa-req">*</span></label>
+      <input id="psaRptNamesSearch" type="search" placeholder="Search project names…" oninput="renderPsaReportNames()"/>
+      <div class="psa-names" id="psaRptNames"></div>
+    </div>
+    <div id="psaRptDims"></div>
+    <div class="auth-field">
+      <label for="psaRpt_budgetReportUrl">Link to budget report (Notion)</label>
+      <input id="psaRpt_budgetReportUrl" type="url" placeholder="https://"/>
+    </div>
+    <div class="auth-field">
+      <label for="psaRpt_comments">Comments</label>
+      <textarea id="psaRpt_comments" rows="4"></textarea>
+    </div>
+    <div class="auth-success" id="psaRptSuccess"></div>
+    <div class="auth-error" id="psaRptError"></div>
+    <div class="auth-actions">
+      <button class="btn btn-ghost btn-sm" type="button" onclick="closePsaReportModal()">Close</button>
+      <button class="btn btn-primary btn-sm" type="button" id="psaRptSubmit" onclick="submitPsaReport()">Create ticket in Jira</button>
+    </div>
+  </div>
+</div>
+
 <!-- CLIENT PROFILE (WIP · preview only): billing terms per client -->
 <div class="auth-modal" id="clientProfileModal" aria-hidden="true" onclick="if(event.target===this)closeClientProfile()">
   <div class="auth-card" style="width:min(820px,100%);max-height:90vh;overflow:auto">
@@ -2148,6 +2212,7 @@ if(window.PMO_LF){ try{
       </div>
       <button class="btn btn-ghost btn-sm" type="button" onclick="psaClearFilters()">Clear filters</button>
       <button class="btn btn-ghost btn-sm" onclick="loadPsaProjectStatus(true)">Refresh</button>
+      <button class="btn btn-primary btn-sm" type="button" onclick="openPsaReportModal()">New status report</button>
     </div>
     <div class="action-summary" id="psaProjectStatusSummaryCards"></div>
     <div id="psaProjectStatusLoading" style="padding:2rem;text-align:center;color:var(--muted)">Loading project reports from Jira…</div>
@@ -10664,6 +10729,196 @@ function psaProjectJiraUrl(epicKey){
   return jiraIssueUrl(epicKey) || '#';
 }
 
+// ── PSA status report form (mirror of Jira PSA form 51) ───────────────
+// Option lists come from /api/psa-reports?meta=1 (read live from Jira).
+let psaReportMeta = null;
+let psaReportSelectedNames = new Set();
+let psaReportAutoSummary = '';
+const PSA_REPORT_DIMENSIONS = [
+  {label:'Project', status:'projectStatus', issues:'projectIssues', plan:'projectActionPlan'},
+  {label:'Team', status:'teamStatus', issues:'teamIssues', plan:'teamActionPlan'},
+  {label:'Client', status:'clientStatus', issues:'clientIssues', plan:'clientActionPlan'},
+  {label:'Budget', status:'budgetStatus', issues:null, plan:'budgetActionPlan'}
+];
+const PSA_REPORT_TEXT_KEYS = ['projectIssues','projectActionPlan','teamIssues','teamActionPlan','clientIssues','clientActionPlan','budgetActionPlan','comments','budgetReportUrl'];
+
+function psaReportTodayIso(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function psaReportMsg(kind, html){
+  const ok = document.getElementById('psaRptSuccess');
+  const err = document.getElementById('psaRptError');
+  if(ok){ ok.style.display = kind === 'ok' ? 'block' : 'none'; ok.innerHTML = kind === 'ok' ? html : ''; }
+  if(err){ err.style.display = kind === 'error' ? 'block' : 'none'; err.innerHTML = kind === 'error' ? html : ''; }
+}
+function psaReportProjects(){
+  return (psaProjectStatusData || []).filter(p => !p.isClosed).slice().sort((a,b) => String(a.epicName||'').localeCompare(String(b.epicName||'')));
+}
+async function openPsaReportModal(epicKey=''){
+  const modal = document.getElementById('psaReportModal');
+  if(!modal) return;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+  psaReportMsg('', '');
+  const submitBtn = document.getElementById('psaRptSubmit');
+  if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = 'Loading form…'; }
+  try{
+    if(!psaProjectStatusLoaded) await loadPsaProjectStatus();
+    if(!psaProjectStatusData) throw new Error('Could not load the PSA projects list');
+    if(!psaReportMeta){
+      const response = await fetch('/api/psa-reports?meta=1', {cache:'no-store', credentials:'same-origin'});
+      const result = await response.json().catch(() => ({}));
+      if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+      psaReportMeta = result;
+    }
+    renderPsaReportForm(epicKey);
+    if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = 'Create ticket in Jira'; }
+  }catch(error){
+    psaReportMsg('error', esc(`Could not open the form: ${error.message}`));
+    if(submitBtn) submitBtn.textContent = 'Create ticket in Jira';
+  }
+}
+window.openPsaReportModal = openPsaReportModal;
+function closePsaReportModal(){
+  const modal = document.getElementById('psaReportModal');
+  if(!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden','true');
+}
+window.closePsaReportModal = closePsaReportModal;
+
+function renderPsaReportForm(epicKey=''){
+  const opts = psaReportMeta?.options || {};
+  const epicSel = document.getElementById('psaRptEpic');
+  const projects = psaReportProjects();
+  epicSel.innerHTML = '<option value="">Select a project…</option>' + projects.map(p =>
+    `<option value="${esc(p.epicKey)}">${esc(p.epicName || p.epicKey)}${p.pmAssigned?.name ? ` — ${esc(p.pmAssigned.name)}` : ''}</option>`
+  ).join('');
+  epicSel.value = projects.some(p => p.epicKey === epicKey) ? epicKey : '';
+
+  const typeSel = document.getElementById('psaRptType');
+  typeSel.innerHTML = (opts.reportType || []).map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+  if((opts.reportType || []).includes('Weekly')) typeSel.value = 'Weekly';
+
+  document.getElementById('psaRptDate').value = psaReportTodayIso();
+  document.getElementById('psaRptSummary').value = '';
+  document.getElementById('psaRptNamesSearch').value = '';
+  psaReportAutoSummary = '';
+  psaReportSelectedNames = new Set();
+
+  const dot = v => {
+    const k = String(v || '').toLowerCase();
+    return `<span class="psa-rag-dot ${['green','yellow','red'].includes(k) ? k : ''}"></span>`;
+  };
+  document.getElementById('psaRptDims').innerHTML = PSA_REPORT_DIMENSIONS.map(d => `
+    <div class="psa-dim">
+      <div class="psa-dim-title">${esc(d.label)}</div>
+      <div class="auth-field">
+        <label>${esc(d.label)} status <span class="psa-req">*</span></label>
+        <div class="psa-rag" role="radiogroup">
+          ${(opts[d.status] || []).map(v => `<label><input type="radio" name="psaRpt_${d.status}" value="${esc(v)}"/>${dot(v)}${esc(v)}</label>`).join('')}
+        </div>
+      </div>
+      ${d.issues ? `<div class="auth-field"><label for="psaRpt_${d.issues}">${esc(d.label)} issues</label><textarea id="psaRpt_${d.issues}" rows="2"></textarea></div>` : ''}
+      <div class="auth-field"><label for="psaRpt_${d.plan}">${esc(d.label)} action plan</label><textarea id="psaRpt_${d.plan}" rows="2"></textarea></div>
+    </div>`).join('');
+
+  ['budgetReportUrl','comments'].forEach(k => { const el = document.getElementById(`psaRpt_${k}`); if(el) el.value = ''; });
+  psaReportEpicChanged();
+}
+
+// When the project changes: default the title to the epic name and pre-check
+// the Project name(s) used in that project's last report (or a name match).
+function psaReportEpicChanged(){
+  const epicKey = document.getElementById('psaRptEpic')?.value || '';
+  const project = (psaProjectStatusData || []).find(p => p.epicKey === epicKey);
+  const summaryEl = document.getElementById('psaRptSummary');
+  const name = project?.epicName || '';
+  if(summaryEl && (!summaryEl.value.trim() || summaryEl.value === psaReportAutoSummary)){
+    summaryEl.value = name;
+    psaReportAutoSummary = name;
+  }
+  const allNames = psaReportMeta?.options?.projectNames || [];
+  let preset = (project?.lastReport?.projectNames || []).filter(n => allNames.includes(n));
+  if(!preset.length && name){
+    const key = name.toLowerCase();
+    preset = allNames.filter(n => n.toLowerCase() === key);
+    if(!preset.length) preset = allNames.filter(n => n.toLowerCase().startsWith(key));
+  }
+  psaReportSelectedNames = new Set(preset);
+  renderPsaReportNames();
+}
+window.psaReportEpicChanged = psaReportEpicChanged;
+
+function renderPsaReportNames(){
+  const box = document.getElementById('psaRptNames');
+  if(!box) return;
+  const q = String(document.getElementById('psaRptNamesSearch')?.value || '').trim().toLowerCase();
+  const all = psaReportMeta?.options?.projectNames || [];
+  // selected first, then the rest; search filters both
+  const ordered = [...all.filter(n => psaReportSelectedNames.has(n)), ...all.filter(n => !psaReportSelectedNames.has(n))]
+    .filter(n => !q || n.toLowerCase().includes(q));
+  box.innerHTML = ordered.map(n =>
+    `<label><input type="checkbox" value="${esc(n)}" ${psaReportSelectedNames.has(n) ? 'checked' : ''} onchange="togglePsaReportName(this.value, this.checked)"/>${esc(n)}</label>`
+  ).join('') || '<span style="color:var(--muted);font-size:.78rem">No project names match.</span>';
+}
+window.renderPsaReportNames = renderPsaReportNames;
+function togglePsaReportName(value, checked){
+  if(checked) psaReportSelectedNames.add(value); else psaReportSelectedNames.delete(value);
+}
+window.togglePsaReportName = togglePsaReportName;
+
+function collectPsaReportPayload(){
+  const radio = key => document.querySelector(`input[name="psaRpt_${key}"]:checked`)?.value || '';
+  const payload = {
+    epicKey: document.getElementById('psaRptEpic')?.value || '',
+    summary: document.getElementById('psaRptSummary')?.value || '',
+    date: document.getElementById('psaRptDate')?.value || '',
+    reportType: document.getElementById('psaRptType')?.value || '',
+    projectNames: [...psaReportSelectedNames]
+  };
+  PSA_REPORT_DIMENSIONS.forEach(d => { payload[d.status] = radio(d.status); });
+  PSA_REPORT_TEXT_KEYS.forEach(k => { payload[k] = document.getElementById(`psaRpt_${k}`)?.value || ''; });
+  return payload;
+}
+
+async function submitPsaReport(){
+  const payload = collectPsaReportPayload();
+  const missing = [];
+  if(!payload.epicKey) missing.push('Project');
+  if(!payload.date) missing.push('Date');
+  if(!payload.reportType) missing.push('Report type');
+  if(!payload.projectNames.length) missing.push('Project name(s)');
+  PSA_REPORT_DIMENSIONS.forEach(d => { if(!payload[d.status]) missing.push(`${d.label} status`); });
+  if(missing.length){
+    psaReportMsg('error', esc(`Missing required fields: ${missing.join(', ')}`));
+    return;
+  }
+  const btn = document.getElementById('psaRptSubmit');
+  if(btn){ btn.disabled = true; btn.textContent = 'Creating…'; }
+  psaReportMsg('', '');
+  try{
+    const response = await fetch('/api/psa-reports', {
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    const key = result.ticket?.key || '';
+    const url = result.ticket?.url || jiraIssueUrl(key);
+    psaReportMsg('ok', `Created <a href="${esc(url)}" target="_blank" rel="noopener noreferrer" style="color:inherit;font-weight:900;text-decoration:underline">${esc(key)}</a> in Jira PSA.`);
+    if(btn) btn.textContent = 'Created';
+    loadPsaProjectStatus(true);
+  }catch(error){
+    psaReportMsg('error', esc(`Could not create the ticket: ${error.message}`));
+    if(btn){ btn.disabled = false; btn.textContent = 'Create ticket in Jira'; }
+  }
+}
+window.submitPsaReport = submitPsaReport;
+
 function psaStatusChip(label, value){
   const v = (value || '').toLowerCase();
   const cls = v === 'green' ? 'badge-green' : v === 'yellow' ? 'badge-yellow' : v === 'red' ? 'badge-red' : '';
@@ -10752,7 +11007,7 @@ function renderPsaProjectStatusModule(){
       <td>${esc(lastDate || '\u2014')}</td>
       <td>${staleBadge}</td>
       <td>${psaStatusChips(row.lastReport)}</td>
-      <td><a class="btn btn-ghost btn-sm" href="${psaProjectJiraUrl(row.epicKey)}" target="_blank" rel="noopener noreferrer">Open in Jira</a></td>
+      <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" type="button" onclick="openPsaReportModal(${jsArg(row.epicKey)})">+ Report</button> <a class="btn btn-ghost btn-sm" href="${psaProjectJiraUrl(row.epicKey)}" target="_blank" rel="noopener noreferrer">Open in Jira</a></td>
     </tr>`;
   }).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No projects found.</td></tr>';
 }
