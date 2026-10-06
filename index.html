@@ -1566,7 +1566,7 @@ if(window.PMO_LF){ try{
   <div class="nav-inner">
     <div class="nav-brand">
       <a href="#" onclick="goTo('overview');return false;" style="text-decoration:none;display:flex"><div class="nav-logo"><img class="nav-wordmark" src="assets/azumo-logo.png" alt="Azumo"/></div></a>
-      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span id="pmoVersionNav">v3.1</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
+      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span id="pmoVersionNav">v3.2</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
     </div>
     <div class="nav-links">
       <button class="nav-link" id="overviewNavLink" onclick="goTo('overview')">Overview</button>
@@ -1677,7 +1677,7 @@ if(window.PMO_LF){ try{
 <!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-badge">PMO Board <span id="pmoVersionHero" style="opacity:.55;font-weight:500;font-size:.8em;letter-spacing:.01em">v3.1</span></div>
+    <div class="hero-badge">PMO Board <span id="pmoVersionHero" style="opacity:.55;font-weight:500;font-size:.8em;letter-spacing:.01em">v3.2</span></div>
     <h1>Operations Center — <span>Azumo PMO</span></h1>
     <p class="hero-copy">Current snapshot for staffing capacity, utilization, client coverage, and delivery risk.</p>
     <div class="hero-stats" aria-label="Current PMO snapshot summary">
@@ -2510,7 +2510,7 @@ if(window.PMO_LF){ try{
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-help-circle"></i></div>
       <h2>Help &amp; Changelog</h2>
-      <div class="sec-tag" id="helpVersionTag">v3.1</div>
+      <div class="sec-tag" id="helpVersionTag">v3.2</div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem">
 
@@ -2615,7 +2615,7 @@ if(window.PMO_LF){ try{
 </main>
 <footer>
   <img src="assets/azumo-logo.png" alt="Azumo" height="16" style="opacity:.7"/>
-  PMO Board <span id="pmoVersionFooter">v3.1</span> · Azumo · <span id="footerLastUpdated">Last updated: —</span>
+  PMO Board <span id="pmoVersionFooter">v3.2</span> · Azumo · <span id="footerLastUpdated">Last updated: —</span>
   · <a href="#" class="footer-help-link" onclick="activateModuleTab('helpChangelog');return false;"><i class="ti ti-help-circle"></i> Help &amp; changelog</a>
 </footer>
 
@@ -3437,6 +3437,9 @@ const IS_PMO_PRODUCTION = PMO_PRODUCTION_HOSTS.has(location.hostname);
 //   2) add a new entry at the TOP of PMO_RELEASES (version +0.1)
 const PREVIEW_ONLY_SECTIONS = new Set(['dashboard','history']);
 const PMO_RELEASES = [
+  {version:'3.2', date:'2026-10-06', title:'Navigation cleanup', items:[
+    'Navigation — Internal Projects tab removed from General. Internal project hours are still counted in Harvest Hours and Logged Harvest Hours'
+  ]},
   {version:'3.1', date:'2026-10-06', title:'New look & feel + Logged Harvest Hours weekly sheets', items:[
     'Look & feel — new Azumo visual identity across the board: Cerebri Sans Pro typeface, official Azumo logo and a redesigned top bar that adapts to smaller screens',
     'Look & feel — Dark and Light themes, switched with the moon / sun buttons in the top bar; your choice is remembered on this browser',
@@ -3484,6 +3487,7 @@ function applyPreviewOnlyMarkers(){
 }
 function sectionAllowedForCurrentRole(id){
   if(IS_PMO_PRODUCTION && PREVIEW_ONLY_SECTIONS.has(id)) return false;
+  if(id === 'azumo') return false; // Internal Projects tab removed (v3.2); hours still counted in Harvest modules
   if(id === 'helpChangelog') return true; // reachable from the footer link, not from the module nav
   if(id === 'processes') return canSeePmoGroup(); // Process Portal: administrators only
   const role = effectiveUserRole();
@@ -3550,8 +3554,7 @@ function sidebarNavConfig(){
     {id:'generalGroup', icon:'', label:'General', children:[
       {id:'overview', icon:'□', label:'Overview'},
       {id:'opsViews', icon:'<i class="ti ti-compass"></i>', label:'Operating Views'},
-      {id:'bench', icon:'<i class="ti ti-armchair"></i>', label:'Bench'},
-      {id:'azumo', icon:'<i class="ti ti-building"></i>', label:'Internal Projects'}
+      {id:'bench', icon:'<i class="ti ti-armchair"></i>', label:'Bench'}
     ]},
     {id:'assignmentsGroup', icon:'', label:'Assignments', count: dueAlertCount + pendingCount, children:[
       {id:'pendingAssignments', icon:'<i class="ti ti-hourglass"></i>', label:'Pending Assignments', count:pendingCount},
