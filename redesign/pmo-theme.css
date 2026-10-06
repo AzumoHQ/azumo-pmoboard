@@ -13,11 +13,20 @@
      every existing component inherits the palette.
    ============================================================ */
 
+/* ---------- Font: Cerebri Sans Pro (self-hosted, assets/fonts) ---------- */
+@font-face{
+  font-family:"Cerebri Sans Pro";
+  src:url("../assets/fonts/CerebriSansPro-Regular.woff2") format("woff2");
+  font-weight:400;font-style:normal;font-display:swap;
+}
+html body .mono,html body [class*="-val"],html body [class*="-value"],html body td.lf-num,html body .pp-num{font-variant-numeric:tabular-nums}
+
 /* ---------- 1. Tokens ---------- */
 html body{
-  --font-display:"Space Grotesk",system-ui,sans-serif !important;
-  --font-sans:"Inter",system-ui,sans-serif !important;
-  --font-mono:"IBM Plex Mono",ui-monospace,monospace !important;
+  /* Una sola fuente: Cerebri Sans Pro (la de Azumo). Los números usan sus cifras tabulares (tnum). */
+  --font-display:"Cerebri Sans Pro",system-ui,sans-serif !important;
+  --font-sans:"Cerebri Sans Pro",system-ui,sans-serif !important;
+  --font-mono:"Cerebri Sans Pro",system-ui,sans-serif !important;
   --radius-card:14px; --radius-dialog:12px; --radius-control:10px;
   --radius-segment:8px; --radius-option:7px; --radius-check:4px;
   --control-h:34px; --gap:14px;
