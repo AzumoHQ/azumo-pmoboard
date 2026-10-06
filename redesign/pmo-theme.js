@@ -119,15 +119,6 @@
     document.addEventListener('pmo-theme', sync);
     sync();
 
-    // 4) "Preview" badge with a way out
-    if(!document.getElementById('lfPreviewBadge')){
-      var badge = document.createElement('div');
-      badge.id = 'lfPreviewBadge';
-      badge.className = 'lf-preview-badge';
-      badge.innerHTML = 'Preview · new look &amp; feel <a href="?lf=0">Exit</a>';
-      document.body.appendChild(badge);
-    }
-
     // 5) Numbers in table cells -> mono (cells whose whole text is a number, %, hours…)
     var NUM = /^[\s$€£+\-−–~≈]*\d[\d.,\s]*(%|h|hrs?|d|pp|x|fte)?\s*$/i;
     function tagCells(){

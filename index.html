@@ -1493,19 +1493,16 @@ document.addEventListener('DOMContentLoaded',function(){
 document.addEventListener('click',function(e){var d=document.getElementById('navConfig');if(d&&d.open&&!d.contains(e.target))d.open=false;});
 document.addEventListener('keydown',function(e){var d=document.getElementById('navConfig');if(e.key==='Escape'&&d)d.open=false;});
 </script>
-<!-- THEME PREVIEW (Deep-Slate / Teal). Apagado por defecto: ?lf=1 lo prende en este navegador, ?lf=0 lo apaga. -->
+<!-- THEME PREVIEW (Deep-Slate / Teal). Prendido por defecto. ?lf=0 lo apaga en este navegador, ?lf=1 lo vuelve a prender. -->
 <script>
 (function(){
-  var KEY = 'pmo_lf_preview', on = false, q = null;
+  var KEY = 'pmo_lf_off', on = true, q = null;
   try{ q = new URLSearchParams(location.search).get('lf'); }catch(e){}
   try{
-    if(q === '1') localStorage.setItem(KEY, '1');
-    if(q === '0') localStorage.removeItem(KEY);
-    on = localStorage.getItem(KEY) === '1';
+    if(q === '0') localStorage.setItem(KEY, '1');
+    if(q === '1') localStorage.removeItem(KEY);
+    if(localStorage.getItem(KEY) === '1') on = false;
   }catch(e){}
-  var h = location.hostname;
-  // URLs de preview de Vercel (rama -git- o deploy con hash). Los alias de producción quedan afuera.
-  if(q !== '0' && /\.vercel\.app$/.test(h) && ['pmoboard.vercel.app','azumo-pmoboard.vercel.app','azumo-pmoboard-azumo-it.vercel.app'].indexOf(h) < 0) on = true;
   window.PMO_LF = on;
   var MAP = {"#0066ff": "var(--brand)", "#00915a": "var(--pos)", "#06b6d4": "var(--brand)", "#0ea5e9": "var(--brand)", "#10b981": "var(--pos)", "#16a34a": "var(--pos)", "#22c55e": "var(--pos)", "#3b82f6": "var(--brand)", "#6b8fbf": "var(--muted)", "#6ee7b7": "var(--pos)", "#7c3aed": "var(--margin)", "#93c5fd": "var(--brand)", "#94a3b8": "var(--muted)", "#a78bfa": "var(--margin)", "#a855f7": "var(--margin)", "#b4690e": "var(--forecast)", "#c4b5fd": "var(--margin)", "#cff3e4": "var(--ink)", "#e6e9ff": "var(--ink)", "#ef4444": "var(--neg)", "#f3cfff": "var(--ink)", "#f59e0b": "var(--forecast)", "#f97316": "var(--forecast)", "#fb923c": "var(--forecast)", "#fcd34d": "var(--forecast)", "#fdba74": "var(--forecast)", "#ffe6cc": "var(--ink)"};
   window.lfc = function(c){ return (on && typeof c === 'string' && MAP[c.toLowerCase()]) || c; };
