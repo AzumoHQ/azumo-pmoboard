@@ -1,4 +1,4 @@
-const { addNote, deleteNote, getNotes, getBenchPm, setBenchPm, getClientTerms, setClientTerms } = require('../lib/data-store');
+const { addNote, deleteNote, getNotes, getBenchPm, setBenchPm, getClientProjects, setClientProjects } = require('../lib/data-store');
 const { createPmoActionIssue } = require('../lib/jira-client');
 const { canRefresh, getSessionUser } = require('../lib/auth');
 
@@ -41,7 +41,7 @@ module.exports = async function notesHandler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      res.status(200).json({ notes: await getNotes(), bench_pm: await getBenchPm(), client_terms: await getClientTerms() });
+      res.status(200).json({ notes: await getNotes(), bench_pm: await getBenchPm(), client_projects: await getClientProjects() });
       return;
     }
 
@@ -59,10 +59,10 @@ module.exports = async function notesHandler(req, res) {
         return;
       }
 
-      // Client terms (Tracking / Cycle / Project): solo PMO escribe; todos leen via GET.
-      if (note.type === 'client_terms') {
-        const saved = await setClientTerms(note, access.user?.email || '');
-        res.status(200).json({ client_terms: saved });
+      // Client projects (SOWs con Tracking / Cycle / Project): solo PMO escribe; todos leen via GET.
+      if (note.type === 'client_projects') {
+        const saved = await setClientProjects(note, access.user?.email || '');
+        res.status(200).json({ client_projects: saved });
         return;
       }
 
