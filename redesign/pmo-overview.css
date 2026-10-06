@@ -337,3 +337,11 @@
   text-align:right;
   white-space:nowrap;
 }
+
+/* Active clients: column header row (Client · Resources · PM · SOWs) */
+.pmo-ov-popover-row.is-head,html body .pmo-ov-popover-row.is-head{background:transparent !important;border-color:transparent !important;padding-top:0;padding-bottom:0}
+.pmo-ov-popover-row.is-head>div{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ov-text-2)}
+.pmo-ov-popover-head-num{text-align:right}
+.pmo-ov-popover-num{font-variant-numeric:tabular-nums}
+html.lf .pmo-ov-popover-num{font-family:var(--font-mono)}
+@media(max-width:760px){.pmo-ov-popover-row.is-head{display:none}}

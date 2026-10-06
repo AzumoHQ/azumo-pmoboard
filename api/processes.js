@@ -58,7 +58,8 @@ module.exports = async function processesHandler(req, res) {
     if (req.method === 'GET') {
       if (id) {
         const process = await getProcessDetail(id);
-        if (!process || (process.status === 'draft' && !access.write)) {
+        // Drafts and processes in review are visible to PMO/admin only.
+        if (!process || (['draft', 'review'].includes(process.status) && !access.write)) {
           res.status(404).json({ error: 'Process not found' });
           return;
         }
@@ -67,7 +68,7 @@ module.exports = async function processesHandler(req, res) {
       }
       const all = await getProcesses();
       // Drafts are visible to PMO/admin only.
-      res.status(200).json({ processes: access.write ? all : all.filter((p) => p.status !== 'draft') });
+      res.status(200).json({ processes: access.write ? all : all.filter((p) => !['draft', 'review'].includes(p.status)) });
       return;
     }
 
@@ -84,7 +85,7 @@ module.exports = async function processesHandler(req, res) {
           res.status(400).json({ error: 'Missing process id' });
           return;
         }
-        const process = await replaceProcessSteps(id, body.steps || []);
+        const process = await replaceProcessSteps(id, body.steps || [], { portal: body.source === 'portal' });
         res.status(200).json({ process });
         return;
       }
