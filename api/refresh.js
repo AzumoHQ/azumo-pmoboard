@@ -10,6 +10,7 @@ const { fetchHarvestSnapshot, hasHarvestConfig, harvestConfigStatus, fetchWeekly
 const { getAccountCoverageIssues, getIssues, countIssues } = require('../lib/jira-client');
 const { canRefresh, getSessionUser } = require('../lib/auth');
 const { getDashboardData, saveSnapshot } = require('../lib/data-store');
+const { upsertWeekFromHarvest } = require('../lib/harvest-weeks-store');
 const {
   buildSnapshot,
   enrichParsedWithSnapshot,
@@ -225,6 +226,15 @@ async function runRefresh(body = {}) {
           ...(parsed.pending || []),
         ])
       });
+      // Weekly sheet (Reports → Logged Harvest Hours → Weekly Sheets): creates the week the
+      // first time a full Mon–Sun range is synced, refreshes it while open, never touches
+      // closed weeks. A failure here must not break the refresh.
+      try {
+        await upsertWeekFromHarvest(parsed.harvest_metrics);
+      } catch (weekError) {
+        console.warn('Weekly Harvest sheet not saved:', weekError.message);
+        warnings.push(`Weekly Harvest sheet not saved: ${weekError.message}`);
+      }
     } catch (error) {
       console.warn('Harvest weekly metrics refresh skipped:', error.message);
       warnings.push(`Harvest weekly metrics refresh skipped: ${error.message}`);
