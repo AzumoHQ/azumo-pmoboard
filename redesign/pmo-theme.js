@@ -39,14 +39,51 @@
       head.insertAdjacentElement('afterend', p);
     });
 
-    // 2) Logo: tile + "azumo · PMO Board"
+    // 2) Logo: official Azumo wordmark (same as azumo.com) + " · PMO Board"
     var logo = document.querySelector('nav .nav-logo');
     if(logo && !logo.querySelector('.lf-brand')){
       var b = document.createElement('span');
       b.className = 'lf-brand';
-      b.innerHTML = '<span class="lf-tile" aria-hidden="true">A</span><span class="lf-word"><span class="lf-word-co">azumo</span><span class="lf-word-dot"> · </span><span class="lf-word-sec">PMO Board</span></span>';
+      b.innerHTML = '<img class="lf-logo" src="assets/azumo-logo.png" alt="Azumo"><span class="lf-word"><span class="lf-word-dot"> · </span><span class="lf-word-sec">PMO Board</span></span>';
       logo.appendChild(b);
     }
+
+    // 2b) Top bar fit: tabs sit next to the logo only when everything fits; otherwise they drop to their own row.
+    var tabs = document.getElementById('layoutSidebar');
+    var home = null;
+    if(tabs && !document.body.classList.contains('nav-merged')){
+      home = document.createElement('span');
+      home.id = 'lfTabsHome';
+      home.hidden = true;
+      tabs.parentNode.insertBefore(home, tabs);
+    }
+    function overflowing(){
+      var inner = document.querySelector('nav .nav-inner'), right = inner && inner.querySelector('.nav-right');
+      var links = document.getElementById('moduleIndexLinks'), last = links && links.lastElementChild;
+      if(!inner) return false;
+      return (last && right && last.getBoundingClientRect().right > right.getBoundingClientRect().left - 8) || inner.scrollWidth > inner.clientWidth + 2;
+    }
+    function unmerge(){
+      if(!tabs || !home) return;
+      document.body.classList.remove('nav-merged');
+      if(tabs.previousElementSibling !== home) home.parentNode.insertBefore(tabs, home.nextSibling);
+    }
+    function merge(){
+      var inner = document.querySelector('nav .nav-inner'), brand = inner && inner.querySelector('.nav-brand');
+      if(!tabs || !brand) return;
+      if(brand.nextElementSibling !== tabs) brand.insertAdjacentElement('afterend', tabs);
+      document.body.classList.add('nav-merged');
+    }
+    function fit(){
+      if(!tabs || !home) return;
+      if(window.innerWidth < 900){ unmerge(); return; }
+      merge();
+      if(overflowing()) unmerge();
+    }
+    var fitT = null;
+    window.addEventListener('resize', function(){ clearTimeout(fitT); fitT = setTimeout(fit, 120); });
+    setTimeout(fit, 700);
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ setTimeout(fit, 50); });
 
     // 3) Dark / Light segmented control in the top bar
     var right = document.querySelector('nav .nav-right');
@@ -57,7 +94,11 @@
       seg.className = 'lf-seg';
       seg.setAttribute('role', 'group');
       seg.setAttribute('aria-label', 'Theme');
-      seg.innerHTML = '<button type="button" data-t="dark">Dark</button><button type="button" data-t="light">Light</button>';
+      // Icons only: moon = Dark, sun = Light (SVG inline, currentColor; the label stays for screen readers and tooltip)
+      var MOON = '<svg class="lf-ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+      var SUN = '<svg class="lf-ico" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+      seg.innerHTML = '<button type="button" data-t="dark" aria-label="Dark theme" title="Dark theme">' + MOON + '</button>' +
+                      '<button type="button" data-t="light" aria-label="Light theme" title="Light theme">' + SUN + '</button>';
       seg.addEventListener('click', function(e){
         var t = e.target.closest('button'); if(!t) return;
         try{ localStorage.setItem('pmo_dashboard_theme', t.dataset.t); }catch(_){}
