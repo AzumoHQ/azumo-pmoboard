@@ -1566,7 +1566,7 @@ if(window.PMO_LF){ try{
   <div class="nav-inner">
     <div class="nav-brand">
       <a href="#" onclick="goTo('overview');return false;" style="text-decoration:none;display:flex"><div class="nav-logo"><img class="nav-wordmark" src="assets/azumo-logo.png" alt="Azumo"/></div></a>
-      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span id="pmoVersionNav">v3.0</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
+      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span id="pmoVersionNav">v3.1</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
     </div>
     <div class="nav-links">
       <button class="nav-link" id="overviewNavLink" onclick="goTo('overview')">Overview</button>
@@ -1677,7 +1677,7 @@ if(window.PMO_LF){ try{
 <!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-badge">PMO Board <span style="opacity:.55;font-weight:500;font-size:.8em;letter-spacing:.01em">v3</span></div>
+    <div class="hero-badge">PMO Board <span id="pmoVersionHero" style="opacity:.55;font-weight:500;font-size:.8em;letter-spacing:.01em">v3.1</span></div>
     <h1>Operations Center — <span>Azumo PMO</span></h1>
     <p class="hero-copy">Current snapshot for staffing capacity, utilization, client coverage, and delivery risk.</p>
     <div class="hero-stats" aria-label="Current PMO snapshot summary">
@@ -2510,7 +2510,7 @@ if(window.PMO_LF){ try{
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-help-circle"></i></div>
       <h2>Help &amp; Changelog</h2>
-      <div class="sec-tag" id="helpVersionTag">v3.0</div>
+      <div class="sec-tag" id="helpVersionTag">v3.1</div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem">
 
@@ -2575,9 +2575,22 @@ if(window.PMO_LF){ try{
           <div><strong>Forecast</strong> — assignments expiring by month (future)</div>
           <div><strong>Bench</strong> — people with available capacity</div>
           <div><strong>Harvest Hours</strong> — weekly logged hours vs. expected; copy to spreadsheet</div>
-          <div><strong>Logged Harvest Hours</strong> — QA: Harvest vs. Jira billing cross-check</div>
+          <div><strong>Logged Harvest Hours</strong> — weekly capacity &amp; utilization sheets and Summary (replaces the Excel); Harvest vs. Jira billing cross-check</div>
+          <div><strong>Process Portal</strong> — Azumo processes: steps, roles, diagrams and weekly cadence (administrators only)</div>
           <div data-preview-only><strong>Billing</strong> — eaZyBI billing report embed</div>
           <div data-preview-only><strong>Trends</strong> — historical KPI snapshots</div>
+        </div>
+      </div>
+
+      <!-- How to (v3.1) -->
+      <div class="qa-wrap">
+        <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.9rem">How to</div>
+        <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.83rem">
+          <div><strong>Review a week</strong> — Reports → Logged Harvest Hours. Pick the week from the tabs at the bottom of the sheet; green dot = Open, grey = Closed, blue = imported from Excel.</div>
+          <div><strong>Close a week</strong> (PMO) — once Harvest is complete, click <em>Close week</em>. Numbers and the Jira billing % are frozen; <em>Reopen</em> unfreezes it if something changes.</div>
+          <div><strong>Check a number</strong> — hover the cell for its formula and inputs, or turn on <em>ƒx Formulas</em> to see every column's formula and its source.</div>
+          <div><strong>Take the data out</strong> — <em>↓ Copy sheet</em> pastes straight into Google Sheets or Excel; <em>↓ CSV</em> downloads a file.</div>
+          <div><strong>Change the theme</strong> — moon / sun buttons in the top bar.</div>
         </div>
       </div>
 
@@ -2588,6 +2601,7 @@ if(window.PMO_LF){ try{
           <div><strong>Access issues</strong> — contact PMO. Only <code style="font-size:.8em;background:var(--surf);padding:1px 5px;border-radius:4px">@azumo.co</code> accounts are authorized.</div>
           <div><strong>Data refresh</strong> — board data syncs automatically. The "Last updated" timestamp in the footer shows the most recent sync.</div>
           <div><strong>Missing client / wrong coverage</strong> — update the source in Jira PSA. The board reflects Jira data within one refresh cycle.</div>
+          <div><strong>Something looks off with the new design?</strong> — add <code style="font-size:.8em;background:var(--surf);padding:1px 5px;border-radius:4px">?lf=0</code> to the URL to go back to the classic look on this browser (<code style="font-size:.8em;background:var(--surf);padding:1px 5px;border-radius:4px">?lf=1</code> turns the new one back on), and let us know.</div>
           <div><strong>Feedback / bugs</strong> — open a ticket in the PMO project or message <strong>Federica González</strong> directly.</div>
           <div style="margin-top:.4rem;padding-top:.6rem;border-top:1px solid var(--brd);color:var(--muted);font-size:.78rem">
             PMO Board is maintained by the Azumo PMO team. Source: Jira PSA · Harvest · Notion.
@@ -2601,7 +2615,7 @@ if(window.PMO_LF){ try{
 </main>
 <footer>
   <img src="assets/azumo-logo.png" alt="Azumo" height="16" style="opacity:.7"/>
-  PMO Board <span id="pmoVersionFooter">v3.0</span> · Azumo · <span id="footerLastUpdated">Last updated: —</span>
+  PMO Board <span id="pmoVersionFooter">v3.1</span> · Azumo · <span id="footerLastUpdated">Last updated: —</span>
   · <a href="#" class="footer-help-link" onclick="activateModuleTab('helpChangelog');return false;"><i class="ti ti-help-circle"></i> Help &amp; changelog</a>
 </footer>
 
@@ -3423,6 +3437,18 @@ const IS_PMO_PRODUCTION = PMO_PRODUCTION_HOSTS.has(location.hostname);
 //   2) add a new entry at the TOP of PMO_RELEASES (version +0.1)
 const PREVIEW_ONLY_SECTIONS = new Set(['dashboard','history']);
 const PMO_RELEASES = [
+  {version:'3.1', date:'2026-10-06', title:'New look & feel + Logged Harvest Hours weekly sheets', items:[
+    'Look & feel — new Azumo visual identity across the board: Cerebri Sans Pro typeface, official Azumo logo and a redesigned top bar that adapts to smaller screens',
+    'Look & feel — Dark and Light themes, switched with the moon / sun buttons in the top bar; your choice is remembered on this browser',
+    'Process Portal — processes now open as full pages with inline editing (administrators only)',
+    'Logged Harvest Hours — weekly sheets and a Summary replace the Excel tabs of "Capacity and Utilization Rates by Week", using the same formulas',
+    'Logged Harvest Hours — a new week is created automatically from the first full Mon–Sun Harvest sync; it keeps refreshing while Open and is frozen when PMO clicks Close week (Reopen is available)',
+    'Logged Harvest Hours — historical weeks imported from the Excel are kept read-only and marked "Imported from Excel"',
+    'Logged Harvest Hours — weeks are browsed through spreadsheet-style tabs at the bottom of the sheet',
+    'Logged Harvest Hours — hover any number to see how it is calculated; ƒx Formulas adds an Excel-style formula row and a panel listing every data source (Harvest, Jira, manual input, Excel)',
+    'Logged Harvest Hours — every week can be copied to the clipboard (↓ Copy sheet) or downloaded as CSV',
+    'In preview — Client profile in Accounts Coverage: billing terms per SOW (Tracking · Cycle · Project), editable by PMO. Not visible in production yet'
+  ]},
   {version:'3.0', date:'2026-09-30', title:'Baseline — QA cleanup', items:[
     'Work in progress badges removed from production: anything still being built now lives only in preview',
     'Billing and Trends moved back to preview while they are restructured',
@@ -3432,7 +3458,7 @@ const PMO_RELEASES = [
 ];
 const PMO_VERSION = 'v' + PMO_RELEASES[0].version;
 function renderPmoReleases(){
-  ['pmoVersionNav','pmoVersionFooter','helpVersionTag'].forEach(id => {
+  ['pmoVersionNav','pmoVersionFooter','helpVersionTag','pmoVersionHero'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.textContent = PMO_VERSION;
   });
@@ -3441,7 +3467,11 @@ function renderPmoReleases(){
   const fmt = d => new Date(d + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
   list.innerHTML = PMO_RELEASES.map(r => `<div>
     <div style="display:flex;gap:.6rem;align-items:baseline;margin-bottom:.35rem"><strong style="font-size:.9rem">v${esc(r.version)}</strong><span style="font-size:.84rem">${esc(r.title || '')}</span><span style="color:var(--muted);font-size:.75rem;margin-left:auto">${esc(fmt(r.date))}</span></div>
-    <ul style="margin:0;padding-left:1.1rem;font-size:.83rem;line-height:1.55">${(r.items || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>
+    <ul style="margin:0;padding-left:1.1rem;font-size:.83rem;line-height:1.55">${(r.items || []).map(i => {
+      // "Area — text": show the area in bold so long releases are easy to scan
+      const k = String(i).indexOf(' — ');
+      return k > 0 ? `<li><strong>${esc(i.slice(0, k))}</strong> — ${esc(i.slice(k + 3))}</li>` : `<li>${esc(i)}</li>`;
+    }).join('')}</ul>
   </div>`).join('');
 }
 function applyPreviewOnlyMarkers(){
