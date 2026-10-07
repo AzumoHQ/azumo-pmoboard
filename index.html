@@ -3405,7 +3405,9 @@ function renderActivityFeed(user) {
 
 // ---- Assign from bench modal ----
 function openAssignModal(name, avail, key) {
-  const maxPct = avail != null ? Math.round(avail) : 100;
+  // Max = this person's available %. Empty / non-numeric availability must not become 0.
+  const availNum = (avail === null || avail === undefined || avail === '') ? NaN : Number(avail);
+  const maxPct = Number.isFinite(availNum) ? Math.max(0, Math.min(100, Math.round(availNum))) : 100;
   document.getElementById('assignModalTitle').textContent = 'Assign ' + (name || '');
   document.getElementById('assignMaxLabel').textContent = '(max ' + maxPct + '% available)';
   const pctInput = document.getElementById('assignPctInput');
@@ -7549,7 +7551,7 @@ function renderBench(){
       <td style="color:var(--muted);font-size:.78rem">${esc(tech || '—')}</td>
       <td style="white-space:nowrap">
         <button class="btn btn-ghost btn-sm" style="font-size:.72rem;padding:3px 10px"
-          onclick='openAssignModal(${jsArg(p.name)},${jsArg(p.avail)},${jsArg(p.key||'')})'>
+          onclick='openAssignModal(${jsArg(displayName(p))},${avail === null ? 'null' : Math.round(avail)},${jsArg(p.key||'')})'>
           Assign
         </button>
       </td>
