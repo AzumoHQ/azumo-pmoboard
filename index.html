@@ -3737,6 +3737,8 @@ const SECTION_ICON_MAP = {
   'forecast': 'ti-chart-arrows',
   'psaProjectStatus': 'ti-trending-up',
   'accountCoverage': 'ti-clipboard-list',
+  'psaNewReport': 'ti-file-plus',
+  'aaNewAssignment': 'ti-user-plus',
   'harvestHours': 'ti-stopwatch',
   'harvestAccess': 'ti-folders',
   'harvestWeekly': 'ti-users',
@@ -3777,14 +3779,16 @@ function sidebarNavConfig(){
     {id:'assignmentsGroup', icon:'', label:'Assignments', count: dueAlertCount + pendingCount, children:[
       {id:'pendingAssignments', icon:'<i class="ti ti-hourglass"></i>', label:'Pending Assignments', count:pendingCount},
       {id:'dueDates', icon:'<i class="ti ti-calendar"></i>', label:'Due Dates', count:dueAlertCount},
-      {id:'forecast', icon:'<i class="ti ti-chart-arrows"></i>', label:'Forecast'}
+      {id:'forecast', icon:'<i class="ti ti-chart-arrows"></i>', label:'Forecast'},
+      {id:'aaNewAssignment', label:'New assignment', action:'openAaAssignmentModal', requires:'pendingAssignments'}
     ]},
     {id:'harvestGroup', icon:'', label:'Harvest', children:[
       {id:'harvestHours', icon:'<i class="ti ti-stopwatch"></i>', label:'Control'},
       {id:'harvestAccess', icon:'<i class="ti ti-folders"></i>', label:'Assignments'}
     ]},
-    {id:'reportsGroup', icon:'', label:'Reports', children:[
-      {id:'psaProjectStatus', icon:'<i class="ti ti-trending-up"></i>', label:'Project Status'},
+    {id:'reportsGroup', icon:'', label:'Accounts', children:[
+      {id:'psaProjectStatus', icon:'<i class="ti ti-trending-up"></i>', label:'Reports'},
+      {id:'psaNewReport', label:'New report', action:'openPsaReportModal', requires:'psaProjectStatus'},
       {id:'accountCoverage', icon:'<i class="ti ti-clipboard-list"></i>', label:'Accounts Coverage'},
       {id:'dashboard', icon:'<i class="ti ti-credit-card"></i>', label:'Billing'},
       {id:'history', icon:'<i class="ti ti-trending-up"></i>', label:'Trends'},
@@ -3815,9 +3819,19 @@ function moduleEntryAvailable(entry, available){
     const children = entry.children.map(child => moduleEntryAvailable(child, available)).filter(Boolean);
     return children.length ? {...entry, children} : null;
   }
+  if(entry?.action) return available.has(entry.requires) ? entry : null;
   return entry?.id && available.has(entry.id) ? entry : null;
 }
+// Nav items with an action open a modal instead of switching section.
+function runModuleNavAction(fnName){
+  openModuleGroup = null;
+  renderModuleTabButtons(activeModuleTabId());
+  const fn = window[fnName];
+  if(typeof fn === 'function') fn();
+}
+window.runModuleNavAction = runModuleNavAction;
 function moduleItemAction(item){
+  if(item.action) return `runModuleNavAction('${String(item.action).replace(/[^A-Za-z0-9_]/g, '')}')`;
   const safeId = String(item.id || '').replace(/'/g, "\\'");
   const safeAnchor = item.anchor ? String(item.anchor).replace(/'/g, "\\'") : '';
   const options = safeAnchor ? `, {anchor:'${safeAnchor}'}` : '';
