@@ -3141,7 +3141,7 @@ function renderOpsChartsMain(user) {
   external.forEach(function(r) { if(r.assignee) myA.add(r.assignee); if(r.client) myC.add(r.client); });
 
   var harvestPct = null, harvestHours = '', harvestColor = 'var(--success)';
-  var hd = PMO && PMO.latest && PMO.latest.harvest;
+  var hd = (typeof latest!=='undefined' && latest) ? latest.harvest : null;
   if (hd && hd.date_from) {
     var hhData = (typeof harvestHoursReportData !== 'undefined') ? harvestHoursReportData : [];
     var totalH = 0, totalE = 0;
@@ -3165,7 +3165,7 @@ function renderOpsChartsMain(user) {
     if(diff<0) fcG.o++; else if(diff<=30) fcG.s++; else if(diff<=60) fcG.m++; else fcG.f++;
   });
 
-  var bench=(PMO&&PMO.latest&&PMO.latest.bench_list)||[];
+  var bench=(typeof latest!=='undefined'&&latest&&latest.bench_list)||[];
   var needsAttn = fcG.s + fcG.o;
 
   function ee(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -3458,7 +3458,7 @@ function openAssignModal(name, avail, key) {
   pctInput.value = Math.min(100, maxPct);
 
   const sel = document.getElementById('assignClientSelect');
-  const clients = (PMO && PMO.latest && PMO.latest.active_clients) || [];
+  const clients = (typeof latest!=='undefined' && latest && latest.active_clients) || [];
   sel.innerHTML = clients.map(c => {
     const name = typeof c === 'string' ? c : (c.client || c.name || '');
     return '<option value="' + esc(name) + '">' + esc(name) + '</option>';
