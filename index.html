@@ -11094,6 +11094,28 @@ function psaStatusChips(lastReport){
     psaStatusChip('Budget', lastReport.budgetStatus)
   ].join('');
 }
+// Projects whose report history row is expanded (by epic key).
+const psaHistoryOpen = new Set();
+function togglePsaHistory(epicKey){
+  if(psaHistoryOpen.has(epicKey)) psaHistoryOpen.delete(epicKey); else psaHistoryOpen.add(epicKey);
+  renderPsaProjectStatusModule();
+}
+window.togglePsaHistory = togglePsaHistory;
+function psaHistoryRowHTML(row){
+  const reports = row.reports || [];
+  const items = reports.map(r => `<tr>
+      <td style="white-space:nowrap">${esc(r.date || '\u2014')}</td>
+      <td>${esc(r.reportType || '\u2014')}</td>
+      <td>${psaStatusChips(r)}</td>
+      <td style="white-space:nowrap"><a href="${jiraIssueUrl(r.key) || '#'}" target="_blank" rel="noopener noreferrer">${esc(r.key)}</a>${r.linkedBy === 'name' ? ' <span title="Old report without parent epic, matched by client name" style="color:var(--muted);font-size:11px">· by name</span>' : ''}</td>
+    </tr>`).join('');
+  return `<tr class="psa-history-row"><td colspan="6" style="padding:0 0 12px 24px;background:var(--surface-2,transparent)">
+      <table style="width:100%;font-size:12.5px">
+        <thead><tr><th>Report date</th><th>Type</th><th>Status</th><th>Jira</th></tr></thead>
+        <tbody>${items || '<tr><td colspan="4" style="color:var(--muted)">No reports.</td></tr>'}</tbody>
+      </table>
+    </td></tr>`;
+}
 function renderPsaProjectStatusModule(){
   const allRows = psaProjectStatusData || [];
   // View filter (Current / Former / All)
@@ -11147,14 +11169,19 @@ function renderPsaProjectStatusModule(){
     const staleBadge = row.stale
       ? `<span class="badge badge-red">${lastDate ? `${days}d ago` : 'No report'}</span>`
       : `<span class="badge badge-green">${days != null ? `${days}d ago` : '\u2014'}</span>`;
+    const reportCount = (row.reports || []).length;
+    const isOpen = psaHistoryOpen.has(row.epicKey);
+    const historyBtn = reportCount
+      ? ` <button class="btn btn-ghost btn-sm" type="button" data-epic="${esc(row.epicKey)}" onclick="togglePsaHistory(this.dataset.epic)" aria-expanded="${isOpen}">${isOpen ? '\u25be' : '\u25b8'} History (${reportCount})</button>`
+      : '';
     return `<tr>
       <td style="font-weight:900">${esc(row.epicName || row.epicKey)}</td>
       <td>${esc(pmName)}</td>
-      <td>${esc(lastDate || '\u2014')}</td>
+      <td style="white-space:nowrap">${esc(lastDate || '\u2014')}${historyBtn}</td>
       <td>${staleBadge}</td>
       <td>${psaStatusChips(row.lastReport)}</td>
       <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" type="button" data-epic="${esc(row.epicKey)}" onclick="openPsaReportModal(this.dataset.epic)">+ Report</button> <a class="btn btn-ghost btn-sm" href="${psaProjectJiraUrl(row.epicKey)}" target="_blank" rel="noopener noreferrer">Open in Jira</a></td>
-    </tr>`;
+    </tr>` + (isOpen ? psaHistoryRowHTML(row) : '');
   }).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No projects found.</td></tr>';
 }
 // --- Project Status multi-select + sort helpers ---
