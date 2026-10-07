@@ -1620,7 +1620,7 @@ if(window.PMO_LF){ try{
   <div class="nav-inner">
     <div class="nav-brand">
       <a href="#" onclick="goTo('overview');return false;" style="text-decoration:none;display:flex"><div class="nav-logo"><img class="nav-wordmark" src="assets/azumo-logo.png" alt="Azumo"/></div></a>
-      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span id="pmoVersionNav">v3.2</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
+      <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span id="pmoVersionNav">v3.3</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
     </div>
     <div class="nav-links">
       <button class="nav-link" id="overviewNavLink" onclick="goTo('overview')">Overview</button>
@@ -1786,7 +1786,7 @@ if(window.PMO_LF){ try{
 <!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-badge">PMO Board <span id="pmoVersionHero" style="opacity:.55;font-weight:500;font-size:.8em;letter-spacing:.01em">v3.2</span></div>
+    <div class="hero-badge">PMO Board <span id="pmoVersionHero" style="opacity:.55;font-weight:500;font-size:.8em;letter-spacing:.01em">v3.3</span></div>
     <h1>Operations Center — <span>Azumo PMO</span></h1>
     <p class="hero-copy">Current snapshot for staffing capacity, utilization, client coverage, and delivery risk.</p>
     <div class="hero-stats" aria-label="Current PMO snapshot summary">
@@ -2563,7 +2563,7 @@ if(window.PMO_LF){ try{
     <div class="sec-head">
       <div class="sec-icon"><i class="ti ti-help-circle"></i></div>
       <h2>Help &amp; Changelog</h2>
-      <div class="sec-tag" id="helpVersionTag">v3.2</div>
+      <div class="sec-tag" id="helpVersionTag">v3.3</div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem">
 
@@ -2629,6 +2629,8 @@ if(window.PMO_LF){ try{
           <div><strong>Bench</strong> — people with available capacity</div>
           <div><strong>Harvest Hours</strong> — weekly logged hours vs. expected; copy to spreadsheet</div>
           <div><strong>Logged Harvest Hours</strong> — weekly capacity &amp; utilization sheets and Summary (replaces the Excel); Harvest vs. Jira billing cross-check</div>
+          <div><strong>Project Status</strong> — last reported status per project (Current / Former); file a new status report from the row or from Accounts → New report</div>
+          <div><strong>Pending Assignments</strong> — open assignment requests; create one with Assignments → New assignment</div>
           <div><strong>Process Portal</strong> — Azumo processes: steps, roles, diagrams and weekly cadence (administrators only)</div>
           <div data-preview-only><strong>Billing</strong> — eaZyBI billing report embed</div>
           <div data-preview-only><strong>Trends</strong> — historical KPI snapshots</div>
@@ -2639,10 +2641,12 @@ if(window.PMO_LF){ try{
       <div class="qa-wrap">
         <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.9rem">How to</div>
         <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.83rem">
-          <div><strong>Review a week</strong> — Reports → Logged Harvest Hours. Pick the week from the tabs at the bottom of the sheet; green dot = Open, grey = Closed, blue = imported from Excel.</div>
+          <div><strong>Review a week</strong> — Accounts → Logged Harvest Hours. Pick the week from the tabs at the bottom of the sheet; green dot = Open, grey = Closed, blue = imported from Excel.</div>
           <div><strong>Close a week</strong> (PMO) — once Harvest is complete, click <em>Close week</em>. Numbers and the Jira billing % are frozen; <em>Reopen</em> unfreezes it if something changes.</div>
           <div><strong>Check a number</strong> — hover the cell for its formula and inputs, or turn on <em>ƒx Formulas</em> to see every column's formula and its source.</div>
           <div><strong>Take the data out</strong> — <em>↓ Copy sheet</em> pastes straight into Google Sheets or Excel; <em>↓ CSV</em> downloads a file.</div>
+          <div><strong>File a project status report</strong> — Accounts → Reports, click <em>+ Report</em> on the project (or Accounts → New report). It creates the Project Status ticket in Jira PSA.</div>
+          <div><strong>Request a new assignment</strong> — Assignments → New assignment. It creates the ticket in Jira AA.</div>
           <div><strong>Change the theme</strong> — moon / sun buttons in the top bar.</div>
         </div>
       </div>
@@ -2668,7 +2672,7 @@ if(window.PMO_LF){ try{
 </main>
 <footer>
   <img src="assets/azumo-logo.png" alt="Azumo" height="16" style="opacity:.7"/>
-  PMO Board <span id="pmoVersionFooter">v3.2</span> · Azumo · <span id="footerLastUpdated">Last updated: —</span>
+  PMO Board <span id="pmoVersionFooter">v3.3</span> · Azumo · <span id="footerLastUpdated">Last updated: —</span>
   · <a href="#" class="footer-help-link" onclick="activateModuleTab('helpChangelog');return false;"><i class="ti ti-help-circle"></i> Help &amp; changelog</a>
 </footer>
 
@@ -3655,6 +3659,17 @@ const IS_PMO_PRODUCTION = PMO_PRODUCTION_HOSTS.has(location.hostname);
 //   2) add a new entry at the TOP of PMO_RELEASES (version +0.1)
 const PREVIEW_ONLY_SECTIONS = new Set(['dashboard','history']);
 const PMO_RELEASES = [
+  {version:'3.3', date:'2026-10-07', title:'Status reports, new assignments and navigation', items:[
+    'Project Status — new status report form that mirrors the Jira PSA form; it creates a Project Status ticket under the project\'s epic. Open it with + Report on a project row or from Accounts → New report',
+    'Project Status — the table now has a single View filter (Current / Former closed); the Project, PM and Status filters and Clear filters were removed',
+    'Project Status — older PSA reports that have no parent epic are now matched to their project by client name, and each project has a History (N) button that lists all its reports',
+    'Assignments — new assignment form that mirrors the Jira AA form, available from Assignments → New assignment',
+    'Navigation — the Reports menu is now Accounts (Reports, New report, Accounts Coverage, Logged Harvest Hours); New assignment sits under Assignments; the action buttons row on the Overview moved to the top nav',
+    'Overview — Jira / Harvest sync chip with logos in the top bar, plus world clocks: your own time zone and San Francisco by default, any time zone can be added with search',
+    'Overview — Forecast, Bench and Harvest cards now read from the latest snapshot (they were not picking up the current data)',
+    'Harvest Hours Control — Jira % column removed from the table and from the CSV / Copy exports',
+    'Process Portal — a single editor with a visible Save button; the Settings dialog keeps the process status (administrators only)'
+  ]},
   {version:'3.2', date:'2026-10-06', title:'Navigation cleanup', items:[
     'Navigation — Internal Projects tab removed from General. Internal project hours are still counted in Harvest Hours and Logged Harvest Hours'
   ]},
