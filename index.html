@@ -2287,7 +2287,7 @@ if(window.PMO_LF){ try{
       <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('dueDates')"><i class="ti ti-calendar"></i> Due Dates</button>
       <button class="pmo-branch-tab" type="button" onclick="activateModuleTab('forecast')"><i class="ti ti-chart-arrows"></i> Forecast</button>
     </div>
-    <div class="tbl-head"><h3><i class="ti ti-hourglass"></i> Pending <span class="badge badge-yellow" id="pendingBadge">—</span></h3></div>
+    <div class="tbl-head"><h3><i class="ti ti-hourglass"></i> Pending <span class="badge badge-yellow" id="pendingBadge">—</span></h3><button class="btn btn-primary btn-sm" type="button" onclick="openAaAssignmentModal()">New assignment</button></div>
     <table><thead><tr><th>Key</th><th>Assignee</th><th>Client</th><th>Role</th><th>Start</th></tr></thead><tbody id="pendingTbody"></tbody></table>
   </div>
 </section>
@@ -3438,6 +3438,175 @@ function copyAssignDraft() {
 window.openAssignModal = openAssignModal;
 window.closeAssignModal = closeAssignModal;
 window.copyAssignDraft = copyAssignDraft;
+
+// ── AA assignment form (mirror of Jira AA form 150) ───────────────────
+// Options, people (AA person epics) and default PM/CSM per client come from
+// /api/assignments (read live from Jira).
+let aaAssignMeta = null;
+let aaAssignAutoPm = '';
+let aaAssignAutoCsm = '';
+
+function aaAssignMsg(kind, html){
+  const ok = document.getElementById('aaAssignSuccess');
+  const err = document.getElementById('aaAssignError');
+  if(ok){ ok.style.display = kind === 'ok' ? 'block' : 'none'; ok.innerHTML = kind === 'ok' ? html : ''; }
+  if(err){ err.style.display = kind === 'error' ? 'block' : 'none'; err.innerHTML = kind === 'error' ? html : ''; }
+}
+function aaAssignToday(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function aaAssignMatch(list, value){
+  const key = normalizeClientKey(value);
+  if(!key) return '';
+  return list.find(v => normalizeClientKey(v) === key)
+    || list.find(v => { const k = normalizeClientKey(v); return k && (k.startsWith(key) || key.startsWith(k)); })
+    || '';
+}
+async function openAaAssignmentModal(prefill = {}){
+  const modal = document.getElementById('aaAssignModal');
+  if(!modal) return;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+  aaAssignMsg('', '');
+  const btn = document.getElementById('aaAssignSubmit');
+  if(btn){ btn.disabled = true; btn.textContent = 'Loading form…'; }
+  try{
+    if(!aaAssignMeta){
+      const response = await fetch('/api/assignments?meta=1', {cache:'no-store', credentials:'same-origin'});
+      const result = await response.json().catch(() => ({}));
+      if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+      aaAssignMeta = result;
+    }
+    renderAaAssignmentForm(prefill || {});
+    if(btn){ btn.disabled = false; btn.textContent = 'Create ticket in Jira'; }
+  }catch(error){
+    aaAssignMsg('error', esc(`Could not open the form: ${error.message}`));
+    if(btn) btn.textContent = 'Create ticket in Jira';
+  }
+}
+window.openAaAssignmentModal = openAaAssignmentModal;
+function closeAaAssignmentModal(){
+  const modal = document.getElementById('aaAssignModal');
+  if(!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden','true');
+}
+window.closeAaAssignmentModal = closeAaAssignmentModal;
+
+// From the Bench "Assign" modal: carry person, client and % into the full form.
+function openAaAssignmentFromBench(){
+  const name = (document.getElementById('assignModalTitle')?.textContent || '').replace(/^Assign\s*/, '');
+  const client = document.getElementById('assignClientSelect')?.value || '';
+  const pct = document.getElementById('assignPctInput')?.value || '';
+  closeAssignModal();
+  openAaAssignmentModal({personName: name, client, pct});
+}
+window.openAaAssignmentFromBench = openAaAssignmentFromBench;
+
+function renderAaAssignmentForm(prefill){
+  const opts = aaAssignMeta?.options || {};
+  const people = aaAssignMeta?.people || [];
+  const optionHtml = (list, placeholder) => `<option value="">${esc(placeholder)}</option>` + list.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+  const peopleHtml = placeholder => `<option value="">${esc(placeholder)}</option>` + people.map(p => `<option value="${esc(p.accountId)}">${esc(p.name)}</option>`).join('');
+
+  const personSel = document.getElementById('aaPerson');
+  personSel.innerHTML = `<option value="">Select a person…</option>` + people.map(p => `<option value="${esc(p.epicKey)}">${esc(p.name)}</option>`).join('');
+  const personKey = normalizeIdentity(prefill.personName || '');
+  const person = personKey ? people.find(p => normalizeIdentity(p.name) === personKey) : null;
+  personSel.value = person ? person.epicKey : '';
+
+  const clientSel = document.getElementById('aaClient');
+  clientSel.innerHTML = optionHtml(opts.client || [], 'Select a client…');
+  clientSel.value = aaAssignMatch(opts.client || [], prefill.client || '');
+
+  document.getElementById('aaRole').innerHTML = optionHtml(opts.harvestRole || [], 'Select a role…');
+  document.getElementById('aaPm').innerHTML = peopleHtml('Select the PM…');
+  document.getElementById('aaCsm').innerHTML = peopleHtml('No CSM');
+  document.getElementById('aaSummary').value = '';
+  document.getElementById('aaPct').value = prefill.pct || '';
+  document.getElementById('aaStart').value = aaAssignToday();
+  document.getElementById('aaDue').value = '';
+  document.getElementById('aaRate').value = '';
+  document.getElementById('aaComment').value = '';
+  aaAssignAutoPm = '';
+  aaAssignAutoCsm = '';
+  aaAssignClientChanged();
+}
+
+// Default PM / CSM from the client's PSA epic, without overwriting a manual pick.
+function aaAssignClientChanged(){
+  const client = document.getElementById('aaClient')?.value || '';
+  const defaults = aaAssignMeta?.clientDefaults?.[client] || {};
+  const pmSel = document.getElementById('aaPm');
+  const csmSel = document.getElementById('aaCsm');
+  if(pmSel && (!pmSel.value || pmSel.value === aaAssignAutoPm)){
+    pmSel.value = defaults.pmAccountId || '';
+    if(pmSel.value !== (defaults.pmAccountId || '')) pmSel.value = '';
+    aaAssignAutoPm = pmSel.value;
+  }
+  if(csmSel && (!csmSel.value || csmSel.value === aaAssignAutoCsm)){
+    csmSel.value = defaults.csmAccountId || '';
+    if(csmSel.value !== (defaults.csmAccountId || '')) csmSel.value = '';
+    aaAssignAutoCsm = csmSel.value;
+  }
+}
+window.aaAssignClientChanged = aaAssignClientChanged;
+
+async function submitAaAssignment(){
+  const val = id => document.getElementById(id)?.value || '';
+  const payload = {
+    epicKey: val('aaPerson'),
+    client: val('aaClient'),
+    summary: val('aaSummary').trim(),
+    harvestRole: val('aaRole'),
+    allocation: val('aaPct'),
+    startDate: val('aaStart'),
+    dueDate: val('aaDue'),
+    pmAccountId: val('aaPm'),
+    csmAccountId: val('aaCsm'),
+    rate: val('aaRate'),
+    comment: val('aaComment')
+  };
+  const missing = [];
+  if(!payload.epicKey) missing.push('Person');
+  if(!payload.client) missing.push('Client');
+  if(!payload.summary) missing.push('Assignment title');
+  if(!payload.harvestRole) missing.push('Harvest role');
+  if(!payload.allocation) missing.push('Assignment (%)');
+  if(!payload.startDate) missing.push('Start date');
+  if(!payload.dueDate) missing.push('Due date');
+  if(!payload.pmAccountId) missing.push('Project Manager');
+  if(missing.length){
+    aaAssignMsg('error', esc(`Missing required fields: ${missing.join(', ')}`));
+    return;
+  }
+  if(payload.dueDate < payload.startDate){
+    aaAssignMsg('error', 'Due date must be on or after the start date.');
+    return;
+  }
+  const btn = document.getElementById('aaAssignSubmit');
+  if(btn){ btn.disabled = true; btn.textContent = 'Creating…'; }
+  aaAssignMsg('', '');
+  try{
+    const response = await fetch('/api/assignments', {
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    const key = result.ticket?.key || '';
+    const url = result.ticket?.url || jiraIssueUrl(key);
+    aaAssignMsg('ok', `Created <a href="${esc(url)}" target="_blank" rel="noopener noreferrer" style="color:inherit;font-weight:900;text-decoration:underline">${esc(key)}</a> in Jira AA. It shows up in the board after the next sync.`);
+    if(btn) btn.textContent = 'Created';
+  }catch(error){
+    aaAssignMsg('error', esc(`Could not create the ticket: ${error.message}`));
+    if(btn){ btn.disabled = false; btn.textContent = 'Create ticket in Jira'; }
+  }
+}
+window.submitAaAssignment = submitAaAssignment;
 
 const THEME_KEY = 'pmo_dashboard_theme';
 function applyTheme(theme){
@@ -13325,6 +13494,73 @@ bootDashboard();
 </div>
 
 <!-- Assign from bench modal -->
+<!-- AA assignment — same fields as Jira AA form 150 -->
+<div class="auth-modal" id="aaAssignModal" aria-hidden="true">
+  <div class="auth-card psa-form">
+    <h3>New assignment</h3>
+    <p>Same fields as the Jira AA assignment form. Submitting creates an <b>Assignment</b> ticket under the person's epic in Jira AA.</p>
+    <div class="psa-grid">
+      <div class="auth-field">
+        <label for="aaPerson">Person <span class="psa-req">*</span></label>
+        <select id="aaPerson"></select>
+      </div>
+      <div class="auth-field">
+        <label for="aaClient">Client <span class="psa-req">*</span></label>
+        <select id="aaClient" onchange="aaAssignClientChanged()"></select>
+      </div>
+    </div>
+    <div class="auth-field">
+      <label for="aaSummary">Assignment title <span class="psa-req">*</span></label>
+      <input id="aaSummary" type="text" maxlength="240" list="aaSummaryPresets" placeholder="[SOW 1] Software Development Services - Delivery"/>
+      <datalist id="aaSummaryPresets">
+        <option value="[SOW 1] Software Development Services - Delivery"></option>
+        <option value="[SOW 1] Software Development Services - Dedicated"></option>
+        <option value="[SOW 1] Software Development Services - On-Demand"></option>
+      </datalist>
+    </div>
+    <div class="psa-grid">
+      <div class="auth-field">
+        <label for="aaRole">Harvest role <span class="psa-req">*</span></label>
+        <select id="aaRole"></select>
+      </div>
+      <div class="auth-field">
+        <label for="aaPct">Assignment (%) <span class="psa-req">*</span></label>
+        <input id="aaPct" type="number" min="1" max="100" step="0.5"/>
+      </div>
+      <div class="auth-field">
+        <label for="aaStart">Start date <span class="psa-req">*</span></label>
+        <input id="aaStart" type="date"/>
+      </div>
+      <div class="auth-field">
+        <label for="aaDue">Due date <span class="psa-req">*</span></label>
+        <input id="aaDue" type="date"/>
+      </div>
+      <div class="auth-field">
+        <label for="aaPm">Project Manager <span class="psa-req">*</span></label>
+        <select id="aaPm"></select>
+      </div>
+      <div class="auth-field">
+        <label for="aaCsm">CSM assigned</label>
+        <select id="aaCsm"></select>
+      </div>
+      <div class="auth-field">
+        <label for="aaRate">Rate (hourly)</label>
+        <input id="aaRate" type="number" min="0" step="0.01" placeholder="Optional"/>
+      </div>
+    </div>
+    <div class="auth-field">
+      <label for="aaComment">Assignment comment</label>
+      <textarea id="aaComment" rows="3"></textarea>
+    </div>
+    <div class="auth-success" id="aaAssignSuccess"></div>
+    <div class="auth-error" id="aaAssignError"></div>
+    <div class="auth-actions">
+      <button class="btn btn-ghost btn-sm" type="button" onclick="closeAaAssignmentModal()">Close</button>
+      <button class="btn btn-primary btn-sm" type="button" id="aaAssignSubmit" onclick="submitAaAssignment()">Create ticket in Jira</button>
+    </div>
+  </div>
+</div>
+
 <div class="auth-modal" id="assignBenchModal" aria-hidden="true">
   <div class="auth-card" style="max-width:480px;width:min(480px,92vw)">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
@@ -13344,7 +13580,8 @@ bootDashboard();
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-ghost btn-sm" onclick="closeAssignModal()">Cancel</button>
-      <button class="btn btn-primary btn-sm" onclick="copyAssignDraft()">Copy draft</button>
+      <button class="btn btn-ghost btn-sm" onclick="copyAssignDraft()">Copy draft</button>
+      <button class="btn btn-primary btn-sm" type="button" onclick="openAaAssignmentFromBench()">Create in Jira</button>
     </div>
     <div id="assignDraftOut" style="display:none;margin-top:1rem;padding:.75rem;background:var(--bg-2);border:1px solid var(--border-subtle);border-radius:8px;font-size:.82rem;color:var(--fg-2);white-space:pre-wrap"></div>
   </div>
