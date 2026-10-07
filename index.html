@@ -11007,7 +11007,7 @@ function renderPsaProjectStatusModule(){
       <td>${esc(lastDate || '\u2014')}</td>
       <td>${staleBadge}</td>
       <td>${psaStatusChips(row.lastReport)}</td>
-      <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" type="button" onclick="openPsaReportModal(${jsArg(row.epicKey)})">+ Report</button> <a class="btn btn-ghost btn-sm" href="${psaProjectJiraUrl(row.epicKey)}" target="_blank" rel="noopener noreferrer">Open in Jira</a></td>
+      <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" type="button" data-epic="${esc(row.epicKey)}" onclick="openPsaReportModal(this.dataset.epic)">+ Report</button> <a class="btn btn-ghost btn-sm" href="${psaProjectJiraUrl(row.epicKey)}" target="_blank" rel="noopener noreferrer">Open in Jira</a></td>
     </tr>`;
   }).join('') || '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No projects found.</td></tr>';
 }
