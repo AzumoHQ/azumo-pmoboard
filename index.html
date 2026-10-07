@@ -1552,8 +1552,12 @@ document.addEventListener('keydown',function(e){var d=document.getElementById('n
 .pmo-clock-day{color:var(--faint,var(--muted));font-size:11.5px}
 .pmo-clock-edit{appearance:none;border:1px solid var(--border-strong,var(--brd));background:var(--surface-2,transparent);color:var(--muted);border-radius:8px;height:24px;padding:0 8px;font:inherit;font-size:12px;cursor:pointer}
 .pmo-clock-edit:hover{color:var(--ink,var(--txt))}
-.pmo-clock-panel{position:absolute;top:calc(100% + 8px);left:0;z-index:50;width:260px;max-height:320px;overflow:auto;padding:6px;background:var(--surface,var(--card));border:1px solid var(--border,var(--brd));border-radius:10px;box-shadow:var(--shadow-card,0 10px 30px rgba(0,0,0,.2))}
+.pmo-clock-panel{position:absolute;top:calc(100% + 8px);left:0;z-index:50;width:300px;max-height:360px;overflow:auto;padding:0 6px 6px;background:var(--surface,var(--card));border:1px solid var(--border,var(--brd));border-radius:10px;box-shadow:var(--shadow-card,0 10px 30px rgba(0,0,0,.2))}
 .pmo-clock-panel[hidden]{display:none}
+.pmo-clock-search{position:sticky;top:0;z-index:1;padding:6px 0;background:var(--surface,var(--card))}
+.pmo-clock-search input{width:100%;box-sizing:border-box;height:28px;padding:0 8px;border:1px solid var(--border-strong,var(--brd));border-radius:7px;background:var(--surface-2,transparent);color:var(--ink,var(--txt));font:inherit;font-size:12.5px}
+.pmo-clock-region{color:var(--faint,var(--muted));font-size:11px;margin-left:4px}
+.pmo-clock-empty{padding:8px;font-size:12px;color:var(--muted)}
 .pmo-clock-opt{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:7px;font-size:12.5px;color:var(--ink-soft,var(--txt));cursor:pointer}
 .pmo-clock-opt:hover{background:var(--surface-2,var(--surf))}
 .pmo-clock-opt input{accent-color:var(--brand,var(--blue))}
@@ -2185,63 +2189,10 @@ if(window.PMO_LF){ try{
       <div class="filter-field" style="min-width:unset">
         <label for="psaProjectStatusFilter">View</label>
         <select id="psaProjectStatusFilter" data-ms="views" multiple onchange="setPsaProjectStatusFilter(msVals(this))">
-          <option value="">All projects</option>
           <option value="current" selected>Current</option>
           <option value="former">Former (closed)</option>
         </select>
       </div>
-      <div class="filter-field" style="min-width:unset">
-        <label>Project</label>
-        <div class="hh-ms-wrap" id="psProjectWrap">
-          <button type="button" class="hh-ms-btn" id="psProjectBtn" onclick="psToggleDrop('Project',event)">
-            <span id="psProjectBtnLabel">All projects</span>
-            <span class="hh-ms-caret">&#9662;</span>
-          </button>
-          <div class="hh-ms-panel" id="psProjectPanel" style="display:none">
-            <div class="hh-ms-head">
-              <button type="button" onclick="psSelectAllDrop('Project')">Select All</button>
-              <button type="button" onclick="psClearDrop('Project')">Clear All</button>
-            </div>
-            <input class="hh-ms-search" type="text" placeholder="Search projects…" oninput="psSearchDrop(this,'Project')">
-            <div id="psProjectOptions"></div>
-          </div>
-        </div>
-      </div>
-      <div class="filter-field" style="min-width:unset">
-        <label>PM</label>
-        <div class="hh-ms-wrap" id="psPmWrap">
-          <button type="button" class="hh-ms-btn" id="psPmBtn" onclick="psToggleDrop('Pm',event)">
-            <span id="psPmBtnLabel">All PMs</span>
-            <span class="hh-ms-caret">&#9662;</span>
-          </button>
-          <div class="hh-ms-panel" id="psPmPanel" style="display:none">
-            <div class="hh-ms-head">
-              <button type="button" onclick="psSelectAllDrop('Pm')">Select All</button>
-              <button type="button" onclick="psClearDrop('Pm')">Clear All</button>
-            </div>
-            <input class="hh-ms-search" type="text" placeholder="Search PMs…" oninput="psSearchDrop(this,'Pm')">
-            <div id="psPmOptions"></div>
-          </div>
-        </div>
-      </div>
-      <div class="filter-field" style="min-width:unset">
-        <label>Status (Project)</label>
-        <div class="hh-ms-wrap" id="psStatusWrap">
-          <button type="button" class="hh-ms-btn" id="psStatusBtn" onclick="psToggleDrop('Status',event)">
-            <span id="psStatusBtnLabel">All statuses</span>
-            <span class="hh-ms-caret">&#9662;</span>
-          </button>
-          <div class="hh-ms-panel" id="psStatusPanel" style="display:none">
-            <div class="hh-ms-head">
-              <button type="button" onclick="psSelectAllDrop('Status')">Select All</button>
-              <button type="button" onclick="psClearDrop('Status')">Clear All</button>
-            </div>
-            <input class="hh-ms-search" type="text" placeholder="Search statuses…" oninput="psSearchDrop(this,'Status')">
-            <div id="psStatusOptions"></div>
-          </div>
-        </div>
-      </div>
-      <button class="btn btn-ghost btn-sm" type="button" onclick="psaClearFilters()">Clear filters</button>
       <button class="btn btn-ghost btn-sm" onclick="loadPsaProjectStatus(true)">Refresh</button>
       <button class="btn btn-primary btn-sm" type="button" onclick="openPsaReportModal()">New status report</button>
     </div>
@@ -10965,21 +10916,7 @@ function renderPsaProjectStatusModule(){
   // View filter (Current / Former / All)
   let rows = allRows.filter(r => msHas(psaProjectStatusFilter, r.isClosed ? 'former' : 'current'));
 
-  // Populate dropdowns (preserves checked state)
-  const projOpts = [...new Set(rows.map(r => r.epicName || r.epicKey || '—').filter(v => v !== '—'))].sort();
-  const pmOpts = [...new Set(rows.map(r => r.pmAssigned?.name || '—').filter(v => v !== '—'))].sort();
-  const stOpts = [...new Set(rows.map(r => r.lastReport?.projectStatus || '—'))].sort();
-  psPopulateDrop('Project', projOpts);
-  psPopulateDrop('Pm', pmOpts);
-  psPopulateDrop('Status', stOpts);
-
-  // Multi-select filters (Project, PM, Status)
-  rows = rows.filter(r => {
-    if(!psPassesFilter('Project', r.epicName || r.epicKey || '—')) return false;
-    if(!psPassesFilter('Pm', r.pmAssigned?.name || '—')) return false;
-    if(!psPassesFilter('Status', r.lastReport?.projectStatus || '—')) return false;
-    return true;
-  });
+  // Only the View filter (Current / Former) remains; Project / PM / Status filters were removed.
 
   // Sort
   const SORT_FNS = {
@@ -13414,11 +13351,15 @@ bootDashboard();
 </div>
 
 <script>
-/* World clocks under the Overview greeting. Argentina is always first; each user picks
-   extra cities (stored per user email in this browser). Refreshes every 30s. */
+/* World clocks under the Overview greeting.
+   - The viewer's own time zone (from the browser) is always first and fixed.
+   - Default extra city: San Francisco (Azumo HQ).
+   - "Edit cities" lists every IANA time zone the browser knows (Intl.supportedValuesOf),
+     with a search box; picks are stored per user email in this browser.
+   - Old saved picks (ids like 'sf', 'ny') keep working. Refreshes every 30s. */
 (function(){
-  var HOME = {id:'ar', city:'Argentina', tz:'America/Argentina/Buenos_Aires'};
-  var CITIES = [
+  // Curated names for common zones (ids kept for backward compatibility with saved picks).
+  var CURATED = [
     {id:'sf', city:'San Francisco', tz:'America/Los_Angeles'},
     {id:'den', city:'Denver', tz:'America/Denver'},
     {id:'chi', city:'Chicago', tz:'America/Chicago'},
@@ -13427,6 +13368,7 @@ bootDashboard();
     {id:'bog', city:'Bogotá', tz:'America/Bogota'},
     {id:'lim', city:'Lima', tz:'America/Lima'},
     {id:'scl', city:'Santiago', tz:'America/Santiago'},
+    {id:'ar', city:'Buenos Aires', tz:'America/Argentina/Buenos_Aires'},
     {id:'mvd', city:'Montevideo', tz:'America/Montevideo'},
     {id:'sao', city:'São Paulo', tz:'America/Sao_Paulo'},
     {id:'lon', city:'London', tz:'Europe/London'},
@@ -13437,56 +13379,135 @@ bootDashboard();
     {id:'ind', city:'India', tz:'Asia/Kolkata'},
     {id:'syd', city:'Sydney', tz:'Australia/Sydney'}
   ];
-  var DEFAULT = ['sf','ny'];
+  var DEFAULT = ['sf'];
+
+  function cityFromTz(tz){
+    var parts = String(tz).split('/');
+    return parts[parts.length-1].replace(/_/g,' ');
+  }
+  function regionFromTz(tz){
+    var p = String(tz).split('/'); return p.length > 1 ? p[0] : '';
+  }
+  var OWN_TZ = 'America/Argentina/Buenos_Aires';
+  try{ OWN_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || OWN_TZ; }catch(e){}
+
+  // Build the full list: curated first (friendly names), then every other IANA zone A–Z.
+  var ALL = (function(){
+    var seen = {}, out = [];
+    CURATED.forEach(function(c){ seen[c.tz] = 1; out.push({id:c.id, city:c.city, tz:c.tz, region:regionFromTz(c.tz)}); });
+    var zones = [];
+    try{ if(Intl.supportedValuesOf) zones = Intl.supportedValuesOf('timeZone'); }catch(e){}
+    if(zones.indexOf('UTC') < 0) zones = zones.concat(['UTC']);
+    zones.filter(function(tz){ return !seen[tz]; })
+      .map(function(tz){ return {id:tz, city:cityFromTz(tz), tz:tz, region:regionFromTz(tz)}; })
+      .sort(function(a,b){ return a.city.localeCompare(b.city); })
+      .forEach(function(z){ out.push(z); });
+    return out;
+  })();
+  var BY_ID = {}; ALL.forEach(function(c){ BY_ID[c.id] = c; });
+  var ownCurated = ALL.filter(function(c){ return c.tz === OWN_TZ; })[0];
+  var HOME = {id:'__own', city: ownCurated ? ownCurated.city : cityFromTz(OWN_TZ), tz:OWN_TZ};
+  // Selectable list never repeats the viewer's own zone.
+  var CHOICES = ALL.filter(function(c){ return c.tz !== OWN_TZ; });
+
   function userKey(){
     var email = '';
     try{ email = (typeof currentUser !== 'undefined' && currentUser && currentUser.email) || ''; }catch(e){}
     return 'pmo_clocks_' + (email || 'anon').toLowerCase();
   }
   function getSel(){
-    try{ var v = JSON.parse(localStorage.getItem(userKey()) || 'null'); if(Array.isArray(v)) return v; }catch(e){}
-    return DEFAULT.slice();
+    var v = null;
+    try{ v = JSON.parse(localStorage.getItem(userKey()) || 'null'); }catch(e){}
+    if(!Array.isArray(v)) v = DEFAULT.slice();
+    return v.filter(function(id){ return BY_ID[id] && BY_ID[id].tz !== OWN_TZ; });
   }
   function setSel(ids){ try{ localStorage.setItem(userKey(), JSON.stringify(ids)); }catch(e){} }
-  function fmt(tz, opts){ try{ return new Intl.DateTimeFormat('en-US', Object.assign({timeZone:tz}, opts)).format(new Date()); }catch(e){ return '—'; } }
-  function time(tz){ return fmt(tz, {hour:'2-digit', minute:'2-digit', hour12:false}); }
-  function day(tz){ return fmt(tz, {weekday:'short'}); }
+
+  var FMT = {};
+  function fmt(tz, kind){
+    var key = tz + '|' + kind;
+    try{
+      if(!FMT[key]){
+        var opts = kind === 'time' ? {hour:'2-digit', minute:'2-digit', hour12:false}
+                 : kind === 'day' ? {weekday:'short'} : {timeZoneName:'shortOffset'};
+        FMT[key] = new Intl.DateTimeFormat('en-US', Object.assign({timeZone:tz}, opts));
+      }
+      if(kind === 'off'){
+        var p = FMT[key].formatToParts(new Date()).filter(function(x){ return x.type === 'timeZoneName'; })[0];
+        return p ? p.value : '';
+      }
+      return FMT[key].format(new Date());
+    }catch(e){ return kind === 'off' ? '' : '—'; }
+  }
+  function time(tz){ return fmt(tz, 'time'); }
+  function day(tz){ return fmt(tz, 'day'); }
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
-  var panelOpen = false;
-  function render(){
-    var box = document.getElementById('pmoClocks'); if(!box) return;
+
+  var panelOpen = false, query = '';
+
+  function chipsHTML(){
     var sel = getSel(), homeDay = day(HOME.tz);
-    var list = [HOME].concat(CITIES.filter(function(c){ return sel.indexOf(c.id) > -1; }));
-    var html = list.map(function(c){
+    var list = [HOME].concat(sel.map(function(id){ return BY_ID[id]; }));
+    return list.map(function(c){
       var d = day(c.tz);
       return '<span class="pmo-clock"><span class="pmo-clock-city">' + esc(c.city) + '</span><span class="pmo-clock-time">' + time(c.tz) + '</span>'
         + (d !== homeDay ? '<span class="pmo-clock-day">' + esc(d) + '</span>' : '') + '</span>';
     }).join('');
-    html += '<button type="button" class="pmo-clock-edit" id="pmoClockEdit" aria-expanded="' + panelOpen + '">Edit cities</button>';
-    html += '<div class="pmo-clock-panel" id="pmoClockPanel"' + (panelOpen ? '' : ' hidden') + '>'
-      + '<label class="pmo-clock-opt fixed"><span><input type="checkbox" checked disabled> ' + esc(HOME.city) + '</span><span>' + time(HOME.tz) + '</span></label>'
-      + CITIES.map(function(c){
-          return '<label class="pmo-clock-opt"><span><input type="checkbox" data-clock="' + c.id + '"' + (sel.indexOf(c.id) > -1 ? ' checked' : '') + '> ' + esc(c.city) + '</span><span>' + time(c.tz) + '</span></label>';
-        }).join('') + '</div>';
-    box.innerHTML = html;
   }
+  function optionsHTML(){
+    var sel = getSel(), q = query.trim().toLowerCase();
+    var rows = CHOICES.filter(function(c){
+      if(!q) return true;
+      return (c.city + ' ' + c.tz + ' ' + c.region + ' ' + fmt(c.tz,'off')).toLowerCase().indexOf(q) > -1;
+    });
+    // Selected zones float to the top so they are easy to un-tick.
+    rows.sort(function(a,b){ return (sel.indexOf(b.id) > -1) - (sel.indexOf(a.id) > -1); });
+    var html = q ? '' : '<label class="pmo-clock-opt fixed"><span><input type="checkbox" checked disabled> ' + esc(HOME.city)
+      + '<span class="pmo-clock-region">your time zone</span></span><span>' + time(HOME.tz) + '</span></label>';
+    if(!rows.length) return html + '<div class="pmo-clock-empty">No time zones match.</div>';
+    return html + rows.map(function(c){
+      return '<label class="pmo-clock-opt"><span><input type="checkbox" data-clock="' + esc(c.id) + '"' + (sel.indexOf(c.id) > -1 ? ' checked' : '') + '> '
+        + esc(c.city) + (c.region ? '<span class="pmo-clock-region">' + esc(c.region) + '</span>' : '') + '</span><span>'
+        + time(c.tz) + ' · ' + esc(fmt(c.tz,'off')) + '</span></label>';
+    }).join('');
+  }
+  function render(){
+    var box = document.getElementById('pmoClocks'); if(!box) return;
+    box.innerHTML = '<span id="pmoClockChips" style="display:contents">' + chipsHTML() + '</span>'
+      + '<button type="button" class="pmo-clock-edit" id="pmoClockEdit" aria-expanded="' + panelOpen + '">Edit cities</button>'
+      + '<div class="pmo-clock-panel" id="pmoClockPanel"' + (panelOpen ? '' : ' hidden') + '>'
+      + (panelOpen
+          ? '<div class="pmo-clock-search"><input type="search" id="pmoClockSearch" placeholder="Search city, region or GMT offset…" value="' + esc(query) + '" autocomplete="off"></div>'
+            + '<div id="pmoClockList">' + optionsHTML() + '</div>'
+          : '')
+      + '</div>';
+    if(panelOpen){ var s = document.getElementById('pmoClockSearch'); if(s){ s.focus(); s.setSelectionRange(s.value.length, s.value.length); } }
+  }
+  // Partial updates so typing in the search box never loses focus.
+  function refreshChips(){ var el = document.getElementById('pmoClockChips'); if(el) el.innerHTML = chipsHTML(); }
+  function refreshList(){ var el = document.getElementById('pmoClockList'); if(el) el.innerHTML = optionsHTML(); }
+
   document.addEventListener('click', function(e){
     var box = document.getElementById('pmoClocks'); if(!box) return;
-    if(e.target.closest && e.target.closest('#pmoClockEdit')){ panelOpen = !panelOpen; render(); return; }
-    if(panelOpen && !box.contains(e.target)){ panelOpen = false; render(); }
+    if(e.target.closest && e.target.closest('#pmoClockEdit')){ panelOpen = !panelOpen; if(!panelOpen) query = ''; render(); return; }
+    if(panelOpen && !box.contains(e.target)){ panelOpen = false; query = ''; render(); }
+  });
+  document.addEventListener('input', function(e){
+    if(e.target && e.target.id === 'pmoClockSearch'){ query = e.target.value || ''; refreshList(); }
+  });
+  document.addEventListener('keydown', function(e){
+    if(panelOpen && e.key === 'Escape'){ panelOpen = false; query = ''; render(); }
   });
   document.addEventListener('change', function(e){
     var id = e.target && e.target.getAttribute && e.target.getAttribute('data-clock'); if(!id) return;
     var sel = getSel().filter(function(x){ return x !== id; });
-    if(e.target.checked) sel.push(id);
-    // keep the list order stable (same order as CITIES)
-    sel = CITIES.map(function(c){ return c.id; }).filter(function(x){ return sel.indexOf(x) > -1; });
-    setSel(sel); render();
+    if(e.target.checked) sel.push(id);   // keeps the order in which the user picked them
+    setSel(sel); refreshChips();
   });
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render); else render();
-  setInterval(function(){ if(!panelOpen) render(); }, 30000);
+  setInterval(function(){ if(panelOpen) refreshChips(); else render(); }, 30000);
   // re-render once auth resolves so the user's own city list is used
-  setTimeout(render, 2500); setTimeout(render, 8000);
+  setTimeout(function(){ if(!panelOpen) render(); }, 2500); setTimeout(function(){ if(!panelOpen) render(); }, 8000);
 })();
 </script>
 </body>
