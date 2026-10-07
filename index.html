@@ -1534,6 +1534,32 @@ document.addEventListener('keydown',function(e){var d=document.getElementById('n
     + '<script src="redesign/process-portal.js" defer><\/script>');
 })();
 </script>
+<style>
+/* ---- Top bar sync chip ---- */
+.pmo-sync-chip{position:relative;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:1px solid var(--border,var(--brd));border-radius:10px;background:var(--surface,var(--card));cursor:default;outline:none}
+.pmo-sync-chip:focus-visible{border-color:var(--brand,var(--blue))}
+.pmo-sync-dot{width:6px;height:6px;border-radius:999px;background:var(--pos,#10B981)}
+.pmo-sync-logo{width:16px;height:16px;border-radius:4px;display:block}
+.pmo-sync-fallback{width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;background:var(--surface-2,var(--surf));color:var(--muted)}
+.pmo-sync-pop{display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:50;min-width:220px;padding:10px 12px;background:var(--surface,var(--card));border:1px solid var(--border,var(--brd));border-radius:10px;box-shadow:var(--shadow-card,0 10px 30px rgba(0,0,0,.2));font-size:12.5px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.pmo-sync-pop-title{color:var(--ink,var(--txt));font-weight:500;margin-bottom:2px}
+.pmo-sync-chip:hover .pmo-sync-pop,.pmo-sync-chip:focus .pmo-sync-pop{display:block}
+/* ---- World clocks (overview hero) ---- */
+.pmo-clocks{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;position:relative}
+.pmo-clock{display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap}
+.pmo-clock-city{color:var(--muted)}
+.pmo-clock-time{color:var(--ink,var(--txt));font-weight:500;font-variant-numeric:tabular-nums}
+.pmo-clock-day{color:var(--faint,var(--muted));font-size:11.5px}
+.pmo-clock-edit{appearance:none;border:1px solid var(--border-strong,var(--brd));background:var(--surface-2,transparent);color:var(--muted);border-radius:8px;height:24px;padding:0 8px;font:inherit;font-size:12px;cursor:pointer}
+.pmo-clock-edit:hover{color:var(--ink,var(--txt))}
+.pmo-clock-panel{position:absolute;top:calc(100% + 8px);left:0;z-index:50;width:260px;max-height:320px;overflow:auto;padding:6px;background:var(--surface,var(--card));border:1px solid var(--border,var(--brd));border-radius:10px;box-shadow:var(--shadow-card,0 10px 30px rgba(0,0,0,.2))}
+.pmo-clock-panel[hidden]{display:none}
+.pmo-clock-opt{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:7px;font-size:12.5px;color:var(--ink-soft,var(--txt));cursor:pointer}
+.pmo-clock-opt:hover{background:var(--surface-2,var(--surf))}
+.pmo-clock-opt input{accent-color:var(--brand,var(--blue))}
+.pmo-clock-opt span:last-child{color:var(--faint,var(--muted));font-variant-numeric:tabular-nums}
+.pmo-clock-opt.fixed{cursor:default;opacity:.7}
+</style>
 </head>
 <body class="auth-locked light">
 <script>
@@ -1600,6 +1626,15 @@ if(window.PMO_LF){ try{
       </div>
     </div>
     <div class="nav-right">
+      <div class="pmo-sync-chip" tabindex="0" aria-label="Synced from Jira and Harvest">
+        <span class="pmo-sync-dot"></span>
+        <img class="pmo-sync-logo" alt="Jira" src="https://www.google.com/s2/favicons?domain=jira.atlassian.com&sz=64" onerror="this.outerHTML='<span class=&quot;pmo-sync-fallback&quot;>J</span>'">
+        <img class="pmo-sync-logo" alt="Harvest" src="https://www.google.com/s2/favicons?domain=getharvest.com&sz=64" onerror="this.outerHTML='<span class=&quot;pmo-sync-fallback&quot;>H</span>'">
+        <div class="pmo-sync-pop" role="tooltip">
+          <div class="pmo-sync-pop-title">Synced from Jira &amp; Harvest</div>
+          <div id="lastRefresh">—</div>
+        </div>
+      </div>
       <button class="nav-refresh" data-sync-action onclick="manualSnapshot()">Sync all sources</button>
       <button class="auth-pill" id="authStatusBtn" onclick="showAuthModal(currentUser ? 'account' : 'login')">Sign in</button>
       <!-- Settings dropdown: same buttons/ids as before, grouped to free up the top bar -->
@@ -1771,11 +1806,7 @@ if(window.PMO_LF){ try{
       <div class="pmo-ov-hero-copy">
         <div class="pmo-ov-eyebrow">Azumo · Operations Command Center</div>
         <h1 id="pmoGreeting">Welcome back</h1>
-        <div class="pmo-ov-hero-meta">
-          <span>Synced from Jira &amp; Harvest</span>
-          <span class="dot"></span>
-          <span id="lastRefresh">—</span>
-        </div>
+        <div class="pmo-ov-hero-meta pmo-clocks" id="pmoClocks" aria-label="World clocks"></div>
       </div>
     </div>
 
@@ -13389,5 +13420,81 @@ bootDashboard();
   </div>
 </div>
 
+<script>
+/* World clocks under the Overview greeting. Argentina is always first; each user picks
+   extra cities (stored per user email in this browser). Refreshes every 30s. */
+(function(){
+  var HOME = {id:'ar', city:'Argentina', tz:'America/Argentina/Buenos_Aires'};
+  var CITIES = [
+    {id:'sf', city:'San Francisco', tz:'America/Los_Angeles'},
+    {id:'den', city:'Denver', tz:'America/Denver'},
+    {id:'chi', city:'Chicago', tz:'America/Chicago'},
+    {id:'ny', city:'New York', tz:'America/New_York'},
+    {id:'mex', city:'Mexico City', tz:'America/Mexico_City'},
+    {id:'bog', city:'Bogotá', tz:'America/Bogota'},
+    {id:'lim', city:'Lima', tz:'America/Lima'},
+    {id:'scl', city:'Santiago', tz:'America/Santiago'},
+    {id:'mvd', city:'Montevideo', tz:'America/Montevideo'},
+    {id:'sao', city:'São Paulo', tz:'America/Sao_Paulo'},
+    {id:'lon', city:'London', tz:'Europe/London'},
+    {id:'lis', city:'Lisbon', tz:'Europe/Lisbon'},
+    {id:'mad', city:'Madrid', tz:'Europe/Madrid'},
+    {id:'ber', city:'Berlin', tz:'Europe/Berlin'},
+    {id:'tlv', city:'Tel Aviv', tz:'Asia/Jerusalem'},
+    {id:'ind', city:'India', tz:'Asia/Kolkata'},
+    {id:'syd', city:'Sydney', tz:'Australia/Sydney'}
+  ];
+  var DEFAULT = ['sf','ny'];
+  function userKey(){
+    var email = '';
+    try{ email = (typeof currentUser !== 'undefined' && currentUser && currentUser.email) || ''; }catch(e){}
+    return 'pmo_clocks_' + (email || 'anon').toLowerCase();
+  }
+  function getSel(){
+    try{ var v = JSON.parse(localStorage.getItem(userKey()) || 'null'); if(Array.isArray(v)) return v; }catch(e){}
+    return DEFAULT.slice();
+  }
+  function setSel(ids){ try{ localStorage.setItem(userKey(), JSON.stringify(ids)); }catch(e){} }
+  function fmt(tz, opts){ try{ return new Intl.DateTimeFormat('en-US', Object.assign({timeZone:tz}, opts)).format(new Date()); }catch(e){ return '—'; } }
+  function time(tz){ return fmt(tz, {hour:'2-digit', minute:'2-digit', hour12:false}); }
+  function day(tz){ return fmt(tz, {weekday:'short'}); }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  var panelOpen = false;
+  function render(){
+    var box = document.getElementById('pmoClocks'); if(!box) return;
+    var sel = getSel(), homeDay = day(HOME.tz);
+    var list = [HOME].concat(CITIES.filter(function(c){ return sel.indexOf(c.id) > -1; }));
+    var html = list.map(function(c){
+      var d = day(c.tz);
+      return '<span class="pmo-clock"><span class="pmo-clock-city">' + esc(c.city) + '</span><span class="pmo-clock-time">' + time(c.tz) + '</span>'
+        + (d !== homeDay ? '<span class="pmo-clock-day">' + esc(d) + '</span>' : '') + '</span>';
+    }).join('');
+    html += '<button type="button" class="pmo-clock-edit" id="pmoClockEdit" aria-expanded="' + panelOpen + '">Edit cities</button>';
+    html += '<div class="pmo-clock-panel" id="pmoClockPanel"' + (panelOpen ? '' : ' hidden') + '>'
+      + '<label class="pmo-clock-opt fixed"><span><input type="checkbox" checked disabled> ' + esc(HOME.city) + '</span><span>' + time(HOME.tz) + '</span></label>'
+      + CITIES.map(function(c){
+          return '<label class="pmo-clock-opt"><span><input type="checkbox" data-clock="' + c.id + '"' + (sel.indexOf(c.id) > -1 ? ' checked' : '') + '> ' + esc(c.city) + '</span><span>' + time(c.tz) + '</span></label>';
+        }).join('') + '</div>';
+    box.innerHTML = html;
+  }
+  document.addEventListener('click', function(e){
+    var box = document.getElementById('pmoClocks'); if(!box) return;
+    if(e.target.closest && e.target.closest('#pmoClockEdit')){ panelOpen = !panelOpen; render(); return; }
+    if(panelOpen && !box.contains(e.target)){ panelOpen = false; render(); }
+  });
+  document.addEventListener('change', function(e){
+    var id = e.target && e.target.getAttribute && e.target.getAttribute('data-clock'); if(!id) return;
+    var sel = getSel().filter(function(x){ return x !== id; });
+    if(e.target.checked) sel.push(id);
+    // keep the list order stable (same order as CITIES)
+    sel = CITIES.map(function(c){ return c.id; }).filter(function(x){ return sel.indexOf(x) > -1; });
+    setSel(sel); render();
+  });
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render); else render();
+  setInterval(function(){ if(!panelOpen) render(); }, 30000);
+  // re-render once auth resolves so the user's own city list is used
+  setTimeout(render, 2500); setTimeout(render, 8000);
+})();
+</script>
 </body>
 </html>
