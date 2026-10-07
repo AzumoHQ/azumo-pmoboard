@@ -3665,6 +3665,7 @@ const PMO_RELEASES = [
     'Project Status — new status report form that mirrors the Jira PSA form; it creates a Project Status ticket under the project\'s epic. Open it with + Report on a project row or from Accounts → New report',
     'Project Status — the table now has a single View filter (Current / Former closed); the Project, PM and Status filters and Clear filters were removed',
     'Project Status — older PSA reports that have no parent epic are now matched to their project by client name, and each project has a History (N) button that lists all its reports',
+    'Project Status — every report in a project\'s History can be expanded to read its comments (issues, action plans and comments from the Jira ticket)',
     'Assignments — new assignment form that mirrors the Jira AA form, available from Assignments → New assignment',
     'Navigation — the Reports menu is now Accounts (Reports, New report, Accounts Coverage, Logged Harvest Hours); New assignment sits under Assignments; the action buttons row on the Overview moved to the top nav',
     'Overview — Jira / Harvest sync chip with logos in the top bar, plus world clocks: your own time zone and San Francisco by default, any time zone can be added with search',
@@ -11118,18 +11119,52 @@ function togglePsaHistory(epicKey){
   renderPsaProjectStatusModule();
 }
 window.togglePsaHistory = togglePsaHistory;
+// Report comments: loaded from /api/psa-reports?details=KEY the first time a report is expanded.
+const psaReportOpen = new Set();
+const psaReportDetails = {}; // report key -> {state:'loading'|'ok'|'error', details:[], error:''}
+async function togglePsaReportDetails(key){
+  if(psaReportOpen.has(key)){ psaReportOpen.delete(key); renderPsaProjectStatusModule(); return; }
+  psaReportOpen.add(key);
+  if(psaReportDetails[key] && psaReportDetails[key].state === 'ok'){ renderPsaProjectStatusModule(); return; }
+  psaReportDetails[key] = {state:'loading'};
+  renderPsaProjectStatusModule();
+  try{
+    const response = await fetch(`/api/psa-reports?details=${encodeURIComponent(key)}`, {cache:'no-store', credentials:'same-origin'});
+    const result = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    psaReportDetails[key] = {state:'ok', details: result.details || []};
+  }catch(error){
+    psaReportDetails[key] = {state:'error', error: error.message};
+  }
+  renderPsaProjectStatusModule();
+}
+window.togglePsaReportDetails = togglePsaReportDetails;
+function psaReportDetailsHTML(key){
+  const entry = psaReportDetails[key];
+  if(!entry || entry.state === 'loading') return '<span style="color:var(--muted)">Loading comments from Jira…</span>';
+  if(entry.state === 'error') return `<span style="color:var(--lf-neg,#991B1B)">Could not load comments: ${esc(entry.error)}</span>`;
+  if(!entry.details.length) return '<span style="color:var(--muted)">No comments in this report.</span>';
+  return entry.details.map(d => {
+    const isUrl = /^https?:\/\//i.test(d.text);
+    const body = isUrl
+      ? `<a href="${esc(d.text)}" target="_blank" rel="noopener noreferrer">${esc(d.text)}</a>`
+      : esc(d.text);
+    return `<div style="margin:0 0 10px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:2px">${esc(d.label)}</div><div style="white-space:pre-wrap;font-size:12.5px;line-height:1.5">${body}</div></div>`;
+  }).join('');
+}
 function psaHistoryRowHTML(row){
   const reports = row.reports || [];
-  const items = reports.map(r => `<tr>
+  const items = reports.map(r => { const isOpen = psaReportOpen.has(r.key); return `<tr>
       <td style="white-space:nowrap">${esc(r.date || '\u2014')}</td>
       <td>${esc(r.reportType || '\u2014')}</td>
       <td>${psaStatusChips(r)}</td>
       <td style="white-space:nowrap"><a href="${jiraIssueUrl(r.key) || '#'}" target="_blank" rel="noopener noreferrer">${esc(r.key)}</a>${r.linkedBy === 'name' ? ' <span title="Old report without parent epic, matched by client name" style="color:var(--muted);font-size:11px">· by name</span>' : ''}</td>
-    </tr>`).join('');
+      <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" type="button" data-report="${esc(r.key)}" onclick="togglePsaReportDetails(this.dataset.report)" aria-expanded="${isOpen}">${isOpen ? '▾' : '▸'} Comments</button></td>
+    </tr>${isOpen ? `<tr><td colspan="5" style="padding:4px 12px 10px 12px;background:var(--surface-1,transparent)">${psaReportDetailsHTML(r.key)}</td></tr>` : ''}`; }).join('');
   return `<tr class="psa-history-row"><td colspan="6" style="padding:0 0 12px 24px;background:var(--surface-2,transparent)">
       <table style="width:100%;font-size:12.5px">
-        <thead><tr><th>Report date</th><th>Type</th><th>Status</th><th>Jira</th></tr></thead>
-        <tbody>${items || '<tr><td colspan="4" style="color:var(--muted)">No reports.</td></tr>'}</tbody>
+        <thead><tr><th>Report date</th><th>Type</th><th>Status</th><th>Jira</th><th>Comments</th></tr></thead>
+        <tbody>${items || '<tr><td colspan="5" style="color:var(--muted)">No reports.</td></tr>'}</tbody>
       </table>
     </td></tr>`;
 }

@@ -1,4 +1,4 @@
-const { getPsaProjectReports, getPsaStatusReportMeta, createPsaStatusReport, getPsaEpic } = require('../lib/jira-client');
+const { getPsaProjectReports, getPsaStatusReportMeta, createPsaStatusReport, getPsaEpic, getPsaReportDetails } = require('../lib/jira-client');
 const { getSessionUser } = require('../lib/auth');
 
 const STALE_DAYS_THRESHOLD = 30;
@@ -144,6 +144,35 @@ module.exports = async function psaReportsHandler(req, res) {
     } catch (error) {
       console.error('psa-reports meta failed:', error.message);
       res.status(502).json({ error: 'Could not read the PSA form options from Jira' });
+    }
+    return;
+  }
+
+  // GET /api/psa-reports?details=PSA-1234 → comments of one report (loaded when it is expanded)
+  if (req.query && req.query.details) {
+    const key = String(req.query.details).trim().toUpperCase();
+    if (!/^PSA-\d+$/.test(key)) {
+      res.status(400).json({ error: 'Invalid report key' });
+      return;
+    }
+    try {
+      const result = await getPsaReportDetails(key);
+      if (!result) {
+        res.status(404).json({ error: 'Report not found' });
+        return;
+      }
+      if (user.role === 'PM') {
+        // PMs only read reports of their own projects (legacy reports without a parent epic are PMO / Executive only)
+        const epic = result.parentKey ? await getPsaEpic(result.parentKey) : null;
+        if (!epic || epic.pmEmail !== normalizeEmail(user.email)) {
+          res.status(403).json({ error: 'Not authorized to read this report' });
+          return;
+        }
+      }
+      res.status(200).json({ key: result.key, details: result.details });
+    } catch (error) {
+      console.error('psa-reports details failed:', error.message);
+      res.status(502).json({ error: 'Could not read the report from Jira' });
     }
     return;
   }
