@@ -3213,12 +3213,6 @@ function renderOpsChartsMain(user) {
     // PM OPERATIVE PROJECTS (populated async by renderOperativeOverview)
     +'<div id="pmOperativeProjects"></div>'
 
-    // ACTIONS
-    +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
-    +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/AA/form/150" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:12px;background:var(--highlight-blue);color:var(--lf-on-brand,#fff);font-size:14px;font-weight:700;text-decoration:none"><i class=\"ti ti-plus\"></i>New Assignment</a>'
-    +'<a href="https://azumohq.atlassian.net/jira/software/c/projects/PSA/form/51" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:12px;background:var(--bg-1);border:1px solid var(--border-default);color:var(--fg-1);font-size:14px;font-weight:700;text-decoration:none"><i class=\"ti ti-clipboard-list\"></i>Account Status</a>'
-    +'<button onclick="goTo(\'opsViews\')" style="display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:12px;background:var(--bg-1);border:1px solid var(--border-default);color:var(--fg-1);font-size:14px;font-weight:700;font-family:var(--font-sans);cursor:pointer"><i class=\"ti ti-compass\"></i>Operating Views</button>'
-    +'</div>'
     +'</div>';
 
   if (window.PMO_FLAGS && window.PMO_FLAGS.overviewOperative) renderOperativeOverview();
