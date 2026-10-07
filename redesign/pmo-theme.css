@@ -1039,3 +1039,18 @@ html body nav .nav-right{flex:0 0 auto;min-width:0}
 html body nav .auth-pill{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:1100px){html body nav .auth-pill{max-width:120px}}
 @media (max-width:760px){html body nav .auth-pill,html body nav .nav-date,html body nav .lf-word{display:none !important}}
+
+/* ---------- One-row header: compact top bar ---------- */
+html body nav .auth-pill.lf-hide{display:none !important}
+html body nav .nav-date{display:none !important}
+html body nav .nav-inner{padding:0 16px !important;gap:8px !important}
+html body.nav-merged nav .side-index .sidebar-item{padding:0 9px !important}
+html body.nav-merged nav .side-index .sidebar-item.active::after{left:9px !important;right:9px !important}
+/* Settings: gear only */
+html body .nav-config>summary{width:var(--control-h);padding:0 !important;justify-content:center}
+html body .nav-config>summary>span,html body .nav-config>summary>i{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+html body .nav-config>summary .lf-gear{width:16px;height:16px}
+/* Dark / Light inside the Settings menu */
+html body .nav-config-menu>.lf-seg{align-self:flex-start;margin:2px 2px 6px}
+html body .nav-config-menu>.lf-seg:hover{background:var(--surface) !important}
+html body .avatar[role="button"]:focus-visible{outline:none;border-color:var(--brand) !important}

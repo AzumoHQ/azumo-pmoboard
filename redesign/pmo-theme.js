@@ -44,8 +44,36 @@
     if(logo && !logo.querySelector('.lf-brand')){
       var b = document.createElement('span');
       b.className = 'lf-brand';
-      b.innerHTML = '<img class="lf-logo" src="assets/azumo-logo.png" alt="Azumo"><span class="lf-word"><span class="lf-word-dot"> · </span><span class="lf-word-sec">PMO Board</span></span>';
+      b.innerHTML = '<img class="lf-logo" src="assets/azumo-logo.png" alt="Azumo PMO Board">';
       logo.appendChild(b);
+    }
+
+    // 2a) Account: the avatar opens the account (same as the name pill). Once signed in the pill
+    //     is hidden from the top bar and the name shows as the avatar tooltip.
+    var av = document.getElementById('authAvatar'), pill = document.getElementById('authStatusBtn');
+    if(av && pill && !av.dataset.lfAcct){
+      av.dataset.lfAcct = '1';
+      av.setAttribute('role', 'button');
+      av.tabIndex = 0;
+      av.style.cursor = 'pointer';
+      av.addEventListener('click', function(){ pill.click(); });
+      av.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pill.click(); } });
+      var acct = function(){
+        var t = (pill.textContent || '').trim();
+        var signedIn = !!t && !/^sign in$/i.test(t);
+        pill.classList.toggle('lf-hide', signedIn);
+        av.title = signedIn ? t : 'Sign in';
+        av.setAttribute('aria-label', signedIn ? 'Account: ' + t : 'Sign in');
+      };
+      acct();
+      try{ new MutationObserver(acct).observe(pill, {childList: true, characterData: true, subtree: true}); }catch(_){}
+    }
+
+    // 2c) Settings = gear icon (the text stays for screen readers and the tooltip)
+    var cfg = document.querySelector('#navConfig > summary');
+    if(cfg && !cfg.querySelector('.lf-gear')){
+      cfg.insertAdjacentHTML('afterbegin', '<svg class="lf-ico lf-gear" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.6v1.8M8 12.6v1.8M1.6 8h1.8M12.6 8h1.8M3.5 3.5l1.3 1.3M11.2 11.2l1.3 1.3M3.5 12.5l1.3-1.3M11.2 4.8l1.3-1.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>');
+      cfg.setAttribute('aria-label', 'Settings');
     }
 
     // 2b) Top bar fit: tabs sit next to the logo only when everything fits; otherwise they drop to their own row.
@@ -105,7 +133,10 @@
         if(typeof applyTheme === 'function') applyTheme(t.dataset.t);
         sync();
       });
-      right.insertBefore(seg, right.firstChild);
+      // Lives inside the Settings menu so the top bar fits on one row
+      var cfgMenu = document.querySelector('#navConfig .nav-config-menu');
+      if(cfgMenu) cfgMenu.insertBefore(seg, cfgMenu.firstChild);
+      else right.insertBefore(seg, right.firstChild);
     }
     function sync(){
       if(!seg) return;
