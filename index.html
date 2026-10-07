@@ -3122,7 +3122,9 @@ function renderOpsChartsMain(user) {
     }
   }
 
-  var allFcRows = Object.values((PMO&&PMO.latest&&PMO.latest.forecast)||{}).flat().filter(Boolean);
+  // Same source as the Forecast tab (allForecastItems): the global `latest` snapshot.
+  // PMO.latest is never set, so reading from it always returned an empty forecast.
+  var allFcRows = Object.values((typeof latest!=='undefined'&&latest&&latest.forecast)||{}).flat().filter(Boolean);
   var fcRows = (typeof scopedForecastRows==='function') ? scopedForecastRows(allFcRows) : allFcRows;
   var t2 = new Date(); t2.setHours(0,0,0,0);
   var fcG = {o:0,s:0,m:0,f:0,tot:0};
