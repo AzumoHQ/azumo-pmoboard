@@ -352,6 +352,12 @@ details.proc-week-cal[open] .proc-week-cal-chev{transform:rotate(180deg)}
 .pf-split-right .pf-section>.pf-field-hint{top:1rem}
 /* UX pass: wider diagram pane, sticky section nav, clearer section titles, metadata row */
 @media (min-width:1100px){.pf-split{grid-template-columns:minmax(420px,44%) 1fr}}
+/* "Process settings" (opened from the Process Portal page): Basics + Related only */
+.process-modal.pf-settings-only .auth-card{width:min(640px,96vw)}
+.process-modal.pf-settings-only .pf-split{grid-template-columns:1fr!important}
+.process-modal.pf-settings-only #pfCanvasSection,
+.process-modal.pf-settings-only #pfSecNav,
+.process-modal.pf-settings-only .pf-full-only{display:none!important}
 .pf-split-right .pf-section-head h4{color:var(--txt);font-size:.8rem}
 .pf-secnav{position:sticky;top:-.9rem;z-index:5;display:flex;flex-wrap:wrap;gap:4px;margin:-.9rem -1.1rem .6rem;padding:.55rem 1.1rem;background:var(--card,var(--lf-surface,#fff));border-bottom:1px solid var(--brd)}
 .pf-secnav button{border:1px solid var(--brd);background:transparent;color:var(--muted);border-radius:999px;padding:.12rem .6rem;font:inherit;font-size:.72rem;font-weight:600;cursor:pointer}
@@ -13113,12 +13119,17 @@ function pfUpdateRoleAvatar(sel){
   chip.style.display = 'flex';
   chip.innerHTML = `<div class="pf-av-circle">${initials}</div><span class="pf-av-name">${esc(person.name)}</span>`;
 }
-function openProcessForm(id){
+function openProcessForm(id, opts){
   if(!canManageProcesses()){ showAuthModal('login'); return; }
   loadProcessCompanyRoles();
   const modal = document.getElementById('processFormModal');
   if(!modal) return;
-  document.getElementById('processFormTitle').textContent = id ? 'Edit process' : 'New process';
+  // From the Process Portal page ("Settings"): only what the page itself does not edit
+  // (Basics + Related). Steps, roles, definition, validations and resources stay on the page.
+  const settingsOnly = !!(opts && opts.settingsOnly) && !!id;
+  window._pfSettingsOnly = settingsOnly;
+  modal.classList.toggle('pf-settings-only', settingsOnly);
+  document.getElementById('processFormTitle').textContent = settingsOnly ? 'Process settings' : (id ? 'Edit process' : 'New process');
   showProcessFormError('');
   document.getElementById('pfId').value = '';
   document.getElementById('pfId').disabled = false;
@@ -13136,6 +13147,7 @@ function openProcessForm(id){
   document.getElementById('pfLastReviewed').value = '';
   document.getElementById('pfVersion').value = '1.00';
   window._pfStatus = ''; // new process: not saved yet
+  window._pfRawStatus = ''; window._pfRawCadence = null;
   pfUpdateStatusButtons();
   document.getElementById('pfStepsList').innerHTML = '';
   document.getElementById('pfValidationsList').innerHTML = '';
@@ -13176,6 +13188,8 @@ function openProcessForm(id){
       document.getElementById('pfName').value = process.name || '';
       document.getElementById('pfCategory').value = process.category || 'other';
       window._pfStatus = process.status === 'draft' ? 'draft' : 'published';
+      window._pfRawStatus = process.status || 'published'; // keeps 'review' intact in settings mode
+      window._pfRawCadence = process.review_cadence_months ?? null;
       pfUpdateStatusButtons();
       document.getElementById('pfOwnerRole').value = process.owner_role || '';
       document.getElementById('pfCorresponsableRole').value = process.corresponsable_role || '';
@@ -13214,10 +13228,10 @@ function openProcessForm(id){
 function pfUpdateStatusButtons(){
   const s = window._pfStatus || '';
   const d = document.getElementById('pfDraftBtn'), p = document.getElementById('pfSaveBtn');
-  if(d){ d.disabled = false; d.textContent = s === 'published' ? 'Unpublish (save as draft)' : 'Save as draft'; }
-  if(p){ p.disabled = false; p.textContent = s === 'published' ? 'Save changes' : 'Publish'; }
+  if(d){ d.disabled = false; d.style.display = window._pfSettingsOnly ? 'none' : ''; d.textContent = s === 'published' ? 'Unpublish (save as draft)' : 'Save as draft'; }
+  if(p){ p.disabled = false; p.textContent = window._pfSettingsOnly ? 'Save settings' : (s === 'published' ? 'Save changes' : 'Publish'); }
   const t = document.getElementById('processFormTitle');
-  if(t) t.textContent = (t.textContent || '').replace(/ \(draft\)$/, '') + (s === 'draft' ? ' (draft)' : '');
+  if(t && !window._pfSettingsOnly) t.textContent = (t.textContent || '').replace(/ \(draft\)$/, '') + (s === 'draft' ? ' (draft)' : '');
 }
 window.pfUpdateStatusButtons = pfUpdateStatusButtons;
 function closeProcessForm(){
@@ -13276,7 +13290,8 @@ function pfCollectResources(){
 }
 
 async function saveProcessForm(targetStatus){
-  const status = targetStatus === 'draft' ? 'draft' : 'published';
+  const settingsOnly = !!window._pfSettingsOnly;
+  const status = settingsOnly ? (window._pfRawStatus || 'published') : (targetStatus === 'draft' ? 'draft' : 'published');
   showProcessFormError('');
   const id = document.getElementById('pfId').value.trim();
   const name = document.getElementById('pfName').value.trim();
@@ -13302,6 +13317,7 @@ async function saveProcessForm(targetStatus){
     related_processes: pfCollectRelated(),
     last_reviewed: document.getElementById('pfLastReviewed').value || null,
     version: document.getElementById('pfVersion').value.trim() || '1.00',
+    review_cadence_months: window._pfRawCadence ?? 6,
     status
   };
   const steps = pfCollectSteps();
@@ -13311,7 +13327,7 @@ async function saveProcessForm(targetStatus){
   const saveBtn = document.getElementById('pfSaveBtn'), draftBtn = document.getElementById('pfDraftBtn');
   saveBtn.disabled = true;
   if(draftBtn) draftBtn.disabled = true;
-  (status === 'draft' && draftBtn ? draftBtn : saveBtn).textContent = 'Saving…';
+  (status === 'draft' && draftBtn && !settingsOnly ? draftBtn : saveBtn).textContent = 'Saving…';
   try{
     const jsonOrThrow = async (response) => {
       if(!response.ok){
@@ -13325,6 +13341,7 @@ async function saveProcessForm(targetStatus){
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload)
     }));
+    if(!settingsOnly){ // settings mode never rewrites steps / validations / resources
     await jsonOrThrow(await fetch(`/api/processes?id=${encodeURIComponent(id)}&action=steps`, {
       method: 'POST', credentials: 'same-origin',
       headers: {'Content-Type': 'application/json'},
@@ -13340,6 +13357,7 @@ async function saveProcessForm(targetStatus){
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({resources})
     }));
+    }
 
     closeProcessForm();
     loadProcessManagerList(true);
@@ -13424,7 +13442,7 @@ bootDashboard();
           </div>
         </div>
 
-        <div class="pf-section">
+        <div class="pf-section pf-full-only">
           <div class="pf-section-head"><h4>Definition</h4></div>
           <div class="pf-grid">
             <div class="auth-field pf-field-full">
@@ -13461,7 +13479,7 @@ bootDashboard();
           </div>
         </div>
 
-        <div class="pf-section">
+        <div class="pf-section pf-full-only">
           <div class="pf-section-head"><h4>Roles &amp; responsibilities</h4></div>
           <p class="pf-field-hint" style="margin:.1rem 0 .5rem">Who takes part and what each role is accountable for.</p>
           <div id="pfRolesList"></div>
@@ -13475,21 +13493,21 @@ bootDashboard();
           <button type="button" class="pf-add-btn" onclick="addProcessRelatedRow()"><i class="ti ti-plus"></i> Add related process</button>
         </div>
 
-        <div class="pf-section">
+        <div class="pf-section pf-full-only">
           <div class="pf-section-head"><h4>Steps</h4></div>
           <p class="pf-field-hint" style="margin:.1rem 0 .5rem">One action per step, in order.</p>
           <div id="pfStepsList"></div>
           <button type="button" class="pf-add-btn" onclick="addProcessStepRow()"><i class="ti ti-plus"></i> Add step</button>
         </div>
 
-        <div class="pf-section">
+        <div class="pf-section pf-full-only">
           <div class="pf-section-head"><h4>Validations</h4></div>
           <p class="pf-field-hint" style="margin:.1rem 0 .5rem">Checks that prove the process worked.</p>
           <div id="pfValidationsList"></div>
           <button type="button" class="pf-add-btn" onclick="addProcessValidationRow()"><i class="ti ti-plus"></i> Add validation</button>
         </div>
 
-        <div class="pf-section">
+        <div class="pf-section pf-full-only">
           <div class="pf-section-head"><h4>Resources</h4></div>
           <p class="pf-field-hint" style="margin:.1rem 0 .5rem">Tools, docs and templates used.</p>
           <div id="pfResourcesList"></div>

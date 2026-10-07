@@ -130,17 +130,28 @@
     if(save.dirty.size && save.state !== 'error'){ clearTimeout(save.timer); save.timer = setTimeout(flush, 700); }
   }
   function paintSave(){
-    var el = $('#ppSaveState'); if(!el) return;
-    var t = save.state === 'pending' ? 'Unsaved changes'
-      : save.state === 'saving' ? 'Saving…'
-      : save.state === 'saved' ? 'Saved ' + ago(save.at)
-      : save.state === 'error' ? '⚠ Could not save · retry' : '';
-    el.textContent = t ? '· ' + t : '';
-    el.className = 'pp-save' + (save.state === 'error' ? ' is-error' : '');
-    el.disabled = save.state !== 'error';
+    var el = $('#ppSaveState'), btn = $('#ppSaveBtn');
+    var st = save.state;
+    if(st !== 'saving' && st !== 'error' && save.dirty.size) st = 'pending';
+    var t = st === 'pending' ? 'Unsaved changes'
+      : st === 'saving' ? 'Saving…'
+      : st === 'error' ? '⚠ Could not save' + (save.err ? ': ' + save.err : '')
+      : st === 'saved' ? 'All changes saved · ' + ago(save.at)
+      : 'All changes saved';
+    if(el){ el.textContent = t; el.className = 'pp-save' + (st === 'error' ? ' is-error' : st === 'pending' ? ' is-warn' : ''); }
+    if(btn){
+      btn.disabled = !(st === 'pending' || st === 'error');
+      btn.textContent = st === 'saving' ? 'Saving…' : st === 'error' ? 'Retry save' : st === 'pending' ? 'Save' : 'Saved';
+    }
   }
   setInterval(function(){ if(save.state === 'saved') paintSave(); var u = $('#ppUpdated'); if(u && view.p) u.textContent = ago(view.p.updated_at) || '—'; }, 30000);
   window.addEventListener('beforeunload', function(e){ if(save.dirty.size){ e.preventDefault(); e.returnValue = ''; } });
+  // Cmd/Ctrl+S on a process page saves now instead of opening the browser's "Save page".
+  document.addEventListener('keydown', function(e){
+    if(!(e.metaKey || e.ctrlKey) || String(e.key).toLowerCase() !== 's') return;
+    if(view.mode !== 'detail' || !view.p || !canEdit()) return;
+    e.preventDefault(); clearTimeout(save.timer); flush();
+  });
 
   // ---------- dialog ----------
   function dialog(opts){
@@ -252,6 +263,8 @@
       actions += '<button type="button" class="btn btn-ghost btn-sm" data-act="print">Export PDF</button>';
       actions += '<button type="button" class="btn btn-ghost btn-sm" data-act="preview">' + (view.preview ? 'Exit preview' : 'Preview') + '</button>';
       if(!view.preview){
+        // Explicit save: autosave keeps running, this makes it visible and lets people force it.
+        actions += '<button type="button" class="btn btn-ghost btn-sm" id="ppSaveBtn" data-act="save-now" title="Changes save automatically · Cmd/Ctrl+S" disabled>Saved</button>';
         actions += '<button type="button" class="btn btn-ghost btn-sm" data-act="settings" title="ID, category, version, last review, related processes">Settings</button>';
         if(m.status === 'draft') actions += '<button type="button" class="btn btn-primary btn-sm" data-act="to-review"' + (iss.length ? ' disabled title="Complete the items in the warning first"' : '') + '>Send to review</button>';
         if(m.status === 'review') actions += '<button type="button" class="btn btn-ghost btn-sm" data-act="to-draft">Back to draft</button><button type="button" class="btn btn-primary btn-sm" data-act="publish">Publish</button>';
@@ -275,7 +288,7 @@
             : '<h3 class="pp-title">' + H(m.name) + '</h3>') +
             '<span class="pp-pill ' + st.c + '">' + st.l + '</span></div>' +
           '<div class="pp-meta">Owner: ' + (m.owner_role ? H(m.owner_role) : '—') + ' · v' + H(m.version || '1.00') + ' · updated <span id="ppUpdated">' + (ago(m.updated_at) || '—') + '</span>' +
-            (edit ? ' <button type="button" id="ppSaveState" class="pp-save" data-act="retry" disabled></button>' : '') + '</div>' +
+            (edit ? ' · <span id="ppSaveState" class="pp-save" role="status" aria-live="polite"></span>' : '') + '</div>' +
         '</div>' +
         '<div class="pp-actions">' + actions + '</div>' +
       '</div>' +
@@ -587,7 +600,8 @@
       case 'back': leave(); break;
       case 'print': window.print(); break;
       case 'preview': view.preview = !view.preview; view.sel = null; renderDetail(); break;
-      case 'settings': if(typeof openProcessForm === 'function'){ if(save.dirty.size){ clearTimeout(save.timer); flush().then(function(){ openProcessForm(m.id); }); } else openProcessForm(m.id); } break;
+      case 'settings': if(typeof openProcessForm === 'function'){ var os = function(){ openProcessForm(m.id, {settingsOnly: true}); }; if(save.dirty.size){ clearTimeout(save.timer); flush().then(os); } else os(); } break;
+      case 'save-now': clearTimeout(save.timer); flush(); break;
       case 'to-review': setStatus('review'); break;
       case 'publish': setStatus('published'); break;
       case 'to-draft': setStatus('draft'); break;
