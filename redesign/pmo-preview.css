@@ -82,3 +82,9 @@ html body nav :is(.module-menu-panel,.module-submenu-panel) .sidebar-item.active
 html body nav :is(.module-menu-panel,.module-submenu-panel) .sidebar-item.active::before{display:none !important}
 html body nav :is(.module-menu-panel,.module-submenu-panel) .sidebar-icon:empty{display:none}
 
+
+/* ---------- Modals: the 34px control height must not clip text (select/input padding reset like in main) ---------- */
+html body .auth-modal :is(input[type=text],input[type=search],input[type=date],input[type=number],input[type=email],input[type=url],input[type=password],select){
+  padding-top:0 !important;padding-bottom:0 !important;font-size:13px !important;line-height:normal !important;
+}
+html body .auth-modal textarea{height:auto !important;min-height:0}
