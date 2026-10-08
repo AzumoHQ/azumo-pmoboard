@@ -3533,7 +3533,8 @@ function renderAaAssignmentForm(prefill){
   const opts = aaAssignMeta?.options || {};
   const people = aaAssignMeta?.people || [];
   const optionHtml = (list, placeholder) => `<option value="">${esc(placeholder)}</option>` + list.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
-  const peopleHtml = placeholder => `<option value="">${esc(placeholder)}</option>` + people.map(p => `<option value="${esc(p.accountId)}">${esc(p.name)}</option>`).join('');
+  // PM / CSM: only the people with that board role (server sends roleLists; null = not restricted).
+  const peopleHtml = (placeholder, allowed) => `<option value="">${esc(placeholder)}</option>` + people.filter(p => !allowed || allowed.includes(p.accountId)).map(p => `<option value="${esc(p.accountId)}">${esc(p.name)}</option>`).join('');
 
   const personSel = document.getElementById('aaPerson');
   personSel.innerHTML = `<option value="">Select a person…</option>` + people.map(p => `<option value="${esc(p.epicKey)}">${esc(p.name)}</option>`).join('');
@@ -3546,8 +3547,8 @@ function renderAaAssignmentForm(prefill){
   clientSel.value = aaAssignMatch(opts.client || [], prefill.client || '');
 
   document.getElementById('aaRole').innerHTML = optionHtml(opts.harvestRole || [], 'Select a role…');
-  document.getElementById('aaPm').innerHTML = peopleHtml('Select the PM…');
-  document.getElementById('aaCsm').innerHTML = peopleHtml('No CSM');
+  document.getElementById('aaPm').innerHTML = peopleHtml('Select the PM…', aaAssignMeta?.roleLists?.pm);
+  document.getElementById('aaCsm').innerHTML = peopleHtml('No CSM', aaAssignMeta?.roleLists?.csm);
   document.getElementById('aaSummary').value = '';
   document.getElementById('aaPct').value = prefill.pct || '';
   document.getElementById('aaStart').value = aaAssignToday();
@@ -3602,6 +3603,7 @@ async function submitAaAssignment(){
   if(!payload.startDate) missing.push('Start date');
   if(!payload.dueDate) missing.push('Due date');
   if(!payload.pmAccountId) missing.push('Project Manager');
+  if(!(Number(payload.rate) > 0)) missing.push('Rate (hourly)');
   if(missing.length){
     aaAssignMsg('error', esc(`Missing required fields: ${missing.join(', ')}`));
     return;
@@ -13708,8 +13710,8 @@ bootDashboard();
         <select id="aaCsm"></select>
       </div>
       <div class="auth-field">
-        <label for="aaRate">Rate (hourly)</label>
-        <input id="aaRate" type="number" min="0" step="0.01" placeholder="Optional"/>
+        <label for="aaRate">Rate (hourly) <span class="psa-req">*</span></label>
+        <input id="aaRate" type="number" min="0.01" step="0.01" placeholder="e.g. 45" required/>
       </div>
     </div>
     <div class="auth-field">
