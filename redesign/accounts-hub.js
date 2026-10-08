@@ -266,7 +266,13 @@
       '<div class="ah-banner ' + (a.reportState === 'due' ? 'warn' : 'neg') + '">' + ico('schedule') + (a.lastReport ? (nextDue < 0 ? 'Report overdue by ' + (-nextDue) + ' days' : 'Next report due in ' + nextDue + ' days') : 'No status report filed for this account yet') + ' · cadence every ' + CADENCE_DAYS + ' days' +
       '<button class="btn btn-primary btn-sm" type="button" onclick="AH.newReport()">Write report</button></div>';
     return banner + (reps.length ? '<div class="tbl-wrap ah-table"><table><thead><tr><th>Date</th><th>Report</th><th>Status</th><th></th></tr></thead><tbody>' +
-      reps.map(function(r){ return '<tr class="ah-row-click" style="cursor:pointer" onclick="AH.openReport(\'' + e(r.key || '') + '\')"><td>' + fmt(r.date) + '</td><td>' + e(r.summary || r.reportType || 'Status report') + '</td><td><span class="ah-rags">' + ragChips(r) + '</span></td><td class="ah-td-act"><button type="button" class="btn btn-ghost btn-sm" onclick="event.stopPropagation();AH.openReport(\'' + e(r.key || '') + '\')">' + ico('visibility') + 'View</button></td></tr>'; }).join('') +
+      reps.map(function(r, i){
+        var open = isRepOpen(r.key, i);
+        var jira = (typeof jiraIssueUrl === 'function' && jiraIssueUrl(r.key)) || '';
+        return '<tr class="ah-row-click" style="cursor:pointer" onclick="AH.toggleReport(\'' + e(r.key || '') + '\')"><td>' + fmt(r.date) + '</td><td>' + e(r.summary || r.reportType || 'Status report') + '</td><td><span class="ah-rags">' + ragChips(r) + '</span></td><td class="ah-td-act"><button type="button" class="btn btn-ghost btn-sm" aria-expanded="' + open + '">' + ico(open ? 'expand_less' : 'expand_more') + (open ? 'Hide' : 'View') + '</button></td></tr>' +
+          (open ? '<tr class="ah-rep-detail"><td colspan="4" style="padding:12px 16px 16px;background:var(--surface-1,transparent)">' + repBody(r.key) +
+            (jira ? '<div style="margin-top:6px"><a class="ah-meta" href="' + e(jira) + '" target="_blank" rel="noopener noreferrer">Open ' + e(r.key) + ' in Jira</a></div>' : '') + '</td></tr>' : '');
+      }).join('') +
       '</tbody></table></div>' : '');
   }
   function tabTerms(a){
@@ -399,20 +405,15 @@
       var go = function(){ var acc = a && account(a.key); openPsaReportModal(acc && acc.psa ? acc.psa.epicKey : ''); };
       try{ if(!psaProjectStatusLoaded) loadPsaProjectStatus().then(go); else go(); }catch(_){ go(); }
     },
-    openReport: function(key){
-      var a = account(S.key), reps = (a && a.psa && a.psa.reports) || [], r = null;
-      for(var i = 0; i < reps.length; i++){ if(reps[i].key === key){ r = reps[i]; break; } }
-      if(!r) return;
-      RP = {open:true, report:r, client:a.client}; rpRender();
-      var c = RPD[key];
-      if(c && c.state === 'ok') return;
-      RPD[key] = {state:'loading'}; rpRender();
-      fetch('/api/psa-reports?details=' + encodeURIComponent(key), {cache:'no-store', credentials:'same-origin'})
-        .then(function(res){ return res.json().catch(function(){ return {}; }).then(function(j){ if(!res.ok) throw new Error(j.error || ('HTTP ' + res.status)); return j; }); })
-        .then(function(j){ RPD[key] = {state:'ok', details:j.details || []}; rpRender(); })
-        .catch(function(err){ RPD[key] = {state:'error', error:err.message}; rpRender(); });
+    toggleReport: function(key){
+      if(!key) return;
+      var reps = (account(S.key) && account(S.key).psa && account(S.key).psa.reports) || [];
+      var idx = reps.findIndex(function(r){ return r.key === key; });
+      var open = isRepOpen(key, idx);
+      RPO[key] = !open;
+      render();
+      if(RPO[key]) loadReport(key);
     },
-    closeReport: function(){ RP.open = false; rpRender(); },
     requestAssignment: function(generic){ var a = generic ? null : account(S.key); openAaAssignmentModal(a ? {client:a.client} : {}); },
     extendAssignment: function(i){
       var a = account(S.key); if(!a) return; var p = a.people[i]; if(!p) return;
@@ -441,21 +442,22 @@
     changeAssignment: function(i){ var a = account(S.key); if(!a) return; var p = a.people[i]; openAaAssignmentModal({client:a.client, personName:p && p.name}); }
   };
 
-  /* ---------- status report viewer (in-app, replaces the link out to Jira) ---------- */
-  var RP = {open:false, report:null, client:''}, RPD = {};
-  function rpHost(){
-    var m = document.getElementById('ahReportModal');
-    if(!m){
-      m = document.createElement('div'); m.id = 'ahReportModal'; m.className = 'auth-modal'; m.setAttribute('aria-hidden', 'true');
-      m.addEventListener('click', function(ev){ if(ev.target === m) AH.closeReport(); });
-      document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape' && RP.open) AH.closeReport(); });
-      document.body.appendChild(m);
-    }
-    return m;
-  }
-  function rpBody(key){
+  /* ---------- status reports: inline detail (replaces the link out to Jira) ---------- */
+  var RPO = {}, RPD = {};
+  function isRepOpen(key, idx){ return key in RPO ? RPO[key] : idx === 0; }   // newest report opens by default
+  function loadReport(key){
     var c = RPD[key];
-    if(!c || c.state === 'loading') return '<div class="ah-meta">Loading report…</div>';
+    if(c && (c.state === 'ok' || c.state === 'loading')) return;
+    RPD[key] = {state:'loading'};
+    fetch('/api/psa-reports?details=' + encodeURIComponent(key), {cache:'no-store', credentials:'same-origin'})
+      .then(function(res){ return res.json().catch(function(){ return {}; }).then(function(j){ if(!res.ok) throw new Error(j.error || ('HTTP ' + res.status)); return j; }); })
+      .then(function(j){ RPD[key] = {state:'ok', details:j.details || []}; if(S.tab === 'reports') render(); })
+      .catch(function(err){ RPD[key] = {state:'error', error:err.message}; if(S.tab === 'reports') render(); });
+  }
+  function repBody(key){
+    var c = RPD[key];
+    if(!c){ loadReport(key); c = RPD[key]; }
+    if(c.state === 'loading') return '<div class="ah-meta">Loading report…</div>';
     if(c.state === 'error') return '<div class="ah-meta" style="color:var(--neg)">Could not load the report: ' + e(c.error) + '</div>';
     if(!c.details.length) return '<div class="ah-meta">No comments in this report.</div>';
     return c.details.map(function(d){
@@ -463,21 +465,6 @@
       var body = url ? '<a href="' + e(d.text) + '" target="_blank" rel="noopener noreferrer">' + e(d.text) + '</a>' : e(d.text);
       return '<div style="margin:0 0 12px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:2px">' + e(d.label) + '</div><div style="white-space:pre-wrap;font-size:13px;line-height:1.5">' + body + '</div></div>';
     }).join('');
-  }
-  function rpRender(){
-    var m = rpHost(), r = RP.report;
-    if(!RP.open || !r){ m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); return; }
-    m.classList.add('open'); m.setAttribute('aria-hidden', 'false');
-    var jira = (typeof jiraIssueUrl === 'function' && jiraIssueUrl(r.key)) || '';
-    m.innerHTML = '<div class="auth-card" style="max-width:640px;max-height:86vh;overflow:auto">' +
-      '<h3>' + e(r.summary || r.reportType || 'Status report') + '</h3>' +
-      '<p class="ah-meta" style="margin:0 0 10px">' + e(RP.client) + ' · ' + fmt(r.date) + (r.reportType ? ' · ' + e(r.reportType) : '') + '</p>' +
-      '<div class="ah-rags" style="margin:0 0 14px">' + ragChips(r) + '</div>' +
-      rpBody(r.key) +
-      '<div class="auth-actions" style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px">' +
-        (jira ? '<a class="ah-meta" href="' + e(jira) + '" target="_blank" rel="noopener noreferrer">Open ' + e(r.key) + ' in Jira</a>' : '<span></span>') +
-        '<button type="button" class="btn btn-primary" onclick="AH.closeReport()">Close</button>' +
-      '</div></div>';
   }
 
   /* ---------- extend assignment (new end date → updates the AA Assignment in Jira) ---------- */
