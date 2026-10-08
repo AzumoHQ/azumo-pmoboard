@@ -1,0 +1,84 @@
+/* PMO Board — preview-only look & feel additions (loaded only when window.PMO_PREVIEW; see the gate in index.html).
+   Theme toggle button, centered nav carets, aligned Overview KPI cards, 34px controls, Settings menu stacking,
+   icon search fields and compact module dropdown items. To promote to production: move this content to
+   redesign/pmo-theme.css and drop the PMO_PREVIEW checks. */
+.lf-seg .lf-theme-btn{display:inline-flex;align-items:center;justify-content:center;padding:5px 8px;color:var(--ink-soft)}
+.lf-seg .lf-theme-btn:hover{background:var(--surface-2);color:var(--ink)}
+/* ---------- Nav caret: vertically centered chevron ---------- */
+html body .module-menu>summary.sidebar-item,html body .module-submenu>summary.sidebar-item{display:inline-flex !important;align-items:center !important}
+html body .module-caret{display:inline-flex !important;align-items:center;justify-content:center;width:12px;height:12px;margin-left:4px !important;line-height:0 !important;font-size:0 !important;transition:transform .15s}
+html body .module-caret svg{display:block}
+
+/* ---------- Overview KPI cards: shared rows so text and buttons line up ---------- */
+html body .pmo-ov-kpis{align-items:stretch}
+html body .pmo-ov-kpi{display:flex !important;flex-direction:column !important}
+html body .pmo-ov-kpi-lbl{line-height:1.25 !important;min-height:2.5em}
+html body .pmo-ov-kpi-sub{line-height:1.35 !important;min-height:1.35em}
+html body .pmo-ov-kpi .pmo-ov-card-action{margin-top:auto !important;align-self:flex-start;display:inline-flex !important;align-items:center}
+html body .pmo-ov-kpi-sub + .pmo-ov-card-action,html body .pmo-ov-kpi-lbl + .pmo-ov-card-action{margin-top:auto !important}
+html body .pmo-ov-kpi > .pmo-ov-kpi-lbl:nth-last-child(1){margin-bottom:calc(1.35em + 4px)}
+
+/* ---------- Unified control height (buttons, inputs, selects, multiselects) ---------- */
+html body :is(.btn,.btn-sm,.nav-refresh,.auth-pill,.action-filter,.hh-ms-btn,.view-tab,.pmo-branch-tab,.lf-seg,.harvest-search,.hw-date-input,.pmo-clock-edit),
+html body main :is(input[type=text],input[type=search],input[type=date],input[type=number],input[type=email],input[type=url],input[type=password],select),
+html body .auth-modal :is(input[type=text],input[type=search],input[type=date],input[type=number],input[type=email],input[type=url],input[type=password],select){
+  height:var(--control-h) !important;min-height:var(--control-h) !important;box-sizing:border-box !important;
+}
+html body :is(.btn,.btn-sm,.nav-refresh,.auth-pill,.action-filter,.hh-ms-btn,.view-tab,.pmo-branch-tab){
+  display:inline-flex !important;align-items:center !important;justify-content:center;gap:6px;
+  padding-top:0 !important;padding-bottom:0 !important;line-height:1 !important;font-size:13px !important;white-space:nowrap;
+}
+html body .hh-ms-btn{justify-content:space-between !important;padding:0 12px !important}
+html body main :is(input,select){padding-top:0 !important;padding-bottom:0 !important;font-size:13px !important}
+html body .harvest-search{display:inline-flex !important;align-items:center !important;padding-top:0 !important;padding-bottom:0 !important}
+html body .harvest-search input{height:auto !important;min-height:0 !important;border:0 !important;background:transparent !important}
+html body .lf-seg{padding:2px !important;align-items:center}
+html body .lf-seg button{height:100% !important}
+/* rows of filters + buttons: align everything to the control baseline */
+html body :is(.forecast-filters,.harvest-hours-controls,.qa-toolbar,.btn-row,.tbl-actions,.tbl-head,.proc-toolbar,.hw-week-picker){align-items:flex-end}
+html body :is(.tbl-head,.tbl-actions,.btn-row,.hw-week-picker,.qa-center-actions){align-items:center}
+html body .filter-field{justify-content:flex-end}
+html body .filter-field label{line-height:1.2}
+html body main textarea{height:auto !important;min-height:0}
+
+/* ---------- Top nav always above page content (Settings dropdown was opening behind cards) ---------- */
+html body nav{z-index:300 !important;overflow:visible !important}
+html body nav .nav-inner,html body nav .nav-right{overflow:visible !important}
+html body .nav-config{position:relative;z-index:310}
+html body .nav-config-menu{z-index:320 !important}
+html body :is(.module-menu-panel,.module-submenu-panel){z-index:320 !important}
+
+/* ---------- Search fields with icon (label.harvest-search > i + input) ---------- */
+html body main label.harvest-search{
+  display:flex !important;align-items:center !important;gap:8px !important;
+  height:var(--control-h) !important;min-height:var(--control-h) !important;box-sizing:border-box !important;
+  padding:0 12px !important;margin:0 !important;
+  background:var(--surface) !important;border:1px solid var(--border) !important;border-radius:var(--radius-control) !important;
+  box-shadow:none !important;color:var(--muted) !important;cursor:text;
+}
+html body main label.harvest-search:focus-within{border-color:var(--brand) !important}
+html body main label.harvest-search > i,html body main label.harvest-search > .msi{flex:0 0 auto;font-size:15px;line-height:1;color:var(--muted)}
+html body main label.harvest-search input[type=search],html body main label.harvest-search input{
+  flex:1 1 auto !important;min-width:0 !important;width:100% !important;
+  height:100% !important;min-height:0 !important;padding:0 !important;margin:0 !important;
+  border:0 !important;outline:0 !important;box-shadow:none !important;background:transparent !important;border-radius:0 !important;
+  color:var(--ink) !important;font-size:13px !important;
+}
+html body main label.harvest-search input::placeholder{color:var(--faint) !important}
+
+/* ---------- Module dropdown items: same compact rows in merged (wide) and stacked nav ---------- */
+html body nav :is(.module-menu-panel,.module-submenu-panel){display:flex !important;flex-direction:column !important;gap:2px !important;padding:6px !important;min-width:200px}
+html body nav :is(.module-menu-panel,.module-submenu-panel) .sidebar-item,
+html body.nav-merged nav .side-index :is(.module-menu-panel,.module-submenu-panel) .sidebar-item{
+  height:34px !important;min-height:34px !important;max-height:34px !important;
+  padding:0 12px !important;margin:0 !important;width:100% !important;box-sizing:border-box !important;
+  display:flex !important;align-items:center !important;justify-content:flex-start !important;gap:8px !important;
+  font-size:13px !important;line-height:1 !important;border-radius:var(--radius-option) !important;
+  border:0 !important;box-shadow:none !important;background:transparent !important;color:var(--ink-soft) !important;position:relative;
+}
+html body nav :is(.module-menu-panel,.module-submenu-panel) .sidebar-item:hover{background:var(--surface-2) !important;color:var(--ink) !important}
+html body nav :is(.module-menu-panel,.module-submenu-panel) .sidebar-item.active{background:var(--surface-2) !important;color:var(--ink) !important}
+html body nav :is(.module-menu-panel,.module-submenu-panel) .sidebar-item.active::after,
+html body nav :is(.module-menu-panel,.module-submenu-panel) .sidebar-item.active::before{display:none !important}
+html body nav :is(.module-menu-panel,.module-submenu-panel) .sidebar-icon:empty{display:none}
+

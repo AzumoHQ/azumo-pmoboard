@@ -97,18 +97,33 @@
       // Icons only: moon = Dark, sun = Light (SVG inline, currentColor; the label stays for screen readers and tooltip)
       var MOON = '<svg class="lf-ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
       var SUN = '<svg class="lf-ico" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
-      seg.innerHTML = '<button type="button" data-t="dark" aria-label="Dark theme" title="Dark theme">' + MOON + '</button>' +
-                      '<button type="button" data-t="light" aria-label="Light theme" title="Light theme">' + SUN + '</button>';
+      if(window.PMO_PREVIEW){
+        // PREVIEW: un solo botón; muestra el ícono del tema al que cambia.
+        seg.innerHTML = '<button type="button" class="lf-theme-btn"></button>';
+      } else {
+        seg.innerHTML = '<button type="button" data-t="dark" aria-label="Dark theme" title="Dark theme">' + MOON + '</button>' +
+                        '<button type="button" data-t="light" aria-label="Light theme" title="Light theme">' + SUN + '</button>';
+      }
       seg.addEventListener('click', function(e){
         var t = e.target.closest('button'); if(!t) return;
-        try{ localStorage.setItem('pmo_dashboard_theme', t.dataset.t); }catch(_){}
-        if(typeof applyTheme === 'function') applyTheme(t.dataset.t);
+        var pick = window.PMO_PREVIEW ? (document.body.classList.contains('light') ? 'dark' : 'light') : t.dataset.t;
+        try{ localStorage.setItem('pmo_dashboard_theme', pick); }catch(_){}
+        if(typeof applyTheme === 'function') applyTheme(pick);
         sync();
       });
       right.insertBefore(seg, right.firstChild);
     }
     function sync(){
       if(!seg) return;
+      if(window.PMO_PREVIEW){
+        var tb = seg.querySelector('button'); if(!tb) return;
+        var isLight = document.body.classList.contains('light');
+        var lbl = isLight ? 'Switch to dark theme' : 'Switch to light theme';
+        tb.innerHTML = isLight ? MOON : SUN; // luna en claro, sol en oscuro
+        tb.setAttribute('aria-label', lbl);
+        tb.title = lbl;
+        return;
+      }
       var cur = document.body.classList.contains('light') ? 'light' : 'dark';
       Array.prototype.forEach.call(seg.querySelectorAll('button'), function(btn){
         var on = btn.dataset.t === cur;

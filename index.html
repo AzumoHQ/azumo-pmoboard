@@ -1529,6 +1529,8 @@ document.addEventListener('keydown',function(e){var d=document.getElementById('n
     if(localStorage.getItem(KEY) === '1') on = false;
   }catch(e){}
   window.PMO_LF = on;
+  // PREVIEW: Accounts hub / My Portfolio / nueva navegación. Solo con el tema nuevo y fuera de los hosts de producción.
+  window.PMO_PREVIEW = on && ['pmoboard.it.azumo.com','pmoboard.vercel.app'].indexOf(location.hostname) === -1;
   var MAP = {"#0066ff": "var(--brand)", "#00915a": "var(--pos)", "#06b6d4": "var(--brand)", "#0ea5e9": "var(--brand)", "#10b981": "var(--pos)", "#16a34a": "var(--pos)", "#22c55e": "var(--pos)", "#3b82f6": "var(--brand)", "#6b8fbf": "var(--muted)", "#6ee7b7": "var(--pos)", "#7c3aed": "var(--margin)", "#93c5fd": "var(--brand)", "#94a3b8": "var(--muted)", "#a78bfa": "var(--margin)", "#a855f7": "var(--margin)", "#b4690e": "var(--forecast)", "#c4b5fd": "var(--margin)", "#cff3e4": "var(--ink)", "#e6e9ff": "var(--ink)", "#ef4444": "var(--neg)", "#f3cfff": "var(--ink)", "#f59e0b": "var(--forecast)", "#f97316": "var(--forecast)", "#fb923c": "var(--forecast)", "#fcd34d": "var(--forecast)", "#fdba74": "var(--forecast)", "#ffe6cc": "var(--ink)"};
   window.lfc = function(c){ return (on && typeof c === 'string' && MAP[c.toLowerCase()]) || c; };
   window.lfAlpha = function(c, pct, hexA){ return (!on || String(c).charAt(0) === '#') ? c + hexA : 'color-mix(in srgb,' + c + ' ' + pct + '%,transparent)'; };
@@ -1537,7 +1539,8 @@ document.addEventListener('keydown',function(e){var d=document.getElementById('n
   document.write('<link rel="preload" href="assets/fonts/CerebriSansPro-Regular.woff2" as="font" type="font/woff2" crossorigin>'
     + '<link rel="stylesheet" href="redesign/pmo-theme.css">'
     + '<script src="redesign/pmo-theme.js" defer><\/script>'
-    + '<script src="redesign/process-portal.js" defer><\/script>');
+    + '<script src="redesign/process-portal.js" defer><\/script>'
+    + (window.PMO_PREVIEW ? '<link rel="stylesheet" href="redesign/pmo-preview.css"><link rel="stylesheet" href="redesign/accounts-hub.css">' : ''));
 })();
 </script>
 <style>
@@ -1619,7 +1622,7 @@ if(window.PMO_LF){ try{
 <nav>
   <div class="nav-inner">
     <div class="nav-brand">
-      <a href="#" onclick="goTo('overview');return false;" style="text-decoration:none;display:flex"><div class="nav-logo"><img class="nav-wordmark" src="assets/azumo-logo.png" alt="Azumo"/></div></a>
+      <a href="#" onclick="goTo(window.PMO_PREVIEW ? 'myPortfolio' : 'overview');return false;" style="text-decoration:none;display:flex"><div class="nav-logo"><img class="nav-wordmark" src="assets/azumo-logo.png" alt="Azumo"/></div></a>
       <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span id="pmoVersionNav">v3.3</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
     </div>
     <div class="nav-links">
@@ -1808,6 +1811,21 @@ if(window.PMO_LF){ try{
 </aside>
 
 <main>
+
+<!-- ── MY PORTFOLIO (preview) ─────────────────────────── -->
+<section id="myPortfolio">
+  <div class="ah-wrap" id="myPortfolioBody"><div class="ah-meta">Loading your portfolio…</div></div>
+</section>
+
+<!-- ── ACCOUNTS HUB (preview) ─────────────────────────── -->
+<section id="accountsHub">
+  <div class="sec-head">
+    <div class="sec-icon"><i class="ti ti-building"></i></div>
+    <h2>Accounts</h2>
+    <div class="sec-tag">Terms · reports · team · documents</div>
+  </div>
+  <div class="ah-wrap" id="accountsHubBody"><div class="ah-meta">Loading accounts…</div></div>
+</section>
 
 <!-- ── OVERVIEW ─────────────────────────────── -->
 <section id="overview">
@@ -3659,7 +3677,7 @@ const IS_PMO_PRODUCTION = PMO_PRODUCTION_HOSTS.has(location.hostname);
 // TO PROMOTE something to production:
 //   1) remove its id from PREVIEW_ONLY_SECTIONS (or drop its data-preview-only attribute)
 //   2) add a new entry at the TOP of PMO_RELEASES (version +0.1)
-const PREVIEW_ONLY_SECTIONS = new Set(['dashboard','history']);
+const PREVIEW_ONLY_SECTIONS = new Set(['dashboard','history','myPortfolio','accountsHub']);
 const PMO_RELEASES = [
   {version:'3.3', date:'2026-10-07', title:'Status reports, new assignments and navigation', items:[
     'Project Status — new status report form that mirrors the Jira PSA form; it creates a Project Status ticket under the project\'s epic. Open it with + Report on a project row or from Accounts → New report',
@@ -3730,9 +3748,9 @@ function sectionAllowedForCurrentRole(id){
   if(canSeePmoGroup()) return true;
   if(PMO_ONLY_SECTIONS.has(id)) return false;
   if(['executive','viewer','c-level','clevel','hr'].includes(role)) return true;
-  if(role === 'pm') return ['overview','opsViews','bench','forecast','harvestHours','harvestAccess','psaProjectStatus','accountCoverage'].includes(id);
-  if(role === 'csm') return ['overview','opsViews','bench','accountCoverage','forecast','harvestHours','harvestAccess'].includes(id);
-  if(role === 'tl') return ['overview','opsViews','accountCoverage','forecast'].includes(id);
+  if(role === 'pm') return ['myPortfolio','accountsHub','overview','opsViews','bench','forecast','harvestHours','harvestAccess','psaProjectStatus','accountCoverage'].includes(id);
+  if(role === 'csm') return ['myPortfolio','accountsHub','overview','opsViews','bench','accountCoverage','forecast','harvestHours','harvestAccess'].includes(id);
+  if(role === 'tl') return ['myPortfolio','accountsHub','overview','opsViews','accountCoverage','forecast'].includes(id);
   if(role === 'assignee') return ['overview','opsViews','forecast'].includes(id);
   return false;
 }
@@ -3748,6 +3766,8 @@ function uniqueModuleSections(){ return allModuleSections().filter(section => se
 const SECTION_ICON_MAP = {
   'overview': 'ti-layout-dashboard',
   'opsViews': 'ti-compass',
+  'myPortfolio': 'ti-layout-grid',
+  'accountsHub': 'ti-building',
   'bench': 'ti-armchair',
   'azumo': 'ti-building',
   'pendingAssignments': 'ti-hourglass',
@@ -3788,6 +3808,36 @@ function sidebarNavConfig(){
     }
   }
   const qaCount = countOpenPmoActions();
+  // PREVIEW: nueva organización (My Portfolio · Accounts · People · Operations). En producción se mantiene el árbol anterior.
+  const entriesPreview = [
+    {id:'myPortfolio', icon:'', label:'My Portfolio'},
+    {id:'accountsGroup', icon:'', label:'Accounts', children:[
+      {id:'accountsHub', icon:'<i class="ti ti-building"></i>', label:'All accounts'},
+      {id:'psaProjectStatus', icon:'<i class="ti ti-trending-up"></i>', label:'Status reports'},
+      {id:'accountCoverage', icon:'<i class="ti ti-clipboard-list"></i>', label:'Coverage'},
+      {id:'psaNewReport', label:'New status report', action:'openPsaReportModal', requires:'psaProjectStatus'}
+    ]},
+    {id:'peopleGroup', icon:'', label:'People', count: dueAlertCount + pendingCount, children:[
+      {id:'opsViews', icon:'<i class="ti ti-compass"></i>', label:'Operating Views'},
+      {id:'pendingAssignments', icon:'<i class="ti ti-hourglass"></i>', label:'Pending Assignments', count:pendingCount},
+      {id:'dueDates', icon:'<i class="ti ti-calendar"></i>', label:'Due Dates', count:dueAlertCount},
+      {id:'forecast', icon:'<i class="ti ti-chart-arrows"></i>', label:'Forecast'},
+      {id:'bench', icon:'<i class="ti ti-armchair"></i>', label:'Bench'},
+      {id:'aaNewAssignment', label:'New assignment', action:'openAaAssignmentModal', requires:'opsViews'}
+    ]},
+    {id:'operationsGroup', icon:'', label:'Operations', children:[
+      {id:'overview', icon:'□', label:'Overview'},
+      {id:'dashboard', icon:'<i class="ti ti-credit-card"></i>', label:'Billing'},
+      {id:'history', icon:'<i class="ti ti-trending-up"></i>', label:'Trends'},
+      {id:'harvestHours', icon:'<i class="ti ti-stopwatch"></i>', label:'Harvest control'},
+      {id:'harvestAccess', icon:'<i class="ti ti-folders"></i>', label:'Harvest assignments'},
+      {id:'harvestWeekly', icon:'<i class="ti ti-users"></i>', label:'Logged Harvest Hours'},
+      {id:'newSearchesTriage', icon:'<i class="ti ti-search"></i>', label:'New Searches'}
+    ]},
+    {id:'processes', icon:'<i class="ti ti-route"></i>', label:'Process Portal'},
+    {id:'pmoActionCenter', icon:'<i class="ti ti-alert-triangle"></i>', label:'PMO QA', count: qaCount}
+  ];
+  if(window.PMO_PREVIEW) return entriesPreview;
   const entries = [
     {id:'generalGroup', icon:'', label:'General', children:[
       {id:'overview', icon:'□', label:'Overview'},
@@ -3820,6 +3870,7 @@ function sidebarNavConfig(){
 }
 function currentModuleTabId(sections){
   const stored = localStorage.getItem(MODULE_TAB_KEY);
+  if(window.PMO_PREVIEW && sections.some(section => section.id === 'myPortfolio')) return 'myPortfolio'; // PREVIEW: nueva home
   if(sections.some(section => section.id === 'overview')) return 'overview';
   if(stored && sections.some(section => section.id === stored)) return stored;
   const preferred = ['overview','opsViews','bench','azumo','pendingAssignments','dueDates','forecast','accountCoverage','harvestHours','harvestAccess','dashboard','history','newSearchesTriage','harvestWeekly','pmoActionCenter'];
@@ -3863,7 +3914,7 @@ function renderModuleNestedItems(items, activeId){
     if(item.children){
       const active = moduleEntryHasActive(item, activeId);
       const inner = renderModuleNestedItems(item.children, activeId);
-      return `<details class="module-submenu"><summary title="${esc(item.label)}" class="sidebar-item ${active ? 'active' : ''}"><span class="sidebar-icon">${sectionIcon(item.id)||esc(item.icon||"")}</span><span class="sidebar-label">${esc(item.label)}</span>${tabBadge(item.count || 0)}<span class="module-caret">⌄</span></summary><div class="module-submenu-panel">${inner}</div></details>`;
+      return `<details class="module-submenu"><summary title="${esc(item.label)}" class="sidebar-item ${active ? 'active' : ''}"><span class="sidebar-icon">${sectionIcon(item.id)||esc(item.icon||"")}</span><span class="sidebar-label">${esc(item.label)}</span>${tabBadge(item.count || 0)}<span class="module-caret">${window.PMO_PREVIEW ? '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '⌄'}</span></summary><div class="module-submenu-panel">${inner}</div></details>`;
     }
     return renderModuleLeaf(item, activeId);
   }).join('');
@@ -3879,7 +3930,7 @@ function renderModuleTabButtons(activeId){
       const active = moduleEntryHasActive(entry, activeId);
       const open = openModuleGroup === entry.id;
       const children = renderModuleNestedItems(entry.children, activeId);
-      return `<details class="module-menu ${open ? 'open' : ''}" ${open ? 'open' : ''}><summary title="${esc(entry.label)}" class="sidebar-item ${active ? 'active' : ''}" onclick="event.preventDefault();event.stopPropagation();toggleModuleGroup('${entry.id}')"><span class="sidebar-icon">${sectionIcon(entry.id)||esc(entry.icon||"")}</span><span class="sidebar-label">${esc(entry.label)}</span>${tabBadge(entry.count || 0)}<span class="module-caret">⌄</span></summary><div class="module-menu-panel">${children}</div></details>`;
+      return `<details class="module-menu ${open ? 'open' : ''}" ${open ? 'open' : ''}><summary title="${esc(entry.label)}" class="sidebar-item ${active ? 'active' : ''}" onclick="event.preventDefault();event.stopPropagation();toggleModuleGroup('${entry.id}')"><span class="sidebar-icon">${sectionIcon(entry.id)||esc(entry.icon||"")}</span><span class="sidebar-label">${esc(entry.label)}</span>${tabBadge(entry.count || 0)}<span class="module-caret">${window.PMO_PREVIEW ? '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '⌄'}</span></summary><div class="module-menu-panel">${children}</div></details>`;
     }
     return renderModuleLeaf(entry, activeId);
   }).join('');
@@ -11169,6 +11220,7 @@ function psaHistoryRowHTML(row){
     </td></tr>`;
 }
 function renderPsaProjectStatusModule(){
+  setTimeout(() => document.dispatchEvent(new Event('pmo-psa-updated')), 0); // PREVIEW: accounts-hub.js escucha este evento
   const allRows = psaProjectStatusData || [];
   // View filter (Current / Former / All)
   let rows = allRows.filter(r => msHas(psaProjectStatusFilter, r.isClosed ? 'former' : 'current'));
@@ -13852,5 +13904,6 @@ bootDashboard();
   setTimeout(function(){ if(!panelOpen) render(); }, 2500); setTimeout(function(){ if(!panelOpen) render(); }, 8000);
 })();
 </script>
+<script>if(window.PMO_PREVIEW) document.write('<script src="redesign/accounts-hub.js"><\/script>');</script>
 </body>
 </html>
