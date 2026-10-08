@@ -18,7 +18,7 @@
   function snap(){ try{ return latest || null; }catch(_){ return null; } }
   function canEdit(){ try{ return canRunRefresh(); }catch(_){ return false; } }
   function role(){ try{ return effectiveUserRole(); }catch(_){ return ''; } }
-  function userName(){ try{ return fullNameFromUser(currentUser) || currentUser?.name || ''; }catch(_){ return ''; } }
+  function userName(){ try{ var u = (typeof effectiveSessionUser === 'function' && effectiveSessionUser()) || currentUser; return fullNameFromUser(u) || (u && u.name) || ''; }catch(_){ return ''; } }
   function terms(key){ try{ return clientProjects.get(key) || []; }catch(_){ return []; } }
   function psaAll(){ try{ return psaProjectStatusData || []; }catch(_){ return []; } }
   function ico(name){ return '<span class="msi ah-ico" aria-hidden="true">' + name + '</span>'; }
