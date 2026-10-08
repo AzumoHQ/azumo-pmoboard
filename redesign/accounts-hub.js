@@ -46,7 +46,7 @@
       var name = r.assignee || r.name; if(!name) return;
       var id = name.toLowerCase(), cur = map.get(id);
       if(!cur) map.set(id, {name:name, position:r.epic_position || r.position || '—', due:r.due || '', key:r.key || '', billing:r.billing});
-      else if(r.due && (!cur.due || r.due < cur.due)) cur.due = r.due;
+      else if(r.due && (!cur.due || r.due < cur.due)){ cur.due = r.due; if(r.key) cur.key = r.key; }
     });
     pending.forEach(function(r){
       if(!r || k(r.client) !== ck) return;
@@ -254,7 +254,7 @@
         return '<tr><td><b>' + e(p.name) + '</b></td><td>' + e(p.position) + '</td>' +
           '<td>' + (p.pending ? '<span class="ah-pill warn">Pending · starts ' + fmt(p.start) + '</span>' : '<span class="ah-pill pos">Active</span>') + '</td>' +
           '<td class="' + dueTone(d) + '">' + (p.pending ? '—' : dueText(p.due)) + '</td>' +
-          '<td class="ah-td-act"><button type="button" class="btn btn-ghost btn-sm" onclick="AH.changeAssignment(' + i + ')">' + ico('event_repeat') + 'Extend / change</button></td></tr>';
+          '<td class="ah-td-act"><button type="button" class="btn btn-ghost btn-sm" onclick="AH.extendAssignment(' + i + ')">' + ico('event_repeat') + 'Extend</button></td></tr>';
       }).join('') + '</tbody></table></div>';
   }
   function tabReports(a){
@@ -401,8 +401,74 @@
       try{ if(!psaProjectStatusLoaded) loadPsaProjectStatus().then(go); else go(); }catch(_){ go(); }
     },
     requestAssignment: function(generic){ var a = generic ? null : account(S.key); openAaAssignmentModal(a ? {client:a.client} : {}); },
+    extendAssignment: function(i){
+      var a = account(S.key); if(!a) return; var p = a.people[i]; if(!p) return;
+      // Without a ticket key (or still pending) there is nothing to extend: go to the full form like before.
+      if(!p.key || p.pending){ AH.changeAssignment(i); return; }
+      EX = {open:true, person:p, client:a.client, index:i, busy:false, msg:''}; exRender();
+      setTimeout(function(){ var d = document.getElementById('ahExDate'); if(d) d.focus(); }, 0);
+    },
+    closeExtend: function(){ EX.open = false; exRender(); },
+    saveExtend: function(){
+      var p = EX.person; if(!p || EX.busy) return;
+      var due = (document.getElementById('ahExDate') || {}).value || '';
+      var why = (document.getElementById('ahExWhy') || {}).value || '';
+      if(!due){ EX.msg = '!Pick the new end date.'; exRender(); return; }
+      EX.busy = true; EX.msg = ''; exRender();
+      fetch('/api/assignments', {method:'PATCH', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({key:p.key, dueDate:due, reason:why})})
+        .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ if(!r.ok) throw new Error(j.error || ('HTTP ' + r.status)); return j; }); })
+        .then(function(j){
+          exApplyLocal(p.key, j.dueDate || due);
+          EX.open = false; EX.busy = false; exRender();
+          S.msg = p.name + ' extended to ' + fmt(j.dueDate || due) + ' (' + p.key + ' updated in Jira)'; render();
+          setTimeout(function(){ S.msg = ''; render(); }, 3500);
+        })
+        .catch(function(err){ EX.busy = false; EX.msg = '!' + err.message; exRender(); });
+    },
     changeAssignment: function(i){ var a = account(S.key); if(!a) return; var p = a.people[i]; openAaAssignmentModal({client:a.client, personName:p && p.name}); }
   };
+
+  /* ---------- extend assignment (new end date → updates the AA Assignment in Jira) ---------- */
+  var EX = {open:false, person:null, client:'', busy:false, msg:''};
+  function exHost(){
+    var m = document.getElementById('ahExtendModal');
+    if(!m){
+      m = document.createElement('div'); m.id = 'ahExtendModal'; m.className = 'auth-modal'; m.setAttribute('aria-hidden', 'true');
+      m.addEventListener('click', function(ev){ if(ev.target === m) AH.closeExtend(); });
+      document.body.appendChild(m);
+    }
+    return m;
+  }
+  function exRender(){
+    var m = exHost(), p = EX.person;
+    if(!EX.open || !p){ m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); return; }
+    m.classList.add('open'); m.setAttribute('aria-hidden', 'false');
+    var cur = p.due ? String(p.due).slice(0,10) : '';
+    var keep = {date:(document.getElementById('ahExDate') || {}).value, why:(document.getElementById('ahExWhy') || {}).value};
+    m.innerHTML = '<div class="auth-card" style="max-width:460px">' +
+      '<h3>Extend assignment</h3>' +
+      '<p><b>' + e(p.name) + '</b> · ' + e(EX.client) + (p.key ? ' · <span class="ah-meta">' + e(p.key) + '</span>' : '') + '</p>' +
+      '<div class="auth-field"><label>Current end date</label><div class="' + dueTone(daysFrom(cur)) + '" style="padding:6px 0">' + (cur ? fmt(cur) + (daysFrom(cur) < 0 ? ' (overdue)' : '') : '—') + '</div></div>' +
+      '<div class="auth-field"><label for="ahExDate">New end date <span class="psa-req">*</span></label><input id="ahExDate" type="date" value="' + e(keep.date || '') + '"' + (cur ? ' min="' + e(cur) + '"' : '') + '></div>' +
+      '<div class="auth-field"><label for="ahExWhy">Comment (optional)</label><textarea id="ahExWhy" rows="3" placeholder="Why is it being extended?">' + e(keep.why || '') + '</textarea></div>' +
+      (EX.msg ? '<div class="ah-meta" style="margin:8px 0;color:' + (EX.msg.charAt(0) === '!' ? 'var(--neg)' : 'var(--muted)') + '">' + e(EX.msg.replace(/^!/, '')) + '</div>' : '') +
+      '<div class="ah-meta" style="margin:6px 0 12px">Updates the due date of ' + (p.key ? e(p.key) : 'the Assignment ticket') + ' in Jira and adds a comment to it. ' +
+        '<a href="#" onclick="AH.closeExtend();AH.changeAssignment(' + EX.index + ');return false;">Need to change something else? Open the full form</a></div>' +
+      '<div class="auth-actions" style="display:flex;gap:8px;justify-content:flex-end">' +
+        '<button type="button" class="btn btn-ghost" onclick="AH.closeExtend()">Cancel</button>' +
+        '<button type="button" class="btn btn-primary" onclick="AH.saveExtend()"' + (EX.busy ? ' disabled' : '') + '>' + (EX.busy ? 'Saving…' : 'Save new end date') + '</button>' +
+      '</div></div>';
+  }
+  function exApplyLocal(key, due){
+    // Keep the board's in-memory snapshot in step until the next sync brings the same change from Jira.
+    try{
+      var s = latest; if(!s) return;
+      var fix = function(r){ if(r && r.key === key) r.due = due; };
+      (s.assignment_rows || []).forEach(fix);
+      (s.expiring_60d || []).forEach(fix);
+      Object.keys(s.forecast || {}).forEach(function(mo){ (s.forecast[mo] || []).forEach(fix); });
+    }catch(_){}
+  }
 
   // Hook into the board: re-render when our sections activate or data changes.
   var origActivate = window.activateModuleTab;

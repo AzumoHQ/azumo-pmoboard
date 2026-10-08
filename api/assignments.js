@@ -1,4 +1,4 @@
-const { getAaAssignmentMeta, createAaAssignment } = require('../lib/jira-client');
+const { getAaAssignmentMeta, createAaAssignment, extendAaAssignment } = require('../lib/jira-client');
 const { getSessionUser } = require('../lib/auth');
 
 // Same audience that submits Jira form 150 today.
@@ -88,8 +88,32 @@ async function handleCreate(req, res, user) {
   }
 }
 
+// PATCH: extend an existing assignment (new due date). Body: { key: 'AA-123', dueDate: 'YYYY-MM-DD', reason?: string }
+async function handleExtend(req, res, user) {
+  let body;
+  try {
+    body = await readJson(req);
+  } catch (error) {
+    res.status(400).json({ error: 'Invalid JSON body' });
+    return;
+  }
+  const key = String(body.key || '').trim().toUpperCase();
+  const dueDate = String(body.dueDate || '').trim();
+  if (!/^AA-\d+$/.test(key)) { res.status(400).json({ error: 'Assignment key is required' }); return; }
+  if (!isIsoDate(dueDate)) { res.status(400).json({ error: 'New end date is required' }); return; }
+  try {
+    const result = await extendAaAssignment(key, dueDate, { email: user.email, name: user.name }, String(body.reason || ''));
+    res.status(200).json({ ok: true, ...result });
+  } catch (error) {
+    console.error('assignments extend failed:', error.message);
+    const disabled = /write-back is disabled/i.test(error.message);
+    const own = /^(Invalid|The new end date|The end date|AA-\d+ is not)/.test(error.message);
+    res.status(disabled ? 503 : own ? 400 : 502).json({ error: disabled ? error.message : own ? error.message : `Jira rejected the change: ${error.message.slice(0, 400)}` });
+  }
+}
+
 module.exports = async function assignmentsHandler(req, res) {
-  if (req.method !== 'GET' && req.method !== 'POST') {
+  if (req.method !== 'GET' && req.method !== 'POST' && req.method !== 'PATCH') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
@@ -112,6 +136,10 @@ module.exports = async function assignmentsHandler(req, res) {
 
   if (req.method === 'POST') {
     await handleCreate(req, res, user);
+    return;
+  }
+  if (req.method === 'PATCH') {
+    await handleExtend(req, res, user);
     return;
   }
 
