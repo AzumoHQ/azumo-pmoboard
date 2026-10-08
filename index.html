@@ -1529,8 +1529,9 @@ document.addEventListener('keydown',function(e){var d=document.getElementById('n
     if(localStorage.getItem(KEY) === '1') on = false;
   }catch(e){}
   window.PMO_LF = on;
-  // PREVIEW: Accounts hub / My Portfolio / nueva navegación. Solo con el tema nuevo y fuera de los hosts de producción.
-  window.PMO_PREVIEW = on && ['pmoboard.it.azumo.com','pmoboard.vercel.app'].indexOf(location.hostname) === -1;
+  // Accounts hub / My Portfolio / nueva navegación: en producción desde v3.4. El nombre PMO_PREVIEW se conserva
+  // para no tocar el código probado; hoy significa 'tema nuevo activo' (con ?lf=0 vuelve la navegación anterior).
+  window.PMO_PREVIEW = on;
   var MAP = {"#0066ff": "var(--brand)", "#00915a": "var(--pos)", "#06b6d4": "var(--brand)", "#0ea5e9": "var(--brand)", "#10b981": "var(--pos)", "#16a34a": "var(--pos)", "#22c55e": "var(--pos)", "#3b82f6": "var(--brand)", "#6b8fbf": "var(--muted)", "#6ee7b7": "var(--pos)", "#7c3aed": "var(--margin)", "#93c5fd": "var(--brand)", "#94a3b8": "var(--muted)", "#a78bfa": "var(--margin)", "#a855f7": "var(--margin)", "#b4690e": "var(--forecast)", "#c4b5fd": "var(--margin)", "#cff3e4": "var(--ink)", "#e6e9ff": "var(--ink)", "#ef4444": "var(--neg)", "#f3cfff": "var(--ink)", "#f59e0b": "var(--forecast)", "#f97316": "var(--forecast)", "#fb923c": "var(--forecast)", "#fcd34d": "var(--forecast)", "#fdba74": "var(--forecast)", "#ffe6cc": "var(--ink)"};
   window.lfc = function(c){ return (on && typeof c === 'string' && MAP[c.toLowerCase()]) || c; };
   window.lfAlpha = function(c, pct, hexA){ return (!on || String(c).charAt(0) === '#') ? c + hexA : 'color-mix(in srgb,' + c + ' ' + pct + '%,transparent)'; };
@@ -3677,8 +3678,14 @@ const IS_PMO_PRODUCTION = PMO_PRODUCTION_HOSTS.has(location.hostname);
 // TO PROMOTE something to production:
 //   1) remove its id from PREVIEW_ONLY_SECTIONS (or drop its data-preview-only attribute)
 //   2) add a new entry at the TOP of PMO_RELEASES (version +0.1)
-const PREVIEW_ONLY_SECTIONS = new Set(['dashboard','history','myPortfolio','accountsHub']);
+const PREVIEW_ONLY_SECTIONS = new Set(['dashboard','history']);
 const PMO_RELEASES = [
+  {version:'3.4', date:'2026-10-08', title:'My Portfolio, Accounts hub and new navigation', items:[
+    'Navigation — new structure: My Portfolio (home), Accounts (All accounts, Status reports, Coverage, New status report), People (Operating Views, Pending, Due Dates, Forecast, Bench, New assignment) and Operations (Overview, Billing, Trends, Harvest sections, New Searches). Process Portal and PMO QA stay as they were',
+    'My Portfolio — new home: what needs attention (overdue or due status reports, assignments ending or past their end date, pending assignments, SOWs without terms), plus My accounts and My people. Administrators can choose which PM to view',
+    'Accounts — one page per client with Overview, Team (Request assignment / Extend or change open the Jira AA form), Status reports, Terms (Tracking, Billing cycle and Type of project per SOW) and Documents (links to SOWs, Granola transcripts, reports and others). Clicking a client name anywhere in the board opens its account page',
+    'Look & feel — single theme button (moon in light mode, sun in dark mode), centered menu arrows, aligned Overview cards, 34px controls, Settings menu above the content, search fields with an icon and equal-height menu items'
+  ]},
   {version:'3.3', date:'2026-10-07', title:'Status reports, new assignments and navigation', items:[
     'Project Status — new status report form that mirrors the Jira PSA form; it creates a Project Status ticket under the project\'s epic. Open it with + Report on a project row or from Accounts → New report',
     'Project Status — the table now has a single View filter (Current / Former closed); the Project, PM and Status filters and Clear filters were removed',
