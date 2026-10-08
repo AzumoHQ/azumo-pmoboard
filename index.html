@@ -1823,7 +1823,7 @@ if(window.PMO_LF){ try{
   <div class="sec-head">
     <div class="sec-icon"><i class="ti ti-building"></i></div>
     <h2>Accounts</h2>
-    <div class="sec-tag">Terms · reports · team · documents</div>
+    <div class="sec-tag">Coverage · terms · reports · team · documents</div>
   </div>
   <div class="ah-wrap" id="accountsHubBody"><div class="ah-meta">Loading accounts…</div></div>
 </section>
@@ -3823,7 +3823,6 @@ function sidebarNavConfig(){
     {id:'accountsGroup', icon:'', label:'Accounts', children:[
       {id:'accountsHub', icon:'<i class="ti ti-building"></i>', label:'All accounts'},
       {id:'psaProjectStatus', icon:'<i class="ti ti-trending-up"></i>', label:'Status reports'},
-      {id:'accountCoverage', icon:'<i class="ti ti-clipboard-list"></i>', label:'Coverage'},
       {id:'psaNewReport', label:'New status report', action:'openPsaReportModal', requires:'psaProjectStatus'}
     ]},
     {id:'peopleGroup', icon:'', label:'People', count: dueAlertCount + pendingCount, children:[
@@ -7021,7 +7020,7 @@ function actionStatusLabel(severity){
 }
 function actionModuleTarget(action){
   if(action.category === 'harvest') return {label:'Open Harvest QA', onclick:"activateModuleTab('harvestAccess')"};
-  if(action.category === 'coverage') return {label:'Open Accounts Coverage', onclick:"activateModuleTab('accountCoverage')"};
+  if(action.category === 'coverage') return {label:'Open Accounts Coverage', onclick:"activateModuleTab('accountsHub');AH.showGaps()"};
   if(action.category === 'billing') return {label:'Open Billing', onclick:"activateModuleTab('dashboard')"};
   if(action.category === 'freshness') return {label:'Open Billing', onclick:"activateModuleTab('dashboard')"};
   if(action.category === 'urgent') return {label:'Open Due Dates', onclick:"activateModuleTab('dueDates')"};
@@ -7405,7 +7404,7 @@ function renderDataTraceability(){
       {name:'Billing', href:'#', onclick:"activateModuleTab('dashboard')", rule:'Billing source reports shown in the Billing tab: Utilization Billing Rate and Bench by Month.'},
       {name:'Due Dates', href:'#', onclick:"activateModuleTab('dueDates')", rule:'Upcoming assignment due dates from Jira In Progress assignments.'},
       {name:'Harvest QA', href:'#', onclick:"activateModuleTab('harvestAccess')", rule:'Harvest active users/projects and Jira access comparison.'},
-      {name:'Account Coverage', href:'#', onclick:"activateModuleTab('accountCoverage')", rule:'PSA Account Coverage: PM, CSM, TL, and Status.'},
+      {name:'Account Coverage', href:'#', onclick:"activateModuleTab('accountsHub');AH.showGaps()", rule:'PSA Account Coverage (now in Accounts): PM, CSM, TL, and Status.'},
       {name:'Jira AA', href:'https://azumohq.atlassian.net/jira/software/projects/AA/boards', rule:'Source project for assignees and assignment issues.'}
     ];
     const lineage = sources.map(source => ({name:source.name, href:'#', onclick:"activateModuleTab('pmoActionCenter')", rule:source.rule || `Feeds: ${(source.feeds || []).join(', ') || '—'}`}));

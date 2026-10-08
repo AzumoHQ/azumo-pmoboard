@@ -3,7 +3,7 @@
    My Portfolio = PM home: to-dos, my accounts, my people. Reads the board's globals
    (latest, clientProjects, psaProjectStatusData…) and reuses its Jira forms. */
 (function(){
-  var S = { view:'list', key:'', tab:'overview', q:'', filter:'all', docFilter:'All', pm:null, draft:null, docForm:false, docs:null, docsLoading:false, msg:'' };
+  var S = { view:'list', key:'', tab:'overview', q:'', filter:'all', ms:{status:[], pm:[], csm:[], tl:[]}, msq:{}, msOpen:'', docFilter:'All', pm:null, draft:null, docForm:false, docs:null, docsLoading:false, msg:'' };
   var DOC_TYPES = ['SOW','Transcript','Report','Other'];
   var DOC_ICON = {SOW:'contract', Transcript:'graphic_eq', Report:'summarize', Other:'link'};
   var TERMS = [
@@ -80,6 +80,11 @@
         pm: cov.pm_assigned || (psa && psa.pmAssigned && psa.pmAssigned.name) || (pmRow && pmRow.name) || '',
         csm: cov.csm_assigned || '', tl: cov.tl_assigned || '', status: cov.status || 'Active',
         psa:psa, lastReport:last, since:since,
+        cov:cov, hasCov: !!(cov && (cov.key || cov.client)), missing: (cov && cov.missing) || [],
+        covComplete: !!(cov && cov.complete),
+        pmOff: !!(cov && cov.pm_assigned && cov.pm_assigned_active === false),
+        csmOff: !!(cov && cov.csm_assigned && cov.csm_assigned_active === false),
+        tlOff: !!(cov && cov.tl_assigned && cov.tl_assigned_active === false),
         reportState: since === null ? 'none' : since > 30 ? 'stale' : since >= CADENCE_DAYS - 4 ? 'due' : 'ok',
         terms:t, docs: docsFor(key),
         ending: people.filter(function(p){ var d = daysFrom(p.due); return !p.pending && d !== null && d <= 30; }).length
@@ -170,30 +175,79 @@
     return '<div class="ah-empty">' + ico(icon) + '<div class="ah-empty-title">' + e(title) + '</div>' + (sub ? '<div class="ah-empty-sub">' + e(sub) + '</div>' : '') + (cta || '') + '</div>';
   }
 
-  /* ---------- Accounts: list ---------- */
+  /* ---------- Accounts: list (table, merged with Account Coverage) ---------- */
+  var MS_DEFS = [['status','Status','statuses'], ['pm','PM','PMs'], ['csm','CSM','CSMs'], ['tl','TL','TLs']];
+  function msValue(a, id){ return (id === 'status' ? a.status : a[id]) || (id === 'status' ? 'Unknown' : 'Unassigned'); }
+  function msOptions(all, id){ return [...new Set(all.map(function(a){ return msValue(a, id); }))].sort(function(x, y){ return String(x).localeCompare(String(y)); }); }
+  function msHTML(all, d){
+    var id = d[0], sel = S.ms[id], open = S.msOpen === id, q = (S.msq[id] || '').toLowerCase();
+    var label = !sel.length ? 'All ' + d[2] : sel.length === 1 ? sel[0] : sel.length + ' ' + d[2];
+    var opts = msOptions(all, id).filter(function(v){ return !q || String(v).toLowerCase().indexOf(q) > -1; });
+    return '<div class="ah-ms' + (open ? ' open' : '') + '">' +
+      '<button type="button" class="ah-ms-btn" onclick="AH.msToggle(\'' + id + '\')"><span class="ah-ms-k">' + d[1] + '</span><span>' + e(label) + '</span><span class="msi ah-ico" aria-hidden="true">expand_more</span></button>' +
+      (open ? '<div class="ah-ms-panel">' +
+        '<input class="ah-ms-search" type="text" placeholder="Search…" value="' + e(S.msq[id] || '') + '" oninput="AH.msSearch(\'' + id + '\', this.value)"/>' +
+        '<div class="ah-ms-actions"><button type="button" onclick="AH.msAll(\'' + id + '\')">Select all</button><button type="button" onclick="AH.msClear(\'' + id + '\')">Clear</button></div>' +
+        '<div class="ah-ms-list">' + (opts.length ? opts.map(function(v){ return '<label class="ah-ms-opt"><input type="checkbox" value="' + e(v) + '"' + (sel.indexOf(v) > -1 ? ' checked' : '') + ' onchange="AH.msPick(\'' + id + '\', this.value)"/> ' + e(v) + '</label>'; }).join('') : '<div class="ah-meta" style="padding:8px 12px">No matches</div>') + '</div>' +
+      '</div>' : '') + '</div>';
+  }
+  function roleCell(name, off){
+    if(!name) return '<span class="ah-pill neg">Missing</span>';
+    return e(name) + (off ? ' <span class="ah-pill neg" title="Deactivated in Jira">Inactive</span>' : '');
+  }
+  function coverageCell(a){
+    if(!a.hasCov) return '<span class="ah-pill warn">No PSA epic</span>';
+    if(a.covComplete) return '<span class="ah-pill pos">Complete</span>';
+    return '<span class="ah-pill neg">Missing ' + e((a.missing || []).join(' · ') || 'PM/CSM/TL') + '</span>';
+  }
+  function hasGap(a){ return !a.hasCov || !a.covComplete || a.pmOff || a.csmOff || a.tlOff; }
+  function matchesList(a, q){
+    if(q && (a.client + ' ' + a.status + ' ' + a.pm + ' ' + a.csm + ' ' + a.tl + ' ' + a.people.map(function(p){ return p.name; }).join(' ')).toLowerCase().indexOf(q) === -1) return false;
+    for(var i = 0; i < MS_DEFS.length; i++){ var id = MS_DEFS[i][0], sel = S.ms[id]; if(sel.length && sel.indexOf(msValue(a, id)) === -1) return false; }
+    if(S.filter === 'gaps') return hasGap(a);
+    if(S.filter === 'report') return a.reportState === 'stale' || a.reportState === 'none' || a.reportState === 'due';
+    if(S.filter === 'terms') return !a.terms.length;
+    if(S.filter === 'ending') return a.ending > 0;
+    return true;
+  }
   function renderList(host){
     var all = accounts();
     var q = S.q.trim().toLowerCase();
-    var list = all.filter(function(a){
-      if(q && (a.client + ' ' + a.pm + ' ' + a.people.map(function(p){ return p.name; }).join(' ')).toLowerCase().indexOf(q) === -1) return false;
-      if(S.filter === 'report') return a.reportState === 'stale' || a.reportState === 'none' || a.reportState === 'due';
-      if(S.filter === 'terms') return !a.terms.length;
-      if(S.filter === 'ending') return a.ending > 0;
-      return true;
-    });
+    var list = all.filter(function(a){ return matchesList(a, q); });
     var count = function(f){ return all.filter(f).length; };
     var filters = [
       ['all', 'All', all.length],
+      ['gaps', 'Coverage gaps', count(hasGap)],
       ['report', 'Report due / overdue', count(function(a){ return a.reportState !== 'ok'; })],
       ['ending', 'Assignments ending ≤30d', count(function(a){ return a.ending > 0; })],
       ['terms', 'Terms not set', count(function(a){ return !a.terms.length; })]
     ];
+    var dirty = S.q || S.filter !== 'all' || MS_DEFS.some(function(d){ return S.ms[d[0]].length; });
+    var missingUrl = (typeof accountCoverageMissingUrl === 'function') ? accountCoverageMissingUrl() : '#';
+    var rows = list.map(function(a){
+      var jira = (typeof accountCoverageUrl === 'function') ? accountCoverageUrl(a.hasCov ? a.cov : {client:a.client}) : '#';
+      return '<tr class="ah-row-click" style="cursor:pointer" onclick="AH.open(\'' + a.key + '\')">' +
+        '<td><div class="ah-acc"><span class="ah-avatar sm">' + e(initials(a.client)) + '</span><b>' + e(a.client) + '</b></div></td>' +
+        '<td>' + (a.status === 'In Progress' ? '<span class="ah-pill pos">' + e(a.status) + '</span>' : '<span class="ah-pill">' + e(a.status) + '</span>') + '</td>' +
+        '<td>' + roleCell(a.pm, a.pmOff) + '</td><td>' + roleCell(a.csm, a.csmOff) + '</td><td>' + roleCell(a.tl, a.tlOff) + '</td>' +
+        '<td>' + coverageCell(a) + '</td>' +
+        '<td>' + reportBadge(a) + '</td>' +
+        '<td><div class="ah-chips">' + termsChips(a.terms) + '</div></td>' +
+        '<td class="ah-meta">' + a.people.length + (a.ending ? ' · <b class="warn">' + a.ending + ' ending</b>' : '') + '</td>' +
+        '<td class="ah-meta">' + a.docs.length + '</td>' +
+        '<td onclick="event.stopPropagation()"><a class="inline-filter" href="' + e(jira) + '" target="_blank" rel="noopener noreferrer">' + (hasGap(a) ? 'Complete in Jira' : 'Open in Jira') + '</a></td>' +
+      '</tr>';
+    }).join('');
     host.innerHTML =
       '<div class="ah-toolbar">' +
-        '<label class="harvest-search ah-search">' + ico('search') + '<input type="search" placeholder="Search account, PM or person" value="' + e(S.q) + '" oninput="AH.search(this.value)"/></label>' +
-        '<div class="ah-filters">' + filters.map(function(f){ return '<button type="button" class="action-filter ' + (S.filter === f[0] ? 'active' : '') + '" onclick="AH.filter(\'' + f[0] + '\')">' + e(f[1]) + ' <span class="ah-count">' + f[2] + '</span></button>'; }).join('') + '</div>' +
+        '<label class="harvest-search ah-search">' + ico('search') + '<input type="search" placeholder="Search account, PM, CSM, TL or person" value="' + e(S.q) + '" oninput="AH.search(this.value)"/></label>' +
+        '<div class="ah-filters">' + MS_DEFS.map(function(d){ return msHTML(all, d); }).join('') +
+          (dirty ? '<button type="button" class="btn btn-ghost btn-sm" onclick="AH.clearFilters()">Clear filters</button>' : '') +
+          '<a class="btn btn-ghost btn-sm" href="' + e(missingUrl) + '" target="_blank" rel="noopener noreferrer">Open missing in Jira</a></div>' +
       '</div>' +
-      (list.length ? '<div class="ah-grid">' + list.map(accountCard).join('') + '</div>' : emptyState('domain', 'No accounts match these filters', 'Clear the search or pick another filter.'));
+      '<div class="ah-toolbar" style="margin-top:8px"><div class="ah-filters">' + filters.map(function(f){ return '<button type="button" class="action-filter ' + (S.filter === f[0] ? 'active' : '') + '" onclick="AH.filter(\'' + f[0] + '\')">' + e(f[1]) + ' <span class="ah-count">' + f[2] + '</span></button>'; }).join('') + '</div>' +
+        '<span class="ah-meta">' + list.length + ' of ' + all.length + ' accounts</span></div>' +
+      (list.length ? '<div class="tbl-wrap ah-table ah-list"><table><thead><tr><th>Account</th><th>Status</th><th>PM</th><th>CSM</th><th>TL</th><th>Coverage</th><th>Report</th><th>Terms</th><th>People</th><th>Docs</th><th>Jira</th></tr></thead><tbody>' + rows + '</tbody></table></div>' : emptyState('domain', 'No accounts match these filters', 'Clear the search or pick another filter.'));
     var input = host.querySelector('.ah-search input');
     if(input && document.activeElement && document.activeElement.dataset && document.activeElement.dataset.ahFocus){ input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
   }
@@ -382,6 +436,9 @@
     try{ if(typeof loadClientProjects === 'function') loadClientProjects().then(render); }catch(_){}
     loadDocs();
   }
+  document.addEventListener('click', function(ev){
+    if(S.msOpen && !(ev.target.closest && ev.target.closest('.ah-ms'))){ S.msOpen = ''; render(); }
+  });
   var AH = window.AH = {
     render: render,
     open: function(key, tab){ S.view = 'detail'; S.key = key; S.tab = tab || 'overview'; S.draft = null; S.docForm = false; S.msg = ''; S.docFilter = 'All';
@@ -391,6 +448,17 @@
     tab: function(t){ S.tab = t; S.msg = ''; if(t !== 'terms') S.draft = null; render(); },
     search: function(v){ S.q = v; render(); var i = document.querySelector('#accountsHubBody .ah-search input'); if(i){ i.focus(); i.setSelectionRange(v.length, v.length); } },
     filter: function(f){ S.filter = f; render(); },
+    showGaps: function(){ S.view = 'list'; S.filter = 'gaps'; S.q = ''; MS_DEFS.forEach(function(d){ S.ms[d[0]] = []; }); render(); },
+    clearFilters: function(){ S.q = ''; S.filter = 'all'; S.msOpen = ''; S.msq = {}; MS_DEFS.forEach(function(d){ S.ms[d[0]] = []; }); render(); },
+    msToggle: function(id){ S.msOpen = S.msOpen === id ? '' : id; render(); if(S.msOpen){ var i = document.querySelector('#accountsHubBody .ah-ms-search'); if(i) i.focus(); } },
+    msSearch: function(id, v){ S.msq[id] = v; render(); var i = document.querySelector('#accountsHubBody .ah-ms-search'); if(i){ i.focus(); i.setSelectionRange(v.length, v.length); } },
+    msPick: function(id, v){ var s = S.ms[id], i = s.indexOf(v); if(i > -1) s.splice(i, 1); else s.push(v); render(); },
+    msAll: function(id){
+      var q = (S.msq[id] || '').toLowerCase();
+      msOptions(accounts(), id).forEach(function(v){ if((!q || String(v).toLowerCase().indexOf(q) > -1) && S.ms[id].indexOf(v) === -1) S.ms[id].push(v); });
+      render();
+    },
+    msClear: function(id){ S.ms[id] = []; render(); },
     docFilter: function(f){ S.docFilter = f; render(); },
     pickPm: function(v){ S.pm = v; render(); },
     toggleTodos: function(){ S.todosAll = !S.todosAll; render(); },

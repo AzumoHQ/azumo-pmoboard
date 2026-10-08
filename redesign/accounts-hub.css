@@ -122,3 +122,23 @@
 .ah-todo-ico.neg{color:var(--neg);background:color-mix(in srgb,var(--neg) 12%,transparent)}
 .ah-todo-ico.warn{color:var(--forecast);background:color-mix(in srgb,var(--forecast) 14%,transparent)}
 .btn .ah-ico{font-size:17px}
+
+/* Accounts list (table) + merged coverage */
+.ah-list table{width:100%}
+.ah-list th,.ah-list td{white-space:nowrap}
+.ah-list td .ah-chips{flex-wrap:nowrap}
+.ah-row-click:hover td{background:var(--surface-2)}
+.ah-acc{display:flex;align-items:center;gap:10px;min-width:0}
+.ah-acc b{font-weight:600;color:var(--ink)}
+.ah-avatar.sm{width:28px;height:28px;font-size:11px;flex:none}
+.ah-ms{position:relative}
+.ah-ms-btn{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-control);background:var(--surface);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+.ah-ms-btn:hover,.ah-ms.open .ah-ms-btn{border-color:var(--brand)}
+.ah-ms-k{color:var(--muted);font-size:12px}
+.ah-ms-panel{position:absolute;top:calc(100% + 6px);left:0;z-index:40;min-width:240px;padding:8px 0;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.ah-ms-search{width:calc(100% - 16px);margin:0 8px 6px;height:32px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px}
+.ah-ms-actions{display:flex;justify-content:space-between;padding:2px 12px 6px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.ah-ms-actions button{background:none;border:0;padding:0;color:var(--brand);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+.ah-ms-list{max-height:260px;overflow-y:auto}
+.ah-ms-opt{display:flex;align-items:center;gap:8px;padding:6px 12px;font-size:13px;color:var(--ink);cursor:pointer}
+.ah-ms-opt:hover{background:var(--surface-2)}
