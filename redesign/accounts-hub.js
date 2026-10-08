@@ -216,8 +216,7 @@
       '<div class="ah-head">' +
         '<div class="ah-head-id"><span class="ah-avatar lg">' + e(initials(a.client)) + '</span><div><div class="ah-head-name">' + e(a.client) + ' <span class="ah-pill pos">' + e(a.status) + '</span></div>' +
           '<div class="ah-roles">' + [['PM',a.pm],['CSM',a.csm],['TL',a.tl]].map(function(r){ return '<span>' + r[0] + ' ' + (r[1] ? '<b>' + e(r[1]) + '</b>' : '<b class="neg">Missing</b>') + '</span>'; }).join('') + '</div></div></div>' +
-        '<div class="btn-row"><button class="btn btn-ghost btn-sm" type="button" onclick="AH.requestAssignment()">' + ico('person_add') + 'Request assignment</button>' +
-          '<button class="btn btn-primary btn-sm" type="button" onclick="AH.newReport()">' + ico('add') + 'New status report</button></div>' +
+        '<div class="btn-row"><button class="btn btn-primary btn-sm" type="button" onclick="AH.newReport()">' + ico('add') + 'New status report</button></div>' +
       '</div>' +
       '<div class="ah-tabs" role="tablist">' + tabs.map(function(t){ return '<button type="button" role="tab" aria-selected="' + (S.tab === t[0]) + '" class="ah-tab ' + (S.tab === t[0] ? 'active' : '') + '" onclick="AH.tab(\'' + t[0] + '\')">' + e(t[1]) + (t[2] !== '' ? '<span class="ah-count">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</div>' +
       '<div class="ah-body">' + body(a) + '</div>';
@@ -247,7 +246,7 @@
       '</div>';
   }
   function tabTeam(a){
-    if(!a.people.length) return emptyState('group', 'Nobody assigned yet', 'Request an assignment to staff this account.', '<button class="btn btn-primary btn-sm" type="button" onclick="AH.requestAssignment()">Request assignment</button>');
+    if(!a.people.length) return emptyState('group', 'Nobody assigned yet', 'No active or upcoming assignments for this account.');
     return '<div class="tbl-wrap ah-table"><table><thead><tr><th>Assignee</th><th>Position</th><th>Status</th><th>End date</th><th></th></tr></thead><tbody>' +
       a.people.map(function(p, i){
         var d = daysFrom(p.due);
@@ -266,8 +265,8 @@
     var banner = a.reportState === 'ok' ? '' :
       '<div class="ah-banner ' + (a.reportState === 'due' ? 'warn' : 'neg') + '">' + ico('schedule') + (a.lastReport ? (nextDue < 0 ? 'Report overdue by ' + (-nextDue) + ' days' : 'Next report due in ' + nextDue + ' days') : 'No status report filed for this account yet') + ' · cadence every ' + CADENCE_DAYS + ' days' +
       '<button class="btn btn-primary btn-sm" type="button" onclick="AH.newReport()">Write report</button></div>';
-    return banner + (reps.length ? '<div class="tbl-wrap ah-table"><table><thead><tr><th>Date</th><th>Report</th><th>Status</th><th>Ticket</th></tr></thead><tbody>' +
-      reps.map(function(r){ return '<tr><td>' + fmt(r.date) + '</td><td>' + e(r.summary || r.reportType || 'Status report') + '</td><td><span class="ah-rags">' + ragChips(r) + '</span></td><td><a href="' + e((typeof jiraIssueUrl === 'function' && jiraIssueUrl(r.key)) || '#') + '" target="_blank" rel="noopener noreferrer">' + e(r.key || '—') + '</a></td></tr>'; }).join('') +
+    return banner + (reps.length ? '<div class="tbl-wrap ah-table"><table><thead><tr><th>Date</th><th>Report</th><th>Status</th><th></th></tr></thead><tbody>' +
+      reps.map(function(r){ return '<tr class="ah-row-click" style="cursor:pointer" onclick="AH.openReport(\'' + e(r.key || '') + '\')"><td>' + fmt(r.date) + '</td><td>' + e(r.summary || r.reportType || 'Status report') + '</td><td><span class="ah-rags">' + ragChips(r) + '</span></td><td class="ah-td-act"><button type="button" class="btn btn-ghost btn-sm" onclick="event.stopPropagation();AH.openReport(\'' + e(r.key || '') + '\')">' + ico('visibility') + 'View</button></td></tr>'; }).join('') +
       '</tbody></table></div>' : '');
   }
   function tabTerms(a){
@@ -400,6 +399,20 @@
       var go = function(){ var acc = a && account(a.key); openPsaReportModal(acc && acc.psa ? acc.psa.epicKey : ''); };
       try{ if(!psaProjectStatusLoaded) loadPsaProjectStatus().then(go); else go(); }catch(_){ go(); }
     },
+    openReport: function(key){
+      var a = account(S.key), reps = (a && a.psa && a.psa.reports) || [], r = null;
+      for(var i = 0; i < reps.length; i++){ if(reps[i].key === key){ r = reps[i]; break; } }
+      if(!r) return;
+      RP = {open:true, report:r, client:a.client}; rpRender();
+      var c = RPD[key];
+      if(c && c.state === 'ok') return;
+      RPD[key] = {state:'loading'}; rpRender();
+      fetch('/api/psa-reports?details=' + encodeURIComponent(key), {cache:'no-store', credentials:'same-origin'})
+        .then(function(res){ return res.json().catch(function(){ return {}; }).then(function(j){ if(!res.ok) throw new Error(j.error || ('HTTP ' + res.status)); return j; }); })
+        .then(function(j){ RPD[key] = {state:'ok', details:j.details || []}; rpRender(); })
+        .catch(function(err){ RPD[key] = {state:'error', error:err.message}; rpRender(); });
+    },
+    closeReport: function(){ RP.open = false; rpRender(); },
     requestAssignment: function(generic){ var a = generic ? null : account(S.key); openAaAssignmentModal(a ? {client:a.client} : {}); },
     extendAssignment: function(i){
       var a = account(S.key); if(!a) return; var p = a.people[i]; if(!p) return;
@@ -427,6 +440,45 @@
     },
     changeAssignment: function(i){ var a = account(S.key); if(!a) return; var p = a.people[i]; openAaAssignmentModal({client:a.client, personName:p && p.name}); }
   };
+
+  /* ---------- status report viewer (in-app, replaces the link out to Jira) ---------- */
+  var RP = {open:false, report:null, client:''}, RPD = {};
+  function rpHost(){
+    var m = document.getElementById('ahReportModal');
+    if(!m){
+      m = document.createElement('div'); m.id = 'ahReportModal'; m.className = 'auth-modal'; m.setAttribute('aria-hidden', 'true');
+      m.addEventListener('click', function(ev){ if(ev.target === m) AH.closeReport(); });
+      document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape' && RP.open) AH.closeReport(); });
+      document.body.appendChild(m);
+    }
+    return m;
+  }
+  function rpBody(key){
+    var c = RPD[key];
+    if(!c || c.state === 'loading') return '<div class="ah-meta">Loading report…</div>';
+    if(c.state === 'error') return '<div class="ah-meta" style="color:var(--neg)">Could not load the report: ' + e(c.error) + '</div>';
+    if(!c.details.length) return '<div class="ah-meta">No comments in this report.</div>';
+    return c.details.map(function(d){
+      var url = /^https?:\/\//i.test(d.text || '');
+      var body = url ? '<a href="' + e(d.text) + '" target="_blank" rel="noopener noreferrer">' + e(d.text) + '</a>' : e(d.text);
+      return '<div style="margin:0 0 12px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:2px">' + e(d.label) + '</div><div style="white-space:pre-wrap;font-size:13px;line-height:1.5">' + body + '</div></div>';
+    }).join('');
+  }
+  function rpRender(){
+    var m = rpHost(), r = RP.report;
+    if(!RP.open || !r){ m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); return; }
+    m.classList.add('open'); m.setAttribute('aria-hidden', 'false');
+    var jira = (typeof jiraIssueUrl === 'function' && jiraIssueUrl(r.key)) || '';
+    m.innerHTML = '<div class="auth-card" style="max-width:640px;max-height:86vh;overflow:auto">' +
+      '<h3>' + e(r.summary || r.reportType || 'Status report') + '</h3>' +
+      '<p class="ah-meta" style="margin:0 0 10px">' + e(RP.client) + ' · ' + fmt(r.date) + (r.reportType ? ' · ' + e(r.reportType) : '') + '</p>' +
+      '<div class="ah-rags" style="margin:0 0 14px">' + ragChips(r) + '</div>' +
+      rpBody(r.key) +
+      '<div class="auth-actions" style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px">' +
+        (jira ? '<a class="ah-meta" href="' + e(jira) + '" target="_blank" rel="noopener noreferrer">Open ' + e(r.key) + ' in Jira</a>' : '<span></span>') +
+        '<button type="button" class="btn btn-primary" onclick="AH.closeReport()">Close</button>' +
+      '</div></div>';
+  }
 
   /* ---------- extend assignment (new end date → updates the AA Assignment in Jira) ---------- */
   var EX = {open:false, person:null, client:'', busy:false, msg:''};
