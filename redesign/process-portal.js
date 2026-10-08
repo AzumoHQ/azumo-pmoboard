@@ -48,6 +48,23 @@
   var save = {dirty: new Set(), timer: null, state: 'idle', at: null, err: ''};
   var root = null;
 
+  // Company roles catalog (Admin -> Roles), same source as the legacy modal.
+  // Loaded once; when it arrives, the open step editor is repainted.
+  var catalog = {roles: [], state: 'idle'};
+  function loadCatalog(){
+    if(catalog.state !== 'idle') return;
+    catalog.state = 'loading';
+    fetch('/api/admin?action=roles-with-people', {credentials: 'same-origin', cache: 'no-store'})
+      .then(function(r){ return r.ok ? r.json() : {roles: []}; })
+      .then(function(j){
+        catalog.roles = (j.roles || []).map(function(r){ return String(r.role_name || '').trim(); }).filter(Boolean)
+          .sort(function(a, b){ return a.localeCompare(b); });
+        catalog.state = 'done';
+        if(view.p && view.sel && root) paint(['editor']);
+      })
+      .catch(function(){ catalog.state = 'idle'; });
+  }
+
   function toModel(p){
     var m = JSON.parse(JSON.stringify(p || {}));
     m.status = m.status || 'published';
@@ -465,6 +482,10 @@
     var s = m.steps[i];
     var roles = []; m.roles_responsibilities.forEach(function(r){ if((r.role || '').trim() && roles.indexOf(r.role.trim()) < 0) roles.push(r.role.trim()); });
     if(s.role && roles.indexOf(s.role) < 0) roles.push(s.role);
+    // Company roles not yet in this process
+    if(edit) loadCatalog();
+    var known = roles.map(norm);
+    var company = catalog.roles.filter(function(r){ return known.indexOf(norm(r)) < 0; });
     var when = s.day ? [DAYS[s.day] || s.day, s.time_of_day].filter(Boolean).join(' · ') : '';
     if(!edit){
       return '<div class="pp-card"><div class="pp-card-head"><div class="pp-card-title"><span class="mono pp-faint">' + pad(i) + '</span> ' + H(s.title) + '</div>' +
@@ -484,7 +505,10 @@
       '<button type="button" class="btn btn-ghost btn-sm" data-act="close-step">Close</button></div></div>' +
       '<div class="pp-card-body pp-form">' +
         '<label class="pp-field pp-span2"><span class="pp-label">Step</span><input class="pp-input" data-sf="title" value="' + H(s.title || '') + '" placeholder="Create the Epic in Azumo Assignments"></label>' +
-        '<label class="pp-field"><span class="pp-label">Role</span><select class="pp-input" data-sf="role">' + opt('', '— role —', s.role || '') + roles.map(function(r){ return opt(r, r, s.role); }).join('') + '</select></label>' +
+        '<label class="pp-field"><span class="pp-label">Role</span><select class="pp-input" data-sf="role">' + opt('', '— role —', s.role || '') +
+          (company.length && roles.length ? '<optgroup label="This process">' : '') + roles.map(function(r){ return opt(r, r, s.role); }).join('') + (company.length && roles.length ? '</optgroup>' : '') +
+          (company.length ? '<optgroup label="Company roles">' + company.map(function(r){ return opt(r, r, s.role); }).join('') + '</optgroup>' : '') +
+          '</select></label>' +
         '<label class="pp-field"><span class="pp-label">Type</span><select class="pp-input" data-sf="node_type">' + TYPES.map(function(t){ return opt(t.v, t.l, s.node_type || 'task'); }).join('') +
           (TYPE_LABEL[s.node_type] && !TYPES.some(function(t){ return t.v === s.node_type; }) ? opt(s.node_type, TYPE_LABEL[s.node_type], s.node_type) : '') + '</select></label>' +
         '<label class="pp-field"><span class="pp-label">Deliverable</span><input class="pp-input" data-sf="outputs" value="' + H(s.outputs || '') + '" placeholder="Signed contract, staffing confirmed…"></label>' +
@@ -673,6 +697,11 @@
       else if(f === '_no'){ s._no = t.value || null; }
       else if(f === '_yes'){ s._yes = t.value || null; }
       else s[f] = t.value || (f === 'node_type' ? 'task' : '');
+      // A company role picked for a step becomes a role of this process (Roles & responsibilities)
+      if(f === 'role' && t.value && !m.roles_responsibilities.some(function(r){ return norm(r.role) === norm(t.value); })){
+        m.roles_responsibilities.push({role: t.value, responsibilities: '', person: ''});
+        touch(['process']); paint(['roles']);
+      }
       touch(['steps']);
       paint(f === 'node_type' ? ['kpis', 'flow', 'editor', 'table'] : ['flow', 'table', 'kpis']);
       if(f === 'node_type' || f === 'role') refreshBannerSoft();
