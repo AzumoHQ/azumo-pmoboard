@@ -176,7 +176,7 @@
   }
 
   /* ---------- Accounts: list (table, merged with Account Coverage) ---------- */
-  var MS_DEFS = [['status','Status','statuses'], ['pm','PM','PMs'], ['csm','CSM','CSMs'], ['tl','TL','TLs']];
+  var MS_DEFS = [['pm','PM','PMs'], ['csm','CSM','CSMs'], ['tl','TL','TLs']];
   function msValue(a, id){ return (id === 'status' ? a.status : a[id]) || (id === 'status' ? 'Unknown' : 'Unassigned'); }
   function msOptions(all, id){ return [...new Set(all.map(function(a){ return msValue(a, id); }))].sort(function(x, y){ return String(x).localeCompare(String(y)); }); }
   function msHTML(all, d){
@@ -202,7 +202,7 @@
   }
   function hasGap(a){ return !a.hasCov || !a.covComplete || a.pmOff || a.csmOff || a.tlOff; }
   function matchesList(a, q){
-    if(q && (a.client + ' ' + a.status + ' ' + a.pm + ' ' + a.csm + ' ' + a.tl + ' ' + a.people.map(function(p){ return p.name; }).join(' ')).toLowerCase().indexOf(q) === -1) return false;
+    if(q && (a.client + ' ' + a.pm + ' ' + a.csm + ' ' + a.tl + ' ' + a.people.map(function(p){ return p.name; }).join(' ')).toLowerCase().indexOf(q) === -1) return false;
     for(var i = 0; i < MS_DEFS.length; i++){ var id = MS_DEFS[i][0], sel = S.ms[id]; if(sel.length && sel.indexOf(msValue(a, id)) === -1) return false; }
     if(S.filter === 'gaps') return hasGap(a);
     if(S.filter === 'report') return a.reportState === 'stale' || a.reportState === 'none' || a.reportState === 'due';
@@ -228,11 +228,10 @@
       var jira = (typeof accountCoverageUrl === 'function') ? accountCoverageUrl(a.hasCov ? a.cov : {client:a.client}) : '#';
       return '<tr class="ah-row-click" style="cursor:pointer" onclick="AH.open(\'' + a.key + '\')">' +
         '<td><div class="ah-acc"><span class="ah-avatar sm">' + e(initials(a.client)) + '</span><b>' + e(a.client) + '</b></div></td>' +
-        '<td>' + (a.status === 'In Progress' ? '<span class="ah-pill pos">' + e(a.status) + '</span>' : '<span class="ah-pill">' + e(a.status) + '</span>') + '</td>' +
+        '<td><div class="ah-chips">' + termsChips(a.terms) + '</div></td>' +
         '<td>' + roleCell(a.pm, a.pmOff) + '</td><td>' + roleCell(a.csm, a.csmOff) + '</td><td>' + roleCell(a.tl, a.tlOff) + '</td>' +
         '<td>' + coverageCell(a) + '</td>' +
         '<td>' + reportBadge(a) + '</td>' +
-        '<td><div class="ah-chips">' + termsChips(a.terms) + '</div></td>' +
         '<td class="ah-meta">' + a.people.length + (a.ending ? ' · <b class="warn">' + a.ending + ' ending</b>' : '') + '</td>' +
         '<td class="ah-meta">' + a.docs.length + '</td>' +
         '<td onclick="event.stopPropagation()"><a class="inline-filter" href="' + e(jira) + '" target="_blank" rel="noopener noreferrer">' + (hasGap(a) ? 'Complete in Jira' : 'Open in Jira') + '</a></td>' +
@@ -247,7 +246,7 @@
       '</div>' +
       '<div class="ah-toolbar" style="margin-top:8px"><div class="ah-filters">' + filters.map(function(f){ return '<button type="button" class="action-filter ' + (S.filter === f[0] ? 'active' : '') + '" onclick="AH.filter(\'' + f[0] + '\')">' + e(f[1]) + ' <span class="ah-count">' + f[2] + '</span></button>'; }).join('') + '</div>' +
         '<span class="ah-meta">' + list.length + ' of ' + all.length + ' accounts</span></div>' +
-      (list.length ? '<div class="tbl-wrap ah-table ah-list"><table><thead><tr><th>Account</th><th>Status</th><th>PM</th><th>CSM</th><th>TL</th><th>Coverage</th><th>Report</th><th>Terms</th><th>People</th><th>Docs</th><th>Jira</th></tr></thead><tbody>' + rows + '</tbody></table></div>' : emptyState('domain', 'No accounts match these filters', 'Clear the search or pick another filter.'));
+      (list.length ? '<div class="tbl-wrap ah-table ah-list"><table><thead><tr><th>Account</th><th>Terms</th><th>PM</th><th>CSM</th><th>TL</th><th>Coverage</th><th>Report</th><th>People</th><th>Docs</th><th>Jira</th></tr></thead><tbody>' + rows + '</tbody></table></div>' : emptyState('domain', 'No accounts match these filters', 'Clear the search or pick another filter.'));
     var input = host.querySelector('.ah-search input');
     if(input && document.activeElement && document.activeElement.dataset && document.activeElement.dataset.ahFocus){ input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
   }
