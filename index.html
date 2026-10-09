@@ -537,7 +537,9 @@ main>section.tab-section-active{animation:tabFade .18s ease-out}
 .ext-legend-chip.active{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
 /* Navigation path: texto en la barra superior, junto a la marca. Sin caja ni fondo: color de la página. */
 /* Navigation path: franja fina debajo de la barra superior. Texto plano en el color de la página, sin caja. */
-#pmoNavPath{display:flex;align-items:center;gap:6px;padding:8px clamp(16px,3vw,32px);font-size:13px;font-weight:500;color:var(--txt);white-space:nowrap;overflow:hidden;background:none;border:0;box-shadow:none;min-width:0}
+#pmoNavPath{display:flex;align-items:center;gap:6px;flex:1 1 0;min-width:0;margin:0 0 0 4px;padding:0 0 0 16px;border-left:1px solid var(--brd);font-size:14px;font-weight:500;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:none;box-shadow:none}
+/* Sin lugar: queda solo el logo de azumo, el path pasa a ocupar ese espacio y el menú no se mueve */
+@media(max-width:1000px){.nav-brand-copy{display:none!important}}
 #pmoNavPath:empty{display:none}
 #pmoNavPath button{all:unset;cursor:pointer;color:var(--txt);opacity:.7;font:inherit;padding:2px;border-radius:4px}
 #pmoNavPath button:hover{opacity:1;text-decoration:underline}
@@ -1653,6 +1655,7 @@ if(window.PMO_LF){ try{
       <a href="#" onclick="goTo(window.PMO_PREVIEW ? 'myPortfolio' : 'overview');return false;" style="text-decoration:none;display:flex"><div class="nav-logo"><img class="nav-wordmark" src="assets/azumo-logo.png" alt="Azumo"/></div></a>
       <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span id="pmoVersionNav">v3.3</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
     </div>
+    <div id="pmoNavPath" class="pmo-path-slot" aria-label="Navigation path"></div>
     <div class="nav-links">
       <button class="nav-link" id="overviewNavLink" onclick="goTo('overview')">Overview</button>
       <button class="nav-link" id="billingNavLink" onclick="goTo('dashboard')"><i class="ti ti-credit-card"></i> Billing</button>
@@ -1837,7 +1840,6 @@ if(window.PMO_LF){ try{
   <!-- PMO-LAYOUT: horizontal top module tabs -->
   <div id="moduleIndexLinks" role="tablist" aria-label="PMO dashboard views"></div>
 </aside>
-<div id="pmoNavPath" class="pmo-path-slot" aria-label="Navigation path"></div>
 
 <main>
 
