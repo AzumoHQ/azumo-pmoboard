@@ -535,6 +535,15 @@ main>section.tab-section-active{animation:tabFade .18s ease-out}
 .ext-legend-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--brd);background:var(--surf);color:var(--txt);border-radius:999px;padding:4px 10px;font:inherit;font-size:.74rem;font-weight:800;cursor:pointer}
 .ext-legend-chip .ext-dot{margin-right:0}
 .ext-legend-chip.active{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+/* Navigation path (preview) */
+.pmo-crumbs{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0 0 .85rem;font-size:13px;color:var(--muted);line-height:1.3}
+.pmo-crumbs button{all:unset;cursor:pointer;color:var(--muted);font:inherit}
+.pmo-crumbs button:hover{color:var(--blue-lt,var(--blue))}
+.pmo-crumbs button:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+.pmo-crumbs-sep{opacity:.6}
+.pmo-crumbs b{color:var(--ink,var(--txt));font-weight:500}
+/* Si la página ya tiene su propio path (ficha de account, detalle de proceso), no se duplica */
+#accountsHub:has(.ah-crumbs) > .pmo-crumbs,#processes:has(.pp-crumbs) > .pmo-crumbs{display:none}
 .forecast-filters{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin:0 0 1rem}
 .filter-field{display:flex;flex-direction:column;gap:5px;min-width:220px}
 .filter-field label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
@@ -3890,6 +3899,8 @@ function sidebarNavConfig(){
   return entries;
 }
 function currentModuleTabId(sections){
+  const fromHash = pmoHashSectionId(); // PREVIEW: link directo (#forecast, #bench, …)
+  if(fromHash && sections.some(section => section.id === fromHash)) return fromHash;
   const stored = localStorage.getItem(MODULE_TAB_KEY);
   if(window.PMO_PREVIEW && sections.some(section => section.id === 'myPortfolio')) return 'myPortfolio'; // PREVIEW: nueva home
   if(sections.some(section => section.id === 'overview')) return 'overview';
@@ -3980,6 +3991,11 @@ function activateModuleTab(id, options={}){
     section.setAttribute('aria-hidden', active ? 'false' : 'true');
   });
   renderModuleTabButtons(activeId);
+  renderPmoCrumbs(activeId);
+  // PREVIEW: la URL refleja la página actual, para poder compartir el link directo.
+  if(!IS_PMO_PRODUCTION && location.hash.slice(1) !== activeId){
+    try{ history.replaceState(null, '', '#' + activeId); }catch(e){}
+  }
   if(activeId === 'psaProjectStatus') loadPsaProjectStatus();
   if(options.scroll !== false){
     const main = document.querySelector('main');
@@ -3997,6 +4013,68 @@ function activateModuleTab(id, options={}){
     }
   }
 }
+// ── Navigation path (breadcrumbs) · PREVIEW ONLY ─────────────────────────
+// "PMO Board / <Grupo> / <Página>", armado desde sidebarNavConfig() (el mismo árbol del menú).
+function pmoNavPath(id){
+  const walk = (items, trail) => {
+    for(const item of items || []){
+      if(item.children){
+        const found = walk(item.children, trail.concat(item));
+        if(found) return found;
+      } else if(item.id === id && !item.action){
+        return trail.concat(item);
+      }
+    }
+    return null;
+  };
+  return walk(sidebarNavConfig(), []) || [];
+}
+function pmoFirstSectionIn(entry, available){
+  const first = moduleLeafItems(entry).find(item => !item.action && available.has(item.id));
+  return first ? first.id : '';
+}
+function pmoHomeSectionId(available){
+  return ['myPortfolio', 'overview'].find(id => available.has(id)) || '';
+}
+function pmoCrumbButton(id, label){
+  const safeId = String(id).replace(/[^A-Za-z0-9_-]/g, '');
+  return `<button type="button" onclick="activateModuleTab('${safeId}')">${esc(label)}</button>`;
+}
+function renderPmoCrumbs(activeId){
+  if(IS_PMO_PRODUCTION) return;
+  document.querySelectorAll('main > section > .pmo-crumbs').forEach(el => el.remove());
+  const section = document.getElementById(activeId);
+  if(!section) return;
+  const available = new Set(uniqueModuleSections().map(s => s.id));
+  const path = pmoNavPath(activeId);
+  const homeId = pmoHomeSectionId(available);
+  const parts = [homeId && homeId !== activeId ? pmoCrumbButton(homeId, 'PMO Board') : '<span>PMO Board</span>'];
+  path.slice(0, -1).forEach(group => {
+    const first = pmoFirstSectionIn(group, available);
+    parts.push(first && first !== activeId ? pmoCrumbButton(first, group.label) : `<span>${esc(group.label)}</span>`);
+  });
+  // Páginas fuera del menú (ej. Help & changelog): se usa el título de la sección.
+  const leaf = path.length ? path[path.length - 1].label : String(section.querySelector('.sec-head h2')?.textContent || activeId).trim();
+  parts.push(`<b aria-current="page">${esc(leaf)}</b>`);
+  const nav = document.createElement('nav');
+  nav.className = 'pmo-crumbs';
+  nav.setAttribute('aria-label', 'Navigation path');
+  nav.innerHTML = parts.join('<span class="pmo-crumbs-sep" aria-hidden="true">/</span>');
+  section.insertBefore(nav, section.firstChild);
+}
+// Link directo: #<id de sección>. Solo si existe y el rol actual la puede ver.
+function pmoHashSectionId(){
+  if(IS_PMO_PRODUCTION) return '';
+  let id = '';
+  try{ id = decodeURIComponent(String(location.hash || '').slice(1)); }catch(e){ return ''; }
+  if(!/^[A-Za-z][A-Za-z0-9_-]*$/.test(id)) return '';
+  return uniqueModuleSections().some(section => section.id === id) ? id : '';
+}
+window.addEventListener('hashchange', () => {
+  const id = pmoHashSectionId();
+  if(id && id !== activeModuleTabId()) activateModuleTab(id);
+});
+
 function applyLayoutSidebar(collapsed){
   document.body.classList.toggle('sidebar-collapsed', false);
   const btn = document.getElementById('sidebarToggle');
