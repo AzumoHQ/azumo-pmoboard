@@ -1,4 +1,4 @@
-const { addNote, deleteNote, getNotes, getBenchPm, setBenchPm, getClientProjects, setClientProjects } = require('../lib/data-store');
+const { addNote, deleteNote, getNotes, getBenchPm, setBenchPm, getClientProjects, setClientProjects, getExtensionForecast, setExtensionForecast } = require('../lib/data-store');
 const { createPmoActionIssue } = require('../lib/jira-client');
 const { canRefresh, getSessionUser } = require('../lib/auth');
 
@@ -41,7 +41,9 @@ module.exports = async function notesHandler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      res.status(200).json({ notes: await getNotes(), bench_pm: await getBenchPm(), client_projects: await getClientProjects() });
+      // extension_forecast falla suave: si la tabla da error, el resto de /api/notes sigue andando.
+      const extensionForecast = await getExtensionForecast().catch((error) => { console.error('extension forecast read failed:', error.message); return []; });
+      res.status(200).json({ notes: await getNotes(), bench_pm: await getBenchPm(), client_projects: await getClientProjects(), extension_forecast: extensionForecast });
       return;
     }
 
@@ -63,6 +65,17 @@ module.exports = async function notesHandler(req, res) {
       if (note.type === 'client_projects') {
         const saved = await setClientProjects(note, access.user?.email || '');
         res.status(200).json({ client_projects: saved });
+        return;
+      }
+
+      // Forecast — probabilidad de extensión + nuevo end date estimado: solo PMO escribe; todos leen via GET.
+      if (note.type === 'extension_forecast') {
+        try {
+          const saved = await setExtensionForecast(note, access.user?.email || '');
+          res.status(200).json({ extension_forecast: saved });
+        } catch (error) {
+          res.status(400).json({ error: error.message });
+        }
         return;
       }
 

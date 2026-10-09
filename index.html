@@ -523,6 +523,18 @@ main>section.tab-section-active{animation:tabFade .18s ease-out}
 .delta-flat{color:var(--muted);background:var(--lf-muted-a10,rgba(107,143,191,.1))}
 /* FORECAST */
 .forecast-wrap{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);padding:1.5rem}
+/* Forecast · extension likelihood (preview) */
+.ext-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;vertical-align:middle;flex:0 0 10px}
+.ext-dot.red{background:var(--lf-neg,#EF4444)}.ext-dot.yellow{background:var(--lf-forecast,#F59E0B)}.ext-dot.green{background:var(--lf-pos,#10B981)}
+.ext-input{background:var(--surf);border:1px solid var(--brd);color:var(--txt);border-radius:8px;padding:4px 8px;font:inherit;font-size:.78rem;outline:none;vertical-align:middle}
+.ext-pct-input{width:68px}
+.ext-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,102,255,.12)}
+.ext-input.ext-ok{border-color:var(--lf-pos,#10B981)}.ext-input.ext-err{border-color:var(--lf-neg,#EF4444)}
+.ext-pct{font-weight:800;font-size:.8rem}
+.ext-legend{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 1rem;font-size:.76rem;color:var(--muted)}
+.ext-legend-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--brd);background:var(--surf);color:var(--txt);border-radius:999px;padding:4px 10px;font:inherit;font-size:.74rem;font-weight:800;cursor:pointer}
+.ext-legend-chip .ext-dot{margin-right:0}
+.ext-legend-chip.active{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
 .forecast-filters{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin:0 0 1rem}
 .filter-field{display:flex;flex-direction:column;gap:5px;min-width:220px}
 .filter-field label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
@@ -2480,6 +2492,7 @@ if(window.PMO_LF){ try{
 
   <div class="forecast-wrap">
     <p style="font-size:.82rem;color:var(--muted);margin-bottom:1.2rem">In Progress assignment due dates grouped by month. Each Jira assignment key counts once; overdue rows remain visible until updated.</p>
+    <div class="ext-legend" id="extLegend" data-preview-only></div>
 
     <div class="forecast-filters" aria-label="Forecast filters">
       <div class="filter-field">
@@ -2506,7 +2519,7 @@ if(window.PMO_LF){ try{
     </div>
     <div class="forecast-chart" id="forecastChart"></div>
     <div class="fc-table-wrap">
-      <table><thead><tr><th>Due Date</th><th>Month</th><th>Client</th><th>Assignee</th><th>Position</th><th>Assignment</th></tr></thead>
+      <table><thead><tr><th>Due Date</th><th data-preview-only>Extension %</th><th data-preview-only>Est. new end</th><th>Month</th><th>Client</th><th>Assignee</th><th>Position</th><th>Assignment</th></tr></thead>
       <tbody id="forecastTbody"></tbody></table>
     </div>
   </div>
@@ -12215,13 +12228,132 @@ function setForecastFilter(field, value){
 }
 function resetForecastFilters(){
   forecastFilters = {client:'', position:'', month:'', assignee:''};
+  extLevelFilter = '';
   renderForecast();
 }
 function forecastRowMatches(row){
   return msHas(forecastFilters.client, row.client || '')
     && msHas(forecastFilters.position, row.position || '')
-    && (!forecastFilters.assignee || (row.assignee || '').toLowerCase().includes(forecastFilters.assignee.toLowerCase()));
+    && (!forecastFilters.assignee || (row.assignee || '').toLowerCase().includes(forecastFilters.assignee.toLowerCase()))
+    && (IS_PMO_PRODUCTION || !extLevelFilter || extLevelForRow(row) === extLevelFilter);
 }
+
+// ── Forecast · extension likelihood (PREVIEW ONLY) ──────────────────────
+// Probabilidad (0–100%) de que el assignment se extienda + nuevo end date estimado, por AA key.
+// Guardado en Neon (pmo_extension_forecast) via /api/notes type 'extension_forecast'. PMO edita; el resto lee.
+// Sin valor = ROJO a propósito, para que se actualice activamente.
+// Rojo 0–39% · Amarillo 40–69% · Verde 70–100%.
+let extensionForecast = new Map();   // AA key -> {probability, est_end_date, updated_by, updated_at}
+let extensionForecastLoaded = false;
+let extensionForecastLoading = null;
+let extLevelFilter = '';             // '' | 'red' | 'yellow' | 'green'
+function loadExtensionForecast(){
+  if(IS_PMO_PRODUCTION || location.protocol === 'file:' || !currentUser) return Promise.resolve();
+  if(extensionForecastLoading) return extensionForecastLoading;
+  extensionForecastLoading = (async () => {
+    try{
+      const response = await fetch('/api/notes', {cache:'no-store', credentials:'same-origin'});
+      if(response.ok){
+        const result = await response.json().catch(()=>({}));
+        const map = new Map();
+        (result.extension_forecast || []).forEach(row => { if(row && row.key) map.set(String(row.key).toUpperCase(), row); });
+        extensionForecast = map;
+        extensionForecastLoaded = true;
+      }
+    }catch(e){ /* sin red: todo queda en rojo */ }
+    finally{ extensionForecastLoading = null; }
+  })();
+  return extensionForecastLoading;
+}
+function extLevel(p){
+  if(p === null || p === undefined || String(p).trim() === '' || !Number.isFinite(Number(p))) return 'red';
+  const n = Number(p);
+  return n >= 70 ? 'green' : n >= 40 ? 'yellow' : 'red';
+}
+function extLevelForRow(row){
+  const saved = extensionForecast.get(String(row.key || '').toUpperCase());
+  return extLevel(saved ? saved.probability : null);
+}
+function extLevelLabel(level){
+  return level === 'green' ? 'Likely to extend (70–100%)' : level === 'yellow' ? 'Uncertain (40–69%)' : 'Likely to be released (0–39%)';
+}
+function setExtLevelFilter(level){
+  extLevelFilter = extLevelFilter === level ? '' : level;
+  renderForecast();
+}
+function renderExtensionLegend(){
+  const box = document.getElementById('extLegend');
+  if(!box || IS_PMO_PRODUCTION) return;
+  // Conteo sobre los assignments con los demás filtros aplicados (sin el filtro de color).
+  const fc = latest.forecast || {};
+  const rows = Object.keys(fc)
+    .filter(month => msHas(forecastFilters.month, month))
+    .flatMap(month => scopedForecastRows(fc[month] || []))
+    .filter(row => msHas(forecastFilters.client, row.client || '')
+      && msHas(forecastFilters.position, row.position || '')
+      && (!forecastFilters.assignee || (row.assignee || '').toLowerCase().includes(forecastFilters.assignee.toLowerCase())));
+  const counts = {red:0, yellow:0, green:0};
+  let notSet = 0;
+  rows.forEach(row => {
+    counts[extLevelForRow(row)]++;
+    const saved = extensionForecast.get(String(row.key || '').toUpperCase());
+    if(!saved || saved.probability === null || saved.probability === undefined) notSet++;
+  });
+  const chip = (level, name) => `<button type="button" class="ext-legend-chip${extLevelFilter === level ? ' active' : ''}" title="${esc(extLevelLabel(level))} · click to filter" onclick="setExtLevelFilter('${level}')"><span class="ext-dot ${level}"></span>${name} · ${counts[level]}</button>`;
+  box.innerHTML = `<strong style="color:var(--txt);font-weight:800">Extension likelihood</strong>
+    ${chip('red', '0–39%')}${chip('yellow', '40–69%')}${chip('green', '70–100%')}
+    <span>${notSet ? `${notSet} not set yet (shown as red)` : 'All set'}${canRunRefresh() ? '' : ' · PMO updates these values'}</span>`;
+}
+function extCellsHTML(a){
+  const key = String(a.key || '').toUpperCase();
+  const empty = '<td data-preview-only><span style="color:var(--muted)">—</span></td>';
+  if(IS_PMO_PRODUCTION) return empty + empty;
+  if(!/^AA-\d+$/.test(key)) return empty + empty;
+  const saved = extensionForecast.get(key) || {};
+  const p = saved.probability === null || saved.probability === undefined ? '' : String(saved.probability);
+  const level = extLevel(p);
+  const title = `${extLevelLabel(level)}${p === '' ? ' · not set yet' : ''}${saved.updated_by ? ' · updated by ' + saved.updated_by : ''}`;
+  const dot = `<span class="ext-dot ${level}" title="${esc(title)}"></span>`;
+  if(!canRunRefresh()){
+    return `<td data-preview-only style="white-space:nowrap">${dot}<span class="ext-pct">${p === '' ? 'Not set' : esc(p) + '%'}</span></td>
+      <td data-preview-only style="white-space:nowrap">${saved.est_end_date ? fmtDate(saved.est_end_date) : '<span style="color:var(--muted)">—</span>'}</td>`;
+  }
+  return `<td data-preview-only style="white-space:nowrap">${dot}<input class="ext-input ext-pct-input" type="number" min="0" max="100" step="5" placeholder="%" value="${esc(p)}" aria-label="Extension probability for ${esc(key)}" onchange='saveExtensionForecast(${jsArg(key)}, this)'/></td>
+    <td data-preview-only><input class="ext-input ext-date-input" type="date" value="${esc(saved.est_end_date || '')}" aria-label="Estimated new end date for ${esc(key)}" onchange='saveExtensionForecast(${jsArg(key)}, this)'/></td>`;
+}
+async function saveExtensionForecast(key, el){
+  const tr = el.closest('tr');
+  const pctInput = tr ? tr.querySelector('.ext-pct-input') : null;
+  const dateInput = tr ? tr.querySelector('.ext-date-input') : null;
+  const raw = pctInput ? pctInput.value.trim() : '';
+  [pctInput, dateInput].forEach(i => { if(i){ i.classList.remove('ext-err','ext-ok'); i.title = ''; } });
+  if(raw !== '' && (!Number.isFinite(Number(raw)) || Number(raw) < 0 || Number(raw) > 100)){
+    if(pctInput){ pctInput.classList.add('ext-err'); pctInput.title = 'Enter a number between 0 and 100'; }
+    return;
+  }
+  try{
+    const response = await fetch('/api/notes', {
+      method:'POST', credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({type:'extension_forecast', key, probability: raw === '' ? null : Number(raw), est_end_date: dateInput ? dateInput.value : ''})
+    });
+    const result = await response.json().catch(()=>({}));
+    if(!response.ok) throw new Error(result.error || ('HTTP ' + response.status));
+    const saved = result.extension_forecast || {};
+    if((saved.probability === null || saved.probability === undefined) && !saved.est_end_date) extensionForecast.delete(key);
+    else extensionForecast.set(key, saved);
+    const dot = tr ? tr.querySelector('.ext-dot') : null;
+    if(dot){ const level = extLevel(saved.probability); dot.className = `ext-dot ${level}`; dot.title = extLevelLabel(level); }
+    el.classList.add('ext-ok');
+    setTimeout(() => el.classList.remove('ext-ok'), 1200);
+    renderExtensionLegend();
+  }catch(error){
+    el.classList.add('ext-err');
+    el.title = 'Not saved: ' + error.message;
+  }
+}
+window.setExtLevelFilter = setExtLevelFilter;
+window.saveExtensionForecast = saveExtensionForecast;
 function filteredForecastByMonth(){
   const fc = latest.forecast || {};
   return Object.fromEntries(
@@ -12252,6 +12384,11 @@ function renderForecast(){
   const sourceTag = document.getElementById('forecastSourceTag');
   if(sourceTag) sourceTag.textContent = source;
   renderForecastFilterControls();
+  // Preview: carga una vez los valores de extensión y vuelve a pintar.
+  if(!IS_PMO_PRODUCTION && !extensionForecastLoaded && !extensionForecastLoading){
+    loadExtensionForecast().then(() => { if(extensionForecastLoaded) renderForecast(); });
+  }
+  renderExtensionLegend();
 
   const allItems = allForecastItems();
   const fc = filteredForecastByMonth();
@@ -12274,7 +12411,7 @@ function renderForecast(){
   const tbody = document.getElementById('forecastTbody');
   if(!months.length){
     chart.innerHTML='<p style="color:var(--muted)">No forecast rows match the selected filters.</p>';
-    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--muted)">No assignments match the selected filters</td></tr>';
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:1rem;color:var(--muted)">No assignments match the selected filters</td></tr>';
     return;
   }
 
@@ -12326,6 +12463,7 @@ ${esc(detail + more)}">
     const assignee = a.assignee ? `<button class="inline-filter" onclick='setForecastFilter("assignee", ${jsArg(a.assignee)})'>${esc(a.assignee)}</button>` : '<span style="color:var(--muted)">Unassigned</span>';
     return `<tr>
       <td style="white-space:nowrap"><span class="${a.due ? expCls(a.due) : ''}">${fmtDate(a.due)}</span></td>
+      ${extCellsHTML(a)}
       <td style="font-weight:600;white-space:nowrap"><button class="inline-filter" onclick='setForecastFilter("month", ${jsArg(a.month || String(a.due || '').slice(0,7))})'>${monthLabel}</button></td>
       <td style="color:var(--txt);font-weight:600">${client}</td>
       <td style="white-space:nowrap">${assignee}</td>
