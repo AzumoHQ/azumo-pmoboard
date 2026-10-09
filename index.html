@@ -536,16 +536,16 @@ main>section.tab-section-active{animation:tabFade .18s ease-out}
 .ext-legend-chip .ext-dot{margin-right:0}
 .ext-legend-chip.active{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
 /* Navigation path: texto en la barra superior, junto a la marca. Sin caja ni fondo: color de la página. */
-/* Navigation path: franja fina debajo de la barra superior. Texto plano en el color de la página, sin caja. */
-#pmoNavPath{display:flex;align-items:center;gap:6px;flex:1 1 0;min-width:0;margin:0 0 0 4px;padding:0 0 0 16px;border-left:1px solid var(--brd);font-size:14px;font-weight:500;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:none;box-shadow:none}
-/* Sin lugar: queda solo el logo de azumo, el path pasa a ocupar ese espacio y el menú no se mueve */
-@media(max-width:1000px){.nav-brand-copy{display:none!important}}
+/* Navigation path: línea discreta bajo el título de cada página. 12px, color muted, sin caja ni negrita. */
+#pmoNavPath{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:-.4rem 0 .75rem;font-size:12px;font-weight:400;line-height:1.3;color:var(--muted);background:none;border:0;box-shadow:none}
 #pmoNavPath:empty{display:none}
-#pmoNavPath button{all:unset;cursor:pointer;color:var(--txt);opacity:.7;font:inherit;padding:2px;border-radius:4px}
-#pmoNavPath button:hover{opacity:1;text-decoration:underline}
-#pmoNavPath button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-#pmoNavPath .pmo-crumbs-sep{display:inline-flex;align-items:center;opacity:.5}
-#pmoNavPath b{font-weight:700;color:var(--txt)}
+#pmoNavPath button{all:unset;cursor:pointer;color:var(--muted);font:inherit;padding:1px 2px;border-radius:4px}
+#pmoNavPath button:hover{color:var(--txt);text-decoration:underline}
+#pmoNavPath button:focus-visible{outline:1px solid var(--blue);outline-offset:2px}
+#pmoNavPath .pmo-crumbs-sep{display:inline-flex;align-items:center;color:var(--muted);opacity:.7}
+#pmoNavPath b{font-weight:400;color:var(--txt)}
+/* Donde la página ya trae su propio path (ficha de account, detalle de proceso) no se duplica */
+#accountsHub:has(.ah-crumbs) #pmoNavPath,#processes:has(.pp-crumbs) #pmoNavPath{display:none}
 /* Si la página ya tiene su propio path (ficha de account, detalle de proceso), no se duplica */
 #accountsHub:has(.ah-crumbs) > .pmo-crumbs,#processes:has(.pp-crumbs) > .pmo-crumbs{display:none}
 /* Sin pills destacadas en las cabeceras de sección (la versión de Help queda visible) */
@@ -1655,7 +1655,6 @@ if(window.PMO_LF){ try{
       <a href="#" onclick="goTo(window.PMO_PREVIEW ? 'myPortfolio' : 'overview');return false;" style="text-decoration:none;display:flex"><div class="nav-logo"><img class="nav-wordmark" src="assets/azumo-logo.png" alt="Azumo"/></div></a>
       <div class="nav-brand-copy"><div class="nav-title-row"><div class="nav-title">PMO Board</div><div class="nav-wip-pill"><span id="pmoVersionNav">v3.3</span><a href="mailto:federica.gonzalez@azumo.co?subject=PMO%20Board%20feedback">Feedback</a></div></div><div class="nav-sub">Operations Command Center</div></div>
     </div>
-    <div id="pmoNavPath" class="pmo-path-slot" aria-label="Navigation path"></div>
     <div class="nav-links">
       <button class="nav-link" id="overviewNavLink" onclick="goTo('overview')">Overview</button>
       <button class="nav-link" id="billingNavLink" onclick="goTo('dashboard')"><i class="ti ti-credit-card"></i> Billing</button>
@@ -4050,8 +4049,13 @@ function pmoCrumbButton(id, label){
   return `<button type="button" onclick="activateModuleTab('${safeId}')">${esc(label)}</button>`;
 }
 function renderPmoCrumbs(activeId){
-  const slot = document.getElementById('pmoNavPath');
-  if(!slot) return;
+  let slot = document.getElementById('pmoNavPath');
+  if(!slot){
+    slot = document.createElement('div');
+    slot.id = 'pmoNavPath';
+    slot.setAttribute('role', 'navigation');
+    slot.setAttribute('aria-label', 'Navigation path');
+  }
   const available = new Set(uniqueModuleSections().map(s => s.id));
   const path = pmoNavPath(activeId);
   const section = document.getElementById(activeId);
@@ -4064,8 +4068,12 @@ function renderPmoCrumbs(activeId){
   // Página actual; páginas fuera del menú usan el título de la sección.
   const leaf = path.length ? path[path.length - 1].label : String((section && section.querySelector('.sec-head h2')?.textContent) || activeId).trim();
   parts.push(`<b aria-current="page">${esc(leaf)}</b>`);
-  const chevron = '<span class="pmo-crumbs-sep" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>';
+  const chevron = '<span class="pmo-crumbs-sep" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>';
   slot.innerHTML = parts.join(chevron);
+  // Bajo el título de la página (si no hay cabecera, al principio de la sección)
+  const head = section && section.querySelector(':scope > .sec-head');
+  if(head) head.after(slot);
+  else if(section) section.insertBefore(slot, section.firstChild);
 }
 // Link directo: #<id de sección>. Solo si existe y el rol actual la puede ver.
 function pmoHashSectionId(){
