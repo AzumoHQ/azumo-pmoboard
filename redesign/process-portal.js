@@ -244,6 +244,13 @@
     m.steps.forEach(function(s){ add((s.role || '').trim()); });
     return lanes.filter(function(l){ return m.steps.some(function(s){ return (norm(s.role) || '__none') === l.k; }) || l.k !== '__none'; });
   }
+  // Lanes for the flow diagram only: roles that have steps, ordered by their first step,
+  // so connectors never cross empty lanes. (Roles card and KPIs keep using lanesOf.)
+  function flowLanes(m){
+    var lanes = lanesOf(m), first = {};
+    m.steps.forEach(function(s, i){ var k = norm(s.role) || '__none'; if(first[k] == null) first[k] = i; });
+    return lanes.filter(function(l){ return first[l.k] != null; }).sort(function(a, b){ return first[a.k] - first[b.k]; });
+  }
   function issues(m){
     var out = [];
     if(!m.steps.length) out.push('no steps yet');
@@ -389,7 +396,7 @@
   }
 
   // flow
-  var CARD_W = 172, CARD_H = 74, COL = 196, LANE_H = 98, LABEL_W = 150;
+  var CARD_W = 172, CARD_H = 92, COL = 196, LANE_H = 116, LABEL_W = 150;
   function flowHtml(m, edit){
     var days = m.steps.reduce(function(a, s){ return a + num(s.days); }, 0);
     var head = '<div class="pp-card-head pp-head-row"><div><div class="pp-card-title">Process flow</div><div class="pp-card-sub">' +
@@ -409,13 +416,13 @@
       var badges = (ctl ? '<span class="pp-pill is-warn">' + (s.node_type === 'decision' ? 'Decision' : 'Approval') + '</span>' : '') + ((s.has_auto || s.automation_url) ? '<span class="pp-auto" title="Automated step">⚡</span>' : '');
       return '<button type="button" class="pp-node' + (ctl ? ' is-ctl' : '') + (sel ? ' is-sel' : '') + '" data-k="' + s._k + '" data-act="select" style="' + style + '" aria-pressed="' + (sel ? 'true' : 'false') + '">' +
         '<span class="pp-node-top"><span class="pp-node-num mono">' + pad(i) + '</span>' + badges + '</span>' +
-        '<span class="pp-node-title">' + H(s.title || 'Untitled step') + '</span>' +
+        '<span class="pp-node-title" title="' + H(s.title || '') + '">' + H(s.title || 'Untitled step') + '</span>' +
         '<span class="pp-node-meta">' + meta + '</span></button>';
     };
     if(view.layout === 'linear'){
       return head + '<div class="pp-flow pp-flow-linear" data-flow>' + m.steps.map(function(s, i){ return card(s, i, '') + (i < m.steps.length - 1 ? '<span class="pp-arrow" aria-hidden="true">→</span>' : ''); }).join('') + '</div>';
     }
-    var lanes = lanesOf(m), li = {};
+    var lanes = flowLanes(m), li = {};
     lanes.forEach(function(l, i){ li[l.k] = i; });
     var W = LABEL_W + 20 + m.steps.length * COL + 10, Hh = lanes.length * LANE_H;
     var lanesHtml = lanes.map(function(l, i){
@@ -430,7 +437,7 @@
   }
   function drawConnectors(){
     var svg = $('.pp-wires', root); if(!svg || view.layout !== 'lanes') return;
-    var m = view.p, lanes = lanesOf(m), li = {}; lanes.forEach(function(l, i){ li[l.k] = i; });
+    var m = view.p, lanes = flowLanes(m), li = {}; lanes.forEach(function(l, i){ li[l.k] = i; });
     var cx = function(i){ return LABEL_W + 20 + i * COL; }, cy = function(s){ return (li[norm(s.role) || '__none'] || 0) * LANE_H + LANE_H / 2; };
     var pos = {}; m.steps.forEach(function(s, i){ pos[s._k] = i; });
     var out = '<defs><marker id="ppArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--muted)"/></marker>' +
@@ -488,7 +495,7 @@
         '<label class="pp-field"><span class="pp-label">Type</span><select class="pp-input" data-sf="node_type">' + TYPES.map(function(t){ return opt(t.v, t.l, s.node_type || 'task'); }).join('') +
           (TYPE_LABEL[s.node_type] && !TYPES.some(function(t){ return t.v === s.node_type; }) ? opt(s.node_type, TYPE_LABEL[s.node_type], s.node_type) : '') + '</select></label>' +
         '<label class="pp-field"><span class="pp-label">Deliverable</span><input class="pp-input" data-sf="outputs" value="' + H(s.outputs || '') + '" placeholder="Signed contract, staffing confirmed…"></label>' +
-        '<label class="pp-field"><span class="pp-label">Days</span><input class="pp-input mono" data-sf="days" type="number" min="0" step="0.5" value="' + H(s.days == null ? '' : s.days) + '" placeholder="—"></label>' +
+        '<label class="pp-field" title="Estimated time this step takes, in days (0.5 = half a day). Adds up to the process estimated duration."><span class="pp-label">Duration (days)</span><input class="pp-input mono" data-sf="days" type="number" min="0" step="0.5" value="' + H(s.days == null ? '' : s.days) + '" placeholder="—"></label>' +
         '<label class="pp-field pp-span2"><span class="pp-label">Description (optional)</span><textarea class="pp-input pp-area" data-sf="desc" rows="2" placeholder="When · Input · Do · Output">' + H(s.desc || '') + '</textarea></label>' +
         (dec ? '<label class="pp-field"><span class="pp-label">If yes →</span><select class="pp-input" data-sf="_yes">' + targets(s._yes || '') + '</select></label>' +
                '<label class="pp-field"><span class="pp-label">If no →</span><select class="pp-input" data-sf="_no">' + opt('', '— no “No” path —', s._no || '') + m.steps.map(function(t, j){ return t._k === s._k ? '' : opt(t._k, pad(j) + ' · ' + (t.title || 'Untitled'), s._no || ''); }).join('') + opt('END', 'End of process', s._no || '') + '</select></label>' : '') +
