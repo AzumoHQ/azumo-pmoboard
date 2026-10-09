@@ -535,15 +535,19 @@ main>section.tab-section-active{animation:tabFade .18s ease-out}
 .ext-legend-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--brd);background:var(--surf);color:var(--txt);border-radius:999px;padding:4px 10px;font:inherit;font-size:.74rem;font-weight:800;cursor:pointer}
 .ext-legend-chip .ext-dot{margin-right:0}
 .ext-legend-chip.active{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
-/* Navigation path (preview) */
-.pmo-crumbs{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0 0 .85rem;font-size:13px;color:var(--muted);line-height:1.3}
-.pmo-crumbs button{all:unset;cursor:pointer;color:var(--muted);font:inherit}
-.pmo-crumbs button:hover{color:var(--blue-lt,var(--blue))}
-.pmo-crumbs button:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
-.pmo-crumbs-sep{opacity:.6}
-.pmo-crumbs b{color:var(--ink,var(--txt));font-weight:500}
+/* Navigation path · estilo azumo.com (barra oscura, chevrons). Visible en preview y producción. */
+.pmo-crumbs{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:0 0 1rem;padding:9px 16px;width:fit-content;max-width:100%;border-radius:999px;background:#0E1A2E;color:rgba(255,255,255,.72);font-size:13px;font-weight:500;line-height:1.3;box-shadow:0 6px 18px rgba(14,26,46,.18)}
+.pmo-crumbs button{all:unset;cursor:pointer;color:rgba(255,255,255,.72);font:inherit;padding:2px 6px;border-radius:6px}
+.pmo-crumbs button:hover{color:#fff;background:rgba(255,255,255,.08)}
+.pmo-crumbs button:focus-visible{outline:2px solid #3385FF;outline-offset:2px}
+.pmo-crumbs-sep{display:inline-flex;align-items:center;opacity:.55;font-size:12px;margin:0 2px}
+.pmo-crumbs b{color:#fff;font-weight:700;padding:2px 6px}
 /* Si la página ya tiene su propio path (ficha de account, detalle de proceso), no se duplica */
 #accountsHub:has(.ah-crumbs) > .pmo-crumbs,#processes:has(.pp-crumbs) > .pmo-crumbs{display:none}
+/* Sin pills destacadas en las cabeceras de sección (la versión de Help queda visible) */
+.sec-tag:not(#helpVersionTag){display:none!important}
+/* Harvest Hours Control: sin badge "Harvest API" */
+#harvestHours .tbl-head{display:none}
 .forecast-filters{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin:0 0 1rem}
 .filter-field{display:flex;flex-direction:column;gap:5px;min-width:220px}
 .filter-field label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
@@ -3993,7 +3997,7 @@ function activateModuleTab(id, options={}){
   renderModuleTabButtons(activeId);
   renderPmoCrumbs(activeId);
   // PREVIEW: la URL refleja la página actual, para poder compartir el link directo.
-  if(!IS_PMO_PRODUCTION && location.hash.slice(1) !== activeId){
+  if(location.hash.slice(1) !== activeId){
     try{ history.replaceState(null, '', '#' + activeId); }catch(e){}
   }
   if(activeId === 'psaProjectStatus') loadPsaProjectStatus();
@@ -4041,7 +4045,6 @@ function pmoCrumbButton(id, label){
   return `<button type="button" onclick="activateModuleTab('${safeId}')">${esc(label)}</button>`;
 }
 function renderPmoCrumbs(activeId){
-  if(IS_PMO_PRODUCTION) return;
   document.querySelectorAll('main > section > .pmo-crumbs').forEach(el => el.remove());
   const section = document.getElementById(activeId);
   if(!section) return;
@@ -4059,12 +4062,11 @@ function renderPmoCrumbs(activeId){
   const nav = document.createElement('nav');
   nav.className = 'pmo-crumbs';
   nav.setAttribute('aria-label', 'Navigation path');
-  nav.innerHTML = parts.join('<span class="pmo-crumbs-sep" aria-hidden="true">/</span>');
+  nav.innerHTML = parts.join('<span class="pmo-crumbs-sep" aria-hidden="true"><i class="ti ti-chevron-right"></i></span>');
   section.insertBefore(nav, section.firstChild);
 }
 // Link directo: #<id de sección>. Solo si existe y el rol actual la puede ver.
 function pmoHashSectionId(){
-  if(IS_PMO_PRODUCTION) return '';
   let id = '';
   try{ id = decodeURIComponent(String(location.hash || '').slice(1)); }catch(e){ return ''; }
   if(!/^[A-Za-z][A-Za-z0-9_-]*$/.test(id)) return '';
