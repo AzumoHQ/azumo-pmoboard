@@ -4059,8 +4059,10 @@ function renderPmoCrumbs(activeId){
   // Páginas fuera del menú (ej. Help & changelog): se usa el título de la sección.
   const leaf = path.length ? path[path.length - 1].label : String(section.querySelector('.sec-head h2')?.textContent || activeId).trim();
   parts.push(`<b aria-current="page">${esc(leaf)}</b>`);
-  const nav = document.createElement('nav');
+  // <div>, no <nav>: el board tiene reglas globales para nav (barra superior blanca/sticky).
+  const nav = document.createElement('div');
   nav.className = 'pmo-crumbs';
+  nav.setAttribute('role', 'navigation');
   nav.setAttribute('aria-label', 'Navigation path');
   nav.innerHTML = parts.join('<span class="pmo-crumbs-sep" aria-hidden="true"><i class="ti ti-chevron-right"></i></span>');
   section.insertBefore(nav, section.firstChild);
